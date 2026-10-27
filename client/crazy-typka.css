@@ -1,0 +1,224 @@
+.crazy-chat {
+  min-width: 0;
+  background: #fafbf5;
+  border: 1px solid #d8e0d0;
+  border-radius: 20px;
+  padding: 24px;
+  color: #193c30;
+}
+.crazy-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.crazy-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  margin: 0;
+}
+.crazy-heading p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #62735c;
+}
+.crazy-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: #e2edc7;
+  font-size: 28px;
+  color: #47632c;
+}
+.crazy-ai-badge {
+  display: inline-block;
+  padding: 3px 6px;
+  border: 1px solid #abbea0;
+  border-radius: 5px;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #3e5d31;
+  background: #ecf2e4;
+  vertical-align: middle;
+}
+.crazy-chat .crazy-definition,
+.crazy-chat .crazy-disclosure {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #5f6d59;
+  margin: 0 0 10px;
+}
+.crazy-availability {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 12px;
+  color: #546947;
+  border-top: 1px solid #e2e7d9;
+}
+.crazy-availability button {
+  padding: 5px 9px;
+  font-size: 11px;
+}
+.crazy-availability.disabled,
+.crazy-availability.error {
+  color: #785a2b;
+}
+.crazy-starters {
+  margin: 10px 0 20px;
+}
+.crazy-starters > p {
+  font-size: 13px;
+  margin: 0 0 9px;
+}
+.crazy-starters > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.crazy-starters button {
+  text-align: left;
+  font-size: 11px;
+  padding: 8px 10px;
+  border-radius: 9px;
+}
+.crazy-log {
+  display: grid;
+  gap: 12px;
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 10px 0 18px;
+  padding: 2px;
+}
+.crazy-message {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: #eaf0e2;
+  overflow-wrap: anywhere;
+}
+.crazy-message.user {
+  margin-left: 24px;
+  background: #f0f0e9;
+}
+.crazy-message > strong {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+}
+.crazy-message p {
+  white-space: pre-wrap;
+  font-size: 13px;
+  margin: 7px 0 0;
+}
+.crazy-sources {
+  border-top: 1px solid #d6e0ca;
+  padding-top: 10px;
+  margin-top: 12px;
+  font-size: 11px;
+}
+.crazy-sources summary {
+  cursor: pointer;
+}
+.crazy-sources ul {
+  padding-left: 16px;
+  margin: 10px 0 0;
+}
+.crazy-sources li + li {
+  margin-top: 9px;
+}
+.crazy-sources a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.crazy-sources small {
+  display: block;
+  color: #57694d;
+  line-height: 1.5;
+  margin-top: 3px;
+}
+.crazy-form label {
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+.crazy-form textarea {
+  resize: vertical;
+  min-height: 72px;
+  max-height: 200px;
+  font-size: 13px;
+}
+.crazy-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.crazy-form-actions small {
+  flex: 1;
+  color: #64705d;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.crazy-form-actions button {
+  white-space: nowrap;
+}
+.crazy-reset {
+  font-size: 11px;
+  background: transparent;
+  border: 0;
+  padding: 8px 0 0;
+  margin-top: 8px;
+  text-decoration: underline;
+}
+.crazy-chat .crazy-working {
+  font-size: 12px;
+  margin: 12px 0;
+  color: #4d643e;
+}
+.crazy-chat button:focus-visible,
+.crazy-chat a:focus-visible,
+.crazy-chat summary:focus-visible {
+  outline: 3px solid #597b43;
+  outline-offset: 3px;
+}
+@media (max-width: 460px) {
+  .crazy-chat {
+    padding: 18px;
+  }
+  .crazy-heading h2 {
+    font-size: 20px;
+  }
+  .crazy-form-actions {
+    flex-wrap: wrap;
+  }
+}
+
+.crazy-channel-switch {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.crazy-channel-switch button {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+}
+.crazy-channel-switch button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.game-ai-chat .crazy-chat {
+  padding: 16px;
+  border-radius: 14px;
+}

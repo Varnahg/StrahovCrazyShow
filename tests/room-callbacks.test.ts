@@ -58,6 +58,7 @@ const callbackNames = [
   "reconnect",
   "enter",
   "leave",
+  "openHumanChat",
 ];
 const callbackSource = callbackNames.map((name) => {
   const declaration = declarations.find(
@@ -480,6 +481,8 @@ function fixture() {
     requestWebGlFallback,
     window: { location: { hostname: "localhost", search: "" } },
     rendererGeneration: 0,
+    observeStartupProgress: () => () => {},
+    paintStartupStage: async () => {},
     DoorConnection,
     CAD_DOOR_DEFINITIONS: [fixtureDoor],
     CAD_DOOR_DEFINITION_HASH: doorIdentity.definitionHash,
@@ -541,6 +544,10 @@ function fixture() {
     "Error",
     "RendererCompatibility",
     "RendererGeneration",
+    "StartupStage",
+    "AiChatActive",
+    "Channel",
+    "Panel",
   ]) {
     const key = name[0].toLowerCase() + name.slice(1);
     environment[`set${name}`] = (value: any) => {
@@ -562,6 +569,7 @@ function fixture() {
     connect: () => Promise<boolean>;
     reconnect: () => Promise<void>;
     enter: (mode: "guest" | "multi") => Promise<void>;
+    openHumanChat: (channel: string) => void;
   };
   return {
     ...callbacks,
@@ -595,6 +603,20 @@ function fixture() {
       }),
   };
 }
+
+test("explicit human chat navigation selects the requested conversation after using AI", () => {
+  for (const channel of ["dm:target-player", "event:campus-event", "dm:list-player"]) {
+    const f = fixture();
+    f.state.aiChatActive = true;
+    f.state.channel = "global";
+    f.state.panel = "people";
+    f.openHumanChat(channel);
+    assert.equal(f.state.aiChatActive, false);
+    assert.equal(f.state.channel, channel);
+    assert.equal(f.state.panel, "chat");
+    assert.equal(f.fetches.length, 0, "changing chat view must not contact AI or create a session");
+  }
+});
 
 function payloads(id = "self") {
   const player = { id, x: 1, y: 2, z: 3, emote: "" };
