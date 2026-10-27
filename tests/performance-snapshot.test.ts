@@ -23,7 +23,9 @@ const freezer = await readFile(
 );
 const prerequisites = [
   "AGENTS.md",
+  ".gitattributes",
   "docs/agents/bmad-policy.md",
+  "docs/trees/20261025/catalog-release.json",
   ".agents/skills/bmad-build/step-02-plan.md",
   ".agents/skills/bmad-build/spec-template.md",
   "patches/@babylonjs__core@9.30.0.patch",

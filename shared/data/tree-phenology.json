@@ -1,0 +1,1062 @@
+{
+  "model": "strahov-regional-phenology-20261025-v1",
+  "periodDays": 365,
+  "evidence": {
+    "retrievedAt": "2026-10-25T17:44:56.129Z",
+    "attribution": "Český hydrometeorologický ústav (ČHMÚ), fenologická pozorování 2014–2025; project-derived regional model, not Strahov observations",
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "licenseEvidence": "https://www.chmi.cz/o-chmu/produkty-a-sluzby/data-a-vyhodnoceni",
+    "method": "UTF-8 quoted CSV; selected 3 regional stations; valid Gregorian DOY only; 444 means phase did not occur, never a date; phase=(DOY-1)*365/daysInYear. Equal-weight median of available station/species phase medians, rounded to 0.1 model day. No missing-value imputation. Not a climatological normal.",
+    "files": [
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/metadata/Lipa_srdcita_stanice.csv",
+        "bytes": 4345,
+        "sha256": "42cfba9fa3252bba85904f44c1163d17b3e9e1d34ba50fb311f68489caf06574",
+        "lastModified": "Mon, 22 Jun 2026 12:00:21 GMT"
+      },
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/data/Lipa_srdcita.csv",
+        "bytes": 251737,
+        "sha256": "dd12116b033da8ffea5c96c5c07fc663fbc1382da11d877dff3e8b5d6093f432",
+        "lastModified": "Thu, 18 Jun 2026 15:27:11 GMT"
+      },
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/metadata/Briza_belokora_stanice.csv",
+        "bytes": 4495,
+        "sha256": "e1d817a5bebeb8d3552ab008c78ef570a7e1874b7d07f10c742255db58c079b0",
+        "lastModified": "Mon, 22 Jun 2026 12:00:21 GMT"
+      },
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/data/Briza_belokora.csv",
+        "bytes": 248797,
+        "sha256": "d86a858d53ae0f18535faaf84e6466f3cb23acaa89387e532daebab5dcdbdfff",
+        "lastModified": "Thu, 18 Jun 2026 15:27:11 GMT"
+      },
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/metadata/Habr_obecny_stanice.csv",
+        "bytes": 3270,
+        "sha256": "08a537b186f61b61fe3dc99f276386112c8ad34c8340ec2bfdf32dd174ee9235",
+        "lastModified": "Mon, 22 Jun 2026 12:00:21 GMT"
+      },
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/data/Habr_obecny.csv",
+        "bytes": 172547,
+        "sha256": "f3f6a0773784c2eda013e46ad54b0892e60b9ff42cb3de3d44817e63ee08e1a6",
+        "lastModified": "Thu, 18 Jun 2026 15:27:11 GMT"
+      },
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/metadata/Modrin_opadavy_stanice.csv",
+        "bytes": 4336,
+        "sha256": "dd1ab539674d3109b0b6174ed7dc20928e7d7ad8a82f8c29080ac1eb5402f67a",
+        "lastModified": "Mon, 22 Jun 2026 12:00:21 GMT"
+      },
+      {
+        "url": "https://opendata.chmi.cz/meteorology/phenology/wood_species/data/Modrin_opadavy.csv",
+        "bytes": 253659,
+        "sha256": "92cadbca439e910681b08e62acb1bb8d08af04f752f06975510ecb75082c492f",
+        "lastModified": "Thu, 18 Jun 2026 15:27:11 GMT"
+      }
+    ],
+    "stationMetadata": [
+      {
+        "species": "Lipa_srdcita",
+        "name": "Benešov",
+        "id": "P3BENS31",
+        "altitude": 370,
+        "lat": 49.78,
+        "lon": 14.68,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Lipa_srdcita",
+        "name": "Doksany",
+        "id": "U1DOKS31",
+        "altitude": 155,
+        "lat": 50.45,
+        "lon": 14.17,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Lipa_srdcita",
+        "name": "Mšecké Žehrovice",
+        "id": "P1MSZE31",
+        "altitude": 460,
+        "lat": 50.17,
+        "lon": 13.9,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Briza_belokora",
+        "name": "Benešov",
+        "id": "P3BENS31",
+        "altitude": 370,
+        "lat": 49.78,
+        "lon": 14.68,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Briza_belokora",
+        "name": "Doksany",
+        "id": "U1DOKS31",
+        "altitude": 155,
+        "lat": 50.45,
+        "lon": 14.17,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Briza_belokora",
+        "name": "Mšecké Žehrovice",
+        "id": "P1MSZE31",
+        "altitude": 460,
+        "lat": 50.17,
+        "lon": 13.9,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Habr_obecny",
+        "name": "Benešov",
+        "id": "P3BENS31",
+        "altitude": 370,
+        "lat": 49.78,
+        "lon": 14.68,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Habr_obecny",
+        "name": "Mšecké Žehrovice",
+        "id": "P1MSZE31",
+        "altitude": 460,
+        "lat": 50.17,
+        "lon": 13.9,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Modrin_opadavy",
+        "name": "Benešov",
+        "id": "P3BENS31",
+        "altitude": 370,
+        "lat": 49.78,
+        "lon": 14.68,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Modrin_opadavy",
+        "name": "Doksany",
+        "id": "U1DOKS31",
+        "altitude": 155,
+        "lat": 50.45,
+        "lon": 14.17,
+        "period": "2014-2025"
+      },
+      {
+        "species": "Modrin_opadavy",
+        "name": "Mšecké Žehrovice",
+        "id": "P1MSZE31",
+        "altitude": 460,
+        "lat": 50.17,
+        "lon": 13.9,
+        "period": "2014-2025"
+      }
+    ],
+    "summaries": [
+      {
+        "species": "Lipa_srdcita",
+        "station": "P1MSZE31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 110.5,
+        "minPhase": 96.73497267759562,
+        "maxPhase": 131
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P1MSZE31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 134.5,
+        "minPhase": 122,
+        "maxPhase": 149
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P1MSZE31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 263.5,
+        "minPhase": 198,
+        "maxPhase": 282
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P1MSZE31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 286.7144808743169,
+        "minPhase": 280,
+        "maxPhase": 297
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P1MSZE31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 275,
+        "minPhase": 200,
+        "maxPhase": 297
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P1MSZE31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 300.09016393442624,
+        "minPhase": 290,
+        "maxPhase": 321
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P3BENS31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 106.5,
+        "minPhase": 94.74043715846994,
+        "maxPhase": 127
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P3BENS31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 122,
+        "minPhase": 114.68579234972678,
+        "maxPhase": 137
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P3BENS31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 255,
+        "minPhase": 213,
+        "maxPhase": 267.26775956284155
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P3BENS31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 288.6051912568306,
+        "minPhase": 277,
+        "maxPhase": 297
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P3BENS31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 263,
+        "minPhase": 218,
+        "maxPhase": 271.2568306010929
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "P3BENS31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 302,
+        "minPhase": 295,
+        "maxPhase": 313
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "U1DOKS31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 102.35928961748634,
+        "minPhase": 90.75136612021858,
+        "maxPhase": 117
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "U1DOKS31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 110.84562841530055,
+        "minPhase": 100.72404371584699,
+        "maxPhase": 128
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "U1DOKS31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 281.5,
+        "minPhase": 240,
+        "maxPhase": 295.1912568306011
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "U1DOKS31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 306.57923497267757,
+        "minPhase": 292,
+        "maxPhase": 332
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "U1DOKS31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 292.0983606557377,
+        "minPhase": 257,
+        "maxPhase": 304
+      },
+      {
+        "species": "Lipa_srdcita",
+        "station": "U1DOKS31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 313,
+        "minPhase": 302,
+        "maxPhase": 333
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P1MSZE31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 99.36338797814207,
+        "minPhase": 85.76502732240438,
+        "maxPhase": 105
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P1MSZE31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 126.5,
+        "minPhase": 113.68852459016394,
+        "maxPhase": 146
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P1MSZE31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 263.14207650273227,
+        "minPhase": 221,
+        "maxPhase": 281.2295081967213
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P1MSZE31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 290.5,
+        "minPhase": 277,
+        "maxPhase": 297
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P1MSZE31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 287,
+        "minPhase": 223,
+        "maxPhase": 297
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P1MSZE31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 318.0655737704918,
+        "minPhase": 307,
+        "maxPhase": 327.10382513661204
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P3BENS31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 102.8620218579235,
+        "minPhase": 89.75409836065573,
+        "maxPhase": 117
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P3BENS31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 118.33743169398906,
+        "minPhase": 110,
+        "maxPhase": 135
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P3BENS31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 250.81284153005464,
+        "minPhase": 216,
+        "maxPhase": 264
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P3BENS31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 299.1803278688525,
+        "minPhase": 288,
+        "maxPhase": 309
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P3BENS31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 259.1475409836065,
+        "minPhase": 220,
+        "maxPhase": 270
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "P3BENS31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 332.09016393442624,
+        "minPhase": 323,
+        "maxPhase": 339
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "U1DOKS31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 102.85928961748634,
+        "minPhase": 84.76775956284153,
+        "maxPhase": 114
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "U1DOKS31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 112.84699453551912,
+        "minPhase": 101.72131147540983,
+        "maxPhase": 134
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "U1DOKS31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 289.09972677595624,
+        "minPhase": 269,
+        "maxPhase": 302
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "U1DOKS31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 307.57923497267757,
+        "minPhase": 283,
+        "maxPhase": 320.12295081967216
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "U1DOKS31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 300.5887978142076,
+        "minPhase": 274,
+        "maxPhase": 332
+      },
+      {
+        "species": "Briza_belokora",
+        "station": "U1DOKS31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 320.5,
+        "minPhase": 306,
+        "maxPhase": 333
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P1MSZE31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 101.86065573770492,
+        "minPhase": 90,
+        "maxPhase": 109
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P1MSZE31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 132.31830601092895,
+        "minPhase": 118.67486338797814,
+        "maxPhase": 141
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P1MSZE31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 261.64207650273227,
+        "minPhase": 253,
+        "maxPhase": 281.2295081967213
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P1MSZE31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 282,
+        "minPhase": 272,
+        "maxPhase": 291.2021857923497
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P1MSZE31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 283.5,
+        "minPhase": 272,
+        "maxPhase": 291.2021857923497
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P1MSZE31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 303.1693989071038,
+        "minPhase": 291,
+        "maxPhase": 313
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P3BENS31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 100.5,
+        "minPhase": 89.75409836065573,
+        "maxPhase": 114
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P3BENS31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 119.33743169398906,
+        "minPhase": 107,
+        "maxPhase": 137
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P3BENS31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 266,
+        "minPhase": 234,
+        "maxPhase": 273
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P3BENS31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 289.10382513661204,
+        "minPhase": 280,
+        "maxPhase": 294
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P3BENS31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 273,
+        "minPhase": 238,
+        "maxPhase": 277
+      },
+      {
+        "species": "Habr_obecny",
+        "station": "P3BENS31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 309,
+        "minPhase": 300,
+        "maxPhase": 323
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P1MSZE31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 97.5,
+        "minPhase": 85.76502732240438,
+        "maxPhase": 109
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P1MSZE31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 127.5,
+        "minPhase": 108.70218579234972,
+        "maxPhase": 136
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P1MSZE31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 268,
+        "minPhase": 254,
+        "maxPhase": 282
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P1MSZE31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 293,
+        "minPhase": 285,
+        "maxPhase": 302
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P1MSZE31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 293,
+        "minPhase": 285,
+        "maxPhase": 304
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P1MSZE31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 331.0464480874317,
+        "minPhase": 309,
+        "maxPhase": 337
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P3BENS31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 100.5,
+        "minPhase": 92.74590163934427,
+        "maxPhase": 115
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P3BENS31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 118.5,
+        "minPhase": 105.7103825136612,
+        "maxPhase": 150
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P3BENS31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 284.5,
+        "minPhase": 273,
+        "maxPhase": 300.1775956284153
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P3BENS31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 302.5,
+        "minPhase": 292.19945355191254,
+        "maxPhase": 307
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P3BENS31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 299.5,
+        "minPhase": 277,
+        "maxPhase": 307
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "P3BENS31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 340.53688524590166,
+        "minPhase": 333,
+        "maxPhase": 357
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "U1DOKS31",
+        "phase": "PL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 92,
+        "minPhase": 81.77595628415301,
+        "maxPhase": 103
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "U1DOKS31",
+        "phase": "LX",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 105.5,
+        "minPhase": 90.75136612021858,
+        "maxPhase": 111
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "U1DOKS31",
+        "phase": "ZL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 303.58469945355193,
+        "minPhase": 288,
+        "maxPhase": 312
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "U1DOKS31",
+        "phase": "ZL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 314,
+        "minPhase": 304,
+        "maxPhase": 324.1120218579235
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "U1DOKS31",
+        "phase": "OL10",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 307,
+        "minPhase": 300,
+        "maxPhase": 316.1338797814208
+      },
+      {
+        "species": "Modrin_opadavy",
+        "station": "U1DOKS31",
+        "phase": "OL100",
+        "records": 12,
+        "valid": 12,
+        "nonOccurrence444": 0,
+        "otherMissing": 0,
+        "medianPhase": 331,
+        "minPhase": 318,
+        "maxPhase": 354
+      }
+    ],
+    "aggregates": {
+      "broadleaf": {
+        "PL10": 102.6,
+        "LX": 120.7,
+        "ZL10": 263.3,
+        "ZL100": 289.8,
+        "OL10": 279.3,
+        "OL100": 311
+      },
+      "deciduousConifer": {
+        "PL10": 97.5,
+        "LX": 118.5,
+        "ZL10": 284.5,
+        "ZL100": 302.5,
+        "OL10": 299.5,
+        "OL100": 331
+      }
+    }
+  },
+  "anchors": {
+    "deciduous-broadleaf": {
+      "PL10": 102.6,
+      "LX": 120.7,
+      "ZL10": 263.3,
+      "ZL100": 289.8,
+      "OL10": 279.3,
+      "OL100": 311
+    },
+    "deciduous-conifer": {
+      "PL10": 97.5,
+      "LX": 118.5,
+      "ZL10": 284.5,
+      "ZL100": 302.5,
+      "OL10": 299.5,
+      "OL100": 331
+    }
+  },
+  "art": {
+    "classification": "authored interpolation and ground hooks, not observations",
+    "leafLead": 12,
+    "maturationLag": 14,
+    "senescenceLead": 14,
+    "cohortReset": 21,
+    "previousLitterFadeLead": 28,
+    "seedOffsetDays": 4,
+    "seedBuckets": 17,
+    "evergreenSpring": [
+      90,
+      115,
+      140,
+      165
+    ],
+    "evergreenAutumn": [
+      240,
+      275,
+      300,
+      335
+    ],
+    "evergreenMaturityDip": 0.18,
+    "evergreenSenescence": 0.08,
+    "evergreenLitterBase": 0.12,
+    "evergreenLitterPeak": 0.25,
+    "flowerSpring": [
+      75,
+      110,
+      140,
+      180
+    ],
+    "flowerAutumn": [
+      215,
+      245,
+      265,
+      300
+    ],
+    "flowerAutumnPeak": 0.28,
+    "litterRetention": [
+      [
+        0,
+        0.7
+      ],
+      [
+        40,
+        0.6
+      ],
+      [
+        130,
+        0.15
+      ],
+      [
+        240,
+        0.15
+      ],
+      [
+        285,
+        0.9
+      ],
+      [
+        330,
+        1
+      ],
+      [
+        365,
+        0.7
+      ]
+    ]
+  }
+}

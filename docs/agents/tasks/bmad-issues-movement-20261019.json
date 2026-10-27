@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "bmad-issues-movement-20261019",
+  "title": "BMAD čtecí analýza issues: movement",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/analysis/issues-20261019/movement.md",
+    "docs/agents/handoffs/bmad-issues-movement-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pokrytí všech přidělených issues: zdroje, fakta/hypotézy, varianty, doporučení, rozsah/refaktor, testy a praktické přijetí.",
+    "Rozlišit commitnutý main db9108dd a cizí WIP; žádná runtime implementace ani náročné testy.",
+    "Zachovat kritéria při konsolidaci a uživatelský pokyn zrušit KEY-13."
+  ],
+  "verification": [
+    "node scripts/agent-tasks.mjs validate",
+    "Ověřit pokrytí ID, existenci citovaných cest, konzistenci rozhodnutí a závislostí.",
+    "Zdrojová kontrola a historické výsledky nejsou nové GPU měření."
+  ],
+  "notes": [
+    "Zadání uživatele19.10.2026: pomocí BMAD analyzovat všechna issues, vytvořit podklady a vhodně sloučit/zahodit. https://linear.app/gigeconomy/document/bmad-analyza-backlogu-a-podklady-k-reseni-19-10-2026-1eac50891685",
+    "Čistá oddělená worktree sdílí původní koordinační registr; žádné rezervace ani WIP se nepřebírají.",
+    "Přijato19.10: analytický podklad a handoff ověřen koordinátorem; žádná runtime změna. Výsledky docs/analysis/issues-20261019/verification.json."
+  ]
+}

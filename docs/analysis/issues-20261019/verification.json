@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-19",
+  "sourceBaseline": "db9108ddd3d069030abebd0fcccd6ecefbd0ff53",
+  "coverage": {
+    "expected": 43,
+    "actual": 43,
+    "unique": 43
+  },
+  "relativeLinks": {
+    "checked": 140,
+    "missing": []
+  },
+  "specCompanions": 4,
+  "linear": {
+    "counts": {
+      "Done": 10,
+      "Todo": 3,
+      "In Progress": 25,
+      "Duplicate": 4,
+      "Canceled": 1
+    },
+    "checks": {
+      "coverage": true,
+      "allBriefs": true,
+      "canceled13": true,
+      "duplicates": true,
+      "donePreserved": true,
+      "parent5": true,
+      "noBlock13": true,
+      "blockCycleFree": true,
+      "parentCycleFree": true,
+      "portRequirements": true
+    },
+    "preserved": [
+      {
+        "id": "KEY-25",
+        "preserved": true
+      },
+      {
+        "id": "KEY-26",
+        "preserved": true
+      },
+      {
+        "id": "KEY-27",
+        "preserved": true
+      },
+      {
+        "id": "KEY-28",
+        "preserved": true
+      }
+    ],
+    "blockCycles": [],
+    "parentCycles": []
+  },
+  "sourceValidation": "Three independent audits of committed source, tests, issue descriptions/comments and cited evidence; historical runtime results not rerun.",
+  "independentConsolidationCheck": "PASS; original scope/work/acceptance25-28 preserved, no actionable findings.",
+  "bmadResolver": "PASS: Czech communication/document language and project hooks resolved in dedicated worktree.",
+  "runtimeValidation": "Not run: documentation-only analysis; no game source/build/browser/GPU/server mutation.",
+  "manifestSha256": {
+    "docs/analysis/issues-20261019/rendering.md": "268c7f1c7d4fcde6f436d4104280914002856ec029bbd4353506b471adbd4010",
+    "docs/analysis/issues-20261019/movement.md": "4e120d9bd4cd90163269c1d559e870cf66660af3ecc13899ecdf6890baf275cf",
+    "docs/analysis/issues-20261019/performance.md": "8366d5055392c14668b6393025d2621b9af44960bec7bcb98b2f34a5102471cd",
+    "docs/analysis/issues-20261019/README.md": "b479ca3bdd292a4b688caf8ae44b35f81f58829f321633ef819bcd11f4064bfa",
+    "docs/analysis/issues-20261019/consolidation.md": "4ec9b52325da796e6e294810f2091b984a0d5f004c9a66a73ec26294e460f21d",
+    "_bmad-output/specs/spec-issues-20261019/SPEC.md": "0b5c4fc924334d59f6ca25e6ea0d82beec16b972a0dfe84028d74ff1a8113d4e",
+    "docs/analysis/issues-20261019/linear-before.json": "1d4c0a04aabaa09e8b1c83c57a916ceeca88abf2d3a97f8ce54b5f752f94fa6e",
+    "docs/analysis/issues-20261019/linear-after.json": "0161e0a0d4e8c5cd0b85952584cfd2d95a4b8bfb7113d1ae0ccf1bfed2c17e31",
+    "_bmad-output/specs/spec-issues-20261019/.memlog.md": "7b124d894b5d5a95732e59dcd662c3e9185740d3f1679c3dc51aafcb16448294"
+  },
+  "taskCatalog": "PASS:224 definitions in dedicated committed-source worktree; other worktrees untracked definitions preserved.",
+  "whitespace": "Initial staged check flagged Windows CRLF from official memlog/Python and extra EOF blank lines. Removed extra EOF blanks in own new documents; validation accepts existing Windows CRLF using explicit cr-at-eol, without changing shared repo config or original files."
+}
