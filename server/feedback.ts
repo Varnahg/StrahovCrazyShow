@@ -7,6 +7,10 @@ import {
   type FeedbackImage,
 } from "./feedback-store";
 import { createFeedbackLinearWorker } from "./feedback-linear";
+import {
+  emitFeedbackDiagnostic,
+  type FeedbackDiagnosticObserver,
+} from "./feedback-config";
 
 class IntakeError extends Error {
   constructor(
@@ -116,6 +120,7 @@ export interface FeedbackServiceOptions {
   workerIntervalMs?: number;
   requestTimeoutMs?: number;
   onDeliveryError?: (code: string, reportId: string) => void;
+  onDiagnostic?: FeedbackDiagnosticObserver;
   limits?: {
     maxReports?: number;
     maxBytes?: number;
@@ -155,6 +160,13 @@ export async function createFeedbackService(
     maxFiles: options.limits?.maxFiles,
   });
   const worker = createFeedbackLinearWorker({ ...options, store, env, now });
+  const reportStorageError = (reportId = "") => {
+    emitFeedbackDiagnostic(options.onDiagnostic, {
+      kind: "storage-error", code: "delivery-storage",
+    });
+    try { options.onDeliveryError?.("delivery-storage", reportId); }
+    catch { /* observer nevlastní příjem */ }
+  };
   const active = new Set<Promise<boolean>>(),
     cancellations = new Set<() => void>();
   const rate = new Map<string, { started: number; count: number }>();
@@ -163,12 +175,12 @@ export async function createFeedbackService(
   const timer = setInterval(() => {
     void worker
       .flush()
-      .catch(() => options.onDeliveryError?.("delivery-storage", ""));
+      .catch(() => reportStorageError());
   }, options.workerIntervalMs ?? 5000);
   timer.unref();
   void worker
     .flush()
-    .catch(() => options.onDeliveryError?.("delivery-storage", ""));
+    .catch(() => reportStorageError());
   function checkRate(req: IncomingMessage) {
     const instant = now();
     if (instant - globalWindow.started >= 60000)
@@ -373,7 +385,7 @@ export async function createFeedbackService(
       const receipt = await store.accept(report, image);
       void worker
         .flush()
-        .catch(() => options.onDeliveryError?.("delivery-storage", report.id));
+        .catch(() => reportStorageError(report.id));
       return reply(202, receipt);
     } catch (error) {
       req.resume();

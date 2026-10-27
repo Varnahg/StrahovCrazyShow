@@ -18,6 +18,38 @@ Nikdy nepoužívejte VITE_ prefix pro přístupové údaje, nedávejte je do URL
 
 Bez nastavení Linear server hlášení trvale přijme do pending-config. Hráčovo potvrzení znamená trvalé uložení vlastním serverem, ne slib vytvoření či opravy ticketu. Po doplnění konfigurace a restartu se fronta obnoví.
 
+## Soukromá diagnostika bez spuštění hry
+
+Připojení Linearu v Codexu nenastavuje prostředí herního serveru. Rozhodující je konfigurace skutečného běžícího procesu nebo kontejneru. Izolované testovací launchery mohou `LINEAR_*` záměrně odstranit, aby test neodesílal skutečná hlášení. Takový výsledek nelze vydávat za závadu externí produkce.
+
+V kořeni nasazení spusťte samostatné read-only CLI. Nespouští herní server, nevolá Linear, neotevírá texty hlášení ani obrázky, nemění frontu a neuklízí staging:
+
+```sh
+node --import tsx server/feedback-diagnostics.ts
+node --import tsx server/feedback-diagnostics.ts --directory /data/feedback
+```
+
+Používáte-li neveřejný soubor prostředí, načtěte ho stejným způsobem jako u skutečného serveru, například `node --env-file=/bezpecna/cesta/server.env --import tsx server/feedback-diagnostics.ts`. Cestu nahraďte skutečnou; hodnoty klíčů nevkládejte do příkazové řádky. V již běžícím Docker kontejneru lze použít `docker compose exec game node --import tsx server/feedback-diagnostics.ts`. Tím se spustí pouze diagnostické CLI v jeho stávajícím prostředí.
+
+JSON obsahuje jen přítomnost povinných nastavení, zvolený typ credential a agregované počty stavů/chyb z `delivery.json`. Neobsahuje credential, team/project hodnoty, report ID, kontakty nebo soukromé URL. `configured: true` znamená pouze přítomnost nastavení; `apiVerified: false` výslovně uvádí, že CLI neověřilo vzdálená oprávnění. Snapshot aktivní fronty je best effort a může během čtení zastarat. Neznámé chybové řetězce se vykážou jako `other`; poškozené či příliš velké soubory a symlinky se neprocházejí dál.
+
+Exit code `0`: konfigurace je přítomná a není nalezený blokovaný/poškozený záznam; stále nejde o doklad vzdáleného doručení. `1`: chybějící nebo podezřelé nastavení, chybějící adresář, `pending-config`, `blocked` či neúplný výpis vyžaduje pozornost. `2`: chybný příkaz nebo nedostupný adresář.
+
+Při současném nastavení API klíče a OAuth tokenu má stejně jako dříve přednost `LINEAR_API_KEY`; diagnostika na nejednoznačnost upozorní. Do `LINEAR_ACCESS_TOKEN` patří samotný token bez prefixu `Bearer`. Záměna osobního klíče a OAuth proměnné nebo vložený prefix se hlásí jako varování, nepřepisuje se automaticky.
+
+Serverová služba poskytuje `onDiagnostic` pro bezpečný startup/configuration záznam a pro kódy doručovacích či úložných chyb. Konfigurace se hlásí jednou při vzniku workeru a při změně její bezpečné projekce; ne každých pět sekund. Selhání loggeru nesmí přerušit příjem nebo doručování. Diagnostika není veřejný HTTP endpoint a nemění odpověď202.
+
+Při řešení konkrétního nasazení rozlište:
+
+- `403 origin-rejected`: hlášení nebylo přijato. Za HTTPS reverse proxy nastavte přesný veřejný origin do `FEEDBACK_ALLOWED_ORIGINS`; forwarded hlavičky nedávají automatické oprávnění.
+- `pending-config` / `linear-not-configured`: chybí serverový credential, tým nebo projekt. Doplnění prostředí skutečného procesu a jeho restart umožní automatickou obnovu těchto záznamů.
+- `blocked` / `linear-auth`: vzdálené oprávnění či credential byly odmítnuté. Oprava konfigurace sama již blokovaný záznam nepřehraje.
+- `linear-rejected`, `linear-upload-failed`, `linear-network` nebo `linear-rate-limit`: použijte konkrétní kód a stav fronty; samotné potvrzení202 neprokazuje vytvořený ticket.
+
+Blokované záznamy se neuvolňují automaticky ani tímto CLI. Obsluha jejich obnovy patří ke konkrétnímu autorizovanému zásahu při zastaveném writeru; zachovejte uložené issue UUID a informaci o předchozím create, aby bylo možné nejprve dohledat případný vzdálený výsledek.
+
+Primární podklady ověřené27.10.2026: [autentizace a GraphQL chyby](https://linear.app/developers/graphql), [serverový upload a jeho hlavičky](https://linear.app/developers/how-to-upload-a-file-to-linear), [rate limity](https://linear.app/developers/rate-limiting). Osobní klíč se posílá přímo v Authorization, OAuth s Bearer; HTTP200 nemusí znamenat úspěch celé GraphQL operace. Stávající adapter tyto kontrakty zachovává.
+
 ## Uložení a doručení
 
 POST /api/feedback přijímá multipart metadata JSON a případnou binární screenshot přílohu, bez multiplayerové relace. Route nevystavuje seznam hlášení, soukromé texty ani stav cizích hráčů. Stejné reportId s totožným obsahem vrací stejné přijetí; jiný obsah stejného ID je konflikt. Server kontroluje původ, objem, MIME/magic/rozměry, kapacitu a frekvenci.

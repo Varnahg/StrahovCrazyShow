@@ -604,7 +604,17 @@ const http = createServer();
 const listenHost = config.host;
 const sessionDiagnostics = createSessionDiagnosticsHandler({ listenHost });
 const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
-const feedback = await createFeedbackService();
+const feedback = await createFeedbackService({
+  onDiagnostic(event) {
+    // Projekce obsahuje jen stav konfigurace a sanitizované kódy, ne hlášení,
+    // přístupové údaje nebo soukromé odkazy. Potvrzení příjmu zůstává lokální.
+    if (event.kind === "configuration") {
+      console.info("[feedback] configuration", event.configuration);
+    } else {
+      console.warn("[feedback]", event);
+    }
+  },
+});
 const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
   if (await feedback.handle(req, res)) return;
   if (await sessionDiagnostics(req, res)) return;
