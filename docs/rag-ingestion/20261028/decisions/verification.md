@@ -1,6 +1,6 @@
 # Ověření routingu podle složitosti · KEY-68
 
-Implementace a nezávislé review jsou dokončené; finální CI a integrace do main ještě čekají. Tento checkpoint mění pouze Decisions adapter, serverový výběr generátoru, jeho testy a serverovou konfiguraci. Automatický dokumentový ingest, plný katalog a oddělený vektorový archiv zůstávají rozpracované v KEY-67 a nejsou vydávány za dokončené tímto záznamem.
+Implementace, nezávislé review, finální CI a integrace do main jsou dokončené přes [PR35](https://github.com/Varnahg/StrahovCrazyShow/pull/35), merge `801b2d07c884c51e42b0fc1a890e7a0f9dbc0196`. Tento checkpoint mění pouze Decisions adapter, serverový výběr generátoru, jeho testy a serverovou konfiguraci. Automatický dokumentový ingest, plný katalog a oddělený vektorový archiv zůstávají rozpracované v KEY-67 a nejsou vydávány za dokončené tímto záznamem.
 
 ## Skutečné API
 
@@ -42,4 +42,14 @@ Výchozí capy jsou500 Decisions pokusů,1000000 konzervativních UTF-8 rezervac
 
 Selhal nezměněný test `v4 wood-only fallback permits complete card coverage and still preloads original detail foliage` v `tests/tree-cluster-streaming.test.ts:239`: `group.active` bylo 2 místo 0. Test po spuštění detailního načítání čeká jen 12 `setImmediate`, zatímco kontrola SHA-256 obsahuje asynchronní `crypto.subtle.digest`; počet ticků není bariérou dokončení. To dokládá možnost předčasné aserce, nikoli samo o sobě konkrétní příčinu v CI. Izolovaný přímý Node běh stejného testu dne 28. 10. 2026 prošel **1/1** (test přibližně 90 ms). Nález a důkazy byly předány vlastníku stromů; žádný soubor stromů nebyl v tomto tasku změněn. **Build a multiplayerová integrace byly v tomto CI přeskočené, nemají tedy úspěšný výsledek.**
 
-[Source secret hygiene 40752514285](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40752514285) prošla: 7/7 testů, 6804 kontrolovaných textových souborů, žádný kandidátní nález. PR zůstává draft a čeká také na přijatou UI base z PR33; finální sloučení ani veřejné nasazení tímto checkpointem nejsou doloženy.
+[Source secret hygiene 40752514285](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40752514285) prošla: 7/7 testů, 6804 kontrolovaných textových souborů, žádný kandidátní nález. V tomto prvním checkpointu PR zůstal draft a čekal také na přijatou UI base z PR33; finální sloučení ani veřejné nasazení tento checkpoint ještě nedokládal.
+
+## Závěrečné přijetí a main
+
+PR33 dodal přijatou base `dc89ba70dc4024b2e0b91d9f37c398aba0525da5`, včetně doložené opravy stromového testu čekajícího na skutečnou `loadDetail` operaci. Nový čistý head PR35 je `741a2ebcdb5e401c828f609484606784d68bb7cb`, tree `19143d7b789332869239f13f2516f9ba889d9269`. Všechny routing/runtime/test/Compose bloby zůstaly shodné s původním ověřeným exportem; změny po něm jsou accepted base a vlastní dokumentace. Jediný konflikt sousedících provider test asertů byl vyřešen zachováním všech kontrol a původního routing testového blobu.
+
+[Verify 40759077463](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40759077463) **SUCCESS**: **2641 PASS, 0 FAIL, 1 SKIP**, 2642 celkem, přibližně 337 sekund. Jediný skip nadále vyžaduje nedostupný lokální záznam stanice. Skutečný PostgreSQL/pgvector blok prošel 11/11. Produkční TypeScript/Vite build a všechny čtyři bloky izolované SDK integrace prošly; poslední zahrnují 12 autentizovaných hráčů v jednom světě, guest/presence hranici, fyziku/chat/relace, respawn/epoch a durable feedback receipt. Vite ponechal upozornění na velké klientské chunky; nejde o nové GPU měření.
+
+CI log potvrdil přesný head/base a checkout testovacího merge `0ec9e08a042297d0eaced8820297965c30c68e7a`. [PR secret check](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40759077450) i [push secret check](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40759072224) prošly: každý 7/7 testů, 6849 textových souborů, žádný kandidátní nález.
+
+Po čerstvém ověření identity a zelených gates bylo zveřejněno [exact-head přijetí](https://github.com/Varnahg/StrahovCrazyShow/pull/35#issuecomment-6479514397) a stav `project-acceptance:success`. PR35 byl sloučen 28. 10. 2026 v 20:14:08 UTC jako **`801b2d07c884c51e42b0fc1a890e7a0f9dbc0196`**. Následný fetch a prázdný diff celého tree proti přijatému headu potvrdily shodu. První neúspěšný CI běh zůstává historickou evidencí, nepřejmenovává se na PASS. Veřejný server nebyl tímto sloučením nasazen.
