@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "profile": "docling-standard-cpu-cs-en-v1",
+  "provenance": [
+    {
+      "repo": "docling-project/docling-layout-heron",
+      "revision": "8f39ad3c0b4c58e9c2d2c84a38465abf757272d8",
+      "patterns": [
+        "*.json",
+        "*.safetensors"
+      ]
+    },
+    {
+      "repo": "docling-project/docling-models",
+      "revision": "fc0f2d45e2218ea24bce5045f58a389aed16dc23",
+      "patterns": [
+        "model_artifacts/tableformer/accurate/*"
+      ]
+    },
+    {
+      "url": "https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/craft_mlt_25k.zip",
+      "filename": "craft_mlt_25k.pth",
+      "md5": "2f8227d2def4037cdb3b34389dcf9ec1"
+    },
+    {
+      "url": "https://github.com/JaidedAI/EasyOCR/releases/download/v1.3/latin_g2.zip",
+      "filename": "latin_g2.pth",
+      "md5": "469869130aad1a34e8f9086f4262bc59"
+    }
+  ],
+  "files": [
+    {
+      "path": "docling-project--docling-layout-heron/config.json",
+      "bytes": 3268,
+      "sha256": "fdea30805ce2f5666b147fca941dcdd27ad468e27d6ed21902207d3da056a97d"
+    },
+    {
+      "path": "docling-project--docling-layout-heron/model.safetensors",
+      "bytes": 171658996,
+      "sha256": "00333a43451945aaf89db8ca9c0a17e75d1537c17db60fdb91aa95f4c7929e0c"
+    },
+    {
+      "path": "docling-project--docling-layout-heron/preprocessor_config.json",
+      "bytes": 444,
+      "sha256": "cd38cd59999e7a95d68e487fbe5132df3d4e5c32a0836add57e6126ba0c4eaf1"
+    },
+    {
+      "path": "docling-project--docling-models/model_artifacts/tableformer/accurate/tableformer_accurate.safetensors",
+      "bytes": 212758388,
+      "sha256": "2a7d6c924b3cd12fb99a09280ca9c33a89c5d60b93253617d2e088c1a40374d9"
+    },
+    {
+      "path": "docling-project--docling-models/model_artifacts/tableformer/accurate/tm_config.json",
+      "bytes": 7060,
+      "sha256": "984e122ceb8ccf84d84c9d2882f6f2302a44b4f1e577babd6289892c36f3cffd"
+    },
+    {
+      "path": "EasyOcr/craft_mlt_25k.pth",
+      "bytes": 83152330,
+      "sha256": "4a5efbfb48b4081100544e75e1e2b57f8de3d84f213004b14b85fd4b3748db17"
+    },
+    {
+      "path": "EasyOcr/latin_g2.pth",
+      "bytes": 15406141,
+      "sha256": "aaa95be1c4a9cb3496879bed7c520886ce1164f89e026f0c54488394e74e8c55"
+    }
+  ]
+}
