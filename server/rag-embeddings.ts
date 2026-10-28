@@ -1,12 +1,19 @@
 import { createHash } from "node:crypto";
-import type { KnowledgeChunk } from "./crazy-typka-retrieval";
+import type {
+  KnowledgeChunk,
+  KnowledgeChunkV3,
+  KnowledgeDocumentV3,
+} from "./rag-knowledge-types";
+import { isRagHash, isRagText } from "../shared/rag-provenance";
 
+export type EmbeddingInputVersion =
+  "title-locator-text-v1" | "title-heading-text-v2";
 export type EmbeddingProfile = Readonly<{
   id: string;
   provider: "openai";
   model: string;
   dimensions: number;
-  inputVersion: "title-locator-text-v1";
+  inputVersion: EmbeddingInputVersion;
 }>;
 export type EmbeddingResult = {
   vectors: number[][];
@@ -53,7 +60,11 @@ const hash = (value: string) =>
   createHash("sha256").update(value, "utf8").digest("hex");
 
 export function createEmbeddingProfile(
-  options: { model?: string; dimensions?: number } = {},
+  options: {
+    model?: string;
+    dimensions?: number;
+    inputVersion?: EmbeddingInputVersion;
+  } = {},
 ): EmbeddingProfile {
   if (!object(options)) throw new EmbeddingError("invalid-profile");
   const model =
@@ -64,19 +75,23 @@ export function createEmbeddingProfile(
     : 0;
   const dimensions =
     options.dimensions === undefined ? maximum : options.dimensions;
+  const inputVersion =
+    options.inputVersion === undefined ? INPUT_VERSION : options.inputVersion;
   if (
     !maximum ||
     !Number.isSafeInteger(dimensions) ||
     dimensions < 1 ||
-    dimensions > maximum
+    dimensions > maximum ||
+    (inputVersion !== "title-locator-text-v1" &&
+      inputVersion !== "title-heading-text-v2")
   )
     throw new EmbeddingError("invalid-profile");
   return Object.freeze({
-    id: hash(JSON.stringify(["openai", model, dimensions, INPUT_VERSION])),
+    id: hash(JSON.stringify(["openai", model, dimensions, inputVersion])),
     provider: "openai",
     model,
     dimensions,
-    inputVersion: INPUT_VERSION,
+    inputVersion,
   });
 }
 
@@ -109,6 +124,41 @@ export function documentEmbeddingInput(chunk: KnowledgeChunk): string {
     chunk.text,
   ]);
 }
+/** V3 explicitly excludes physical locators and all review/parser metadata. */
+export function documentEmbeddingInputV3(
+  document: Pick<
+    KnowledgeDocumentV3,
+    "schemaVersion" | "id" | "sourceVersionId" | "title"
+  >,
+  chunk: Pick<
+    KnowledgeChunkV3,
+    "schemaVersion" | "sourceId" | "sourceVersionId" | "text" | "headingPath"
+  >,
+  profile: EmbeddingProfile,
+): string {
+  const valid = validateEmbeddingProfile(profile);
+  if (
+    valid.inputVersion !== "title-heading-text-v2" ||
+    !document ||
+    !chunk ||
+    document.schemaVersion !== 3 ||
+    chunk.schemaVersion !== 3 ||
+    !isRagText(document.id, 300) ||
+    document.id !== chunk.sourceId ||
+    !isRagHash(document.sourceVersionId) ||
+    document.sourceVersionId !== chunk.sourceVersionId ||
+    !isRagText(document.title, 4000) ||
+    !isRagText(chunk.text, 8191) ||
+    !Array.isArray(chunk.headingPath) ||
+    chunk.headingPath.length > 64 ||
+    !chunk.headingPath.every((heading) => isRagText(heading, 4000))
+  )
+    throw new EmbeddingError("invalid-input");
+  const input = JSON.stringify([document.title, chunk.headingPath, chunk.text]);
+  if (Buffer.byteLength(input, "utf8") > 8191)
+    throw new EmbeddingError("request-too-large");
+  return input;
+}
 export function embeddingInputHash(input: string): string {
   if (!inputString(input)) throw new EmbeddingError("invalid-input");
   return hash(input);
@@ -131,7 +181,9 @@ function positiveLimit(
     throw new EmbeddingError("invalid-configuration");
   return limit;
 }
-function validProfile(value: EmbeddingProfile): EmbeddingProfile {
+export function validateEmbeddingProfile(
+  value: EmbeddingProfile,
+): EmbeddingProfile {
   if (
     !object(value) ||
     typeof value.model !== "string" ||
@@ -142,7 +194,7 @@ function validProfile(value: EmbeddingProfile): EmbeddingProfile {
   if (
     value.id !== profile.id ||
     value.provider !== profile.provider ||
-    value.inputVersion !== INPUT_VERSION
+    value.inputVersion !== profile.inputVersion
   )
     throw new EmbeddingError("invalid-profile");
   return profile;
@@ -257,7 +309,7 @@ export function createOpenAIEmbedder(options: {
   responseBytes?: number;
 }): Embedder {
   if (!object(options)) throw new EmbeddingError("invalid-configuration");
-  const profile = validProfile(options.profile);
+  const profile = validateEmbeddingProfile(options.profile);
   const apiKey = options.apiKey;
   if (typeof apiKey !== "string" || !apiKey.trim() || /[\r\n]/.test(apiKey))
     throw new EmbeddingError("invalid-configuration");

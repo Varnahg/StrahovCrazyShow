@@ -6,6 +6,8 @@ import type { KnowledgeChunk } from "../server/crazy-typka-retrieval";
 import {
   createEmbeddingProfile,
   documentEmbeddingInput,
+  documentEmbeddingInputV3,
+  validateEmbeddingProfile,
   embeddingInputHash,
   createOpenAIEmbedder,
   EmbeddingError,
@@ -13,6 +15,85 @@ import {
 } from "../server/rag-embeddings";
 
 const profile = createEmbeddingProfile({ dimensions: 3 });
+
+test("explicit heading input profile preserves every legacy identity and requires a matching v3 representation", () => {
+  const legacy = createEmbeddingProfile();
+  assert.equal(
+    legacy.id,
+    createEmbeddingProfile({ inputVersion: "title-locator-text-v1" }).id,
+  );
+  const next = createEmbeddingProfile({
+    inputVersion: "title-heading-text-v2",
+  });
+  assert.notEqual(next.id, legacy.id);
+  assert.equal(
+    next.id,
+    createHash("sha256")
+      .update(
+        JSON.stringify([
+          "openai",
+          "text-embedding-3-large",
+          3072,
+          "title-heading-text-v2",
+        ]),
+      )
+      .digest("hex"),
+  );
+  assert.deepEqual(
+    validateEmbeddingProfile(JSON.parse(JSON.stringify(next))),
+    next,
+  );
+  assert.throws(
+    () => createEmbeddingProfile({ inputVersion: "unknown" } as never),
+    { message: "invalid-profile" },
+  );
+  assert.throws(() => validateEmbeddingProfile({ ...next, id: legacy.id }), {
+    message: "invalid-profile",
+  });
+  const document = {
+    schemaVersion: 3 as const,
+    id: "suz-document",
+    sourceVersionId: "a".repeat(64),
+    title: "Ubytování",
+  };
+  const chunk = {
+    schemaVersion: 3 as const,
+    sourceId: document.id,
+    sourceVersionId: document.sourceVersionId,
+    text: "  Výjimka neplatí. 🐎\n",
+    headingPath: ["Pravidla", "Výjimky"],
+  };
+  assert.equal(
+    documentEmbeddingInputV3(document, chunk, next),
+    JSON.stringify([document.title, chunk.headingPath, chunk.text]),
+  );
+  assert.throws(() => documentEmbeddingInputV3(document, chunk, legacy), {
+    message: "invalid-input",
+  });
+  assert.throws(
+    () =>
+      documentEmbeddingInputV3(
+        document,
+        { ...chunk, sourceVersionId: "b".repeat(64) },
+        next,
+      ),
+    { message: "invalid-input" },
+  );
+  assert.throws(
+    () =>
+      documentEmbeddingInputV3(document, { ...chunk, text: "bad\0text" }, next),
+    { message: "invalid-input" },
+  );
+  assert.throws(
+    () =>
+      documentEmbeddingInputV3(
+        document,
+        { ...chunk, text: "😀".repeat(2050) },
+        next,
+      ),
+    { message: "request-too-large" },
+  );
+});
 const signal = () => new AbortController().signal;
 const complete = (
   vectors = [[1, 0, 0]],
@@ -51,6 +132,24 @@ function fixture(
   });
   return { embedder, calls };
 }
+
+test("heading profile uses the same fixed OpenAI wire API with its exact new input", async () => {
+  const next = createEmbeddingProfile({
+    dimensions: 3,
+    inputVersion: "title-heading-text-v2",
+  });
+  const f = fixture(complete(), { profile: next });
+  const input = JSON.stringify(["Dokument", ["Oddíl"], "Přesný text"]);
+  const result = await f.embedder.embed([input], { signal: signal() });
+  assert.deepEqual(result.vectors, [[1, 0, 0]]);
+  assert.equal(f.embedder.profile.id, next.id);
+  assert.deepEqual(JSON.parse(String(f.calls[0].init.body)), {
+    model: next.model,
+    dimensions: 3,
+    encoding_format: "float",
+    input: [input],
+  });
+});
 
 test("profile identity includes provider/model/dimensions/format and is immutable", () => {
   const standard = createEmbeddingProfile();
