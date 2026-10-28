@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "rag-vector-20261028-validation",
   "title": "RAG: izolované ověření pgvector a integrační pipeline",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "dist/",
@@ -32,6 +32,7 @@
     "Zachovat ověřené aktuální SH/SÚZ datasety a oddělené archivy; research/source-contract aktualizuje jejich koordinátor podle nového zadání. Starší textový návrh není zákazem uživatelem nyní vyžádané vektorové cesty.",
     "Žádná hra, GPU, editor, automatický crawler či scheduler. Žádný reálný OpenAI klíč v Git, CI, klientovi ani logu. Izolované testy používají fake embedding provider; reálnou místní DB spouští jen držitel validation claimu.",
     "Implementaci, cílený refaktoring, cache/lifecycle kontrolu a relevantní důkazy předat společně. Podagent nespouští další BMAD workflow ani nezasahuje do cizích scope. Main okno a centrální dokumentace se koordinují zvlášť.",
-    "28. 10. 2026 po předání zastaveného vlastního kontejneru a skutečném release oddělen DB lifecycle do rag-vector-20261028-database. Samotné spuštění/zastavení DB nyní vyžaduje jeho rezervace port:5468 a rag-postgres-local, nikoli toto heavy okno. Zde zůstává heavy-validation, workspace-build a porty2568/4268 pro plnou pipeline. Pokud zdejší kontrola používá DB, její lifecycle musí současně vlastnit koordinátor pod novým database taskem. Docker Desktop se při předání nezastavuje a volume se zachovává."
+    "28. 10. 2026 po předání zastaveného vlastního kontejneru a skutečném release oddělen DB lifecycle do rag-vector-20261028-database. Samotné spuštění/zastavení DB nyní vyžaduje jeho rezervace port:5468 a rag-postgres-local, nikoli toto heavy okno. Zde zůstává heavy-validation, workspace-build a porty2568/4268 pro plnou pipeline. Pokud zdejší kontrola používá DB, její lifecycle musí současně vlastnit koordinátor pod novým database taskem. Docker Desktop se při předání nezastavuje a volume se zachovává.",
+    "Přijato28.10.2026 přes PR34 https://github.com/Varnahg/StrahovCrazyShow/pull/34, head a4c24af4756e45c72563919715edd7102465fb18, merge86e4dd603ca1b91e3eaa5f84573f9481be410a29. CI40692141941:2579PASS/0FAIL/1SKIP, skutečnápgvector regrese, build aSDKPASS; source-secret-hygiene aproject-acceptanceSUCCESS. Přejímka https://github.com/Varnahg/StrahovCrazyShow/pull/34#issuecomment-6469934495. Zdrojovéclaims skutečněuvolněné; vlastník předal DBexited a zachovanýpaidvolume, bezstopDockerDesktopu. Tasky jsou implementačně uzavřené, nikoli potvrzení veřejného nasazení čiJantar3D. Navazující čistěmetadata closeoutb72b4f350605cdd582b3e85bd2ed4ea7628c64c3 čeká na selektivnípřevzetí4předanýchsouborů vdalšímkoordinačnímcheckpointu."
   ]
 }

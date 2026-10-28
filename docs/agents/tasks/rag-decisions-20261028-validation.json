@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "rag-decisions-20261028-validation",
   "title": "AI: omezené živé ověření Decisions a výběru modelu",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/rag-decisions-validation-20261028/",
@@ -30,6 +30,7 @@
     "Konkrétní omezený validační rozsah předal koordinátor01a17e9d-dd4a-7fe3-91ac-4f3bc548982d po18/18adapter a72/72runtime/provider scoped kontrolách. Tyto hlášené výsledky samy nedokládají živé API.",
     "Main okno PR33 i Jantar Docker/GPU procesy zůstávají oddělené. Výsledky a převzetí do dalšího checkpointu se koordinují až po skončení tohoto omezeného běhu.",
     "Admin přidělil pouze zadání; nečetl klíč a neprovedl žádné placené volání nebo start serveru.",
-    "28.10.2026 po skutečném release a handoffu změněn pouze celkový Responses cap4→6. Důvodem je jedna plánovaná dvojice Luna→Sol k ověření konkrétní provider opravy: absence dřívějšího podpůrného úryvku sama není důkaz chyby předchozí správné citované odpovědi. Dosavadní ledger28Decisions/4Responses/1complex/8moderations se zachovává append-only, všechny dosavadní pokusy jsou podle handoffu confirmed. Nejde o retry ani nový checkpoint/rozpočet; Decisions32 a complex2 zůstávají celkové limity. Před dalším pokusem nový claim a kontrola zbývajícího souhrnného čerpání."
+    "28.10.2026 po skutečném release a handoffu změněn pouze celkový Responses cap4→6. Důvodem je jedna plánovaná dvojice Luna→Sol k ověření konkrétní provider opravy: absence dřívějšího podpůrného úryvku sama není důkaz chyby předchozí správné citované odpovědi. Dosavadní ledger28Decisions/4Responses/1complex/8moderations se zachovává append-only, všechny dosavadní pokusy jsou podle handoffu confirmed. Nejde o retry ani nový checkpoint/rozpočet; Decisions32 a complex2 zůstávají celkové limity. Před dalším pokusem nový claim a kontrola zbývajícího souhrnného čerpání.",
+    "KEY68 přijat přes PR35 https://github.com/Varnahg/StrahovCrazyShow/pull/35, head741a2ebcdb5e401c828f609484606784d68bb7cb, main801b2d07c884c51e42b0fc1a890e7a0f9dbc0196 nadJantardc89. Verify40759077463SUCCESS, build/SDK a secretsSUCCESS; acceptance https://github.com/Varnahg/StrahovCrazyShow/pull/35#issuecomment-6479514397. Mergedtree shodný s přijatýmheadem. Živý omezenýcheckpoint30Decisions/6Responses(2complex)/12moderací, všeconfirmed; syntetická24případová sada není obecná garance. Source/validation/integrationclaims skutečněuvolněné. StarýCI702treeFAIL se nepřeznačuje; automatickýingest/archivKEY67 zůstáváopen. Dokumentačnícloseout14218a50 předán pro následný vlastnímetadatacheckpoint."
   ]
 }

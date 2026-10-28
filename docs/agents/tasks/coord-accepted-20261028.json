@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "coord-accepted-20261028",
+  "title": "Předat a publikovat dokumentační přijetí dokončených home/RAG celků",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/coord-accepted-20261028.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Pouze centrální přehled již přijatých výsledků, stavy již publikovaných tasků a přesné předané dokumentační closeouty b72b4f35/14218a50; žádný runtime nebo rozpracovaný KEY67 obsah.",
+    "Sestavit explicitní allowlisted Git tree nad přijatým main801b2d07 v izolovaném dočasném indexu, bez změny D pracovního stromu/indexu, C worktrees nebo hraných služeb.",
+    "Ověřit skutečný navržený katalog projektovým validátorem v malé izolované fixture a nezávisle zkontrolovat tvrzení/provenience; příkazy nesmějí instalovat dependencies.",
+    "Publikovat samostatný PR a integrovat až po exact-head povinných kontrolách a přijetí. Při vzdáleném CI bez místní práce uvolnit heavy a pro závěrečnou integraci znovu claim."
+  ],
+  "verification": [
+    "Žádné změny klient/server/shared/scripts/tests/public/assets/package/lock/Docker/CI; tvrzení o uživatelském nasazení a GPU nepřidávat.",
+    "Zachovat staré FAIL/timeout/incident záznamy a otevřený KEY31/KEY67. Source metadata nesmí přeznačit neprovedené kontroly na PASS."
+  ],
+  "notes": [
+    "Admin/catalog/architecture a centrální verification/cache používají současně původní root claims; tento task vymezuje jen nový publikační handoff a krátké integrační okno.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Žádná hra, server, Docker, liveAPI nebo modelové stahování. Předané closeouty použít jako immutable Git bloby, bez editace původních autorských worktrees."
+  ]
+}

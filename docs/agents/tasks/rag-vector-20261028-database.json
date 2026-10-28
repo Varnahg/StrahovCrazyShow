@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "rag-vector-20261028-database",
   "title": "RAG: samostatný životní cyklus místní pgvector databáze",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/rag-vector-20261028-database/",
@@ -28,6 +28,7 @@
     "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/rag-sources-sh-suz. Přímý požadavek na embeddingy a vector DB je již autorizován; toto je pouze oddělení rezervací pro souběh s Jantar UI.",
     "Předání root KEY-65 je v docs/agents/handoffs/rag-vector-20261028-validation.md; původní claim byl skutečně uvolněn před změnou definice.",
     "Samotný DB lifecycle nyní rezervuje tento task namísto původního validation tasku. Heavy-validation/workspace-build/port2568/port4268 zůstávají v rag-vector-20261028-validation a před plnou pipeline vyžadují vlastní dohodnuté okno.",
-    "Admin pouze přiděluje metadata a žádný kontejner, volume, Docker Desktop ani port sám nemění. Nový owner si claim získá samostatně."
+    "Admin pouze přiděluje metadata a žádný kontejner, volume, Docker Desktop ani port sám nemění. Nový owner si claim získá samostatně.",
+    "Přijato28.10.2026 přes PR34 https://github.com/Varnahg/StrahovCrazyShow/pull/34, head a4c24af4756e45c72563919715edd7102465fb18, merge86e4dd603ca1b91e3eaa5f84573f9481be410a29. CI40692141941:2579PASS/0FAIL/1SKIP, skutečnápgvector regrese, build aSDKPASS; source-secret-hygiene aproject-acceptanceSUCCESS. Přejímka https://github.com/Varnahg/StrahovCrazyShow/pull/34#issuecomment-6469934495. Zdrojovéclaims skutečněuvolněné; vlastník předal DBexited a zachovanýpaidvolume, bezstopDockerDesktopu. Tasky jsou implementačně uzavřené, nikoli potvrzení veřejného nasazení čiJantar3D. Navazující čistěmetadata closeoutb72b4f350605cdd582b3e85bd2ed4ea7628c64c3 čeká na selektivnípřevzetí4předanýchsouborů vdalšímkoordinačnímcheckpointu."
   ]
 }

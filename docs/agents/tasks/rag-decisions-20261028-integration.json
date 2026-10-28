@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-decisions-20261028-integration",
+  "title": "AI: čistá integrace priority routeru po přijetí Jantaru",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/rag-decisions-20261028-integration.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Začít až po skutečném PR33 merge a koordinovaném předání main/validačního okna. Použít skutečnou přijatou main revizi, nikoli předpokládaný nebo starý86e4 checkpoint.",
+    "Aktualizovat čistou exportní větev codex/decisions-routing pomocí explicitního merge-tree/commit-tree a dočasného indexu v již vlastněné research cache, bez checkout/stash/reset nad KEY67 WIP.",
+    "Výsledný tree ověřit allowlistem a shodou blobů: zachovat celé přijaté UI a stromové opravy, přenést pouze vlastní routing checkpoint a příslušnou routing dokumentaci40087bf. Nepřibalit automatický ingest ani b72closeout.",
+    "Zachovat pracovní strom s rozpracovaným ingestem, jeho skutečný index a ostatní větve. Při konfliktu či nečekané změně base/head nepoužít slepý force nebo cizí WIP.",
+    "Pushnout PR35 a doložit nové povinné CI, source hygiene a exact-head project-acceptance před merge. Starý failedCI na702bb2d9 zůstává evidovaný; nová base/barrier oprava ho zpětně nepřejmenovává naPASS.",
+    "Žádný místní fullbuild/fullsuite, GPU, Docker, DB, API nebo listener. Po integračních operacích a handoffu skutečně uvolnit lokální rezervaci; žádný bypass rulesetu či CI."
+  ],
+  "verification": [
+    "Zaznamenat accepted main SHA, původní a nový export head/tree, přesný allowlist změn a výsledky kontroly blobů; ověřit nedotčenost pracovního stromu/indexu KEY67.",
+    "Lokální integrační krok používá explicitní heavy-validation rezervaci podle projektové dohody. Samotné vzdálené GitHub CI tuto hostitelskou kapacitu nepotřebuje: pokud už neběží žádná místní práce/pomocník, zapsat mezistav a release během čekání, před dalším integračním krokem znovu claim.",
+    "Main publikační okno zůstává samostatně koordinované i při dočasném release heavy. Před merge znovu ověřit skutečný PR head/base a relevantnost zelených kontrol."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, KEY-68. Vlastní research cache/docs a případné source úpravy zůstávají pod dosavadními samostatnými claims; nový task přidává pouze tento handoff a integrační zdroj.",
+    "Koordinátor01a17e9d-dd4a-7fe3-91ac-4f3bc548982d výslovně požádal o tento následný krok. Při přidělení drží heavy-validation ještě jantar-validation-01a17fd8; ready není oprávnění jeho rezervaci převzít.",
+    "Žádné další živé OpenAI ověření ani nový rozpočet tím nevzniká. Rozsah původního router paid checkpointu zůstává uzavřený ve vlastním ledgeru/handoffu.",
+    "Admin vytvořil metadata, neprovedl merge/push/publikaci a nezasáhl do main okna PR33.",
+    "KEY68 přijat přes PR35 https://github.com/Varnahg/StrahovCrazyShow/pull/35, head741a2ebcdb5e401c828f609484606784d68bb7cb, main801b2d07c884c51e42b0fc1a890e7a0f9dbc0196 nadJantardc89. Verify40759077463SUCCESS, build/SDK a secretsSUCCESS; acceptance https://github.com/Varnahg/StrahovCrazyShow/pull/35#issuecomment-6479514397. Mergedtree shodný s přijatýmheadem. Živý omezenýcheckpoint30Decisions/6Responses(2complex)/12moderací, všeconfirmed; syntetická24případová sada není obecná garance. Source/validation/integrationclaims skutečněuvolněné. StarýCI702treeFAIL se nepřeznačuje; automatickýingest/archivKEY67 zůstáváopen. Dokumentačnícloseout14218a50 předán pro následný vlastnímetadatacheckpoint."
+  ]
+}

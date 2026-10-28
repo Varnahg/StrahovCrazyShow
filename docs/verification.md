@@ -1,5 +1,26 @@
 # Ověření dema a známá omezení
 
+## Přijaté výsledky · 28. října 2026
+
+Společná přijatá runtime baseline je `801b2d07c884c51e42b0fc1a890e7a0f9dbc0196`. Následující přehled uzavírá dřívější pracovní checkpointy pro konkrétní funkce; jejich původní lokální FAIL, timeouty a incidenty níže zůstávají zachované.
+
+| Přijatý celek | Merge do main | Přesné CI: PASS / FAIL / SKIP |
+| --- | --- | --- |
+| [PR32: původní úvod, loader a AI](https://github.com/Varnahg/StrahovCrazyShow/pull/32) | `de6f87a2` | [2 476 / 0 / 1](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40602880238) |
+| [PR34: OpenAI embeddingy a pgvector](https://github.com/Varnahg/StrahovCrazyShow/pull/34) | `86e4dd60` | [2 579 / 0 / 1](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40692141941) |
+| [PR33: Jantar úvodní stránka](https://github.com/Varnahg/StrahovCrazyShow/pull/33) | `dc89ba70` | [2 597 / 0 / 1](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40755445255) |
+| [PR35: Decisions routing](https://github.com/Varnahg/StrahovCrazyShow/pull/35) | `801b2d07` | [2 641 / 0 / 1](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40759077463) |
+
+U těchto přijatých revizí prošel build, izolovaná SDK integrace, source-secret kontroly i přijetí přesného PR headu. Novější úspěšný CI běh nepřeznačuje starší neúspěšný lokální běh na PASS. [RAG closeout](home-ai/20261028/verification.md), [Jantar důkazy](home-design/20261028/verification.md) a [routing closeout](rag-ingestion/20261028/decisions/verification.md) uvádějí identity a hranice jednotlivých kontrol.
+
+Jantar má doložené skutečné UI/profile/popup scénáře, úspěšný standardní Docker browser/SDK/lifecycle harness a přímé uživatelské potvrzení finální běžné adresy `http://127.0.0.1:4280/`. Tato neměnná lokální verze používá zdroj `0d957a1b`, source ID `6bfb508e6361023bbe3e1cccbfbdb6f89de0714908e8c3da4788ce780e3ebcba` a vlastní fyzické závislosti. Není to automaticky nově přestavěný server z posledního main; AI a feedback v této izolované službě zůstávají bez soukromé konfigurace neaktivní.
+
+Historický studený startup timeout a dependency incident se nezamlčují. Oddělený úspěšný Edge/GTX1060 WebGL2 průchod není zárukou každého studeného startu ani FPS benchmarkem. Následná diagnostická odbočka `e8192885` byla na výslovné přání uživatele celá revertována `b67ec21e`; do přijaté homepage nepřidává rendererovou opravu a KEY-31 zůstává otevřený. Testová oprava čekání na skutečný stromový detail je samostatně zachovaná v přijaté base.
+
+Routing má vedle 94 cílených případů doložených 30 skutečných Decisions pokusů, 6 Responses generací (2 complex) a 12 moderací, vše potvrzené v souhrnném limitu bez retry. Výsledek 24/24 syntetických tiers při prahu 0,80 není garancí produkční přesnosti. Malý živý HTTP harness používal evidence fixture; nebyl novým SQL/E2E důkazem.
+
+Automatické získávání a převod plných dokumentů, celý katalog zdrojů a oddělený vektorový archiv jsou nadále otevřený KEY-67, nikoli hotové vlastnosti přijatého routeru. Současný kurátorovaný korpus a archivní metadata jsou popsané v RAG evidenci. Veřejný host `strahov.bandportal.cz` nebyl tímto lokálním/GitHub přijetím nasazen nebo překonfigurován; konkrétní produkční příčina feedbacku stále vyžaduje spolupráci jeho provozovatele. Úplná přejímka všech budov, tras a požadovaného GPU výkonu se těmito samostatnými celky neuzavírá.
+
 ## Vektorový RAG pro SH a SÚZ · pracovní stav 28. října 2026
 
 Tento záznam popisuje větev `codex/rag-sources-sh-suz`, čtecí checkpoint `9ed94e861651eb32547a6d0b677b3f54c03fd8dd` nad přijatým `main` `de6f87a2efbf8596bb03efae863e8d6763e22774`, včetně navazujících rozpracovaných review oprav. **Není to finální integrovaný checkpoint.** [Vektorový kontrakt](home-ai/20261028/research/vector-contract.md), [skutečná evaluace](home-ai/20261028/research/vector-evaluation.md) a [validační předání](agents/handoffs/rag-vector-20261028-validation.md) určují přesný rozsah důkazů; centrální zápis tyto běhy neopakoval.
