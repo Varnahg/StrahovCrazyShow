@@ -163,9 +163,6 @@ const initialActivity: ActivityState = {
 };
 export function App() {
   const feedbackLocale = useLocale();
-  useEffect(() => {
-    document.title = "Strahov Crazy Show";
-  }, [feedbackLocale]);
   const ai = useCrazyTypka();
   const [aiChatActive, setAiChatActive] = useState(false);
   const [startupStage, setStartupStage] = useState("import");
