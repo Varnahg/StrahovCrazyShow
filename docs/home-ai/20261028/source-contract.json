@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "purpose": "Ověřené krátké faktické parafráze pro skutečný RAG; archiv není součástí aktuálního indexu.",
+  "activeFiles": ["server/data/silicon-hill-knowledge.json", "server/data/rag/silicon-hill.json", "server/data/rag/suz.json"],
+  "archiveFiles": ["server/data/rag/silicon-hill-archive.json", "server/data/rag/suz-archive.json"],
+  "datasetShape": { "version": 2, "sources": [], "chunks": [] },
+  "sourceFields": {
+    "id": "Globálně unikátní řetězec; nové SH sh-*, SÚZ suz-*; původních šest source IDs zůstává.",
+    "title": "Čitelný název s institucí a případným rokem/verzí.",
+    "url": "Přesná ověřená veřejná HTTPS adresa dokumentu, bez přihlašovacích údajů.",
+    "discoveryUrl": "Ověřený rodičovský rozcestník či oficiální detail odkazující dokument; může být shodný s URL.",
+    "authority": "silicon-hill | suz",
+    "status": "current v aktivním souboru; archived v odděleném archivu.",
+    "checkedAt": "YYYY-MM-DD, kontrolní den v UTC, není datum účinnosti.",
+    "reviewAfter": "YYYY-MM-DD, výlučná administrativní hranice UTC; typicky měsíc, provozní postupy/kontakty nejvýše týden.",
+    "effectiveFrom": "null nebo ISO okamžik s výslovným offsetem. České datum účinnosti převést na půlnoc Europe/Prague, např. 2026-09-01T00:00:00+02:00. Nevymýšlet datum z názvu souboru.",
+    "effectiveUntil": "null nebo ISO okamžik s offsetem, EXCLUSIVE. Jen doložený konec platnosti; do konce dne znamená následující půlnoc Europe/Prague.",
+    "author": "Instituce či doložený wiki autor, případně null.",
+    "license": "CC BY-SA 4.0 pro doloženou wiki; jinak null, nikdy domnělá otevřená licence.",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/ nebo null.",
+    "sourceUpdatedAt": "Doložený čas poslední úpravy nebo null; časovou zónu nevymýšlet.",
+    "documentDate": "Doložené datum schválení/vydání YYYY-MM-DD nebo null, oddělené od účinnosti.",
+    "authorityLevel": "statutes | internal-rule | official-document | official-service | overview | directory | wiki",
+    "versionNote": "Krátké vysvětlení verze, účinnosti, známých výluk a povahy parafráze. Nejvýše 1000 znaků.",
+    "archiveReason": "Jen pro archiv: doložený důvod vyřazení. Archiv nemusí mít chunky; historické ceny nemusíme rozmnožovat."
+  },
+  "chunkFields": {
+    "id": "Globálně unikátní sh-* či suz-*.",
+    "sourceId": "ID zdroje v tomto souboru.",
+    "text": "Vlastní stručná věcná parafráze v češtině, nejvýše 800 znaků; zachovat podmínky a nepřevzít sporný údaj.",
+    "sourceLocator": "Nadpis sekce nebo článek a stránka PDF.",
+    "topic": "Jedna hodnota z topics.",
+    "keywords": "Stručné relevantní české/anglické výrazy pro dohledání; bez plošných obecných slov.",
+    "contentSha256": "SHA-256 přesných UTF-8 bytů textu, malá hex písmena."
+  },
+  "topics": ["membership", "network", "office", "projects", "sport", "documents", "housing", "housing-payments", "housing-arrival", "housing-termination", "housing-maintenance", "dining", "photography", "printing", "game-room"],
+  "evidenceRules": [
+    "Každý přijatý zdroj má v child docs záznam URL, skutečného ověření, locators, licence a konfliktů/výluk; nepřebírat soukromé údaje ani celé nejasně licencované texty.",
+    "Respektovat publikační/quoting limity podkladu; krátké faktické parafráze nejsou kopie dokumentů.",
+    "Starý FAQ nemůže přepsat aktuální předpis. SH členství není ubytování SÚZ. Sporné částky, neověřené tabulkové vazby a otevření v reálném čase se neimportují.",
+    "Aktuální menza může mít text s umístěním a odkazem na dynamický jídelníček; dnešní jídla/ceny se neukládají jako trvalá znalost.",
+    "Dítě uloží docs/.../retrieval-cases.json jako pole {query, expectedChunkIds, forbiddenSourceIds?}; použít reálné parapráze včetně navazujících témat v popisu evidence."
+  ],
+  "vectorContract": "docs/home-ai/20261028/research/vector-contract.md",
+  "runtimeRules": [
+    "Administrativní import načítá explicitně tři current a dva archive soubory; archiv publikuje pouze jako metadata bez embeddingů a aktuálních chunků. JSON není runtime fallback.",
+    "OpenAI embeddingy jsou persistované podle neměnného profilu a hashe přesného vstupu. PostgreSQL/pgvector je autorita publikované revize a vybírá kandidáty cosine SQL dotazem.",
+    "Current/public/profil/časové hranice se filtrují v SQL. Source validity a všechny source-version dependencies se znovu ověřují po provideru a při replay, i bez modelových citací.",
+    "Výpadek nebo vadná konfigurace volitelné AI nesmí shodit hru. Chyba DB není prázdný úspěch ani pokyn k textovému fallbacku.",
+    "Embedding dotazu následuje po moderaci přesného omezeného USER kontextu. Odpovědi asistenta ani zablokované dotazy nejsou zdrojem faktů nebo query historie.",
+    "Žádný scheduler, runtime fetch uživatelských URL nebo automatické placené retry. Aktuální zdroje a archiv zůstávají oddělené."
+  ]
+}

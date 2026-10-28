@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
 import {
   CrazyTypkaChat,
   createCrazyTypkaClient,
@@ -11,8 +12,50 @@ import {
 } from "../client/crazy-typka";
 import {
   CRAZY_TYPKA_SPEAKER,
+  isCrazyTypkaSource,
   type CrazyTypkaSource,
 } from "../shared/crazy-typka";
+
+test("new verified SUZ and SHerna citations survive client validation and render their actual URLs", () => {
+  const selected = getKnowledgeRegistry().chunks.filter((chunk) =>
+    ["suz-housing-payment-methods", "sh-game-room-booking"].includes(chunk.id),
+  );
+  assert.equal(selected.length, 2);
+  const sources = selected.map((chunk) => chunk.source);
+  sources.forEach((source) => assert.ok(isCrazyTypkaSource(source)));
+  assert.equal(
+    isCrazyTypkaSource({ ...sources[0], checkedAt: "2026-02-30" }),
+    false,
+  );
+  for (const url of [
+    "https://www.suz.cvut.cz.evil.invalid/cz",
+    "https://evil.suz.cvut.cz/cz",
+    "https://www.suz.cvut.cz:444/cz",
+    "http://www.suz.cvut.cz/cz",
+    "https://user:pass@www.suz.cvut.cz/cz",
+  ])
+    assert.equal(isCrazyTypkaSource({ ...sources[0], url }), false, url);
+  const state: CrazyTypkaState = {
+    availability: "enabled",
+    busy: false,
+    draft: "",
+    error: null,
+    notice: null,
+    recovery: "none",
+    messages: [{ id: 1, role: "ai", text: "Ověřené odkazy", sources }],
+    setDraft() {},
+    async send() {},
+    async retry() {},
+    async reset() {},
+    async cancel() {},
+    async refreshStatus() {},
+  };
+  const html = renderToStaticMarkup(
+    createElement(CrazyTypkaChat, { state, locale: "cs" }),
+  );
+  for (const source of sources) assert.ok(html.includes(source.url));
+  assert.match(html, /2026-10-28/);
+});
 
 const token = "a".repeat(64);
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));

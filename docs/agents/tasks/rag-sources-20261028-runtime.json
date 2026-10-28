@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-sources-20261028-runtime",
+  "title": "RAG: zapojení nových korpusů, freshness a citace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/crazy-typka-retrieval.ts",
+    "server/crazy-typka-provider.ts",
+    "server/crazy-typka.ts",
+    "server/data/silicon-hill-knowledge.json",
+    "shared/crazy-typka.ts",
+    "tests/crazy-typka-retrieval.test.ts",
+    "tests/crazy-typka-provider.test.ts",
+    "tests/crazy-typka.test.ts",
+    "tests/crazy-typka-ui.test.ts",
+    "docs/home-ai/20261028/runtime/",
+    ".cache/rag-sources-20261028-runtime/",
+    "docs/agents/handoffs/rag-sources-20261028-runtime.md",
+    "server/rag-evidence-backend.ts",
+    "tests/rag-evidence-backend.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zapojit předané SH/SÚZ výstupy do skutečné retrieval/provider/service cesty; citace musí ukazovat na skutečně použitý platný zdroj, archiv se nesmí zaměnit za aktuální pravidla.",
+    "Zachovat requestSeq replay, freshness před publikací a replay, oddělení USER kontextu, moderaci, soukromé relace, limity a cleanup. Doložit pozitivní i negativní retrieval a životní cyklus.",
+    "Po implementaci cíleně sjednotit opakovanou logiku, posoudit cache, alokace a uvolňování zdrojů; předat kód i testy. Žádné zápisy do client/ui.tsx, server/index.ts, SH/SÚZ datových výstupů či centrálních docs.",
+    "Skutečná evidence používá asynchronní OpenAI query embedding a pgvector vyhledání přes rag-evidence-backend. Žádný BM25/lexikální fallback při nedostupnosti vektorové cesty; stav a selhání backendu nesmějí předstírat úspěšný semantic retrieval. Zachovat source guardy, platnost/citace, soukromí, requestSeq a abort/timeout/shutdown."
+  ],
+  "verification": [
+    "Primární zdroje a stávající řetězec prozkoumat před změnou; rozlišit platný obsah, archiv, hypotézu a nedostupný či neověřený zdroj.",
+    "Lehké cílené CPU/schema/lifecycle kontroly podle rozsahu s fake providerem; plnou sadu/build/integraci předat samostatné validation rezervaci."
+  ],
+  "notes": [
+    "Přiděleno koordinátorovi chatu Vylepši úvodní obrazovku a AI chat (01a17e9d-dd4a-7fe3-91ac-4f3bc548982d). Přímé uživatelské zadání z 28. 10. 2026 ověřeno: import použitelných zdrojů z katalogu do skutečného RAG, začít Silicon Hillem a SÚZ, oddělit aktuální dokumenty od archivu.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Výchozí přijatá implementace PR32: main de6f87a2efbf8596bb03efae863e8d6763e22774. Před zápisem vlastní disjunktní claim; ready samo nepotvrzuje běžící práci. Původní primary WIP a snapshot 4182 se nemění.",
+    "Žádné GPU, hra ani editor; žádný scheduler ani provoz automatického crawleru. Přímé ověření veřejných primárních zdrojů je součást výzkumu. Placený provider není součást izolovaných testů.",
+    "Koordinátor sjednotí source-contract před propojením výstupů SH/SÚZ s runtime. Dítě nemění cizí soubory ani task katalog a nespouští další BMAD workflow; implementaci, cílený refaktoring a relevantní důkazy předá společně.",
+    "Vektorové rozšíření 28. 10. 2026 po doloženém předání v2 mezistavu 237d107cc52526f166d9a7db90d05b7b755ad0cc a skutečném release rag-runtime-integrator-01a17e9d. Koordinátor doložil 85/85 cílených CPU testů; tento záznam není opakovaný běh. Přidány pouze server/rag-evidence-backend.ts a tests/rag-evidence-backend.test.ts. Nový async/vector mode navazuje na rag-vector embeddings/store kontrakt; config/SQL/ingest a reálná DB validace patří odděleným taskům. Starší textový MVP neplní nový explicitní uživatelský požadavek embeddings+vector DB."
+  ]
+}

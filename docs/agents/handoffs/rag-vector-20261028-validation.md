@@ -1,0 +1,12 @@
+# Průběžné předání vektorové validace
+
+Vlastník `rag-vector-validation-01a17e9d`, root KEY-65, worktree `C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow`, větev `codex/rag-sources-sh-suz`.
+
+Docker Desktop byl před touto etapou vypnutý, root jej spustil oficiálním `docker desktop start --detach`. Stažen oficiální pgvector image0.8.7-pg17-bookworm, digest `sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d`. Vlastní kontejner `strahov-rag-20261028`, volume `strahov-rag-20261028-data`, label strahov.rag.task=rag-vector-20261028. Bind pouze127.0.0.1:5468, limit512MiB/1CPU. Ověřeno healthy, PostgreSQL17.11, dostupná extension vector0.8.7, oba parametry logováníbindů0. Privátní DB konfigurace je mimoGit, klíčOpenAI nebyl čten/kopírován. Schéma/RAGdata dosud nejsou importovaná, žádné placené embeddingy/generování neběžely.
+
+Kvůli souběžnému schválenému UI zadání se DB lifecycle oddělí od heavy/build/port2568 okna. Root nyní vlastní kontejner zastavil příkazem docker stop --time10 a ověřil status exited. Volume se nemaže. Žádný další vlastní server/browser/GPU neběží. Docker Desktop je sdílená nainstalovaná platforma a zůstává spuštěný; žádné cizí kontejnery se neukončovaly.
+
+Stávající validation claim se uvolní po tomto předání. Admin připraví samostatný DB task/cache/handoff pro port5468 a rag-postgres-local; teprve po jeho claimu root kontejner znovu spustí. Nikdo nepřebírá živý proces ani cizí port. Heavy/build/2568 může potom použít UI koordinátor; další RAG těžké ověření bude mít vlastní dohodnuté okno.
+
+28.10 root obnovil heavy okno a spustil plnou sadu nad výchozím head786c1bda78e71d73a429c515628d80207a706ed2 se skutečnou oddělenou testDB. Běh1506023ms skončil2564PASS/3FAIL/3SKIP:1autodev legacy review child a2WGSL inactive readiness. Nedotčené testy izolovaně1/1 a7/7PASS; původní logtest.log zachován, fullsuite se neoznačujePASS. Během posledního samotného autodev procesu byl dokončen samostatný kalibrační commit9ed94e86; dotčený RAG subset znovu108/108PASS. Build/SDK lokálně dosud neproběhly. Review odhalilo dvě RAG hrany, předány původním implementátorům. Následující plné ověření musí zahrnout opravy; místní těžké okno nyní předávám Jantar kvůli jeho čekajícímu buildu, CI běží samostatně až po novém PR.
+Skutečný HTTP harness4268 ukončen po3generacích, reset204; žádný vlastní server2568/4268 ani test/scanner proces nezůstává. DB5468 zůstává samostatně vlastněná database taskem, paidvolume se zachovává. Zdejší release není přijetí celku ani dokončení build/SDK.

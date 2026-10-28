@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-vector-20261028-validation",
+  "title": "RAG: izolované ověření pgvector a integrační pipeline",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "dist/",
+    ".cache/rag-vector-20261028-validation/",
+    "docs/agents/handoffs/rag-vector-20261028-validation.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568",
+    "port:4268"
+  ],
+  "acceptance": [
+    "Rezervovat zdroje před spuštěním Dockeru/DB/pipeline. Lokální PostgreSQL bind pouze 127.0.0.1:5468; evidovat identitu vlastního kontejneru a použitý image digest.",
+    "Koordinátorův kandidát image je pgvector/pgvector:0.8.7-pg17-bookworm z jeho primárního průzkumu; před startem ověřit dostupný tag/digest a zaznamenat skutečně použitou identitu.",
+    "Pokud je nutný start Docker Desktopu, spustit jej skrytě; neukončovat cizí služby. Žádná hra, editor ani GPU a žádné přepsání snapshotu 4182.",
+    "Oddělit úspěšný import/retrieval nad skutečnou DB od kvality skutečných OpenAI embeddingů. CI používá fake embedding provider a falešné DB credentials; skutečné tajné údaje se nevypisují ani necommitují."
+  ],
+  "verification": [
+    "Před náročnou pipeline a spuštěním DB vlastní claim a ověření skutečných procesů/portů. Testovat přesný stabilní zdrojový checkpoint včetně testů; zachovat původní selhání.",
+    "Spustit podle rozsahu reálné pgvector DB regrese s fake embedding providerem, plnou sadu, build a celý izolovaný SDK běh; nesměšovat je s živým OpenAI ověřením.",
+    "Po dokončení ukončit vlastní kontejnery/procesy, předat skutečné výsledky a release. Neměnit cizí kontejnery, procesy ani hraný snapshot."
+  ],
+  "notes": [
+    "Přímý požadavek uživatele na OpenAI embeddingy a vektorovou databázi ověřen v chatu Vylepši úvodní obrazovku a AI chat, 01a17e9d-dd4a-7fe3-91ac-4f3bc548982d. Koordinátor KEY-65 po průzkumu přidělil tuto pgvector etapu; původní textový MVP ji nenahrazuje.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/rag-sources-sh-suz. Před zápisem vlastní claim. Existující runtime WIP drží rag-runtime-integrator-01a17e9d a nepřebírá se podle stáří ani neexistujícího procesu.",
+    "Zachovat ověřené aktuální SH/SÚZ datasety a oddělené archivy; research/source-contract aktualizuje jejich koordinátor podle nového zadání. Starší textový návrh není zákazem uživatelem nyní vyžádané vektorové cesty.",
+    "Žádná hra, GPU, editor, automatický crawler či scheduler. Žádný reálný OpenAI klíč v Git, CI, klientovi ani logu. Izolované testy používají fake embedding provider; reálnou místní DB spouští jen držitel validation claimu.",
+    "Implementaci, cílený refaktoring, cache/lifecycle kontrolu a relevantní důkazy předat společně. Podagent nespouští další BMAD workflow ani nezasahuje do cizích scope. Main okno a centrální dokumentace se koordinují zvlášť.",
+    "28. 10. 2026 po předání zastaveného vlastního kontejneru a skutečném release oddělen DB lifecycle do rag-vector-20261028-database. Samotné spuštění/zastavení DB nyní vyžaduje jeho rezervace port:5468 a rag-postgres-local, nikoli toto heavy okno. Zde zůstává heavy-validation, workspace-build a porty2568/4268 pro plnou pipeline. Pokud zdejší kontrola používá DB, její lifecycle musí současně vlastnit koordinátor pod novým database taskem. Docker Desktop se při předání nezastavuje a volume se zachovává."
+  ]
+}

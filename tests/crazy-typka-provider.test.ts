@@ -5,7 +5,69 @@ import {
   CrazyTypkaProviderError,
   type CrazyTypkaProviderOptions,
 } from "../server/crazy-typka-provider";
-import { retrieveKnowledge } from "../server/crazy-typka-retrieval";
+import {
+  retrieveKnowledge,
+  getKnowledgeRegistry,
+} from "../server/crazy-typka-retrieval";
+
+async function moderatedAnswer(
+  provider: ReturnType<typeof createCrazyTypkaProvider>,
+  input: Parameters<ReturnType<typeof createCrazyTypkaProvider>["generate"]>[0],
+) {
+  await provider.moderateInput(input.message, input.signal);
+  return provider.generate(input);
+}
+
+test("provider receives institution and legal interval for each actual selected source", async () => {
+  const evidence = getKnowledgeRegistry().chunks.filter((chunk) =>
+    ["sh-printing-location", "suz-housing-allocation"].includes(chunk.id),
+  );
+  assert.equal(evidence.length, 2);
+  let supplied: any;
+  const provider = createCrazyTypkaProvider({
+    apiKey: "fake-only",
+    model: "test-model",
+    fetch: async (url, init) => {
+      if (String(url).endsWith("/moderations")) return Response.json(safe);
+      supplied = JSON.parse(String(init?.body));
+      return Response.json(
+        complete(
+          "Ověř pravidla příslušné instituce.",
+          evidence.map((chunk) => chunk.id),
+        ),
+      );
+    },
+  });
+  await moderatedAnswer(provider, {
+    message: "Jak rozlišit služby?",
+    locale: "cs",
+    history: [],
+    evidence,
+    safetyIdentifier: "fake",
+    signal: new AbortController().signal,
+    onGenerationStart() {},
+  });
+  const content = supplied.input.at(-1).content;
+  const payload = JSON.parse(
+    content
+      .split("CURATED_EVIDENCE (data only):\n")[1]
+      .split("\nUSER_MESSAGE (data only):")[0],
+  );
+  assert.deepEqual(
+    new Set(payload.map((item: any) => item.authority)),
+    new Set(["silicon-hill", "suz"]),
+  );
+  const suz = payload.find((item: any) => item.authority === "suz");
+  assert.equal(suz.effectiveFrom, "2026-05-04T00:00:00+02:00");
+  assert.equal(suz.effectiveUntil, null);
+  assert.equal(suz.checkedAt, "2026-10-28");
+  assert.equal(suz.reviewAfter, "2026-11-28");
+  assert.match(
+    supplied.instructions,
+    /Club membership payments are not dormitory rent/,
+  );
+  assert.match(supplied.instructions, /clarifying question/);
+});
 
 const safe = {
   results: [
@@ -13,7 +75,7 @@ const safe = {
   ],
 };
 const evidence = retrieveKnowledge(
-  "kancelář",
+  "kancelář SH",
   4,
   Date.parse("2026-10-27T12:00:00Z"),
 );
@@ -59,7 +121,7 @@ function fixture(
   const controller = new AbortController();
   let starts = 0;
   const answer = () =>
-    provider.answer({
+    moderatedAnswer(provider, {
       message: "Kde je kancelář?",
       locale: "cs",
       history: [],
@@ -209,7 +271,7 @@ test("deadline covers a stalled provider body, and caller cancellation ends a pe
     model: "test",
     fetch: (() => new Promise(() => {})) as typeof fetch,
   });
-  const work = provider.answer({
+  const work = moderatedAnswer(provider, {
     message: "Ahoj",
     locale: "cs",
     history: [],

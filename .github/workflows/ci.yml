@@ -17,6 +17,21 @@ jobs:
     name: verify
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    services:
+      rag-postgres:
+        image: pgvector/pgvector:0.8.7-pg17-bookworm@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
+        env:
+          POSTGRES_DB: strahov_rag_test
+          POSTGRES_USER: rag_test
+          # Ephemeral CI fixture only; no production credentials or OpenAI key.
+          POSTGRES_PASSWORD: rag_test_fixture
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rag_test -d strahov_rag_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - name: Checkout source and LFS assets
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -60,7 +75,20 @@ jobs:
         run: pnpm check:readme
 
       - name: Run all tests
-        run: pnpm test
+        env:
+          RAG_TEST_DATABASE_URL: postgresql://rag_test:rag_test_fixture@127.0.0.1:5432/strahov_rag_test
+        # New connections inherit safe bind logging before any vector is sent.
+        run: |
+          node --input-type=module <<'NODE'
+          import pg from 'pg';
+          const client = new pg.Client({ connectionString: process.env.RAG_TEST_DATABASE_URL });
+          try {
+            await client.connect();
+            await client.query('ALTER DATABASE strahov_rag_test SET log_parameter_max_length = 0');
+            await client.query('ALTER DATABASE strahov_rag_test SET log_parameter_max_length_on_error = 0');
+          } finally { await client.end(); }
+          NODE
+          pnpm test
 
       - name: Build production client
         run: pnpm build

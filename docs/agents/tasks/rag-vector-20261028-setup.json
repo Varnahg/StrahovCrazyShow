@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-vector-20261028-setup",
+  "title": "RAG: pg driver, Compose a CI pgvector konfigurace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "compose.ai.yaml",
+    "compose.rag.yaml",
+    "Dockerfile",
+    "scripts/test-integration.mjs",
+    "tests/feedback-deployment.test.ts",
+    ".github/workflows/ci.yml",
+    "docs/home-ai/20261028/deployment/",
+    ".cache/rag-vector-20261028-setup/",
+    "docs/agents/handoffs/rag-vector-20261028-setup.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přidat pg a @types/pg a nutné konfigurační vazby; zachovat nesouvisející zamčené verze, patche a existující build/deployment kontrakty.",
+    "Před každou instalací ověřit, že node_modules patří této worktree a není junction/symlink; neinstalovat do sdílené závislosti jiné worktree.",
+    "CI poskytne skutečnou pgvector službu s pouze falešnými testovacími přihlašovacími údaji a bez OpenAI klíče. Izolované testy nepřebírají produkční AI/DB/feedback konfiguraci.",
+    "Konfigurace zachová volitelnou AI službu a popíše provozní předpoklady. Službu, Docker ani pipeline tento task nespouští; ty patří validation rezervaci."
+  ],
+  "verification": [
+    "Nejdřív ověřit implementační kontrakt a relevantní primární podklady; lehké CPU testy používají fake transport/provider/DB podle hranice modulu.",
+    "Build, plnou sadu, skutečnou DB a integraci předat koordinátorovi s vlastní validation rezervací. Bez placeného OpenAI volání v izolovaných testech."
+  ],
+  "notes": [
+    "Přímý požadavek uživatele na OpenAI embeddingy a vektorovou databázi ověřen v chatu Vylepši úvodní obrazovku a AI chat, 01a17e9d-dd4a-7fe3-91ac-4f3bc548982d. Koordinátor KEY-65 po průzkumu přidělil tuto pgvector etapu; původní textový MVP ji nenahrazuje.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/rag-sources-sh-suz. Před zápisem vlastní claim. Existující runtime WIP drží rag-runtime-integrator-01a17e9d a nepřebírá se podle stáří ani neexistujícího procesu.",
+    "Zachovat ověřené aktuální SH/SÚZ datasety a oddělené archivy; research/source-contract aktualizuje jejich koordinátor podle nového zadání. Starší textový návrh není zákazem uživatelem nyní vyžádané vektorové cesty.",
+    "Žádná hra, GPU, editor, automatický crawler či scheduler. Žádný reálný OpenAI klíč v Git, CI, klientovi ani logu. Izolované testy používají fake embedding provider; reálnou místní DB spouští jen držitel validation claimu.",
+    "Implementaci, cílený refaktoring, cache/lifecycle kontrolu a relevantní důkazy předat společně. Podagent nespouští další BMAD workflow ani nezasahuje do cizích scope. Main okno a centrální dokumentace se koordinují zvlášť.",
+    "28. 10. 2026 dokončena fyzická instalace pg/@types/pg podle docs/agents/handoffs/rag-vector-20261028-setup.md; koordinátor doložil frozen/supply-chain PASS, zachované nesouvisející piny a ukončené pnpm procesy. Po skutečném release odebráno pouze node_modules/ pro setup Jantar worktree. Package/lock/config cesty zůstávají tomuto tasku; jejich vlastní dirty WIP převezme původní root s doloženým adopt-dirty. Toto není přijetí zbývající konfigurace ani oprávnění dále instalovat do node_modules."
+  ]
+}

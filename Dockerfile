@@ -10,6 +10,16 @@ FROM dependencies AS production-dependencies
 RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store \
     pnpm install --prod --frozen-lockfile --store-dir=/pnpm/store
 
+# Administrative importer shares the locked server dependencies, not game assets.
+FROM production-dependencies AS rag-tools
+COPY --chown=node:node tsconfig.json ./
+COPY --chown=node:node server ./server
+COPY --chown=node:node shared ./shared
+COPY --chown=node:node scripts/rag-import.ts ./scripts/rag-import.ts
+USER node
+ENTRYPOINT ["node", "--import", "tsx", "scripts/rag-import.ts"]
+CMD ["status"]
+
 FROM dependencies AS build
 RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --store-dir=/pnpm/store

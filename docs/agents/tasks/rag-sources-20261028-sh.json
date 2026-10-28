@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-sources-20261028-sh",
+  "title": "RAG: ověřené aktuální a archivní zdroje Silicon Hill",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/data/rag/silicon-hill.json",
+    "server/data/rag/silicon-hill-archive.json",
+    "docs/home-ai/20261028/sh/",
+    ".cache/rag-sources-20261028-sh/",
+    "docs/agents/handoffs/rag-sources-20261028-sh.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Prověřit použitelné primární zdroje Silicon Hill z předaného katalogu; přijmout jen doložené údaje s URL, původem, kontrolou, platností a přiměřeným rozsahem použití.",
+    "Aktuální korpus a archiv mají oddělené výstupy podle sjednaného source-contract; historické údaje nesmějí vystupovat jako současná pravidla.",
+    "Validovat vlastní datové výstupy a předat jejich skutečný rozsah, mezery a důkazy runtime integrátorovi bez zápisů do retrieval/provider/service."
+  ],
+  "verification": [
+    "Primární zdroje a stávající řetězec prozkoumat před změnou; rozlišit platný obsah, archiv, hypotézu a nedostupný či neověřený zdroj.",
+    "Lehké cílené CPU/schema/lifecycle kontroly podle rozsahu s fake providerem; plnou sadu/build/integraci předat samostatné validation rezervaci."
+  ],
+  "notes": [
+    "Přiděleno koordinátorovi chatu Vylepši úvodní obrazovku a AI chat (01a17e9d-dd4a-7fe3-91ac-4f3bc548982d). Přímé uživatelské zadání z 28. 10. 2026 ověřeno: import použitelných zdrojů z katalogu do skutečného RAG, začít Silicon Hillem a SÚZ, oddělit aktuální dokumenty od archivu.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Výchozí přijatá implementace PR32: main de6f87a2efbf8596bb03efae863e8d6763e22774. Před zápisem vlastní disjunktní claim; ready samo nepotvrzuje běžící práci. Původní primary WIP a snapshot 4182 se nemění.",
+    "Žádné GPU, hra ani editor; žádný scheduler ani provoz automatického crawleru. Přímé ověření veřejných primárních zdrojů je součást výzkumu. Placený provider není součást izolovaných testů.",
+    "Koordinátor sjednotí source-contract před propojením výstupů SH/SÚZ s runtime. Dítě nemění cizí soubory ani task katalog a nespouští další BMAD workflow; implementaci, cílený refaktoring a relevantní důkazy předá společně."
+  ]
+}
