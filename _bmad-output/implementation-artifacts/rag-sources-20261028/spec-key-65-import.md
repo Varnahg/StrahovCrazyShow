@@ -2,7 +2,7 @@
 title: 'KEY-65: OpenAI embeddingy a pgvector nad ověřenými SH a SÚZ podklady'
 type: feature
 created: '2026-10-28'
-status: in-review
+status: done
 route: dispatch
 baseline_commit: 'de6f87a2efbf8596bb03efae863e8d6763e22774'
 review_loop_iteration: 0
@@ -52,14 +52,14 @@ Archiv není ve výchozím retrievalu ani modelovém kontextu; v DB lze uchovat 
 
 ## Tasks & Acceptance
 
-- [ ] SH current/archiv, vlastní docs a retrieval-cases: ověřené nové věcné podklady a výluky, hash každé parafráze.
-- [ ] SÚZ current/archiv, vlastní docs a retrieval-cases: ubytování, pravidla, postupy, kontakty, tarifní jednotky s přesnými podklady.
-- [ ] OpenAI embedding adapter a testy: model/dim/profil/vstupní hash, bounds/abort/usage/fixed errors bez retry.
-- [ ] PostgreSQL/pgvector store, SQL, ingest a CLI: skutečné vektory, immutable revize, archive/current/časové filtry, cache a trvalé nejasné pokusy.
-- [ ] Backend/provider/service/shared: asynchronní DB cesta, moderace před embeddingem, pouze bezpečný USER kontext, oddělený embedding rozpočet a bez fallbacku; zachovat API.
-- [ ] Čtyři crazy-typka testy: pozitivní/negativní dotazy, archivní sentinel, data/hash/URL, účinnost a expiry, provider context, server citace/replay a klientská validace.
-- [ ] Root: review všech předaných dat/kódu, stabilní kontroly, omezená živá QA a samostatná integrace.
-- [ ] Root setup: pouze nový pg driver/types s původními piny ostatních závislostí, compose/CLI/provozní návod, skutečný pgvector v CI a soukromé místní ověření.
+- [x] SH current/archiv, vlastní docs a retrieval-cases: ověřené nové věcné podklady a výluky, hash každé parafráze.
+- [x] SÚZ current/archiv, vlastní docs a retrieval-cases: ubytování, pravidla, postupy, kontakty, tarifní jednotky s přesnými podklady.
+- [x] OpenAI embedding adapter a testy: model/dim/profil/vstupní hash, bounds/abort/usage/fixed errors bez retry.
+- [x] PostgreSQL/pgvector store, SQL, ingest a CLI: skutečné vektory, immutable revize, archive/current/časové filtry, cache a trvalé nejasné pokusy.
+- [x] Backend/provider/service/shared: asynchronní DB cesta, moderace před embeddingem, pouze bezpečný USER kontext, oddělený embedding rozpočet a bez fallbacku; zachovat API.
+- [x] Čtyři crazy-typka testy: pozitivní/negativní dotazy, archivní sentinel, data/hash/URL, účinnost a expiry, provider context, server citace/replay a klientská validace.
+- [x] Root: review všech předaných dat/kódu, stabilní kontroly, omezená živá QA a samostatná integrace.
+- [x] Root setup: pouze nový pg driver/types s původními piny ostatních závislostí, compose/CLI/provozní návod, skutečný pgvector v CI a soukromé místní ověření.
 
 Given dotaz na novou SH/SÚZ informaci, when projde celý service/provider řetězec, then model obdrží ověřený úryvek a klient přijme jeho správnou citaci. Given starý nebo archivní předpis, when má podobná klíčová slova, then se neobjeví v evidence ani odpovědních citacích. Given nový zdroj má kratší review interval, when vyprší, then nevyřadí ostatní platné dokumenty. Given přijatá operace použila podklady, when později vyprší, then ani odpověď bez veřejných sourceIds nelze neplatně replayovat.
 
@@ -104,5 +104,7 @@ Konečné cílené re-review B2: uzavřeno, chat předává pouze limit/now. Rev
 Po měření zvolen OpenAI large/3072 a práh0.60, PostgreSQL/pgvector exact cosine pro malý corpus. ANN index až podle měření. Immutable revize a oddělená embedding cache zachovají poslední platný obsah při výpadku importu. Datum kontroly není embedding vstup ani právní účinnost. Runtime načítá publikovanou DB revizi, nemění ji lokální JSON fallbackem. Přesná rozhraní, limity a zdroje jsou ve vector-contract. Nejasné výsledky placených operací se neoznačí za zdarma; přesnou exactly-once záruku přes externí API netvrdíme.
 
 ## Verification
+
+Konečné přijetí28.10: [PR34](https://github.com/Varnahg/StrahovCrazyShow/pull/34) sloučeno do main jako `86e4dd603ca1b91e3eaa5f84573f9481be410a29`. [CI40692141941](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40692141941) na přesném headu `a4c24af4756e45c72563919715edd7102465fb18`:2579PASS/0FAIL/1SKIP, skutečný pgvector test spuštěn, TypeScript/produkční build a celý izolovaný SDK běhSUCCESS. Source-secret checkSUCCESS a [project-acceptance](https://github.com/Varnahg/StrahovCrazyShow/pull/34#issuecomment-6469934495)SUCCESS. Merge tree `c1d382347b05829251d255dfb36bd2249771224b` je shodný s reviewed tree. Žádný odložený podložený review nález; známé limity relevance a absence veřejného deploymentu jsou v verification.md.
 
 Cílené AI/embedding/store/ingest/backend testy, skutečný PG/pgvector integrační test a perzistentní restart/cache/atomické publikace; potom celý TypeScript, build, izolovaná SDK integrace a plná CI. Živě importovat nejvýše45 dokumentových vstupů do prvního profilu, poté prokázat nulové embedding volání při nezměněném importu. Bounded skutečný query eval pro změření recall a prahu, samostatně nejvýše tři generativní odpovědi; všechny hodnoty a nejasné pokusy vykázat. Klíč/DB URL mimo Git; bez GPU/3D přejímky. Žádný mock nebo textový test není důkazem skutečných vektorů.
