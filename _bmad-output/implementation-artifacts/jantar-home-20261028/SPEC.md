@@ -2,7 +2,7 @@
 title: 'KEY-66: Jantar úvod a skutečný vstup do společného světa'
 type: 'feature'
 created: '2026-10-28'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 context: ['{project-root}/AGENTS.md', '{project-root}/docs/agents/bmad-policy.md', '{project-root}/docs/home-design/20261028/decision.md']
@@ -50,7 +50,7 @@ baseline_commit: 'e09d60fa24419a93b26f15e21c862e95e44aff2f'
 - [x] `client/welcome-map*.tsx/ts`, `tests/welcome-map.test.ts`, `public/fonts/manrope/`, `public/ui/crazy-typka.svg` — cache geometrie, lokální font/licence, původní vektorový portrét; task assets.
 - [x] `client/crazy-typka.tsx/css`, `tests/crazy-typka-compact.test.ts` — `variant?: "default" | "compact"`, původní default zachovat; task chat.
 - [x] `client/welcome-screen.tsx/css`, `client/ui.tsx`, `index.html`, `tests/welcome-screen.test.ts` — schválený tok a Jantar; task ui.
-- [ ] Vlastní handoffy, cílený refaktoring, review, stabilní test/build/integrace a produkční port 4276 — příslušné samostatné claims.
+- [x] Vlastní handoffy, cílený refaktoring, nezávislé source review, stabilní test/build/integrace a nová produkční4278 — příslušné samostatné claims; původní4276 retired se zachovanými důkazy.
 
 **Acceptance Criteria:**
 - Given úvod, when první render, then je vidět jediný multiplayer CTA, online bublinka a launcher AI; žádný editor/canvas, demo ani duplicitní název.
@@ -61,16 +61,39 @@ baseline_commit: 'e09d60fa24419a93b26f15e21c862e95e44aff2f'
 
 ## Implementation Notes
 
+Finální funkční obsah odpovídá `0d957a1ba0f53baeeef894b13791da857663d6fe`: skutečný produkční4280 má source manifest6bfb508e6361023bbe3e1cccbfbdb6f89de0714908e8c3da4788ce780e3ebcba/9494souborů a clientIDsha256-efca68de0348122b8183a0b2b7b1e68953bf3b45a77b9c8006856f5a150c90c6.148/148cílených testů, plný build, SDK a následný bytecheck dependencies PASS. Celý Docker03 na0d prošel popup/focus/draft/pending/citacemi, skutečným profilem/admission, HTTP/SDK/lifecycle/restartem a cleanupem. CI0d:2597PASS/0FAIL/1SKIP, build/integrace/secret checks SUCCESS. Uživatel výslovně potvrdil, že na běžné4280 vše funguje, a požádal dokončit pouze novou stránku. Publikační head má po b67ec21e zdroje/testy/build vstupy opět shodné s0d; zbývající commit je evidence. Přesná main přejímka je samostatný dokladPR33, lokální done ji nenahrazuje.
+
+Ověřený checkpoint987bcd92 nad přijatým86e4 má izolovaný source64e0678…/9494files a dependency8782a45…/16288files/0links0hardlinks. CI2596PASS/0FAIL/1SKIP, vlastní fyzické testy138/138, build a quiet SDK PASS. Praktický IAB je jen doplňkový; následný skutečný Edge/NVIDIA GTX1060 WebGL2 retry dokončil všech9lighting stages a původní game-ready gates. W/A/D reagují v testovaném natočení. Studený Edge timeout zůstává známé omezení bez renderer změny, žádný FPS benchmark se netvrdí. Podrobnosti a skutečné původní neúspěchy jsou v verification.md a handoffech. Po source review opravách je kanonický zdroj f57076ca; nový Docker E2E, izolovaný runtime4280 a integrační doklad teprve následují. Linear ani project-acceptance nejsou dosud Done/success.
+
 2026-10-28: Checkpoint ready-for-dev přijat na základě výslovného uživatelského schválení implementace Jantaru; následně in-progress. Baseline ověřen Git HEAD. Dvě oddělené implementační větve práce mají vlastní souborové rezervace.
 
 ## Spec Change Log
+
+- Uživatel následně výslovně ukončil rozšíření do diagnostiky startupu: původní goal je nová stránka a na4280 vše funguje. Diagnostický commit e819288559d896c7431859b0c8ef9866da61bd5f byl celý revertován b67ec21e6d3c319a7ebb89737857f431ca6333c4, bez přepisu historie. Všechny3startupclaims byly uvolněné,4282nevzniklo. Výsledný scope zachovává původní zákaz rendererových změn; historické timeouty nejsou vydávané za opravené.
+
+- Formální review vyžaduje dvě další přesně přidělené navazující plochy: canonical locale/title publisher + jeho storage regrese a existující Docker browser konzument nového home/profile toku + popup interakční regrese. Nejde o nový produktový záměr ani veřejné API; metadata-only App workaround se odstraní ve vlastním UI scope. Tasky i procesní port4281/finální výstup4280 přidělil koordinátor. Současná hraná4278 se nepřepisuje.
 
 - Přijatý upstream RAG main86e4dd603ca1b91e3eaa5f84573f9481be410a29 byl koordinovaně sloučen do62ba8c870082b1a3897d8f580d81dbd4005ca481. Zmrazený produktový záměr se nemění. Původní technický předpoklad bez serverových editací doplnil nový explicitně přidělený task jantar-home-20261028-provider-onboarding: jediná persona instrukce a regrese musí přestat nabízet odstraněný sólo vstup. Žádná změna serverového guest kontraktu nebo RAG architektury. Původní vlastník předal oba soubory a uvolnil scope.
 - Kombinovaný client transport/compact test nově prochází SÚZ/SHerna citacemi přes skutečný shared validátor. Starý bundle se k novému backendu nepřipojuje; následující checkpoint dostane vlastní fyzické dependencies, aby se nepozměnil původní immutable snapshot.
 
 ## Review Triage Log
 
-- Čtecí source review /root/review_home_flow: opraven prioritní fokus composeru před close a CSS span náhledu; kontrola oprav bez dalších doložených chyb. Vnější chat wrapper je transparentní, aby se neskládaly dvě .93 vrstvy. Samostatný přezkum compact/map kontraktů bez nových nálezů. Praktická browser přejímka a finální workflow review dosud čekají.
+Formální tři vrstvy nad finálním scoped diffem vůči přijatému main86e4 doběhly před triage; edge-case vrstva vrátila []. Spec nebyla součástí společného diffu a claims načítala jen edge vrstva podle instrukce.
+
+| Nález | Verdikt a důkaz | Route |
+| --- | --- | --- |
+| Blind B1: stejný locale při storage události vrátí starý title | low: publishLocale přepíše title před next===locale guardem, bez notify; App efekt závisí jen na locale. Staticky reálné, kosmetické. Přímá korekce kanonického publisheru a odstranění duplicitního efektu nevyžadují novou veřejnou surface/guard. | patch |
+| Verification G1: nový profile submit bez automatického interakčního guardu | medium: SSR výchozího stavu a API SDK neprovádějí nový formulář; odstranění enter by nezachytily. Manuální proof současného chování není průběžná automatická regrese. | patch |
+| Verification G2: popup open/close/Escape/focus jen manuálně | medium: přímé compact SSR neprovádí parent chatOpen. Launcher no-op by běžné testy nezachytily. Potřeba skutečného browser scénáře, bez placeného AI. | patch |
+| Verification Other D1: Docker browser driver hledá odstraněný tok | medium: původní scripts/integration-docker.ts po goto hledal hned nickname a starý CTA; test-docker.mjs jej povinně spouští s --browser. Nový home nickname nemountuje. Doložený zastaralý konzument před opravou f57076ca. | patch |
+
+G1+D1 tvoří společný kořen zastaralého browserového konzumenta nového vstupu. G2 je samostatný kořen chybějící popup regrese, byť může využít tentýž driver. B1 je samostatná metadata korekce. Žádné intent_gap/bad_spec/defer podle těchto zjištění; původní cold renderer limit zůstává oddělená známá okolnost, nikoli nový kódový nález těchto vrstev.
+
+Závěrečné ověření patches: skutečný browser odhalil hidden-launcher atributový read vtestu;0d957a1b jej opravil přes DOM bez změnyUI či očekávání, nový kontrakt RED→GREEN4/4 a nezávislý review[]. Třetí celý Docker harness pak PASS/exit0 včetně celého popup/onboarding scénáře. B1/G1/G2/D1 jsou vyřešené; žádný otevřený podložený nález ve výsledném Jantar diffu. Startup diagnostika byla na přímý pokyn uživatele vyřazená, nikoli vydaná za fix.
+
+Opravy B1/G1/G2/D1 jsou source-fixed:25dff25b přesouvá trvalý title do kanonického publisheru a ověřuje skutečné storage události (RED2FAIL→GREEN10/10); f57076ca aktualizuje skutečný dvoukrokový Docker browser vstup a doplňuje popup open/close/Escape/focus/draft/pending/reopen/citation regrese. Všechny AI adresy přebírá lokální fixture bez provider volání. Scoped tsc,49/49UI a3/3fixture kontrakty PASS. Následný nezávislý source review bez dalších konkrétních nálezů. Skutečný Docker E2E zatím pending; lehké testy jej nenahrazují.
+
+- Čtecí source review /root/review_home_flow: opraven prioritní fokus composeru před close a CSS span náhledu; kontrola oprav bez dalších doložených chyb. Vnější chat wrapper je transparentní, aby se neskládaly dvě .93 vrstvy. Samostatný přezkum compact/map kontraktů bez nových nálezů. Praktická browser přejímka987 proběhla; přijetí finálního patchovaného zdroje čeká na nové ověření.
 
 ## Design Notes
 

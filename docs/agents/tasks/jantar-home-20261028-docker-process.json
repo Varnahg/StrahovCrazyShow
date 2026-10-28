@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-docker-process",
+  "title": "Jantar: izolovaný Docker test na4281",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/jantar-home-20261028-docker-process/",
+    "docs/agents/handoffs/jantar-home-20261028-docker-process.md"
+  ],
+  "resources": [
+    "port:4281"
+  ],
+  "acceptance": [
+    "Spustit jen vlastní Docker test s STRAHOV_DOCKER_TEST_PORT=4281 po kontrole skutečného portu. Task sám vlastní jen port; full Docker build/integrace/browser současně vyžadují koordinátorův jantar validation heavy/GPU scope.",
+    "Před browserovou 3D fází inventura skutečných scén: nespouštět druhou scénu vedle4278. Zachovat servírované snapshoty; ovládat pouze vlastní testovací kartu v autorizovaném prohlížeči a používat skutečnou readiness.",
+    "Docker Desktop je sdílená platforma. Žádný prune ani stop cizích kontejnerů/volumes; označit vlastní procesy/kontejner, po testu je uklidit a release portu doložit.",
+    "Žádné reálné OpenAI/generační volání nebo produkční credentials; oddělit fake route scénáře od skutečného herního/HTTP výsledku."
+  ],
+  "verification": [
+    "Ověřit skutečný kód a reprodukční důkaz před opravou; zachovat původní výsledkové asserty a omezit diff na vlastní scope.",
+    "Příslušné kontroly a cleanup popsat v handoffu. Procesní, buildové a GPU operace jen s odpovídajícími současně drženými rezervacemi."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, větev codex/jantar-home. Přímé navazující review zadání KEY-66 od koordinátora01a17fd8-017a-7852-87f9-cd1538e1bde2; při přidělení source HEAD987bcd9242f747a6dd78c83a68b127a60ab90f19.",
+    "Současný neměnný klient/server4278 se během zdrojových oprav nepřepisuje; chráněná4182 zůstává beze změny. Starý4276 byl po dependency incidentu ukončen a neobnovuje se tímto taskem.",
+    "Žádná změna renderer budgetů/readiness, serverového API nebo PostgreSQL/RAG architektury. Žádné placené API. Package-manager příkazy nesmějí synchronizovat host root node_modules; používat přímé explicitní Node vstupy a oddělené fyzické snapshot dependencies.",
+    "Před zápisem vlastní disjunktní claim; konkrétní dítě neopakuje BMAD workflow. Předat změny, cílený refaktoring, důkazy i omezení, neoznačovat dílčí kontroly za přijetí celé hry."
+  ]
+}

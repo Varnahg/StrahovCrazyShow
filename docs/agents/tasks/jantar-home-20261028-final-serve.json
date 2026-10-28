@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-final-serve",
+  "title": "Jantar: finální neměnný produkční kandidát na4280",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/jantar-home-20261028-final-serve/",
+    "docs/agents/handoffs/jantar-home-20261028-final-serve.md"
+  ],
+  "resources": [
+    "port:4280"
+  ],
+  "acceptance": [
+    "Na vlastním loopback4280 obsluhovat přesně doložený nový finální source/build po review opravách, bez HMR. Současná4278 zůstává nezměněná a může být porovnávacím kandidátem.",
+    "Nový kandidát musí používat vlastní fyzické frozen dependencies; žádný zápis přes root nebo starý snapshot junction. Tento task není oprávnění pro build/GPU, které má samostatná validation rezervace.",
+    "Před startem ověřit port a vlastní proces, po předání uživateli držet portovou rezervaci. Release teprve po výslovném ukončení či doloženém předání serveru.",
+    "Platí jediná potvrzená varianta D cache, nikoli nový checkout nebo LFS bootstrap. Source kopírovat jednou z výslovného C rootu do vyhrazeného D subtree bez junctionu/hardlinků. D branch, root node_modules, Git/LFS a zdrojové soubory se nemění.",
+    "Snapshot node_modules musí být fyzický: případná COPY z vlastního combined02 jen po doložené shodě package/lock/workspace/patches a bajtů, s kontrolou linků/hardlinků a dependency manifestem. Všechny nové snapshot/dist/node_modules/game-diagnostics výstupy patří do D subtree; nejde o oprávnění instalovat do root dependencies."
+  ],
+  "verification": [
+    "Ověřit skutečný kód a reprodukční důkaz před opravou; zachovat původní výsledkové asserty a omezit diff na vlastní scope.",
+    "Příslušné kontroly a cleanup popsat v handoffu. Procesní, buildové a GPU operace jen s odpovídajícími současně drženými rezervacemi.",
+    "Před copy fresh kapacita a součet source + fyzické dependencies + dist + log/cache + rezerva. Koordinátorův odhad14.6GB je plán, ne důkaz skutečného využití. Build/GPU/SDK2568 nadále vyžadují současnou Jantar validation rezervaci; SDK proběhne před spuštěním serveru."
+  ],
+  "notes": [
+    "Procesní/claim worktree: D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Fyzický výstup: .cache/jantar-home-20261028-final-serve/snapshots/final-01 pod touto D worktree. Read-only zdroj: C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, source HEAD 0d957a1ba0f53baeeef894b13791da857663d6fe. Případný jiný zdrojový checkpoint nejprve doložit; D parent checkout/GitHEAD není zdrojem buildu.",
+    "Současný neměnný klient/server4278 se během zdrojových oprav nepřepisuje; chráněná4182 zůstává beze změny. Starý4276 byl po dependency incidentu ukončen a neobnovuje se tímto taskem.",
+    "Žádná změna renderer budgetů/readiness, serverového API nebo PostgreSQL/RAG architektury. Žádné placené API. Package-manager příkazy nesmějí synchronizovat host root node_modules; používat přímé explicitní Node vstupy a oddělené fyzické snapshot dependencies.",
+    "Před zápisem vlastní disjunktní claim; konkrétní dítě neopakuje BMAD workflow. Předat změny, cílený refaktoring, důkazy i omezení, neoznačovat dílčí kontroly za přijetí celé hry.",
+    "28.10 převod potvrzen živým registrem: C owner uvolnil původní metadata-only rezervaci bez4280procesu či snapshotu, nový owner jantar-final-serve-d-01a17fd8 již claimnul z D worktree. WritePaths/resources se nemění; upraveny jsou pouze jednoznačné source/output podmínky. Staré C helpery lze pouze číst, žádná globální Docker/WSL změna tím není udělena.",
+    "28.10 doložen nový zdroj0d957a1ba0f53baeeef894b13791da857663d6fe: vůči rodiči mění pouze Docker test driver5+/1− a jeho handoff; klient/server/assets/dependency vstupy beze změny. Ještě nebuilděná/nehraná příprava final-01 byla revidována se zachováním starého manifestu a driveru v preparation-history. Nová zjištěná source identity6bfb508e6361023bbe3e1cccbfbdb6f89de0714908e8c3da4788ce780e3ebcba/9494souborů, nikoli původníf570/bdce88ea. Příjemce doloží úplný before/after audit před buildem; nejde o povolení mutace již hraného4278 ani budoucího vydaného kandidáta."
+  ]
+}
