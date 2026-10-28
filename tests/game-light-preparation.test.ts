@@ -31,12 +31,14 @@ const compiled = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(`(function(environment) {
-  const { AuthoredLightPreparation, PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document } = environment;
+  const { AuthoredLightPreparation, PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document, sessionDiagnostics = { isRecording: false } } = environment;
   ${compiled}
   return PreparationGame;
 })`).runInThisContext();
 
-function fixture(t: import("node:test").TestContext) {
+function fixture(t: import("node:test").TestContext, diagnostics: {
+  hostname?: string; search?: string; recording?: boolean;
+} = {}) {
   const realEngine = new NullEngine();
   const scene = new Scene(realEngine);
   const camera = new FreeCamera(
@@ -67,6 +69,13 @@ function fixture(t: import("node:test").TestContext) {
     draws = 0,
     readyCalls = 0;
   let observeRender: (() => void) | undefined;
+  const calls: string[] = [];
+  const visibilityListeners = new Set<() => void>();
+  const document = {
+    hidden: false,
+    addEventListener(_type: string, callback: () => void) { visibilityListeners.add(callback); },
+    removeEventListener(_type: string, callback: () => void) { visibilityListeners.delete(callback); },
+  };
   const states: {
     instant: number;
     enabled: boolean;
@@ -81,8 +90,9 @@ function fixture(t: import("node:test").TestContext) {
     prepareLightVariants,
     arePreparationEffectsReady,
     selectLightingPreview,
+    sessionDiagnostics: { isRecording: diagnostics.recording === true },
     performance: { now: () => now },
-    document: { hidden: false, addEventListener() {}, removeEventListener() {} },
+    document,
     window: {
       setTimeout(callback: () => void) {
         timer = callback;
@@ -97,7 +107,7 @@ function fixture(t: import("node:test").TestContext) {
     isWebGPU: false,
     isDisposed: false,
     currentRenderPassId: 901,
-    areAllEffectsReady: () => effectsReady,
+    areAllEffectsReady: () => { calls.push("effects"); return effectsReady; },
     runRenderLoop(callback: () => void) {
       assert.equal(loop, undefined);
       loop = callback;
@@ -129,6 +139,9 @@ function fixture(t: import("node:test").TestContext) {
     ready: false,
     disposed: false,
     quality: "medium",
+    environmentProfile: createEnvironmentProfile({
+      hostname: diagnostics.hostname ?? "127.0.0.1", search: diagnostics.search ?? "",
+    }, { onSlowFrame() {} }),
     timeOverride: 1792144800000,
     flashlightOn: false,
     profile: {},
@@ -205,11 +218,13 @@ function fixture(t: import("node:test").TestContext) {
   activeMeshes.push(caster);
   scene.getActiveMeshes = () => activeMeshes;
   caster.isReady = () => {
+    calls.push("mesh");
     readyCalls++;
     assert.equal(engine.currentRenderPassId, camera.renderPassId);
     return true;
   };
   const render = () => {
+    calls.push("render");
     assert.equal(game.ready, false);
     assert.equal(engine.currentRenderPassId, 901);
     observeRender?.();
@@ -229,6 +244,7 @@ function fixture(t: import("node:test").TestContext) {
   });
   return {
     game,
+    calls,
     scene,
     states,
     rig,
@@ -259,6 +275,11 @@ function fixture(t: import("node:test").TestContext) {
       now = atMs;
       timer?.();
     },
+    visibility(hidden: boolean) {
+      document.hidden = hidden;
+      for (const callback of visibilityListeners) callback();
+    },
+    get visibilityObservers() { return visibilityListeners.size; },
     observeRender(callback: () => void) { observeRender = callback; },
     effects(value: boolean) {
       effectsReady = value;
@@ -733,4 +754,178 @@ test("native WebGL preparation remains nine stages without an independent day pr
   assert.equal(result.status, "complete");
   assert.equal(result.stages.length, 9);
   assert.ok(result.stages.every((s: { stage: string }) => !s.stage.startsWith("day-")));
+});
+
+test("real multiplayer diagnostics require both the existing local profile opt-in and recording", async (t) => {
+  for (const configuration of [
+    { search: "", recording: true, enabled: false },
+    { search: "?profileEnvironment=1", recording: false, enabled: false },
+    { hostname: "example.com", search: "?profileEnvironment=1", recording: true, enabled: false },
+    { search: "?profileEnvironment=1&profileEnvironment=1", recording: true, enabled: false },
+    { search: "?profileEnvironment=1", recording: true, enabled: true },
+  ]) {
+    const f = fixture(t, configuration);
+    f.game.network = { sessionId: "private-session", playerId: "private-player" };
+    const pending = f.start();
+    f.finish();
+    const result = await pending;
+    assert.equal(result.status, "complete");
+    assert.equal(!!f.game.lightingReadiness, configuration.enabled);
+    assert.ok(result.stages.every((stage: { readiness?: unknown }) =>
+      Object.hasOwn(stage, "readiness") === configuration.enabled));
+    if (configuration.enabled) {
+      assert.equal(f.game.lightingReadiness.mesh, null);
+      assert.equal(f.game.lightingReadiness.material, null);
+      assert.equal(f.game.lightingReadiness.observations.identity, "anonymous-stage-local-mesh-ordinal");
+    }
+  }
+});
+
+test("anonymous Game waits are bounded and never inspect mesh names, metadata or effect caches", async (t) => {
+  const f = fixture(t, { search: "?profileEnvironment=1", recording: true });
+  f.game.network = { sessionId: "private-session", playerId: "private-player" };
+  let ready = false, probes = 0, forbiddenReads = 0;
+  const meshes = Array.from({ length: 12 }, () => ({
+    isDisposed: () => false, isEnabled: () => true, isVisible: true,
+    isReady() { probes++; return ready; },
+    get name() { forbiddenReads++; throw new Error("private name"); },
+    get material() { forbiddenReads++; throw new Error("private material"); },
+    get metadata() { forbiddenReads++; throw new Error("private metadata"); },
+    get uniqueId() { forbiddenReads++; throw new Error("private identity"); },
+  }));
+  f.scene.getActiveMeshes = () => ({ data: meshes, length: meshes.length }) as any;
+  Object.defineProperty(f.engine, "_compiledEffects", {
+    get() { forbiddenReads++; throw new Error("cache accessor must not be read"); },
+  });
+  const pending = f.start();
+  f.tick(); f.tick();
+  const snapshot = f.game.lightingReadiness;
+  assert.equal(probes, 12, "one real readiness result per checked mesh");
+  assert.equal(snapshot.observations.samples.length, 8);
+  assert.equal(snapshot.observations.replacedSamples, 4);
+  assert.deepEqual(snapshot.observations.samples.map((sample: any) => sample.meshOrdinal), [5, 6, 7, 8, 9, 10, 11, 12]);
+  assert.ok(snapshot.observations.samples.every((sample: any) => sample.ready === false && sample.gate === "mesh"));
+  assert.equal(snapshot.mesh, null); assert.equal(snapshot.material, null);
+  assert.doesNotMatch(JSON.stringify(snapshot), /private|name|metadata|sessionId|playerId|http|NaN|Infinity/);
+  snapshot.waits.mesh = 999999;
+  f.tick();
+  assert.equal(snapshot.waits.mesh, 1000000);
+  assert.equal(snapshot.observations.capped, 1);
+  ready = true; f.finish();
+  assert.equal((await pending).status, "complete");
+  assert.equal(forbiddenReads, 0);
+});
+
+test("anonymous ordinals have a fixed per-stage allocation budget and reset at the next stage", async (t) => {
+  const f = fixture(t, { search: "?profileEnvironment=1", recording: true });
+  f.game.network = {};
+  let ready = false;
+  const meshes = Array.from({ length: 4100 }, () => ({
+    isDisposed: () => false, isEnabled: () => true, isVisible: true, isReady: () => ready,
+  }));
+  f.scene.getActiveMeshes = () => ({ data: meshes, length: meshes.length }) as any;
+  const pending = f.start();
+  for (let i = 0; i < 34; i++) f.tick();
+  const observations = f.game.lightingReadiness.observations;
+  assert.equal(observations.capped, 1);
+  assert.equal(observations.droppedMeshOrdinals, 4);
+  assert.equal(observations.samples.at(-1).meshOrdinal, null);
+  assert.equal(observations.samples.at(-1).waits, 4);
+  assert.ok(observations.samples.length <= 8);
+  ready = true;
+  for (let i = 0; i < 90 && f.game.lightingReadiness.stage === "current-off"; i++) f.tick();
+  assert.equal(f.game.lightingReadiness.stage, "current-on");
+  ready = false;
+  f.tick();
+  const next = observations.samples.filter((sample: any) => sample.stage === "current-on");
+  assert.equal(next.length, 8);
+  assert.ok(next.every((sample: any) => sample.meshOrdinal >= 1 && sample.meshOrdinal <= 128));
+  assert.equal(observations.droppedMeshOrdinals, 4, "a fresh stage has its own ordinal budget");
+  f.game.cancelLightPreparation();
+  assert.equal((await pending).status, "disposed");
+  assert.equal(f.hasTimer, false);
+});
+
+test("opt-in Game observation preserves exact check/effect/draw sequence and terminal cleanup", async (t) => {
+  for (const ending of ["complete", "timeout", "dispose", "throw"] as const) {
+    const results = [];
+    for (const enabled of [false, true]) {
+      const f = fixture(t, { search: enabled ? "?profileEnvironment=1" : "", recording: true });
+      f.game.network = {};
+      if (ending === "throw") f.game.isMeshReadyForCamera = () => { throw new Error("original check failure"); };
+      if (ending === "complete") f.observeRender(() => {
+        if (f.draws === 0) f.effects(false);
+        if (f.draws === 2) f.effects(true);
+      });
+      else f.effects(false);
+      const pending = f.start();
+      if (ending === "complete") f.finish();
+      else {
+        f.tick(); f.tick();
+        if (ending === "timeout") f.timeout();
+        if (ending === "dispose") f.game.cancelLightPreparation();
+      }
+      const result = await pending;
+      const base = { ...result, stages: result.stages.map(({ readiness: _readiness, ...stage }: any) => stage) };
+      results.push({ base, calls: [...f.calls], states: f.states.map(state => ({ ...state, self: !!state.self })) });
+      assert.equal(f.hasTimer, false);
+      assert.equal(f.game.cancelLightPreparation, undefined);
+      assert.equal(f.engine.currentRenderPassId, 901);
+      assert.equal(f.game.flashlight.beam.light.isEnabled(), false);
+      if (enabled && ending === "complete") {
+        assert.ok(result.stages[0].readiness.effectsFalseBeforeDraw > 0);
+        assert.ok(f.game.lightingReadiness.observations.samples.some((sample: any) => sample.gate === "effects"));
+      }
+    }
+    assert.deepEqual(results[1], results[0], ending);
+  }
+});
+
+test("recorded multiplayer diagnostics preserve hidden pause, visible deadline and observer cleanup", async (t) => {
+  const results = [];
+  for (const enabled of [false, true]) {
+    const f = fixture(t, { search: enabled ? "?profileEnvironment=1" : "", recording: true });
+    f.game.network = {};
+    f.effects(false);
+    const pending = f.start();
+    f.tick(); f.tick();
+    f.visibility(true);
+    const calls = f.calls.length;
+    f.timeout(60000); f.tick();
+    assert.equal(f.calls.length, calls, "hidden ticks do no preparation work");
+    f.visibility(false); f.effects(true); f.finish();
+    const result = await pending;
+    assert.equal(result.status, "complete");
+    assert.ok(result.pausedMs > 59000);
+    assert.ok(result.activeElapsedMs < 30000);
+    assert.equal(f.hasTimer, false);
+    assert.equal(f.visibilityObservers, 0);
+    results.push({ ...result, stages: result.stages.map(({ readiness: _readiness, ...stage }: any) => stage) });
+  }
+  assert.deepEqual(results[1], results[0]);
+});
+
+test("the real startup payload retains pipeline snapshots only in the existing named guest QA", async () => {
+  let initializer: ts.Expression | undefined;
+  const start = declaration.members.find(node => node.name?.getText(source) === "start")!;
+  const visit = (node: ts.Node) => {
+    if (ts.isVariableDeclaration(node) && node.name.getText(source) === "preparation") initializer = node.initializer;
+    ts.forEachChild(node, visit);
+  };
+  visit(start); assert.ok(initializer);
+  const expression = ts.transpileModule(`(async function(pipelinePreparation, preloadRender) { return ${initializer.getText(source)}; })`,
+    { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
+  const capture = new Script(expression).runInThisContext();
+  for (const network of [undefined, {}]) {
+    let snapshots = 0;
+    const readiness = { mesh: network ? null : "offline QA receiver" };
+    const result = await capture.call({
+      network, terrainReview: {}, lightingReadiness: readiness,
+      renderHealth: { guard: (promise: unknown) => promise },
+      prepareLighting: async () => ({ status: "complete", stages: [] }),
+    }, { snapshot() { snapshots++; return { offline: "offline shader label" }; } }, () => {});
+    assert.equal(result.readiness, readiness);
+    assert.equal(Object.hasOwn(result, "pipeline"), !network);
+    assert.equal(snapshots, network ? 0 : 1);
+  }
 });

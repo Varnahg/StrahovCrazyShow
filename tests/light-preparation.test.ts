@@ -584,3 +584,234 @@ test("stage diagnostics retain real callback gaps, named restart causes and incl
   assert.equal(result.pausedMs, 0);
   assert.equal(result.activeElapsedMs, result.elapsedMs);
 });
+
+test("readiness observations are opt-in and retain the exact callback and clock sequence", async () => {
+  const run = async (diagnostics?: boolean) => {
+    const calls: string[] = [];
+    const f = fixture({ diagnostics });
+    for (const key of Object.keys(
+      f.options,
+    ) as (keyof LightPreparationOptions)[]) {
+      const callback = f.options[key];
+      if (typeof callback === "function")
+        (f.options as unknown as Record<string, unknown>)[key] = (
+          ...args: unknown[]
+        ) => {
+          calls.push(key);
+          return (callback as (...values: unknown[]) => unknown)(...args);
+        };
+    }
+    const pending = f.start();
+    f.finish();
+    return { result: await pending, calls, state: f.state() };
+  };
+  const omitted = await run();
+  const off = await run(false);
+  const on = await run(true);
+  assert.deepEqual(off, omitted);
+  assert.deepEqual(await run("true" as unknown as boolean), omitted);
+  assert.deepEqual(on.calls, omitted.calls);
+  assert.deepEqual(on.state, omitted.state);
+  assert.ok(
+    omitted.result.stages.every((stage) => !Object.hasOwn(stage, "readiness")),
+  );
+  assert.ok(on.result.stages.every((stage) => stage.readiness !== undefined));
+  assert.deepEqual(
+    {
+      ...on.result,
+      stages: on.result.stages.map(({ readiness: _, ...stage }) => stage),
+    },
+    omitted.result,
+  );
+  assert.deepEqual(on.result.stages[0].readiness, {
+    collections: 2,
+    queueLength: 5,
+    queuePeak: 5,
+    cursor: 5,
+    retryLength: 0,
+    retryPeak: 0,
+    retryPasses: 0,
+    meshFalse: 0,
+    batchYields: 4,
+    effectsFalseBeforeDraw: 0,
+    effectsFalseAfterDraw: 0,
+    readyDraws: 2,
+    capped: 0,
+  });
+});
+
+test("readiness observations distinguish mesh retry, batch yield and pre/post draw false results", async () => {
+  let draws = 0;
+  const f = fixture({
+    diagnostics: true,
+    render() {
+      draws++;
+    },
+    check: () => draws >= 2,
+  });
+  const pending = f.start();
+  f.tick(); // Initial progress draw; all five meshes then retry once.
+  for (let i = 0; i < 3; i++) f.tick();
+  f.dispose();
+  const retry = (await pending).stages[0].readiness!;
+  assert.equal(retry.meshFalse, 5);
+  assert.equal(retry.retryPeak, 5);
+  assert.equal(retry.retryPasses, 1);
+  assert.equal(retry.queueLength, 5);
+  assert.equal(retry.cursor, 0);
+  assert.equal(retry.batchYields, 2);
+  assert.equal(retry.readyDraws, 0);
+
+  const before = fixture({
+    diagnostics: true,
+    meshes: () => [],
+    effectsReady: () => false,
+  });
+  const waiting = before.start();
+  before.tick();
+  before.tick();
+  before.tick();
+  before.dispose();
+  assert.equal((await waiting).stages[0].readiness!.effectsFalseBeforeDraw, 2);
+
+  let checks = 0;
+  const after = fixture({
+    diagnostics: true,
+    meshes: () => [],
+    effectsReady: () => ++checks !== 2,
+  });
+  const confirming = after.start();
+  after.tick();
+  after.tick();
+  after.dispose();
+  const observed = (await confirming).stages[0].readiness!;
+  assert.equal(observed.effectsFalseAfterDraw, 1);
+  assert.equal(observed.effectsFalseBeforeDraw, 0);
+  assert.equal(observed.collections, 2);
+  assert.equal(observed.readyDraws, 0);
+});
+
+test("readiness terminal snapshot precedes cleanup and retains timeout/error/hidden outcomes", async () => {
+  for (const ending of ["timeout", "failed", "disposed"] as const) {
+    const f = fixture({ diagnostics: true, check: () => false });
+    const stop = f.options.stop;
+    let resultDuringCleanup: unknown;
+    f.options.stop = (callback) => {
+      resultDuringCleanup = f.state();
+      stop(callback);
+    };
+    const pending = f.start();
+    f.tick();
+    f.tick();
+    if (ending === "timeout") f.timeout();
+    else if (ending === "disposed") f.dispose();
+    else {
+      f.options.check = () => {
+        throw new Error("private failure text");
+      };
+      f.tick();
+    }
+    const result = await pending;
+    assert.equal(result.status, ending);
+    assert.ok(resultDuringCleanup);
+    assert.equal(result.stages[0].readiness!.meshFalse, 2);
+    assert.equal(result.stages[0].readiness!.retryLength, 2);
+    assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
+    assert.equal(f.state().restores, ending === "disposed" ? 0 : 1);
+    assert.doesNotMatch(JSON.stringify(result), /private failure text/);
+  }
+  const hidden = visibilityFixture(true, { diagnostics: true });
+  const pending = hidden.start();
+  hidden.tick();
+  hidden.tick();
+  hidden.visible(false);
+  hidden.elapse(1000);
+  hidden.visible(true);
+  hidden.finish();
+  const result = await pending;
+  assert.equal(result.status, "complete");
+  assert.equal(result.pausedMs, 1000);
+  assert.ok(result.stages.every((stage) => stage.readiness?.readyDraws === 2));
+});
+
+test("readiness output is fixed numeric data and never reads mesh identity or metadata", async () => {
+  let reads = 0;
+  const hostile = {
+    isDisposed: () => false,
+    isEnabled: () => true,
+    isVisible: true,
+    isReady: () => true,
+    get name() {
+      reads++;
+      throw new Error("player private name");
+    },
+    get material() {
+      reads++;
+      throw new Error("private material getter");
+    },
+    get metadata() {
+      reads++;
+      throw new Error("private metadata getter");
+    },
+  };
+  const f = fixture({ diagnostics: true, meshes: () => [hostile] });
+  const pending = f.start();
+  f.finish();
+  const result = await pending;
+  assert.equal(result.status, "complete");
+  assert.equal(reads, 0);
+  for (const stage of result.stages) {
+    assert.equal(Object.keys(stage.readiness!).length, 13);
+    assert.ok(
+      Object.values(stage.readiness!).every(
+        (value) =>
+          Number.isSafeInteger(value) && value >= 0 && value <= 1_000_000,
+      ),
+    );
+  }
+  assert.doesNotMatch(
+    JSON.stringify(result),
+    /player|private|metadata|material/,
+  );
+});
+
+test("readiness collection sizes saturate without retaining an oversized mesh queue", async () => {
+  const mesh = {
+    isDisposed: () => false,
+    isEnabled: () => true,
+    isVisible: true,
+    isReady: () => true,
+  };
+  const f = fixture({
+    diagnostics: true,
+    meshes: () => Array(1_000_001).fill(mesh),
+  });
+  const pending = f.start();
+  f.tick();
+  f.dispose();
+  const result = await pending;
+  assert.equal(result.stages[0].readiness!.queueLength, 1_000_000);
+  assert.equal(result.stages[0].readiness!.queuePeak, 1_000_000);
+  assert.equal(result.stages[0].readiness!.capped, 1);
+  assert.ok(JSON.stringify(result.stages[0].readiness).length < 400);
+});
+
+test("an apply failure never attributes the previous stage queue to the new stage", async () => {
+  const f = fixture({
+    diagnostics: true,
+    apply(stage) {
+      if (stage === "current-on") throw new Error("apply failed");
+    },
+  });
+  const pending = f.start();
+  f.finish();
+  const result = await pending;
+  assert.equal(result.status, "failed");
+  assert.equal(result.failureStep, "apply");
+  assert.equal(result.stages[0].readiness!.readyDraws, 2);
+  const next = result.stages[1].readiness!;
+  assert.equal(next.collections, 0);
+  assert.equal(next.queueLength, 0);
+  assert.equal(next.cursor, 0);
+  assert.equal(next.retryLength, 0);
+});

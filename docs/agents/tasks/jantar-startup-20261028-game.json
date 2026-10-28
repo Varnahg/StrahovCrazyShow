@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "id": "jantar-startup-20261028-game",
+  "title": "Startup: bezpečné opt-in gate záznamy při skutečném multiplayer startu",
+  "writePaths": [
+    "client/game.ts",
+    "tests/game-authored-light-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    ".cache/jantar-startup-game-20261028/",
+    "docs/agents/handoffs/jantar-startup-20261028-game.md"
+  ],
+  "acceptance": [
+    "Zapnout existující tracker také při existing profileEnvironment opt-in a sessionDiagnostics.isRecording ve skutečném multiplayer startupu; normální remote/default režim nic nového nesbírá.",
+    "V network režimu raw mesh/material/player names a hráčské/session identity vždy chybí. Pouze class nebo opaque-local-renderer ordinal, nejvýše8samples a několik předem vymezených obyčejných own-datafields; žádné getter/isReady volání navíc, proxy ani cache mutation.",
+    "Dosavadní explicitní offline guest named QA zachovat; nerozšířit jeho jmenný výstup do síťového režimu.",
+    "Pipeline readiness, všechny varianty, health, submitted frame, deadlines a restore aktuálních nastavení zůstávají stejné. Doložit související skutečné Game a privacy/call-order CPU regrese."
+  ],
+  "verification": [
+    "Ověřit skutečné Game integrační body a privacy/offline/online rozdíly v cílených CPU fixtures, nikoli pouze pomocný recorder.",
+    "Předat přesný source/test diff a limity; tento task sám nespouští GPU nebo nové herní servery."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow. Nové přímé lidské hlášení opakovaného startup timeoutu ověřeno v chatu01a17fd8-017a-7852-87f9-cd1538e1bde2; nestačí další slepý retry.",
+    "Diagnostická fáze před opravou: doložit skutečnou čekací podmínku v reálném multiplayer startupu, bez změny readiness/timeoutů/variant. Konkrétní oprava bude samostatně odůvodněná následným důkazem.",
+    "Warm daylight0.598 a nynější night/daylight0 nejsou srovnatelný výkonový pár. Zaznamenat skutečné světelné/stage podmínky, cadence a source/build; původní výsledky ani chyby nepřepisovat.",
+    "Nové network diagnostiky nesmějí nést raw mesh/material/player names, session/player IDs ani libovolná metadata/URL/pakety. Existující výslovný offline guest named QA zůstává zachovaný; žádný nový jmenný síťový výstup.",
+    "Stávající immutable4278/4280 se nemění. Žádný GPU/build/fullsuite/server v těchto source taskách; nová copy/port a praktické ověření vyžadují samostatně konkrétní přidělení.",
+    "Podagent s konkrétní delegací neopakuje BMAD workflow. Přímé Node cílené testy, žádný pnpm exec/run/install do sdílených závislostí; vlastní claim před zápisem.",
+    "28.10 přesný minimální scope podle koordinátorova source auditu, existující Linear KEY-31 (startup/pipeline), nikoli KEY-39 UBO. World-renderer, strict helper a WebGPU pipeline source/testy se v této fázi neupravují; výzkumné artefakty v parentově nested startup-timeout prefixu. Další skutečná oprava až po gate důkazu."
+  ]
+}
