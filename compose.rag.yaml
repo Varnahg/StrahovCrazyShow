@@ -1,0 +1,42 @@
+# Optional local pgvector dependency; combine with compose.yaml + compose.ai.yaml.
+# Credentials belong in an external --env-file. No database host port is published.
+services:
+  rag-db:
+    image: pgvector/pgvector:0.8.7-pg17-bookworm@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: strahov_rag
+      POSTGRES_USER: strahov_rag_owner
+      POSTGRES_PASSWORD: ${RAG_POSTGRES_PASSWORD:?Set the database owner password outside Git}
+    command:
+      - postgres
+      - -c
+      - log_parameter_max_length=0
+      - -c
+      - log_parameter_max_length_on_error=0
+      - -c
+      - log_statement=none
+    volumes:
+      - rag-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U strahov_rag_owner -d strahov_rag]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  rag-tools:
+    profiles: [rag-admin]
+    build:
+      context: .
+      target: rag-tools
+    depends_on:
+      rag-db:
+        condition: service_healthy
+    environment:
+      # Use owner only for migrate, then switch to the limited ingestion role.
+      RAG_DATABASE_URL: ${RAG_INGEST_DATABASE_URL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-large}
+      OPENAI_EMBEDDING_DIMENSIONS: ${OPENAI_EMBEDDING_DIMENSIONS:-3072}
+    command: [status]
+volumes:
+  rag-data:

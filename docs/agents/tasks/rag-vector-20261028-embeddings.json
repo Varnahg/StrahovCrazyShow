@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-vector-20261028-embeddings",
+  "title": "RAG: OpenAI embedding klient a jeho kontrakt",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/rag-embeddings.ts",
+    "tests/rag-embeddings.test.ts",
+    "docs/home-ai/20261028/embeddings/",
+    ".cache/rag-vector-20261028-embeddings/",
+    "docs/agents/handoffs/rag-vector-20261028-embeddings.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat skutečný serverový OpenAI embedding adaptér podle sjednaného modelu/dimenzí a primárních API podkladů; klíč se nesmí dostat klientovi ani do evidence.",
+    "Ověřit vektory, chybové odpovědi, pořadí položek, omezení vstupů a abort/timeout/lifecycle. Neprovádět skryté neomezené placené retry.",
+    "Model, dimenze a přesný embedding vstup musí mít reprodukovatelnou identitu pro cache/import; změna profilu nesmí zaměnit nekompatibilní vektory."
+  ],
+  "verification": [
+    "Nejdřív ověřit implementační kontrakt a relevantní primární podklady; lehké CPU testy používají fake transport/provider/DB podle hranice modulu.",
+    "Build, plnou sadu, skutečnou DB a integraci předat koordinátorovi s vlastní validation rezervací. Bez placeného OpenAI volání v izolovaných testech."
+  ],
+  "notes": [
+    "Přímý požadavek uživatele na OpenAI embeddingy a vektorovou databázi ověřen v chatu Vylepši úvodní obrazovku a AI chat, 01a17e9d-dd4a-7fe3-91ac-4f3bc548982d. Koordinátor KEY-65 po průzkumu přidělil tuto pgvector etapu; původní textový MVP ji nenahrazuje.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/rag-sources-sh-suz. Před zápisem vlastní claim. Existující runtime WIP drží rag-runtime-integrator-01a17e9d a nepřebírá se podle stáří ani neexistujícího procesu.",
+    "Zachovat ověřené aktuální SH/SÚZ datasety a oddělené archivy; research/source-contract aktualizuje jejich koordinátor podle nového zadání. Starší textový návrh není zákazem uživatelem nyní vyžádané vektorové cesty.",
+    "Žádná hra, GPU, editor, automatický crawler či scheduler. Žádný reálný OpenAI klíč v Git, CI, klientovi ani logu. Izolované testy používají fake embedding provider; reálnou místní DB spouští jen držitel validation claimu.",
+    "Implementaci, cílený refaktoring, cache/lifecycle kontrolu a relevantní důkazy předat společně. Podagent nespouští další BMAD workflow ani nezasahuje do cizích scope. Main okno a centrální dokumentace se koordinují zvlášť."
+  ]
+}

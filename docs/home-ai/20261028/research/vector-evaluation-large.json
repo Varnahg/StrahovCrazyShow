@@ -1,0 +1,1681 @@
+{
+  "createdAt": "2026-10-28T11:53:46.368Z",
+  "revisionId": "76922848bbaf791b366a87dc7b8985f5b995d9542b512948697b301edb3dbfdb",
+  "profile": {
+    "id": "48298f1f727a87ab57999ec2584b79c4d7a3f8c39060cdb03f635d226ae5bcbc",
+    "provider": "openai",
+    "model": "text-embedding-3-large",
+    "dimensions": 3072,
+    "inputVersion": "title-locator-text-v1"
+  },
+  "usage": {
+    "promptTokens": 825,
+    "totalTokens": 825
+  },
+  "embeddingCalls": 2,
+  "embeddingElapsedMs": 1326.6680000000001,
+  "results": [
+    {
+      "query": "Co si mám připravit před registrací do Silicon Hill?",
+      "expectedChunkIds": [
+        "sh-registration-preparation"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-1",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill"
+      },
+      "latencyMs": 128.23180000000002,
+      "hits": [
+        {
+          "id": "sh-registration-preparation",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.3217251456430452
+        },
+        {
+          "id": "sh-moving-college",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.4037892514100494
+        },
+        {
+          "id": "sh-membership-join",
+          "sourceId": "statutes",
+          "distance": 0.4167007870286096
+        },
+        {
+          "id": "sh-moving-block",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.43920975585401345
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Přestěhoval jsem se na jiný blok, komu mám napsat kvůli internetu?",
+      "expectedChunkIds": [
+        "sh-moving-block"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-2",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 43.9686999999999,
+      "hits": [
+        {
+          "id": "sh-moving-block",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.39280466229143396
+        },
+        {
+          "id": "sh-moving-college",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.46344285075927405
+        },
+        {
+          "id": "sh-registration-preparation",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.5339074062692557
+        },
+        {
+          "id": "sh-network-devices",
+          "sourceId": "network",
+          "distance": 0.5369246152674663
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Na předchozí koleji už mám členství zaplacené. Jak ho převedu do SH?",
+      "expectedChunkIds": [
+        "sh-moving-college"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-3",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill"
+      },
+      "latencyMs": 79.8697000000002,
+      "hits": [
+        {
+          "id": "sh-moving-college",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.4002266540353775
+        },
+        {
+          "id": "sh-membership-join",
+          "sourceId": "statutes",
+          "distance": 0.5056264541065381
+        },
+        {
+          "id": "sh-moving-block",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.5112707400811325
+        },
+        {
+          "id": "sh-membership-fees",
+          "sourceId": "membership",
+          "distance": 0.5548204629440432
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jak se připojím k WiFi SiliconHill?",
+      "expectedChunkIds": [
+        "sh-wifi-registration"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-4",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill"
+      },
+      "latencyMs": 39.205099999999675,
+      "hits": [
+        {
+          "id": "sh-wifi-registration",
+          "sourceId": "sh-wifi-guide",
+          "distance": 0.2755848451905124
+        },
+        {
+          "id": "sh-registration-preparation",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.3418087529102126
+        },
+        {
+          "id": "sh-wifi-stable-address",
+          "sourceId": "sh-wifi-guide",
+          "distance": 0.3507740200373547
+        },
+        {
+          "id": "sh-moving-college",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.4275324360897935
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Telefon má soukromou MAC a WiFi SiliconHill nefunguje, co zkontrolovat?",
+      "expectedChunkIds": [
+        "sh-wifi-stable-address"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-5",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill"
+      },
+      "latencyMs": 56.67859999999973,
+      "hits": [
+        {
+          "id": "sh-wifi-stable-address",
+          "sourceId": "sh-wifi-guide",
+          "distance": 0.33920563999415065
+        },
+        {
+          "id": "sh-wifi-registration",
+          "sourceId": "sh-wifi-guide",
+          "distance": 0.40527529731196943
+        },
+        {
+          "id": "sh-mac-identification",
+          "sourceId": "sh-mac-guide",
+          "distance": 0.4113866148532145
+        },
+        {
+          "id": "sh-registration-preparation",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.4683157238296036
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kterou MAC adresu z Windows mám dát registrátorovi, když mám i VPN?",
+      "expectedChunkIds": [
+        "sh-mac-identification"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-6",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 64.67979999999989,
+      "hits": [
+        {
+          "id": "sh-mac-identification",
+          "sourceId": "sh-mac-guide",
+          "distance": 0.42188266762866045
+        },
+        {
+          "id": "sh-wifi-stable-address",
+          "sourceId": "sh-wifi-guide",
+          "distance": 0.4478087822292137
+        },
+        {
+          "id": "sh-registration-preparation",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.5087627709581425
+        },
+        {
+          "id": "sh-network-devices",
+          "sourceId": "network",
+          "distance": 0.5255307959891764
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kde na Strahově najdu dílnu 3D tisku?",
+      "expectedChunkIds": [
+        "sh-printing-location"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-7",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill",
+        "topics": [
+          "printing"
+        ]
+      },
+      "latencyMs": 86.34029999999984,
+      "hits": [
+        {
+          "id": "sh-printing-location",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.3337080944697608
+        },
+        {
+          "id": "sh-printing-request",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.3862382709712572
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Můžu přijít k 3D tiskárně a tisknout sám?",
+      "expectedChunkIds": [
+        "sh-printing-request"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-8",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill",
+        "topics": [
+          "printing"
+        ]
+      },
+      "latencyMs": 60.05149999999958,
+      "hits": [
+        {
+          "id": "sh-printing-request",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.373051013089725
+        },
+        {
+          "id": "sh-printing-location",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.45547180748860916
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kde na Strahově vyvolám fotografický film?",
+      "expectedChunkIds": [
+        "sh-photography-location"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-9",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 70.33300000000008,
+      "hits": [
+        {
+          "id": "sh-photography-location",
+          "sourceId": "sh-photography-guide",
+          "distance": 0.4581934066907013
+        },
+        {
+          "id": "sh-photography-first-visit",
+          "sourceId": "sh-photography-guide",
+          "distance": 0.5314549916024026
+        },
+        {
+          "id": "sh-printing-location",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.5559629341756716
+        },
+        {
+          "id": "sh-printing-request",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.561436082280526
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jak si domluvím první návštěvu Fotokomory?",
+      "expectedChunkIds": [
+        "sh-photography-first-visit"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-10",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill",
+        "topics": [
+          "photography"
+        ]
+      },
+      "latencyMs": 28.11030000000028,
+      "hits": [
+        {
+          "id": "sh-photography-first-visit",
+          "sourceId": "sh-photography-guide",
+          "distance": 0.3558428210610931
+        },
+        {
+          "id": "sh-photography-location",
+          "sourceId": "sh-photography-guide",
+          "distance": 0.4898714382490801
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Stačí vyplnit rezervaci SHerny a rovnou přijít?",
+      "expectedChunkIds": [
+        "sh-game-room-booking"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-11",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill",
+        "topics": [
+          "game-room"
+        ]
+      },
+      "latencyMs": 29.25520000000006,
+      "hits": [
+        {
+          "id": "sh-game-room-booking",
+          "sourceId": "sh-game-room-reservations",
+          "distance": 0.4009588361557007
+        },
+        {
+          "id": "sh-game-room-vr",
+          "sourceId": "sh-game-room-home",
+          "distance": 0.5323931090705443
+        },
+        {
+          "id": "sh-game-room-conduct",
+          "sourceId": "sh-game-room-rules",
+          "distance": 0.5328548477739314
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Můžu si v SHerně rovnou nasadit VR brýle?",
+      "expectedChunkIds": [
+        "sh-game-room-vr"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-12",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill",
+        "topics": [
+          "game-room"
+        ]
+      },
+      "latencyMs": 36.249399999999696,
+      "hits": [
+        {
+          "id": "sh-game-room-vr",
+          "sourceId": "sh-game-room-home",
+          "distance": 0.40185873345384715
+        },
+        {
+          "id": "sh-game-room-conduct",
+          "sourceId": "sh-game-room-rules",
+          "distance": 0.5501218682345013
+        },
+        {
+          "id": "sh-game-room-booking",
+          "sourceId": "sh-game-room-reservations",
+          "distance": 0.591539346891227
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Můžeme v SHerně jíst a dát si pivo?",
+      "expectedChunkIds": [
+        "sh-game-room-conduct"
+      ],
+      "forbiddenSourceIds": [
+        "sh-archive-fotoatelier",
+        "sh-archive-modelland"
+      ],
+      "id": "sh-13",
+      "group": "source-cases",
+      "filters": {
+        "authority": "silicon-hill",
+        "topics": [
+          "game-room"
+        ]
+      },
+      "latencyMs": 66.93700000000035,
+      "hits": [
+        {
+          "id": "sh-game-room-conduct",
+          "sourceId": "sh-game-room-rules",
+          "distance": 0.5466221799888811
+        },
+        {
+          "id": "sh-game-room-booking",
+          "sourceId": "sh-game-room-reservations",
+          "distance": 0.5866341479847494
+        },
+        {
+          "id": "sh-game-room-vr",
+          "sourceId": "sh-game-room-home",
+          "distance": 0.6186116123051941
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kde najdu aktuální ubytovací dokumenty SÚZ?",
+      "expectedChunkIds": [
+        "suz-current-housing-documents"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-1",
+      "group": "source-cases",
+      "filters": {
+        "authority": "suz"
+      },
+      "latencyMs": 42.90910000000031,
+      "hits": [
+        {
+          "id": "suz-current-housing-documents",
+          "sourceId": "suz-housing-documents",
+          "distance": 0.33040125240839247
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.3849699176417579
+        },
+        {
+          "id": "suz-housing-office-location",
+          "sourceId": "suz-housing-office",
+          "distance": 0.38706475716961464
+        },
+        {
+          "id": "suz-housing-allocation",
+          "sourceId": "suz-scenario-2026-2027",
+          "distance": 0.3967396329685897
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Stačí podat žádost a mám kolej jistou?",
+      "expectedChunkIds": [
+        "suz-housing-allocation",
+        "suz-housing-applications"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-2",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 50.095200000000204,
+      "hits": [
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.4360960705305539
+        },
+        {
+          "id": "suz-housing-applications",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.4657660096254489
+        },
+        {
+          "id": "suz-arrival-documents",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.497263409062377
+        },
+        {
+          "id": "suz-housing-allocation",
+          "sourceId": "suz-scenario-2026-2027",
+          "distance": 0.5195066118235245
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Můžu požádat o kolej ČVUT během roku?",
+      "expectedChunkIds": [
+        "suz-housing-applications"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-3",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 32.42489999999998,
+      "hits": [
+        {
+          "id": "suz-housing-applications",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.4057854173876986
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5090504549525305
+        },
+        {
+          "id": "suz-arrival-documents",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.5195804669828734
+        },
+        {
+          "id": "suz-arrival-coordination",
+          "sourceId": "suz-arrival-guidance",
+          "distance": 0.5206502633830599
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jaké doklady potřebuji při nástupu na kolej?",
+      "expectedChunkIds": [
+        "suz-arrival-documents"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-4",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 25.908899999999903,
+      "hits": [
+        {
+          "id": "suz-arrival-documents",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.31158305227470817
+        },
+        {
+          "id": "suz-arrival-coordination",
+          "sourceId": "suz-arrival-guidance",
+          "distance": 0.4974801404309619
+        },
+        {
+          "id": "suz-housing-applications",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.5212689485130324
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5292489843102604
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jsem nezletilý a nastupuji na kolej, jaký souhlas potřebuji?",
+      "expectedChunkIds": [
+        "suz-arrival-documents"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-5",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 35.71900000000005,
+      "hits": [
+        {
+          "id": "suz-arrival-documents",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.46639999693769174
+        },
+        {
+          "id": "suz-housing-applications",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.5718189692576461
+        },
+        {
+          "id": "suz-arrival-coordination",
+          "sourceId": "suz-arrival-guidance",
+          "distance": 0.5747449776549531
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5811325760927752
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jaký je rozdíl mezi rezervační a ubytovací jistotou?",
+      "expectedChunkIds": [
+        "suz-deposit-distinction"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-6",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 41.6877999999997,
+      "hits": [
+        {
+          "id": "suz-deposit-distinction",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.3480591195600481
+        },
+        {
+          "id": "suz-housing-allocation",
+          "sourceId": "suz-scenario-2026-2027",
+          "distance": 0.5117759140131831
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5406354471041064
+        },
+        {
+          "id": "suz-housing-termination",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.5565344397414116
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Do kdy musí být zaplacené kolejné SÚZ?",
+      "expectedChunkIds": [
+        "suz-housing-payment-due"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-7",
+      "group": "source-cases",
+      "filters": {
+        "authority": "suz"
+      },
+      "latencyMs": 34.38259999999991,
+      "hits": [
+        {
+          "id": "suz-housing-payment-due",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.36435120566433477
+        },
+        {
+          "id": "suz-arrival-coordination",
+          "sourceId": "suz-arrival-guidance",
+          "distance": 0.4669435941981057
+        },
+        {
+          "id": "suz-housing-termination",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.4756078314346013
+        },
+        {
+          "id": "suz-housing-payment-methods",
+          "sourceId": "suz-payment-methods",
+          "distance": 0.49431387467934484
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kolik dní předem musím podat výpověď ubytování?",
+      "expectedChunkIds": [
+        "suz-housing-termination"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-8",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 34.20320000000038,
+      "hits": [
+        {
+          "id": "suz-housing-termination",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.363724705469852
+        },
+        {
+          "id": "suz-housing-payment-due",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.54928144200502
+        },
+        {
+          "id": "suz-deposit-distinction",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.5543393388941107
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.554416666994582
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jak si vyměním pokoj na koleji?",
+      "expectedChunkIds": [
+        "suz-room-change"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-9",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 46.65020000000004,
+      "hits": [
+        {
+          "id": "suz-room-change",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.31924687827942577
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.4109963600439782
+        },
+        {
+          "id": "suz-report-maintenance",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.43228748993689503
+        },
+        {
+          "id": "suz-housing-applications",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.4722836361085946
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Je cena kolejného na Strahově za měsíc nebo za den?",
+      "expectedChunkIds": [
+        "suz-dorm-tariff-unit"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-10",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 64.92419999999993,
+      "hits": [
+        {
+          "id": "suz-dorm-tariff-unit",
+          "sourceId": "suz-dorm-tariff-2026-09",
+          "distance": 0.4025407394637269
+        },
+        {
+          "id": "sh-sport",
+          "sourceId": "sport",
+          "distance": 0.49584286815278567
+        },
+        {
+          "id": "suz-housing-payment-methods",
+          "sourceId": "suz-payment-methods",
+          "distance": 0.5056629965976892
+        },
+        {
+          "id": "suz-strahov-sports-rental",
+          "sourceId": "suz-sports-rental",
+          "distance": 0.5070261917749103
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jak zaplatím za kolej kartou a jde to v hotovosti?",
+      "expectedChunkIds": [
+        "suz-housing-payment-methods"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-11",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 49.233000000000175,
+      "hits": [
+        {
+          "id": "suz-housing-payment-methods",
+          "sourceId": "suz-payment-methods",
+          "distance": 0.3651835331026926
+        },
+        {
+          "id": "suz-dorm-tariff-unit",
+          "sourceId": "suz-dorm-tariff-2026-09",
+          "distance": 0.5880109006289875
+        },
+        {
+          "id": "suz-arrival-coordination",
+          "sourceId": "suz-arrival-guidance",
+          "distance": 0.5882279127958195
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5901337853152391
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Nemůžu nastoupit na kolej v termínu, komu mám napsat?",
+      "expectedChunkIds": [
+        "suz-arrival-coordination"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-12",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 51.190200000000004,
+      "hits": [
+        {
+          "id": "suz-arrival-coordination",
+          "sourceId": "suz-arrival-guidance",
+          "distance": 0.5002529020240165
+        },
+        {
+          "id": "suz-housing-applications",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.5798602321804931
+        },
+        {
+          "id": "suz-housing-payment-due",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.5996149801383606
+        },
+        {
+          "id": "suz-arrival-documents",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.6024707785441858
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Na koleji praskla voda, kam hlásit havárii?",
+      "expectedChunkIds": [
+        "suz-report-maintenance"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-13",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 31.510099999999966,
+      "hits": [
+        {
+          "id": "suz-report-maintenance",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.3569536515368614
+        },
+        {
+          "id": "suz-report-insects",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.5083149953642006
+        },
+        {
+          "id": "suz-strahov-contacts",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.561429666102892
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5862531933889035
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Na pokoji na Strahově jsou štěnice, komu to hlásit?",
+      "expectedChunkIds": [
+        "suz-report-insects"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-14",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 34.00310000000036,
+      "hits": [
+        {
+          "id": "suz-report-insects",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.41745822745674466
+        },
+        {
+          "id": "suz-strahov-room-types",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.5489573534882433
+        },
+        {
+          "id": "suz-report-maintenance",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.561746001528408
+        },
+        {
+          "id": "suz-housing-office-location",
+          "sourceId": "suz-housing-office",
+          "distance": 0.5926876163846004
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jaký je kontakt na hospodářku bloku 6 Strahov?",
+      "expectedChunkIds": [
+        "suz-strahov-contacts"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-15",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 26.17430000000013,
+      "hits": [
+        {
+          "id": "suz-strahov-contacts",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.3529020135118288
+        },
+        {
+          "id": "suz-housing-office-location",
+          "sourceId": "suz-housing-office",
+          "distance": 0.4869467703507425
+        },
+        {
+          "id": "sh-moving-block",
+          "sourceId": "sh-faq-onboarding",
+          "distance": 0.5271505976626422
+        },
+        {
+          "id": "sh-office",
+          "sourceId": "membership",
+          "distance": 0.5318990081399467
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Jaké pokoje jsou na bloku 8 Strahov?",
+      "expectedChunkIds": [
+        "suz-strahov-room-types"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-16",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 42.32619999999997,
+      "hits": [
+        {
+          "id": "suz-strahov-room-types",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.3951406414656472
+        },
+        {
+          "id": "suz-strahov-contacts",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.4904798103703676
+        },
+        {
+          "id": "suz-housing-office-location",
+          "sourceId": "suz-housing-office",
+          "distance": 0.5192121457581342
+        },
+        {
+          "id": "suz-buffet-location",
+          "sourceId": "suz-strahov-buffet",
+          "distance": 0.5609032778012009
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kde sídlí oddělení pro ubytování SÚZ?",
+      "expectedChunkIds": [
+        "suz-housing-office-location"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-17",
+      "group": "source-cases",
+      "filters": {
+        "authority": "suz"
+      },
+      "latencyMs": 53.17230000000018,
+      "hits": [
+        {
+          "id": "suz-housing-office-location",
+          "sourceId": "suz-housing-office",
+          "distance": 0.2354147314807571
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.392947068083743
+        },
+        {
+          "id": "suz-housing-allocation",
+          "sourceId": "suz-scenario-2026-2027",
+          "distance": 0.4285355373717261
+        },
+        {
+          "id": "suz-strahov-contacts",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.4327237980777232
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kde najdu jídelníček menzy Strahov?",
+      "expectedChunkIds": [
+        "suz-menza-location-menu"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-18",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 70.36389999999983,
+      "hits": [
+        {
+          "id": "suz-menza-location-menu",
+          "sourceId": "suz-menza-strahov",
+          "distance": 0.30509541005683505
+        },
+        {
+          "id": "suz-buffet-location",
+          "sourceId": "suz-strahov-buffet",
+          "distance": 0.38267618885261123
+        },
+        {
+          "id": "sh-sport",
+          "sourceId": "sport",
+          "distance": 0.494118301591852
+        },
+        {
+          "id": "suz-strahov-contacts",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.5114003274978088
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kde je bufet na Strahově?",
+      "expectedChunkIds": [
+        "suz-buffet-location"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-19",
+      "group": "source-cases",
+      "filters": {},
+      "latencyMs": 53.15030000000024,
+      "hits": [
+        {
+          "id": "suz-buffet-location",
+          "sourceId": "suz-strahov-buffet",
+          "distance": 0.299458938847755
+        },
+        {
+          "id": "suz-menza-location-menu",
+          "sourceId": "suz-menza-strahov",
+          "distance": 0.46439998740475064
+        },
+        {
+          "id": "sh-sport",
+          "sourceId": "sport",
+          "distance": 0.5038266398238889
+        },
+        {
+          "id": "suz-strahov-room-types",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.5744335199481514
+        }
+      ],
+      "hit": true
+    },
+    {
+      "query": "Kdo řeší pronájem sportoviště SÚZ na Strahově?",
+      "expectedChunkIds": [
+        "suz-strahov-sports-rental"
+      ],
+      "forbiddenSourceIds": [
+        "suz-archive-documents-2022-2023",
+        "suz-archive-scenario-2022-2023",
+        "suz-archive-procedures-2022-2023",
+        "suz-archive-reservations-old-alias",
+        "suz-archive-reservation-window-2026"
+      ],
+      "id": "suz-20",
+      "group": "source-cases",
+      "filters": {
+        "authority": "suz"
+      },
+      "latencyMs": 32.458000000000084,
+      "hits": [
+        {
+          "id": "suz-strahov-sports-rental",
+          "sourceId": "suz-sports-rental",
+          "distance": 0.28809709973074926
+        },
+        {
+          "id": "suz-housing-allocation",
+          "sourceId": "suz-scenario-2026-2027",
+          "distance": 0.5369027300686986
+        },
+        {
+          "id": "suz-housing-office-location",
+          "sourceId": "suz-housing-office",
+          "distance": 0.5412638246129129
+        },
+        {
+          "id": "suz-dorm-tariff-unit",
+          "sourceId": "suz-dorm-tariff-2026-09",
+          "distance": 0.553622732819975
+        }
+      ],
+      "hit": true
+    },
+    {
+      "id": "holdout-1",
+      "group": "holdout",
+      "query": "Potřebuji při převzetí pokoje občanku?",
+      "expectedChunkIds": [
+        "suz-arrival-documents"
+      ],
+      "filters": {},
+      "latencyMs": 29.533800000000156,
+      "hits": [
+        {
+          "id": "suz-arrival-documents",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.41721113209121496
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5360699157942928
+        },
+        {
+          "id": "suz-deposit-distinction",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.5621870616374036
+        },
+        {
+          "id": "suz-room-change",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.5660882092650962
+        }
+      ],
+      "hit": true
+    },
+    {
+      "id": "holdout-2",
+      "group": "holdout",
+      "query": "Na pokoji nám teče voda, kam to nahlásit?",
+      "expectedChunkIds": [
+        "suz-report-maintenance"
+      ],
+      "filters": {},
+      "latencyMs": 32.384799999999814,
+      "hits": [
+        {
+          "id": "suz-report-maintenance",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.47786402528887906
+        },
+        {
+          "id": "suz-report-insects",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.5373018513025639
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.6301722280433295
+        },
+        {
+          "id": "suz-housing-office-location",
+          "sourceId": "suz-housing-office",
+          "distance": 0.6433744606126308
+        }
+      ],
+      "hit": true
+    },
+    {
+      "id": "holdout-3",
+      "group": "holdout",
+      "query": "Jak se zbavit štěnic na koleji?",
+      "expectedChunkIds": [
+        "suz-report-insects"
+      ],
+      "filters": {},
+      "latencyMs": 25.750100000000202,
+      "hits": [
+        {
+          "id": "suz-report-insects",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.40010217878011645
+        },
+        {
+          "id": "suz-report-maintenance",
+          "sourceId": "suz-housing-faq",
+          "distance": 0.5557603369157464
+        },
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.5898249846518608
+        },
+        {
+          "id": "suz-room-change",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.6187518530315814
+        }
+      ],
+      "hit": true
+    },
+    {
+      "id": "holdout-4",
+      "group": "holdout",
+      "query": "Chci si pronajmout hřiště na Strahově pro naši partu.",
+      "expectedChunkIds": [
+        "suz-strahov-sports-rental"
+      ],
+      "filters": {},
+      "latencyMs": 28.007300000000214,
+      "hits": [
+        {
+          "id": "suz-strahov-sports-rental",
+          "sourceId": "suz-sports-rental",
+          "distance": 0.43694219831088776
+        },
+        {
+          "id": "sh-sport",
+          "sourceId": "sport",
+          "distance": 0.47890870779592964
+        },
+        {
+          "id": "sh-game-room-booking",
+          "sourceId": "sh-game-room-reservations",
+          "distance": 0.5963037070417485
+        },
+        {
+          "id": "sh-printing-request",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.5981752491031841
+        }
+      ],
+      "hit": true
+    },
+    {
+      "id": "holdout-5",
+      "group": "holdout",
+      "query": "May I use the 3D printer without asking anyone?",
+      "expectedChunkIds": [
+        "sh-printing-request"
+      ],
+      "filters": {
+        "authority": "silicon-hill",
+        "topics": [
+          "printing"
+        ]
+      },
+      "latencyMs": 29.263400000000274,
+      "hits": [
+        {
+          "id": "sh-printing-request",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.5731355327778263
+        },
+        {
+          "id": "sh-printing-location",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.6810961857387756
+        }
+      ],
+      "hit": true
+    },
+    {
+      "id": "holdout-6",
+      "group": "holdout",
+      "query": "Where can I develop my photographic film?",
+      "expectedChunkIds": [
+        "sh-photography-location"
+      ],
+      "filters": {},
+      "latencyMs": 48.62480000000005,
+      "hits": [
+        {
+          "id": "sh-photography-location",
+          "sourceId": "sh-photography-guide",
+          "distance": 0.6674782370784993
+        },
+        {
+          "id": "sh-photography-first-visit",
+          "sourceId": "sh-photography-guide",
+          "distance": 0.76071300430487
+        },
+        {
+          "id": "sh-projects-closed",
+          "sourceId": "projects",
+          "distance": 0.8135432309174973
+        },
+        {
+          "id": "sh-printing-location",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.8277954363599154
+        }
+      ],
+      "hit": true
+    },
+    {
+      "id": "negative-1",
+      "group": "unrelated",
+      "query": "Jak upéct čokoládový dort?",
+      "expectedChunkIds": [],
+      "filters": {},
+      "latencyMs": 40.964500000000044,
+      "hits": [
+        {
+          "id": "sh-printing-request",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.7195615429969091
+        },
+        {
+          "id": "sh-game-room-conduct",
+          "sourceId": "sh-game-room-rules",
+          "distance": 0.757040483987424
+        },
+        {
+          "id": "sh-printing-location",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.7582301228860366
+        },
+        {
+          "id": "sh-photography-first-visit",
+          "sourceId": "sh-photography-guide",
+          "distance": 0.7597531298907053
+        }
+      ],
+      "hit": null
+    },
+    {
+      "id": "negative-2",
+      "group": "unrelated",
+      "query": "Kdo vyhrál mistrovství světa ve fotbale?",
+      "expectedChunkIds": [],
+      "filters": {},
+      "latencyMs": 56.37760000000026,
+      "hits": [
+        {
+          "id": "sh-sport",
+          "sourceId": "sport",
+          "distance": 0.7760905230586488
+        },
+        {
+          "id": "sh-documents",
+          "sourceId": "documents",
+          "distance": 0.8063878479618354
+        },
+        {
+          "id": "sh-projects-options",
+          "sourceId": "projects",
+          "distance": 0.8087123677884736
+        },
+        {
+          "id": "suz-strahov-sports-rental",
+          "sourceId": "suz-sports-rental",
+          "distance": 0.8177393217095621
+        }
+      ],
+      "hit": null
+    },
+    {
+      "id": "negative-3",
+      "group": "unrelated",
+      "query": "Napiš program na obchodování s bitcoinem.",
+      "expectedChunkIds": [],
+      "filters": {},
+      "latencyMs": 28.563900000000103,
+      "hits": [
+        {
+          "id": "sh-mac-identification",
+          "sourceId": "sh-mac-guide",
+          "distance": 0.6529404108017498
+        },
+        {
+          "id": "sh-projects-join",
+          "sourceId": "projects",
+          "distance": 0.665600575494092
+        },
+        {
+          "id": "sh-projects-options",
+          "sourceId": "projects",
+          "distance": 0.6721556152206302
+        },
+        {
+          "id": "sh-wifi-stable-address",
+          "sourceId": "sh-wifi-guide",
+          "distance": 0.6865785597590033
+        }
+      ],
+      "hit": null
+    },
+    {
+      "id": "negative-4",
+      "group": "unrelated",
+      "query": "What is the capital of Peru?",
+      "expectedChunkIds": [],
+      "filters": {},
+      "latencyMs": 38.352599999999256,
+      "hits": [
+        {
+          "id": "suz-apply-housing-route",
+          "sourceId": "suz-apply-housing",
+          "distance": 0.9567763031084859
+        },
+        {
+          "id": "sh-mac-identification",
+          "sourceId": "sh-mac-guide",
+          "distance": 0.9578329889337112
+        },
+        {
+          "id": "suz-strahov-contacts",
+          "sourceId": "suz-strahov-dorms",
+          "distance": 0.9657176373268578
+        },
+        {
+          "id": "suz-housing-payment-methods",
+          "sourceId": "suz-payment-methods",
+          "distance": 0.9702035403863534
+        }
+      ],
+      "hit": null
+    },
+    {
+      "id": "negative-5",
+      "group": "unrelated",
+      "query": "Jakou grafickou kartu mám koupit?",
+      "expectedChunkIds": [],
+      "filters": {},
+      "latencyMs": 30.65350000000035,
+      "hits": [
+        {
+          "id": "sh-mac-identification",
+          "sourceId": "sh-mac-guide",
+          "distance": 0.6569721716354757
+        },
+        {
+          "id": "sh-printing-request",
+          "sourceId": "sh-printing-guide",
+          "distance": 0.6854990054104757
+        },
+        {
+          "id": "sh-wifi-stable-address",
+          "sourceId": "sh-wifi-guide",
+          "distance": 0.7182816904278386
+        },
+        {
+          "id": "sh-game-room-vr",
+          "sourceId": "sh-game-room-home",
+          "distance": 0.7183488461259441
+        }
+      ],
+      "hit": null
+    },
+    {
+      "id": "negative-6",
+      "group": "unrelated",
+      "query": "Kolik měsíců má planeta Jupiter?",
+      "expectedChunkIds": [],
+      "filters": {},
+      "latencyMs": 31.524499999999534,
+      "hits": [
+        {
+          "id": "suz-housing-payment-due",
+          "sourceId": "suz-vup-2026-2027",
+          "distance": 0.7776454013101893
+        },
+        {
+          "id": "suz-deposit-distinction",
+          "sourceId": "suz-procedures-2026-2027",
+          "distance": 0.7840841391515957
+        },
+        {
+          "id": "suz-dorm-tariff-unit",
+          "sourceId": "suz-dorm-tariff-2026-09",
+          "distance": 0.8083043628630281
+        },
+        {
+          "id": "sh-sport",
+          "sourceId": "sport",
+          "distance": 0.8093161723128927
+        }
+      ],
+      "hit": null
+    }
+  ]
+}

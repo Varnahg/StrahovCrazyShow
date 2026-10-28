@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-vector-20261028-store",
+  "title": "RAG: pgvector úložiště, schéma a import",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/rag-vector-store.ts",
+    "server/rag-ingest.ts",
+    "server/rag-schema.sql",
+    "scripts/rag-import.ts",
+    "tests/rag-vector-store.test.ts",
+    "tests/rag-ingest.test.ts",
+    "tests/rag-vector-db.test.ts",
+    "docs/home-ai/20261028/vector-store/",
+    ".cache/rag-vector-20261028-store/",
+    "docs/agents/handoffs/rag-vector-20261028-store.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat pgvector schéma, úložiště a explicitní import ověřených zdrojů v souladu s kontraktem; archiv se nepoužije jako aktuální evidence.",
+    "Zachovat provenance, source validity, embedding profil a identitu vstupu; import musí bezpečně řešit opakování, částečné selhání a publikaci konzistentní revize.",
+    "Testovat hranice SQL, transakcí, poolu a shutdown; připravit skutečnou DB regresi, kterou spustí pouze validation držitel. Samotný fake DB test není důkaz funkčního pgvector.",
+    "Žádné runtime načítání uživatelských URL, periodický crawler ani zápis do zdrojových SH/SÚZ datasetů či runtime souborů jiného vlastníka."
+  ],
+  "verification": [
+    "Nejdřív ověřit implementační kontrakt a relevantní primární podklady; lehké CPU testy používají fake transport/provider/DB podle hranice modulu.",
+    "Build, plnou sadu, skutečnou DB a integraci předat koordinátorovi s vlastní validation rezervací. Bez placeného OpenAI volání v izolovaných testech."
+  ],
+  "notes": [
+    "Přímý požadavek uživatele na OpenAI embeddingy a vektorovou databázi ověřen v chatu Vylepši úvodní obrazovku a AI chat, 01a17e9d-dd4a-7fe3-91ac-4f3bc548982d. Koordinátor KEY-65 po průzkumu přidělil tuto pgvector etapu; původní textový MVP ji nenahrazuje.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/rag-sources-sh-suz. Před zápisem vlastní claim. Existující runtime WIP drží rag-runtime-integrator-01a17e9d a nepřebírá se podle stáří ani neexistujícího procesu.",
+    "Zachovat ověřené aktuální SH/SÚZ datasety a oddělené archivy; research/source-contract aktualizuje jejich koordinátor podle nového zadání. Starší textový návrh není zákazem uživatelem nyní vyžádané vektorové cesty.",
+    "Žádná hra, GPU, editor, automatický crawler či scheduler. Žádný reálný OpenAI klíč v Git, CI, klientovi ani logu. Izolované testy používají fake embedding provider; reálnou místní DB spouští jen držitel validation claimu.",
+    "Implementaci, cílený refaktoring, cache/lifecycle kontrolu a relevantní důkazy předat společně. Podagent nespouští další BMAD workflow ani nezasahuje do cizích scope. Main okno a centrální dokumentace se koordinují zvlášť."
+  ]
+}

@@ -11,6 +11,18 @@ export const CRAZY_TYPKA_SPEAKER = Object.freeze({
   kind: "ai",
 } as const);
 
+/** Exact researched publishers; a subdomain suffix is not an authorization. */
+export const CRAZY_TYPKA_SOURCE_HOSTS = Object.freeze({
+  "silicon-hill": Object.freeze([
+    "www.siliconhill.cz",
+    "wiki.sh.cvut.cz",
+    "zapisy.sh.cvut.cz",
+    "sherna.siliconhill.cz",
+  ]),
+  suz: Object.freeze(["www.suz.cvut.cz"]),
+});
+const sourceHosts = new Set(Object.values(CRAZY_TYPKA_SOURCE_HOSTS).flat());
+
 /** The visible starters are also retrieval acceptance cases, in both UI locales. */
 export const CRAZY_TYPKA_STARTERS = {
   cs: ["Jak se přidám do Silicon Hill?", "Co se dá na Strahově podniknout?"],
@@ -147,15 +159,20 @@ export function isCrazyTypkaSource(value: unknown): value is CrazyTypkaSource {
     !(value.licenseUrl === null || short(value.licenseUrl, 300))
   )
     return false;
+  const checked = Date.parse(value.checkedAt + "T00:00:00.000Z");
+  if (
+    !Number.isFinite(checked) ||
+    new Date(checked).toISOString().slice(0, 10) !== value.checkedAt
+  )
+    return false;
   try {
     const url = new URL(value.url);
     if (
       url.protocol !== "https:" ||
       url.username ||
       url.password ||
-      !["www.siliconhill.cz", "wiki.sh.cvut.cz", "zapisy.sh.cvut.cz"].includes(
-        url.hostname,
-      )
+      url.port ||
+      !sourceHosts.has(url.hostname)
     )
       return false;
     if (

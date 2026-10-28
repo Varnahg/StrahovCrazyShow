@@ -4,6 +4,590 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { createServer } from "node:http";
 import { Readable } from "node:stream";
 import test from "node:test";
+import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
+
+import { createEmbeddingProfile } from "../server/rag-embeddings";
+import {
+  RagEvidenceError,
+  type AsyncEvidenceBackend,
+  type EvidenceSnapshot,
+  type PreparedEvidenceQuery,
+} from "../server/rag-evidence-backend";
+
+function fakeEvidenceBackend(): AsyncEvidenceBackend {
+  const registry = getKnowledgeRegistry(),
+    profile = createEmbeddingProfile();
+  return {
+    profile,
+    async ready() {
+      return true;
+    },
+    async search(query, options) {
+      options.onEmbeddingAttempt(Buffer.byteLength(query.text, "utf8"));
+      options.onEmbeddingUsage?.({ promptTokens: 1, totalTokens: 1 });
+      const message = query.text.split("\nCurrent user question:\n").at(-1)!;
+      const previous =
+        query.filterText === message
+          ? []
+          : [{ role: "user", content: query.filterText }];
+      const chunks = registry.retrieveConversation(
+        message,
+        previous,
+        4,
+        options.now,
+      );
+      return {
+        snapshot: { revisionId: "a".repeat(64), profile },
+        chunks,
+        sourceVersionIds: [...new Set(chunks.map((chunk) => chunk.source.id))],
+        embeddingUsage: { promptTokens: 1, totalTokens: 1 },
+      };
+    },
+    async validate(evidence, instant) {
+      return evidence.sourceVersionIds.every((id) =>
+        registry.isSourceUsable(id, instant),
+      );
+    },
+    async close() {},
+  };
+}
+
+test("the exact bounded query is moderated before embedding and failed or blocked USER text never becomes follow-up input", async () => {
+  const base = fakeEvidenceBackend(),
+    events: string[] = [],
+    queries: string[] = [],
+    moderated: string[] = [];
+  let failGeneration = false;
+  const backend: AsyncEvidenceBackend = {
+    ...base,
+    async search(query, options) {
+      events.push("embedding");
+      queries.push(query.text);
+      return base.search(query, options);
+    },
+  };
+  const f = fixture({
+    evidenceBackend: backend,
+    now: () => Date.parse("2026-10-28T12:00:00Z"),
+    fetch: async (url, init) => {
+      const body = JSON.parse(String(init?.body));
+      if (String(url).endsWith("/moderations")) {
+        events.push("moderation");
+        moderated.push(body.input);
+        const flagged = body.input.includes("BLOCKED USER");
+        return Response.json({
+          results: [{ flagged, categories: { harassment: flagged } }],
+        });
+      }
+      events.push("generation");
+      if (failGeneration) {
+        failGeneration = false;
+        throw new Error("private failure");
+      }
+      return responseText("Schválená odpověď.");
+    },
+  });
+  try {
+    const token = await f.session();
+    const send = (requestSeq: number, message: string) =>
+      f.send("/api/ai/chat", { token, requestSeq, message, locale: "cs" });
+    await send(1, "Kde je Fotokomora?");
+    await send(2, "A kolik to stojí?");
+    assert.deepEqual(events.slice(0, 8), [
+      "moderation",
+      "embedding",
+      "generation",
+      "moderation",
+      "moderation",
+      "embedding",
+      "generation",
+      "moderation",
+    ]);
+    assert.equal(queries[0], moderated[0]);
+    assert.equal(queries[1], moderated[2]);
+    assert.match(queries[1], /Kde je Fotokomora/);
+    assert.equal((await send(3, "BLOCKED USER text")).body.error, "blocked");
+    await send(4, "A kolik to stojí?");
+    assert.equal(queries.at(-1), "A kolik to stojí?");
+    assert.ok(queries.every((query) => !query.includes("BLOCKED USER")));
+    failGeneration = true;
+    assert.equal(
+      (await send(5, "FAILED USER nové téma")).body.error,
+      "provider-unavailable",
+    );
+    await send(6, "Kde to najdu?");
+    assert.equal(queries.at(-1), "Kde to najdu?");
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("transient DB failure while replaying keeps the cached success without any additional API work", async () => {
+  const backend = fakeEvidenceBackend();
+  let unavailable = false,
+    searches = 0;
+  const baseSearch = backend.search,
+    baseValidate = backend.validate;
+  backend.search = async (query, options) => {
+    searches++;
+    return baseSearch(query, options);
+  };
+  backend.validate = async (evidence, now, signal) => {
+    if (unavailable) throw new Error("postgres://private-password");
+    return baseValidate(evidence, now, signal);
+  };
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session(),
+      body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+    const first = await f.send("/api/ai/chat", body);
+    assert.equal(first.status, 200);
+    unavailable = true;
+    const retry = await f.send("/api/ai/chat", body);
+    assert.deepEqual(retry.body, { error: "provider-unavailable" });
+    unavailable = false;
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, first.body);
+    assert.equal(searches, 1);
+    assert.equal(f.calls.length, 3);
+    assert.equal(f.service.usage().embeddingAttempts, 1);
+    assert.equal(f.service.usage().generationAttempts, 1);
+  } finally {
+    await f.service.close();
+  }
+});
+
+for (const phase of ["publish", "replay"] as const)
+  for (const boundary of ["review", "effective"] as const)
+    test(`all evidence is rechecked at the fresh clock after ${phase} SQL validation crosses the ${boundary} boundary`, async () => {
+      const cutoff = Date.parse(
+        boundary === "review"
+          ? "2026-11-04T00:00:00Z"
+          : "2026-11-04T00:00:00+01:00",
+      );
+      let instant = cutoff - 1,
+        validations = 0;
+      const backend = fakeEvidenceBackend(),
+        baseSearch = backend.search,
+        original = getKnowledgeRegistry().chunks.find(
+          (item) => item.id === "sh-printing-location",
+        )!;
+      const dependency = {
+        ...original,
+        document: {
+          ...original.document,
+          reviewAfter: boundary === "review" ? "2026-11-04" : "2026-11-10",
+          effectiveUntil:
+            boundary === "effective" ? "2026-11-04T00:00:00+01:00" : null,
+        },
+      };
+      backend.search = async (query, options) => ({
+        ...(await baseSearch(query, options)),
+        chunks: [dependency],
+        sourceVersionIds: [dependency.source.id],
+      });
+      backend.validate = async () => {
+        validations++;
+        if (validations === (phase === "publish" ? 2 : 3)) {
+          await Promise.resolve();
+          instant = cutoff;
+        }
+        return true; // SQL evaluated its caller-supplied, earlier timestamp.
+      };
+      const f = fixture({ evidenceBackend: backend, now: () => instant });
+      try {
+        const token = await f.session(),
+          body = {
+            token,
+            requestSeq: 1,
+            message: "Kde je 3D tisk?",
+            locale: "cs",
+          };
+        const initial = await f.send("/api/ai/chat", body);
+        if (phase === "replay") {
+          assert.equal(initial.status, 200);
+          assert.deepEqual(
+            initial.body.sources,
+            [],
+            "uncited evidence must also expire",
+          );
+        }
+        const expired =
+          phase === "publish" ? initial : await f.send("/api/ai/chat", body);
+        assert.equal(expired.status, 409);
+        assert.deepEqual(expired.body, {
+          error: "response-expired",
+          requestSeq: 1,
+        });
+        assert.deepEqual(await f.send("/api/ai/chat", body), expired);
+        assert.equal(validations, phase === "publish" ? 2 : 3);
+        assert.equal(f.calls.length, 3);
+        assert.equal(f.service.usage().embeddingAttempts, 1);
+        assert.equal(f.service.usage().generationAttempts, 1);
+      } finally {
+        await f.service.close();
+      }
+    });
+
+for (const changed of [false, true])
+  test(`${changed ? "new" : "same"} published revision ${changed ? "discards" : "retains"} successful USER and assistant history before generation`, async () => {
+    const backend = fakeEvidenceBackend(),
+      baseSearch = backend.search;
+    let searches = 0;
+    backend.search = async (query, options) => {
+      const evidence = await baseSearch(query, options);
+      searches++;
+      return {
+        ...evidence,
+        snapshot: {
+          ...evidence.snapshot,
+          revisionId: (changed && searches > 1 ? "b" : "a").repeat(64),
+        },
+      };
+    };
+    const f = fixture({
+      evidenceBackend: backend,
+      now: () => Date.parse("2026-10-28T12:00:00Z"),
+    });
+    try {
+      const token = await f.session();
+      for (const [index, message] of [
+        "Kde je Fotokomora?",
+        "Jak funguje 3D tisk?",
+      ].entries())
+        assert.equal(
+          (
+            await f.send("/api/ai/chat", {
+              token,
+              requestSeq: index + 1,
+              message,
+              locale: "cs",
+            })
+          ).status,
+          200,
+        );
+      const generations = f.calls.filter((call) =>
+        call.url.endsWith("/responses"),
+      );
+      assert.equal(generations.length, 2);
+      assert.deepEqual(generations[0].body.input.slice(0, -1), []);
+      assert.deepEqual(
+        generations[1].body.input.slice(0, -1),
+        changed
+          ? []
+          : [
+              { role: "user", content: "Kde je Fotokomora?" },
+              {
+                role: "assistant",
+                content: "Ahoj! Jsem fiktivní AI průvodkyně.",
+              },
+            ],
+      );
+    } finally {
+      await f.service.close();
+    }
+  });
+
+test("async replay validation is serialized with new operations and reset cannot resurrect its old answer", async () => {
+  const backend = fakeEvidenceBackend();
+  let gate = false,
+    release!: (value: boolean) => void,
+    reached!: () => void;
+  const entered = new Promise<void>((resolve) => {
+    reached = resolve;
+  });
+  backend.validate = async () => {
+    if (!gate) return true;
+    reached();
+    return new Promise<boolean>((resolve) => {
+      release = resolve;
+    });
+  };
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session(),
+      body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+    await f.send("/api/ai/chat", body);
+    gate = true;
+    const replay = f.send("/api/ai/chat", body);
+    await entered;
+    assert.deepEqual(
+      (
+        await f.send("/api/ai/chat", {
+          ...body,
+          requestSeq: 2,
+          message: "Další",
+        })
+      ).body,
+      { error: "busy" },
+    );
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, {
+      error: "busy",
+    });
+    await f.send("/api/ai/session", undefined, "DELETE", {
+      authorization: `Bearer ${token}`,
+    });
+    release(true);
+    assert.deepEqual((await replay).body, { error: "session-expired" });
+    assert.equal(f.calls.length, 3);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("embedding attempt and conservative token caps are independent of generation and cached errors never refund or retry", async () => {
+  const f = fixture({
+    env: {
+      ...env,
+      CRAZY_TYPKA_EMBEDDINGS_PER_PROCESS: "1",
+      CRAZY_TYPKA_EMBEDDING_TOKEN_BUDGET: "100",
+    },
+    limits: { generationsPerProcess: 3 },
+  });
+  try {
+    const token = await f.session();
+    await f.send("/api/ai/chat", {
+      token,
+      requestSeq: 1,
+      message: "Hello there",
+      locale: "en",
+    });
+    const body = { token, requestSeq: 2, message: "More facts", locale: "en" };
+    const blocked = await f.send("/api/ai/chat", body);
+    assert.deepEqual(blocked.body, {
+      error: "budget-exhausted",
+      requestSeq: 2,
+    });
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, blocked.body);
+    assert.deepEqual(f.service.usage(), {
+      embeddingAttempts: 1,
+      reservedEmbeddingTokens: 11,
+      confirmedEmbeddingTokens: 1,
+      generationAttempts: 1,
+    });
+    assert.equal(f.calls.length, 4);
+  } finally {
+    await f.service.close();
+  }
+  const bounded = fixture({ limits: { embeddingTokenBudget: 1 } });
+  try {
+    const token = await bounded.session();
+    assert.equal(
+      (
+        await bounded.send("/api/ai/chat", {
+          token,
+          requestSeq: 1,
+          message: "Dotaz",
+          locale: "cs",
+        })
+      ).body.error,
+      "budget-exhausted",
+    );
+    assert.deepEqual(bounded.service.usage(), {
+      embeddingAttempts: 0,
+      reservedEmbeddingTokens: 0,
+      confirmedEmbeddingTokens: 0,
+      generationAttempts: 0,
+    });
+    assert.equal(bounded.calls.length, 1, "only free moderation ran");
+  } finally {
+    await bounded.service.close();
+  }
+});
+
+test("backend readiness never falls back and DELETE remains usable during a DB outage", async () => {
+  const backend = fakeEvidenceBackend();
+  let available = true;
+  backend.ready = async () => available;
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session();
+    available = false;
+    assert.deepEqual((await f.send("/api/ai/status", undefined, "GET")).body, {
+      enabled: false,
+    });
+    assert.deepEqual((await f.send("/api/ai/session", {})).body, {
+      error: "unavailable",
+    });
+    assert.equal(
+      (
+        await f.send("/api/ai/session", undefined, "DELETE", {
+          authorization: `Bearer ${token}`,
+        })
+      ).status,
+      204,
+    );
+    assert.equal(f.calls.length, 0);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("a revision expiring inside vector retrieval is confirmed as a conflict and replays without another embedding", async () => {
+  const backend = fakeEvidenceBackend();
+  let searches = 0;
+  backend.search = async (_query, options) => {
+    searches++;
+    options.onEmbeddingAttempt(5);
+    throw new RagEvidenceError("response-expired");
+  };
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session(),
+      body = {
+        token,
+        requestSeq: 1,
+        message: "Kde je Fotokomora?",
+        locale: "cs",
+      };
+    const first = await f.send("/api/ai/chat", body);
+    assert.equal(first.status, 409);
+    assert.deepEqual(first.body, { error: "response-expired", requestSeq: 1 });
+    assert.deepEqual(await f.send("/api/ai/chat", body), first);
+    assert.equal(searches, 1);
+    assert.equal(f.calls.length, 1, "only input moderation ran");
+    assert.equal(f.service.usage().generationAttempts, 0);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("missing or invalid vector configuration disables optional AI without provider calls", async () => {
+  for (const database of [undefined, "not-a-database-url"]) {
+    let diagnostics = 0,
+      calls = 0;
+    const service = createOptionalCrazyTypkaService(
+      {
+        env: { ...env, RAG_DATABASE_URL: database },
+        fetch: async () => {
+          calls++;
+          throw new Error("must not call");
+        },
+      },
+      () => {
+        diagnostics++;
+      },
+    );
+    const result = response();
+    await service.handle(
+      request("/api/ai/status", undefined, "GET"),
+      result.res,
+    );
+    assert.deepEqual(result.result().body, { enabled: false });
+    assert.equal(
+      await service.handle(
+        request("/api/health", undefined, "GET"),
+        response().res,
+      ),
+      false,
+    );
+    assert.equal(diagnostics, 1);
+    assert.equal(calls, 0);
+    await service.close();
+  }
+});
+
+test("new SH and SUZ facts reach provider and compatible client citations through the service", async () => {
+  const cases = [
+    {
+      question: "Kde je dílna 3D tisku?",
+      id: "sh-printing-location",
+      authority: "silicon-hill",
+      host: "wiki.sh.cvut.cz",
+    },
+    {
+      question: "Do kdy platím kolejné SÚZ?",
+      id: "suz-housing-payment-due",
+      authority: "suz",
+      host: "www.suz.cvut.cz",
+    },
+  ];
+  for (const item of cases) {
+    let delivered: any;
+    const f = fixture({
+      now: () => Date.parse("2026-10-28T12:00:00Z"),
+      fetch: async (url, init) => {
+        if (String(url).endsWith("/moderations"))
+          return Response.json({
+            results: [{ flagged: false, categories: { harassment: false } }],
+          });
+        delivered = JSON.parse(String(init?.body));
+        return responseText("Stručná odpověď s ověřeným podkladem.", [item.id]);
+      },
+    });
+    try {
+      const token = await f.session();
+      const result = await f.send("/api/ai/chat", {
+        token,
+        requestSeq: 1,
+        message: item.question,
+        locale: "cs",
+      });
+      assert.equal(result.status, 200);
+      assert.ok(isCrazyTypkaChatResponse(result.body));
+      assert.ok(delivered.input.at(-1).content.includes(item.id));
+      assert.ok(delivered.input.at(-1).content.includes(item.authority));
+      assert.equal(new URL(result.body.sources[0].url).hostname, item.host);
+      assert.equal(
+        Object.hasOwn(result.body.sources[0], "effectiveFrom"),
+        false,
+        "internal source metadata must not change the public citation shape",
+      );
+    } finally {
+      await f.service.close();
+    }
+  }
+});
+
+for (const expiry of ["during", "replay"] as const)
+  test(`all evidence dependencies expire ${expiry}, including an answer with no public citations`, async () => {
+    const cutoff = Date.parse("2026-11-04T00:00:00Z");
+    let instant = cutoff - 1000,
+      calls = 0;
+    const f = fixture({
+      now: () => instant,
+      fetch: async (url) => {
+        calls++;
+        if (String(url).endsWith("/moderations"))
+          return Response.json({
+            results: [{ flagged: false, categories: { harassment: false } }],
+          });
+        if (expiry === "during") instant = cutoff;
+        return responseText("S tímto tématem ti pomůžu.", []);
+      },
+    });
+    try {
+      const token = await f.session(),
+        body = {
+          token,
+          requestSeq: 1,
+          message: "Kde je 3D tisk?",
+          locale: "cs",
+        };
+      assert.ok(
+        getKnowledgeRegistry().retrieve(body.message, 4, instant).length > 0,
+      );
+      const first = await f.send("/api/ai/chat", body);
+      assert.equal(first.status, expiry === "during" ? 409 : 200);
+      if (expiry === "replay") assert.deepEqual(first.body.sources, []);
+      instant = cutoff;
+      const replay = await f.send("/api/ai/chat", body);
+      assert.deepEqual(replay.body, {
+        error: "response-expired",
+        requestSeq: 1,
+      });
+      assert.deepEqual((await f.send("/api/ai/chat", body)).body, replay.body);
+      assert.equal(calls, 3);
+      assert.equal(
+        getKnowledgeRegistry().isSourceUsable(
+          "suz-scenario-2026-2027",
+          instant,
+        ),
+        true,
+      );
+    } finally {
+      await f.service.close();
+    }
+  });
 import {
   createCrazyTypkaService,
   createOptionalCrazyTypkaService,
@@ -146,6 +730,7 @@ function fixture(options: CrazyTypkaServiceOptions = {}) {
   const service = createCrazyTypkaService({
     env,
     fetch: fetcher,
+    evidenceBackend: fakeEvidenceBackend(),
     now: () => Date.parse("2026-10-27T12:00:00Z"),
     ...options,
   });
@@ -708,7 +1293,7 @@ test("history is bounded to six turns, and source links come only from curated m
   for (let i = 0; i < 8; i++) {
     const result = await f.send("/api/ai/chat", {
       token,
-      message: `Kancelář dotaz ${i}`,
+      message: `Kancelář SH dotaz ${i}`,
       locale: "cs",
     });
     assert.equal(result.status, 200);
@@ -720,7 +1305,7 @@ test("history is bounded to six turns, and source links come only from curated m
     instant += 61000;
   }
   assert.equal(generationBodies[7].input.length, 13);
-  assert.equal(generationBodies[7].input[0].content, "Kancelář dotaz 1");
+  assert.equal(generationBodies[7].input[0].content, "Kancelář SH dotaz 1");
   await f.service.close();
 });
 
@@ -1025,7 +1610,7 @@ test("a moderation block is a confirmed replayable attempt and does not leave a 
 });
 
 test("evidence expiring during generation is never published and the rejection replays without another call", async () => {
-  const cutoff = Date.parse("2026-11-27T00:00:00Z");
+  const cutoff = Date.parse("2026-11-03T00:00:00Z");
   let instant = cutoff - 1000,
     calls = 0;
   const f = fixture({
@@ -1042,7 +1627,7 @@ test("evidence expiring during generation is never published and the rejection r
   });
   try {
     const token = await f.session(),
-      body = { token, requestSeq: 1, message: "Kancelář", locale: "cs" };
+      body = { token, requestSeq: 1, message: "Kancelář SH", locale: "cs" };
     const expired = await f.send("/api/ai/chat", body);
     assert.equal(expired.status, 409);
     assert.deepEqual(expired.body, {
@@ -1057,7 +1642,7 @@ test("evidence expiring during generation is never published and the rejection r
 });
 
 test("reset and expiry forget operations; cited replay loses freshness without regenerating", async () => {
-  const cutoff = Date.parse("2026-11-27T00:00:00Z");
+  const cutoff = Date.parse("2026-11-03T00:00:00Z");
   let instant = cutoff - 1000,
     calls = 0;
   const f = fixture({
@@ -1072,7 +1657,7 @@ test("reset and expiry forget operations; cited replay loses freshness without r
     },
   });
   const token = await f.session(),
-    body = { token, requestSeq: 1, message: "Kancelář", locale: "cs" };
+    body = { token, requestSeq: 1, message: "Kancelář SH", locale: "cs" };
   assert.equal((await f.send("/api/ai/chat", body)).status, 200);
   instant = cutoff;
   const expired = await f.send("/api/ai/chat", body);
