@@ -46,7 +46,8 @@ Zachovat moderaci, soukromé relace, origin/admission, requestSeq/replay, abort/
 - [x] Adapter s fixed/v1/decisions, gpt-6-luna, skutečným predicate schema, timeout/size/abort/usage, bez retry.
 - [x] Runtime simple/complex volba z důvěryhodné konfigurace, cap a fallback, včetně concurrent reservation a replay.
 - [x] Provider/Compose s nezměněným veřejným kontraktem a žádným klíčem v klientovi/logu.
-- [ ] Označená česká evaluace, bounded skutečné API ověření obou cest, review a samostatný commit/PR.
+- [x] Označená česká evaluace, bounded skutečné API ověření obou cest, review a samostatný commit/PR.
+- [ ] Úspěšné celé CI včetně buildu a integrace, aktualizovaná přijatá UI base a sloučení PR35 do main.
 
 Given složitý povolený požadavek a rozpočet, when klasifikace překročí ověřený práh, then Responses request používá nakonfigurovaný complex model/effort. Given jednoduchý či nejistý požadavek, when proběhne stejné API, then používá simple model. Given duplicitní requestSeq, when klient obnoví požadavek, then nevznikne nová moderace/Decisions/embedding/generace. Given blokovaný vstup, when moderace odmítne, then Decisions ani generace neběží.
 
@@ -82,3 +83,5 @@ Volba skutečných Decisions proti regexům a klasifikaci generátorem je v kont
 ## Verification
 
 Cílené Node/tsx a strict TypeScript, zejména serializované API requesty a race/cancel/expiry/replay. Bounded live Decisions a simple/complex generation se skutečnými usage; žádné volání bez validačního scope. Finální review, plné CI/build/SDK a exact-head přijetí před main. Výsledky neoznačovat za veřejný deployment nebo obecný výkonový benchmark.
+
+PR35 obsahuje přesně 18 routing souborů; head `702bb2d9db373400c02413e951b02bc310f6b284`, base `86e4dd603ca1b91e3eaa5f84573f9481be410a29`. Jejich bloby se shodují s lokálními ověřenými commity, bez automatického ingest WIP. První CI mělo 2622 PASS, 1 FAIL a 1 SKIP: selhal nezměněný test stromů na `group.active`, očekával 0 a pozoroval 2 po pevných 12 `setImmediate`. Izolovaný běh stejného testu prošel 1/1; příčina v CI zatím není dokázaná. Build a SDK integrace byly přeskočené. Secret hygiene prošla bez nálezů. Podrobnosti a odkazy v samostatné verification evidenci; žádný slepý rerun ani úprava cizích stromových souborů.

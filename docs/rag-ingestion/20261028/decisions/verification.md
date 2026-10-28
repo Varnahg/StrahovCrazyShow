@@ -33,3 +33,13 @@ Dosavadní `OPENAI_MODEL`/`OPENAI_REASONING_EFFORT` zůstávají simple cestou. 
 Výchozí capy jsou500 Decisions pokusů,1000000 konzervativních UTF-8 rezervací a20 complex generací za běh procesu, plus dosavadní celkový generation cap500. Nejde o trvalý finanční limit ani přesný tokenizer. Complex cap0 vypne eskalaci. `usage()` odděluje potvrzená a neznámá čerpání; obsah dotazů se do metrik neukládá. `low-confidence` ve fallback čítači znamená nedosažení požadovaného prahu pro complex, nikoli nutně nejistotu mezi oběma třídami.
 
 Žádné Node závislosti ani nový veřejný DTO/SQL/klientský protokol tento checkpoint nepřidává. Převzatý Jantar onboarding má být integrován až s odpovídající přijatou UI base. Veřejný host nebyl těmito lokálními testy nasazen a stále vyžaduje provozní konfiguraci jeho správce. Všechny vlastní validační HTTP procesy byly ukončené.
+
+## První export a CI
+
+[PR35](https://github.com/Varnahg/StrahovCrazyShow/pull/35) má samostatnou větev `codex/decisions-routing`. První exportní head je `702bb2d9db373400c02413e951b02bc310f6b284`, base `86e4dd603ca1b91e3eaa5f84573f9481be410a29`. Přesně 18 routing souborů odpovídá původním ověřeným blobům; změny KEY-67 a starší dokumentační closeout nejsou zahrnuté. Export použil izolovaný dočasný Git index bez přepnutí nebo změny pracovních souborů.
+
+[Verify 40752514245](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40752514245) skončilo neúspěšně: **2622 PASS, 1 FAIL, 1 SKIP**, 2624 testů, přibližně 438 sekund. Skutečný PostgreSQL/pgvector test a nové router regrese prošly. Jediný skip patří nedostupnému lokálnímu záznamu stanice. Checkout byl testovací merge `701460bbfc1c4715bd3e023358a9c34d412f6961` nad uvedeným head/base.
+
+Selhal nezměněný test `v4 wood-only fallback permits complete card coverage and still preloads original detail foliage` v `tests/tree-cluster-streaming.test.ts:239`: `group.active` bylo 2 místo 0. Test po spuštění detailního načítání čeká jen 12 `setImmediate`, zatímco kontrola SHA-256 obsahuje asynchronní `crypto.subtle.digest`; počet ticků není bariérou dokončení. To dokládá možnost předčasné aserce, nikoli samo o sobě konkrétní příčinu v CI. Izolovaný přímý Node běh stejného testu dne 28. 10. 2026 prošel **1/1** (test přibližně 90 ms). Nález a důkazy byly předány vlastníku stromů; žádný soubor stromů nebyl v tomto tasku změněn. **Build a multiplayerová integrace byly v tomto CI přeskočené, nemají tedy úspěšný výsledek.**
+
+[Source secret hygiene 40752514285](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40752514285) prošla: 7/7 testů, 6804 kontrolovaných textových souborů, žádný kandidátní nález. PR zůstává draft a čeká také na přijatou UI base z PR33; finální sloučení ani veřejné nasazení tímto checkpointem nejsou doloženy.
