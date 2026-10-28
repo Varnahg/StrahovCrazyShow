@@ -32,7 +32,7 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
   const scoped = new URL(url); scoped.searchParams.set("options", `-c search_path=${schema},public`);
   const connectionString = scoped.href;
   const store = createVectorKnowledgeStore({ connectionString, connectionTimeoutMs: 3000, statementTimeoutMs: 3000, maxConnections: 2 });
-  const run = (current: ReturnType<typeof fixture>, embedder: Embedder, extra: { retryUncertain?: boolean; maxEmbeddingInputs?: number; maxEmbeddingBytes?: number; archiveDatasets?: unknown[] } = {}) => importRagCorpus({ connectionString, currentDatasets: [current], archiveDatasets: [], embedder, maxEmbeddingInputs: 100, maxEmbeddingBytes: 100000, ...extra });
+  const run = (current: unknown, embedder: Embedder, extra: { retryUncertain?: boolean; maxEmbeddingInputs?: number; maxEmbeddingBytes?: number; archiveDatasets?: unknown[] } = {}) => importRagCorpus({ connectionString, currentDatasets: [current], archiveDatasets: [], embedder, maxEmbeddingInputs: 100, maxEmbeddingBytes: 100000, ...extra });
   try {
     const logging = await admin.query("SELECT current_setting('log_parameter_max_length') AS normal, current_setting('log_parameter_max_length_on_error') AS errors");
     assert.deepEqual(logging.rows[0], { normal: "0", errors: "0" }, "DB bind parameter logging must be disabled");
@@ -173,6 +173,36 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
       } finally { await session.close(); }
       const next = await openRagImportSession({ connectionString }); await next.close();
       assert.ok(await store.captureActive());
+    });
+    await t.test("SQL authority and topic filters exclude nearer mixed-corpus vectors before LIMIT", async () => {
+      const sh = { ...fixture(0).sources[0], id: "sh-filter-source", title: "Synthetic SH filter fixture" };
+      const suz = { ...sh, id: "suz-filter-source", title: "Synthetic SUZ filter fixture", authority: "suz", url: "https://www.suz.cvut.cz/cz/ubytovani", discoveryUrl: "https://www.suz.cvut.cz/cz/ubytovani", author: null, license: null, licenseUrl: null };
+      const cases = [
+        { id: "sh-filter-office", sourceId: sh.id, topic: "office", vector: [1, 0, 0] },
+        { id: "suz-filter-office", sourceId: suz.id, topic: "office", vector: [0.98, Math.sqrt(1 - 0.98 ** 2), 0] },
+        { id: "sh-filter-network", sourceId: sh.id, topic: "network", vector: [0.8, 0.6, 0] },
+        { id: "suz-filter-network-first", sourceId: suz.id, topic: "network", vector: [0.6, 0.8, 0] },
+        { id: "suz-filter-network-second", sourceId: suz.id, topic: "network", vector: [0.4, Math.sqrt(0.84), 0] },
+      ];
+      const mixed = { version: 2, sources: [sh, suz], chunks: cases.map(({ id, sourceId, topic }) => ({ id, sourceId, topic, text: id, sourceLocator: "Synthetic filter test", keywords: ["filter"], contentSha256: createHash("sha256").update(id).digest("hex") })) };
+      const vectors = new Map(cases.map(({ id, vector }) => [id, vector]));
+      const embedder: Embedder = { profile, async embed(inputs, request) {
+        request.onAttempt?.(inputs.reduce((sum, input) => sum + Buffer.byteLength(input), 0));
+        return { vectors: inputs.map((input) => {
+          const vector = vectors.get(JSON.parse(input)[2]); assert.ok(vector); return vector;
+        }), usage: { promptTokens: inputs.length, totalTokens: inputs.length } };
+      } };
+      await run(mixed, embedder);
+      const active = await store.captureActive(); assert.ok(active);
+      const ids = async (filters: Parameters<typeof store.search>[2]) => (await store.search(active, [1, 0, 0], { now, ...filters })).map((hit) => hit.chunk.id);
+      assert.deepEqual(await ids({ limit: 1 }), ["sh-filter-office"]);
+      assert.deepEqual(await ids({ authority: "suz", limit: 1 }), ["suz-filter-office"]);
+      assert.deepEqual(await ids({ topics: ["network"], limit: 1 }), ["sh-filter-network"]);
+      assert.deepEqual(await ids({ authority: "suz", topics: ["network"], limit: 1 }), ["suz-filter-network-first"]);
+      assert.deepEqual(await ids({ authority: "suz", topics: ["network"], limit: 2 }), ["suz-filter-network-first", "suz-filter-network-second"]);
+      assert.deepEqual(await ids({ authority: "silicon-hill", topics: ["office", "network"], limit: 4 }), ["sh-filter-office", "sh-filter-network"]);
+      assert.deepEqual(await ids({ authority: "suz", topics: ["printing"], limit: 4 }), []);
+      assert.deepEqual(await ids({ topics: [], limit: 4 }), []);
     });
   } finally {
     await store.close();

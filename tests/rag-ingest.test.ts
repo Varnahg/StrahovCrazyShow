@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { mkdir, mkdtemp, readFile, rm, unlink, writeFile } from "node:fs/promises";
+import { dirname, join, resolve, sep } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import test from "node:test";
 import original from "../server/data/silicon-hill-knowledge.json";
 import { createEmbeddingProfile, type Embedder } from "../server/rag-embeddings";
 import { prepareRagCorpus, importPreparedCorpus } from "../server/rag-ingest";
 import type { PreparedCorpus, RagImportSession } from "../server/rag-vector-store";
+import { loadApprovedRagDatasets, RAG_ARCHIVE_FILES, RAG_CURRENT_FILES } from "../scripts/rag-import";
 const profile = createEmbeddingProfile({ dimensions: 3 });
 function data(count = 2) {
   const source = { ...original.sources[0], id: "sh-ingest-test", title: "Synthetic import fixture", checkedAt: "2026-10-28", reviewAfter: "2026-11-28", effectiveFrom: null, effectiveUntil: null };
@@ -100,4 +104,68 @@ test("canonical planning is stable across object key order and profile changes d
   assert.equal(prepareRagCorpus([reversed], [], profile).revisionId, plan.revisionId);
   const other = prepareRagCorpus([input], [], createEmbeddingProfile({ dimensions: 2 }));
   assert.notEqual(other.revisionId, plan.revisionId); assert.equal(other.inputs[0].inputHash, plan.inputs[0].inputHash);
+});
+
+test("the real approved file loader plans SH and SUZ current chunks plus metadata-only archives", async () => {
+  const datasets = await loadApprovedRagDatasets();
+  assert.equal(datasets.currentDatasets.length, 3); assert.equal(datasets.archiveDatasets.length, 2);
+  const plan = prepareRagCorpus(datasets.currentDatasets, datasets.archiveDatasets, profile);
+  const current = new Map(plan.sources.filter((source) => source.metadata.status === "current").map((source) => [source.metadata.id, source.metadata]));
+  assert.equal(current.get("membership")?.authority, "silicon-hill");
+  assert.equal(current.get("sh-wifi-guide")?.authority, "silicon-hill");
+  assert.equal(current.get("suz-vup-2026-2027")?.authority, "suz");
+  const chunks = new Map(plan.chunks.map((chunk) => [chunk.raw.id, chunk]));
+  for (const id of ["sh-membership-join", "sh-wifi-registration", "suz-housing-payment-due", "suz-arrival-documents"])
+    assert.ok(chunks.has(id), `Missing approved current chunk ${id}`);
+  const archived = plan.sources.filter((source) => source.metadata.status === "archived");
+  assert.ok(archived.some((source) => source.metadata.id === "sh-archive-fotoatelier"));
+  assert.ok(archived.some((source) => source.metadata.id === "suz-archive-documents-2022-2023"));
+  assert.ok(archived.every((source) => source.metadata.archiveReason && !plan.chunks.some((chunk) => chunk.raw.sourceId === source.metadata.id)));
+  assert.ok(plan.chunks.every((chunk) => current.has(chunk.raw.sourceId)));
+  assert.deepEqual(new Set(plan.inputs.map((input) => input.inputHash)), new Set(plan.chunks.map((chunk) => chunk.inputHash)));
+});
+
+test("a missing, malformed or invalid approved file cannot replace the published corpus with a partial import", async () => {
+  const projectRoot = new URL("../", import.meta.url);
+  const cacheRoot = fileURLToPath(new URL(".cache/rag-vector-20261028-store/", projectRoot));
+  await mkdir(cacheRoot, { recursive: true });
+  const temporary = await mkdtemp(join(cacheRoot, "loader-fixture-"));
+  const root = pathToFileURL(temporary + sep);
+  const files = [...RAG_CURRENT_FILES, ...RAG_ARCHIVE_FILES];
+  const memory = memorySession(), embedder = fakeEmbedder();
+  const importApproved = async () => {
+    // Same loader -> validation/planning -> publication boundary as the administrative CLI.
+    const datasets = await loadApprovedRagDatasets(root);
+    const plan = prepareRagCorpus(datasets.currentDatasets, datasets.archiveDatasets, profile);
+    return importPreparedCorpus(plan, memory.session, options(embedder));
+  };
+  try {
+    for (const file of files) {
+      const destination = fileURLToPath(new URL(file, root));
+      await mkdir(dirname(destination), { recursive: true });
+      await writeFile(destination, await readFile(new URL(file, projectRoot)));
+    }
+    const published = await importApproved(), previousCalls = embedder.calls.length;
+    const previousCache = [...memory.cache.entries()];
+    for (const file of files) {
+      const destination = fileURLToPath(new URL(file, root)), originalContents = await readFile(destination);
+      const unchanged = () => {
+        assert.equal(memory.head(), published.revisionId, `Failed ${file} replaced the head`);
+        assert.equal(embedder.calls.length, previousCalls);
+        assert.deepEqual([...memory.cache.entries()], previousCache);
+      };
+      try {
+        await unlink(destination);
+        await assert.rejects(importApproved(), (error: NodeJS.ErrnoException) => error.code === "ENOENT"); unchanged();
+        await writeFile(destination, '{"version":');
+        await assert.rejects(importApproved(), SyntaxError); unchanged();
+        await writeFile(destination, JSON.stringify({ version: 1, sources: [], chunks: [] }));
+        await assert.rejects(importApproved(), (error: any) => error.code === "invalid-import-data"); unchanged();
+      } finally { await writeFile(destination, originalContents); }
+    }
+  } finally {
+    // Only the unique directory just created under this task's cache may be removed.
+    assert.ok(resolve(temporary).startsWith(resolve(cacheRoot) + sep));
+    await rm(temporary, { recursive: true, force: true });
+  }
 });
