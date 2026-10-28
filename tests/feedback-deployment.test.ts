@@ -97,7 +97,7 @@ test("Docker build runs the frozen dependency tree without an implicit pnpm inst
   }
 });
 
-test("isolated integration excludes inherited feedback/Linear/OpenAI settings while preserving NODE_OPTIONS", () => {
+test("isolated integration excludes inherited feedback/Linear/OpenAI/RAG settings while preserving NODE_OPTIONS", () => {
   const directory = join(tmpdir(), "strahov-integration-feedback-unit");
   const env = integration.createIsolatedIntegrationEnvironment(
     {
@@ -120,6 +120,9 @@ test("isolated integration excludes inherited feedback/Linear/OpenAI settings wh
       CRAZY_TYPKA_ENABLED: "1",
       crazy_typka_allowed_origins: "https://production.example.invalid",
       CRAZY_TYPKA_GENERATIONS_PER_PROCESS: "500",
+      RAG_DATABASE_URL: "postgresql://fake:fake@production.invalid/private",
+      rag_test_database_url: "postgresql://fake:fake@production.invalid/test",
+      RAG_MAX_COSINE_DISTANCE: "0.5",
     },
     directory,
   );
