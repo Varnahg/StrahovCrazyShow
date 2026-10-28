@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-decisions-20261028-validation",
+  "title": "AI: omezené živé ověření Decisions a výběru modelu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-decisions-validation-20261028/",
+    "docs/agents/handoffs/rag-decisions-20261028-validation.md"
+  ],
+  "resources": [
+    "openai-paid-validation",
+    "port:4268"
+  ],
+  "acceptance": [
+    "Za celý tento validační checkpoint nejvýše32 skutečných Decisions HTTP pokusů nad syntetickými předem označenými českými případy a nejvýše6 Responses generační pokusy, z nich nejvýše2 complex. Limity platí souhrnně i při více procesech nebo přerušeném běhu; nejisté odeslané pokusy je nesmějí resetovat.",
+    "Ověřit skutečný /v1/decisions endpoint a pevný serverový výběr simple/complex modelu. Uchovat očekávané štítky, rozhodnutí, požadovaný/skutečný model, usage, latence a nejasné výsledky; malá sada není obecná záruka klasifikace.",
+    "Žádná automatická retry smyčka ani drahá eskalace při timeoutu/nejasnosti. Doprovodnou moderaci a potvrzené versus neznámé usage evidovat odděleně; neznámý usage se nevydává za nulu.",
+    "API klíč použije jen původní koordinátor z přesného již uživatelem uloženého souboru mimo Git. Klíč, privátní konfigurace a autorizační hlavičky se nevypisují, nekopírují do evidence ani necommitují.",
+    "Případný malý service HTTP harness bind pouze127.0.0.1:4268 používá injektovanou ověřenou evidence fixture. Jeho úspěch se nesmí označit za novou SQL/pgvector nebo plnou E2E přejímku; žádný DB start.",
+    "Tento task nevlastní heavy/GPU/Docker/node_modules a nespouští fullsuite/build/SDK/3D. Po omezeném ověření ukončit vlastní harness/operace, zapsat konečné souhrnné čerpání a skutečně uvolnit obě rezervace."
+  ],
+  "verification": [
+    "Před jakýmkoli živým pokusem vlastní claim, skutečný stav portu a kontrola dosud vyčerpaného souhrnného rozpočtu. Předem uložit označené syntetické případy a přesný zdrojový/config profil bez tajných hodnot.",
+    "Uchovat raw bezpečné receipts a původní chyby bez přepisování; absence potvrzené odpovědi není povolení k opakovanému placenému volání.",
+    "Použít přímo explicitní Node entrypoint, nikoli pnpm exec/run. Koncovou zprávu svázat s konkrétním source hashem a zdokumentovanými omezeními; plná CI a integrace následují samostatně."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow; samostatná priorita KEY-68 Decisions routing, bez přibalení automatického ingest WIP.",
+    "Konkrétní omezený validační rozsah předal koordinátor01a17e9d-dd4a-7fe3-91ac-4f3bc548982d po18/18adapter a72/72runtime/provider scoped kontrolách. Tyto hlášené výsledky samy nedokládají živé API.",
+    "Main okno PR33 i Jantar Docker/GPU procesy zůstávají oddělené. Výsledky a převzetí do dalšího checkpointu se koordinují až po skončení tohoto omezeného běhu.",
+    "Admin přidělil pouze zadání; nečetl klíč a neprovedl žádné placené volání nebo start serveru.",
+    "28.10.2026 po skutečném release a handoffu změněn pouze celkový Responses cap4→6. Důvodem je jedna plánovaná dvojice Luna→Sol k ověření konkrétní provider opravy: absence dřívějšího podpůrného úryvku sama není důkaz chyby předchozí správné citované odpovědi. Dosavadní ledger28Decisions/4Responses/1complex/8moderations se zachovává append-only, všechny dosavadní pokusy jsou podle handoffu confirmed. Nejde o retry ani nový checkpoint/rozpočet; Decisions32 a complex2 zůstávají celkové limity. Před dalším pokusem nový claim a kontrola zbývajícího souhrnného čerpání."
+  ]
+}
