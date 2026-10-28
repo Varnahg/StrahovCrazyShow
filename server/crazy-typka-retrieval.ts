@@ -104,6 +104,19 @@ export function isKnowledgeCurrent(
     now < expires
   );
 }
+/** Synchronous final clock check for an already schema-validated SQL document. */
+export function isKnowledgeDocumentUsable(
+  source: Readonly<KnowledgeDocument>,
+  now: number,
+): boolean {
+  return (
+    source.status === "current" &&
+    isKnowledgeCurrent(source.checkedAt, source.reviewAfter, now) &&
+    (source.effectiveFrom === null ||
+      now >= Date.parse(source.effectiveFrom)) &&
+    (source.effectiveUntil === null || now < Date.parse(source.effectiveUntil))
+  );
+}
 function parseEffective(value: unknown): number {
   if (typeof value !== "string") return NaN;
   const match = /^(\d{4}-\d{2}-\d{2})T00:00:00([+-]\d{2}:\d{2})$/.exec(value);

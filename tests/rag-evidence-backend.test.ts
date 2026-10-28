@@ -4,7 +4,6 @@ import {
   createRagEvidenceBackend,
   createConfiguredEvidenceBackend,
   prepareEvidenceQuery,
-  explicitEvidenceFilters,
   RagEvidenceError,
 } from "../server/rag-evidence-backend";
 import {
@@ -120,44 +119,35 @@ test("prepared query is byte-bounded and only narrow follow-up includes the supp
   assert.throws(() => prepareEvidenceQuery("x".repeat(8192)), RagEvidenceError);
 });
 
-test("metadata filters identify only explicit institutions or named services, never broad room vocabulary", () => {
-  assert.deepEqual(
-    explicitEvidenceFilters(prepareEvidenceQuery("Na mém pokoji je havárie")),
-    {},
-  );
-  assert.deepEqual(
-    explicitEvidenceFilters(prepareEvidenceQuery("Ubytování na Strahově")),
-    {},
-  );
-  assert.deepEqual(
-    explicitEvidenceFilters(prepareEvidenceQuery("Doklady SÚZ")),
-    { authority: "suz" },
-  );
-  assert.deepEqual(
-    explicitEvidenceFilters(prepareEvidenceQuery("Kde je Fotokomora?")),
-    { authority: "silicon-hill", topics: ["photography"] },
-  );
-  assert.deepEqual(
-    explicitEvidenceFilters(prepareEvidenceQuery("Rozdíl SH a SÚZ")),
-    {},
-  );
-  assert.deepEqual(
-    explicitEvidenceFilters(
-      prepareEvidenceQuery("Ubytování v pokoji vedle Fotokomory"),
-    ),
-    {},
-  );
-  for (const mixed of [
-    "Platí členství SH také kolejné?",
-    "Does Silicon Hill membership pay my dorm rent?",
-    "A dorm room near Fotokomora",
-    "SÚZ a členské příspěvky",
-  ])
-    assert.deepEqual(explicitEvidenceFilters(prepareEvidenceQuery(mixed)), {});
-  assert.deepEqual(
-    explicitEvidenceFilters(prepareEvidenceQuery("Porovnej 3D tisk a SHernu")),
-    { authority: "silicon-hill", topics: ["printing", "game-room"] },
-  );
+test("runtime search never derives SQL metadata restrictions from institutions or mixed services in a question", async () => {
+  const f = fixture();
+  try {
+    for (const question of [
+      "Kde je Fotokomora a kancelář SÚZ?",
+      "Kde je Fotokomora a kancelář SH?",
+      "Doklady SÚZ",
+      "Členství Silicon Hill",
+      "Rozdíl SH a SÚZ",
+      "Porovnej 3D tisk a posilovnu",
+      "Kde je Fotokomora a menza?",
+      "Porovnej 3D tisk a SHernu",
+      "Does Silicon Hill membership pay my dorm rent?",
+      "A dorm room near Fotokomora",
+      "Na mém pokoji je havárie",
+    ]) {
+      const result = await f.search(question);
+      assert.deepEqual(f.filters(), { limit: 4, now: instant }, question);
+      assert.equal(f.vector(), vector);
+      assert.deepEqual(
+        result.chunks,
+        [hit.chunk],
+        "runtime must keep eligible SQL hits without an NLP authority filter",
+      );
+      assert.equal(f.inputs.at(-1)?.[0], question);
+    }
+  } finally {
+    await f.backend.close();
+  }
 });
 
 test("search uses the query vector and actual store hits without a lexical candidate list", async () => {

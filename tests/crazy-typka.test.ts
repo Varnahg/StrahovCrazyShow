@@ -156,6 +156,137 @@ test("transient DB failure while replaying keeps the cached success without any 
   }
 });
 
+for (const phase of ["publish", "replay"] as const)
+  for (const boundary of ["review", "effective"] as const)
+    test(`all evidence is rechecked at the fresh clock after ${phase} SQL validation crosses the ${boundary} boundary`, async () => {
+      const cutoff = Date.parse(
+        boundary === "review"
+          ? "2026-11-04T00:00:00Z"
+          : "2026-11-04T00:00:00+01:00",
+      );
+      let instant = cutoff - 1,
+        validations = 0;
+      const backend = fakeEvidenceBackend(),
+        baseSearch = backend.search,
+        original = getKnowledgeRegistry().chunks.find(
+          (item) => item.id === "sh-printing-location",
+        )!;
+      const dependency = {
+        ...original,
+        document: {
+          ...original.document,
+          reviewAfter: boundary === "review" ? "2026-11-04" : "2026-11-10",
+          effectiveUntil:
+            boundary === "effective" ? "2026-11-04T00:00:00+01:00" : null,
+        },
+      };
+      backend.search = async (query, options) => ({
+        ...(await baseSearch(query, options)),
+        chunks: [dependency],
+        sourceVersionIds: [dependency.source.id],
+      });
+      backend.validate = async () => {
+        validations++;
+        if (validations === (phase === "publish" ? 2 : 3)) {
+          await Promise.resolve();
+          instant = cutoff;
+        }
+        return true; // SQL evaluated its caller-supplied, earlier timestamp.
+      };
+      const f = fixture({ evidenceBackend: backend, now: () => instant });
+      try {
+        const token = await f.session(),
+          body = {
+            token,
+            requestSeq: 1,
+            message: "Kde je 3D tisk?",
+            locale: "cs",
+          };
+        const initial = await f.send("/api/ai/chat", body);
+        if (phase === "replay") {
+          assert.equal(initial.status, 200);
+          assert.deepEqual(
+            initial.body.sources,
+            [],
+            "uncited evidence must also expire",
+          );
+        }
+        const expired =
+          phase === "publish" ? initial : await f.send("/api/ai/chat", body);
+        assert.equal(expired.status, 409);
+        assert.deepEqual(expired.body, {
+          error: "response-expired",
+          requestSeq: 1,
+        });
+        assert.deepEqual(await f.send("/api/ai/chat", body), expired);
+        assert.equal(validations, phase === "publish" ? 2 : 3);
+        assert.equal(f.calls.length, 3);
+        assert.equal(f.service.usage().embeddingAttempts, 1);
+        assert.equal(f.service.usage().generationAttempts, 1);
+      } finally {
+        await f.service.close();
+      }
+    });
+
+for (const changed of [false, true])
+  test(`${changed ? "new" : "same"} published revision ${changed ? "discards" : "retains"} successful USER and assistant history before generation`, async () => {
+    const backend = fakeEvidenceBackend(),
+      baseSearch = backend.search;
+    let searches = 0;
+    backend.search = async (query, options) => {
+      const evidence = await baseSearch(query, options);
+      searches++;
+      return {
+        ...evidence,
+        snapshot: {
+          ...evidence.snapshot,
+          revisionId: (changed && searches > 1 ? "b" : "a").repeat(64),
+        },
+      };
+    };
+    const f = fixture({
+      evidenceBackend: backend,
+      now: () => Date.parse("2026-10-28T12:00:00Z"),
+    });
+    try {
+      const token = await f.session();
+      for (const [index, message] of [
+        "Kde je Fotokomora?",
+        "Jak funguje 3D tisk?",
+      ].entries())
+        assert.equal(
+          (
+            await f.send("/api/ai/chat", {
+              token,
+              requestSeq: index + 1,
+              message,
+              locale: "cs",
+            })
+          ).status,
+          200,
+        );
+      const generations = f.calls.filter((call) =>
+        call.url.endsWith("/responses"),
+      );
+      assert.equal(generations.length, 2);
+      assert.deepEqual(generations[0].body.input.slice(0, -1), []);
+      assert.deepEqual(
+        generations[1].body.input.slice(0, -1),
+        changed
+          ? []
+          : [
+              { role: "user", content: "Kde je Fotokomora?" },
+              {
+                role: "assistant",
+                content: "Ahoj! Jsem fiktivní AI průvodkyně.",
+              },
+            ],
+      );
+    } finally {
+      await f.service.close();
+    }
+  });
+
 test("async replay validation is serialized with new operations and reset cannot resurrect its old answer", async () => {
   const backend = fakeEvidenceBackend();
   let gate = false,

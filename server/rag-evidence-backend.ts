@@ -2,11 +2,7 @@ import {
   CRAZY_TYPKA_LIMITS,
   type CrazyTypkaErrorCode,
 } from "../shared/crazy-typka";
-import type {
-  KnowledgeAuthority,
-  KnowledgeChunk,
-  KnowledgeTopic,
-} from "./crazy-typka-retrieval";
+import type { KnowledgeChunk } from "./crazy-typka-retrieval";
 import {
   createEmbeddingProfile,
   createOpenAIEmbedder,
@@ -121,38 +117,6 @@ export function prepareEvidenceQuery(
   });
 }
 
-/** Optional SQL metadata constraints, never a lexical candidate list or ranking. */
-export function explicitEvidenceFilters(query: PreparedEvidenceQuery): {
-  authority?: KnowledgeAuthority;
-  topics?: readonly KnowledgeTopic[];
-} {
-  const text = normalized(query.filterText);
-  const sh = /\bsh\b|silicon\s*hill/.test(text),
-    suz = /\bsuz\b/.test(text);
-  const authority: KnowledgeAuthority | undefined =
-    sh !== suz ? (sh ? "silicon-hill" : "suz") : undefined;
-  const topics: KnowledgeTopic[] = [];
-  if (/\bfoto\s*atelier\w*\b|\bmodelland\b/.test(text)) topics.push("projects");
-  if (/\bfotokomor\w*\b/.test(text)) topics.push("photography");
-  if (/\b3d\s*(?:tisk\w*|print\w*)\b/.test(text)) topics.push("printing");
-  if (/\bshern\w*\b/.test(text)) topics.push("game-room");
-  const housingContext =
-    /\b(?:pokoj|ubytov|kolejne|smlouv|najem)\w*|\b(?:room|dorm\w*|housing|rent|accommodation)\b/.test(
-      text,
-    );
-  const clubContext = /\b(?:clenstvi|clensk\w*|membership|club)\b/.test(text);
-  // Broad context can only remove an optional filter, never create one or select IDs.
-  // A project used as a landmark or a cross-institution comparison must stay semantic.
-  if (
-    (sh && suz) ||
-    (sh && housingContext) ||
-    (suz && clubContext) ||
-    (topics.length && (suz || housingContext))
-  )
-    return {};
-  if (topics.length) return { authority: "silicon-hill", topics };
-  return authority ? { authority } : {};
-}
 function sameProfile(actual: EmbeddingProfile, expected: EmbeddingProfile) {
   return (
     actual.id === expected.id &&
@@ -296,11 +260,10 @@ export function createRagEvidenceBackend(options: {
         });
         if (closed || signal.aborted) throw new RagEvidenceError("cancelled");
         input.onEmbeddingUsage?.(embedded.usage);
-        const filters = explicitEvidenceFilters(query);
         const hits = await store.search(
           snapshot,
           embedded.vectors[0],
-          { ...filters, limit: CRAZY_TYPKA_LIMITS.sources, now: input.now },
+          { limit: CRAZY_TYPKA_LIMITS.sources, now: input.now },
           signal,
         );
         if (closed || signal.aborted) throw new RagEvidenceError("cancelled");
@@ -310,12 +273,6 @@ export function createRagEvidenceBackend(options: {
               !Number.isFinite(hit.distance) ||
               hit.distance < 0 ||
               hit.distance > 2
-            )
-              throw new RagEvidenceError("invalid-response");
-            if (
-              (filters.authority &&
-                hit.chunk.document.authority !== filters.authority) ||
-              (filters.topics && !filters.topics.includes(hit.chunk.topic))
             )
               throw new RagEvidenceError("invalid-response");
             return maxDistance === undefined || hit.distance <= maxDistance;

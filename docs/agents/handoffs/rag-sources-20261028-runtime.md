@@ -84,3 +84,49 @@ Při obnovení byly opraveny dvě doložené hrany: (1) expirace vyhozená pří
 - Manifest osmi předaných zdrojů/docs a deseti čtených dependencies: `.cache/rag-sources-20261028-runtime/resume-manifest.json`, checkedAt `2026-10-28T11:48:28.090Z`, SHA256 `{sources,inputs}`: `5e91ffe88d482490ca780bb85a5fbc3eee1069074ad210fb7351820752c04fc4`.
 
 Žádné live OpenAI/DB volání, privátní konfigurace, síťový proces, build, full suite ani GPU nebyly v tomto převzetí použity. Všechny vlastní krátké procesy skončily. Cílené fake-store testy nejsou důkazem SQL integrace nebo sémantické kvality. Práh `RAG_MAX_COSINE_DISTANCE` zůstává explicitně volitelný a bez odhadnutého defaultu; root jej případně nastaví podle skutečného eval. Prázdná hodnota je úmyslně vadná konfigurace. Root dokončí skutečný import/eval, společné kontroly a review/integraci; release tohoto tasku není Done celého KEY-65.
+
+Koordinátor 28.10 převzal a commitoval runtime66c4335a a kalibraci9ed94e86. Předává původnímu resume agentovi navazující review opravy: expiry po async validaci, smíšené služby bez předčasného topic filtru a regression změny revize/historie. Žádný runtime helper/port neběží; DB vlastní samostatný root task. Před novým claimem root uvolní rag-runtime-integrator-01a17e9d; předání zahrnuje jen doložený runtime WIP a historii těchto commitů.
+
+## Předání oprav review nad 9ed94e86
+
+28. 10. 2026 `/root/vector_runtime_resume` převzal výslovné navazující zadání koordinátora, task `rag-sources-20261028-runtime`, owner `rag-vector-runtime-review-20261028`. Claim s `--adopt-dirty` převzal pouze předaný zápis tohoto handoffu; zdroje byly čisté na `9ed94e861651eb32547a6d0b677b3f54c03fd8dd`. Po kontrole diffu a cílené reprodukci byly dokončeny tři požadavky:
+
+1. SQL validace používá čas zadaný před asynchronním čekáním. Překročení review nebo effectiveUntil během tohoto čekání dříve dovolilo publish i replay s HTTP200. Služba nyní po každém await validace synchronně zkontroluje všechny předané dokumenty vůči čerstvému `now()`. Čistý `isKnowledgeDocumentUsable` v retrieval modulu nečte registry/JSON ani neprovádí nový dotaz; sdílí existující kontrolu administrativních UTC dat a používá schema-validované efektivní ISO hranice. Žádný další await mezi touto kontrolou a publikací není. Další SQL dotaz by znovu otevřel stejnou časovou mezeru, proto nebyl zvolen. Helper `evidenceCurrent` sjednocuje publish, replay i kontrolu před generováním.
+2. Z `explicitEvidenceFilters` byla odstraněna veškerá inference témat i implicitní SH autority podle jména služby. Zůstává pouze explicitní SH/SÚZ s dosavadní ochranou smíšených institucionálních kontextů. Nebyly přidány nové regex výjimky. Smíšené dotazy Fotokomora+kancelář, 3D tisk+posilovna a Fotokomora+menza už neztrácejí tematické kandidáty. Při45 řádcích není důvod vyvažovat tuto ztrátu recall domnělým výkonovým přínosem; offline eval bez filtrů doložil koordinátor samostatně, tento autor jej nespouštěl.
+3. Přidány skutečné service regrese dvou úspěšných operací: stejný revisionId předá předchozí USER/assistant historii generátoru, změněný revisionId nepředá ani jednu. Existující implementace této hranice byla správná a nepotřebovala změnu.
+
+Default `text-embedding-3-large`/3072, práh0.60, embedding adaptéry, SQL, provider i klient zůstaly nedotčené. Změněno pouze:
+
+- `server/crazy-typka.ts`
+- `server/crazy-typka-retrieval.ts`
+- `server/rag-evidence-backend.ts`
+- `tests/crazy-typka.test.ts`
+- `tests/rag-evidence-backend.test.ts`
+- `docs/home-ai/20261028/runtime/README.md`
+- toto předání; pomocné logy a manifest pouze ve vlastní runtime cache.
+
+### Skutečné ověření oprav review
+
+- RED `review-red.log`:7 testů,2 PASS (obě historie),5 FAIL; čtyři časové hrany reprodukovaly200 místo409, topic regrese reprodukovala nadbytečný filtr photography.
+- GREEN `review-green.log`:7/7 PASS, exit0. Časové testy pokrývají publish/replay × review/effectiveUntil, necitované evidence, potvrzený requestSeq a opakovaný replay bez nového embeddingu/generování.
+- Finální stejná cílená sada pěti AI test souborů: **105/105 PASS**, žádný skip/cancel, exit0,1857.5528ms; `.cache/rag-sources-20261028-runtime/review-targeted-final.log`.
+- Scoped strict TypeScript stejných pěti runtime/shared zdrojů a pěti testů: **PASS**, exit0, bez diagnostiky; `review-types-final.log`. Scoped Prettier a `git diff --check`: PASS.
+- Manifest šesti změněných zdrojů/docs +12 čtených dependencies: `.cache/rag-sources-20261028-runtime/review-manifest.json`, checkedAt `2026-10-28T12:26:51.408Z`, SHA256 `{sources,inputs}` `ce0ed6eaac5a82df2e8c25ea73b3c9b43cf442b086cadf3e1e0666cb82ecdc53`.
+
+Všechny vlastní krátké procesy skončily; žádný port, síťová služba, placené API, databázová integrace, full suite, build ani GPU nebyly spuštěny. Žádný commit. Po zapsání předání se claim uvolní a koordinátor přebírá uvedený přesný dirty rozsah k opakované společné kontrole a integraci.
+
+Navazující čtecí review uzavřelo E1/E2 a původní B1, ale doložilo regresi: Fotokomora+kancelářSÚZ nyní vynucuje jenSÚZ. Koordinátor volí úplné odstranění odvozovaných NLP filtrů z runtime, včetně instituce; SQL API explicitních metadatových filtrů zůstává podporované/testované. Offline skutečné SQL nad45zaplacenýmiqueryvectors bezvšechfiltrů zachovalo stejné39/39 předprahem a38/39 při0.60. Předáváno původnímu autorovi, po rootrelease znovu vlastníclaim. Žádné helpery neběží.
+
+## Úplné odstranění odvozovaných SQL filtrů
+
+Podle tohoto předání `/root/vector_runtime_resume` získal nový claim `rag-vector-runtime-unfiltered-20261028`, převzal sedm doložených runtime dirty cest a odstranil celou `explicitEvidenceFilters`, nepoužívaný typ instituce a navazující post-filter guard. `store.search` v chatu nyní dostává pouze `{limit, now}`; SQL vybere sémantické kandidáty při zachování povinných source/profile/freshness pravidel. `prepareEvidenceQuery`, bezpečná USER kotva, expiry opravy, model large/3072 i práh0.60 jsou zachovány. Store API authority/topics zůstalo nedotčené pro explicitní administrativní dotazy.
+
+Dosavadní test konkrétního classifieru byl nahrazen behaviorální regresí skutečné backend→store cesty. Jedenáct dotazů včetně Fotokomora+kancelářSÚZ, Fotokomora+kancelářSH, obou institucí samostatně i společně, 3D tisk+posilovna a Fotokomora+menza ověřuje, že se odešle celý query embedding a jen limit/čas, a že runtime nevyřadí platný SQL výsledek podle slovního odhadu autority.
+
+- RED `unfiltered-red.log`: původní implementace pro první smíšený dotaz skutečně poslala nadbytečné `authority: suz`.
+- GREEN `unfiltered-green.log`: behaviorální regrese PASS pro všech11 dotazů.
+- Finální pětisouborová cílená sada: **105/105 PASS**, žádný skip/cancel, exit0,978.5456ms; `unfiltered-targeted-final.log`.
+- Scoped strict TypeScript: **PASS**, exit0 bez diagnostiky; `unfiltered-types-final.log`. Scoped Prettier PASS; po formátování žádný odkaz na odstraněný export v server/tests/scripts ani současné runtime dokumentaci.
+- Manifest šesti souborů celého předávaného runtime checkpointu a12 dependencies: `unfiltered-manifest.json`, checkedAt `2026-10-28T12:38:37.846Z`, SHA256 `{sources,inputs}` `54f305f5705e690b1809c36f2b89f64c49fc47ddefc483a480bafee28e6d39a5`. Při převzetí HEAD9ed94e86, během nezávislé práce koordinátora se HEAD posunul na `bedaacb7b95abb3e9d482d27e25cc0f09ce084e3`; zde žádný commit proveden nebyl.
+
+V této poslední opravě se změnily pouze backend, jeho test a runtime README; původní expiry/history opravy zůstávají v celém sedmisouborovém dirty předání. Žádná nová API platba, DB integrace, server, full suite, build ani GPU. Všechny krátké helpery skončily. Po konečné kontrole diffu se claim uvolňuje a root přebírá stejné doložené runtime cesty včetně tohoto předání. Offline query eval popsaný koordinátorem nebyl tímto agentem opakován.

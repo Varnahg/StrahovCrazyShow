@@ -27,6 +27,7 @@ import {
   type AsyncEvidenceBackend,
   type EvidenceSnapshot,
 } from "./rag-evidence-backend";
+import { isKnowledgeDocumentUsable } from "./crazy-typka-retrieval";
 
 export type CrazyTypkaServiceLimits = {
   requestBytes: number;
@@ -94,6 +95,11 @@ type Operation = {
   terminal?: TerminalResult;
 };
 type Address = { requests: number[]; sessions: number[] };
+function evidenceCurrent(evidence: EvidenceSnapshot, instant: number) {
+  return evidence.chunks.every((chunk) =>
+    isKnowledgeDocumentUsable(chunk.document, instant),
+  );
+}
 function rememberTerminal(
   session: Session,
   operation: Operation,
@@ -536,11 +542,12 @@ export function createCrazyTypkaService(
         const current =
           previous.terminal.status >= 400 ||
           !previous.evidence ||
-          (await backend!.validate(
+          ((await backend!.validate(
             previous.evidence,
             now(),
             controller.signal,
-          ));
+          )) &&
+            evidenceCurrent(previous.evidence, now()));
         if (
           controller.signal.aborted ||
           sessions.get(key) !== session ||
@@ -627,7 +634,12 @@ export function createCrazyTypkaService(
         },
       });
       if (
-        !(await backend!.validate(operation.evidence, now(), controller.signal))
+        !(await backend!.validate(
+          operation.evidence,
+          now(),
+          controller.signal,
+        )) ||
+        !evidenceCurrent(operation.evidence, now())
       )
         throw new RequestError(409, "response-expired");
       if (
@@ -663,7 +675,12 @@ export function createCrazyTypkaService(
       )
         throw new RequestError(409, "cancelled");
       if (
-        !(await backend!.validate(operation.evidence, now(), controller.signal))
+        !(await backend!.validate(
+          operation.evidence,
+          now(),
+          controller.signal,
+        )) ||
+        !evidenceCurrent(operation.evidence, now())
       )
         throw new RequestError(409, "response-expired");
       if (
