@@ -53,3 +53,42 @@ Vlastní instalační/probe/test procesy běžely jen jako přímé ukončené C
 Zbývá: rezervované CPU ověření skutečné standardní CLI izolace/offline běhu, syntetická PDF tabulka a český sken s fidelity oracle, případná oprava OCR profilu podle chybějícího zvýrazněného data; samostatná izolovaná legacy konverze; root Node orchestrace/reporting/SQL integrace a odpovídající širší přejímka. Nebyl spuštěn full suite hry, build, image, integrační test, GPU ani placené API. Tento task nedává oprávnění označit114seedů nebo celou KEY-67 hotovou.
 
 Předání a poslední čtecí kontrola jsou uzavřené16:38UTC, vlastní pomocníci ukončeni; následuje výslovný CLI release extraction rezervace pro převzetí koordinátorem. `release` není stavDone. Přijetí tasku, commit/integraci a společné `docs/verification.md` vlastní koordinátor.
+
+## Root checkpoint a následné HTML odlehčení
+
+Root ověřil všech 20 source hashů proti tomuto manifestu a uložil komponentu jako `0ff4209cfbf854066530c8ee4802f3f2ede81770`. Modelový manifest včetně původních CRLF/SHA byl zachován podle byte-preserving `.gitattributes`. Následný accepted-main sync `0f80ac85` neměnil žádný z těchto zdrojů.
+
+Skutečný SÚZ HTML hub z bounded acquisition probe má 45088 B a SHA `c4629e7f1fa683c09e9949b80bc826adae1e145f607aae74c978d703a818dc9f`; uložený je `.cache/rag-auto-20261028/source-probe-9FBMrk/source.html`. Native HTML CLI trvalo 65,8 s, výstup 74 bloků/71 chunků, 1553 znaků, 27 odkazů včetně 20 příloh. Review-required kvůli partner logům je zachované; celkový čas zatím nemá úplnou atribuci. Nejde o důkaz, že se načítaly váhy nebo běžela inference.
+
+Čtecí primární audit našel opakované čtení package METADATA přibližně čtyřikrát na distribuci a obecný DocumentConverter import/backend/factory řetězec i pro HTML. Přímý pinovaný HTMLDocumentBackend přes skutečný InputDocument volá stejnou convert metodu jako SimplePipeline; zachovat validitu, limity, fetch_images=False, celé normalize/quality/chunk guardy a cleanup. Preferovaný úzký kandidát: jediná četba metadat a přímá HTML cesta, bez změny PDF/DOCX, modelových profilů nebo fresh-process lifecycle. Persistentní pool/nové prostředí nejsou tímto automaticky schválené.
+
+Root nyní předává vlastní změnu tohoto handoffu a celý doložený source checkpoint novému příjemci `/root/implement_html_extraction`. Po release převezme task `rag-auto-20261028-extraction` vlastním claimem s adopt-dirty. Úzký kódový scope v rámci původních writePaths: docling_adapter.py, worker.py, odpovídající testy a tento handoff; žádná instalace, modelový download, síť, OpenAI nebo změna modelového manifestu. Před přijetím významné cílené regrese a samostatně koordinovaný bounded A/B/A probe nad stejnými bytes/venv, srovnávající skutečný výstup. Výkonový závěr až podle měření, ne podle importního grafu. Vlastní root helpery již skončily.
+
+## HTML kandidát — 28. 10. 2026, 21:42 UTC
+
+Příjemce `/root/implement_html_extraction` převzal původní task claimem `rag-html-refactor-01a17e9d --adopt-dirty`, pouze předaný handoff byl dirty. Upravuje `docling_adapter.py`, `worker.py`, nový `tests/test_html_backend.py` a tento záznam; žádné staging/commity. Současný nadřazený HEAD se mezitím posunul na `a5ac67d199be1a94ba8d05df16610f857e31e6a9`; jiné změny agent nepřebírá.
+
+Pinované primární API bylo znovu přečteno z existujícího venv: `docling/backend/html_backend.py` (constructor/convert/unload), `datamodel/document.py` (InputDocument/ConversionResult), `pipeline/simple_pipeline.py` a `pipeline/base_pipeline.py`, `datamodel/settings.py`. Přímý skutečný InputDocument zachovává výpočet hashe, filesize limit, backend validity a stejné backend options. HTML backend vytvoří úplný DoclingDocument; ten je použitelný i po zavření vstupního streamu, což kontrolují skutečné tabulkové a normalizační regrese.
+
+Zvažována ponechaná obecná cesta, samotné odlehčení metadat, přímý SimplePipeline a přímý HTML backend. Kandidát kombinuje jedinou četbu Name/Version z distribution.metadata a úzkou HTML odbočku před DocumentConverter importem. Samotný SimplePipeline by zachoval společnou factory inicializaci; pool/nové prostředí by měnily mnohem více lifecycle a provisioning. Přínos zrychlení zatím není změřený a tento výběr může být podle A/B zúžen na metadata-only variantu.
+
+`convert()` stále vrací skutečný ConversionResult. HTML sestaví skutečný InputDocument s explicitními limity a `fetch_images=False`, backend.convert vytvoří dokument a finally vždy zavolá unload; vnější BytesIO context uzavře stream také při konstrukční/validační/konverzní nebo cleanup chybě. PDF/DOCX konverzní větev, JSON schema, pipeline label, normalizace, chunkování a quality guards se nemění. Přirozeně se mění implementation fingerprint upraveného kódu. Modelový manifest SHA `d5b983cd697a2520ff2246796eb24c58688db89e0d2a608c8de1774eade5f6f4` zůstává shodný, včetně původních bajtů.
+
+Nový fresh-process důkaz zpřesnil dřívější importní hypotézu: i přímý HTML backend potřebuje `base_models → pipeline_options → asr_model_specs/asr_presets → pipeline_options_vlm_model`. Poslední modul na top-level zkouší `from transformers import StoppingCriteria` a importuje sdílený `docling.models.utils.generation_utils`. Nelze tvrdit, že zmizely všechny modelové knihovny nebo přisoudit jim původních 65,8 s. Test proto blokuje skutečně odstraňované DocumentConverter/runtime pipeline/factories/stages, nikoli potřebné datamodelové utility. Třetí knihovny nejsou stubované ani změněné.
+
+Ověření přímým interpreterem vlastního venv, s tokenizer cache a bez pycache/pytest cache:
+
+- RED původních dvou regresí: 2 FAIL, 6 deselected; metadata reads `[4,2,1]` místo `[1,1,1]` a HTML při blokovaném DocumentConverter skončilo failed. `.cache/rag-auto-extraction-20261028/html-refactor-red.log`.
+- První kandidát: 7 PASS, 1 FAIL. Příliš široký import guard odhalil výše uvedený sdílený datamodelový import; původní výsledek zachován v `html-refactor-green.log`.
+- Po zpřesnění guardu: 8/8 PASS, `html-refactor-green2.log`.
+- Závěrečné cílené regrese včetně cleanup failure, původního HTML, nativního PDF a DOCX: **13 PASS, 24 deselected**, 31,80 s, exit0; `html-refactor-targeted.log`. Příkaz: `python -m pytest tools/rag_ingestion/tests/test_html_backend.py tools/rag_ingestion/tests/test_extraction.py -q -p no:cacheprovider -k 'package_versions or html or full_native_pdf_and_page_limit or docx_order_tables_negations_and_no_fake_pages'` s vlastní basetemp.
+
+`html-refactor-manifest.json` obsahuje hashe obou kódových souborů i nového testu a potvrzení původního modelového manifestu. Whitespace kontrola těchto kódových změn prošla. Všechny dosavadní cílené testové procesy skončily. Nedošlo k instalaci, modelové inferenci, síti/API, DB, buildu, GPU ani zásahu do hrané hry.
+
+Výkonový A/B/A ještě neproběhl. Přidělený task `rag-auto-20261028-html-profile` byl načten, ale jeho claim se nezískával během cizího heavy okna; čeká se na výslovné GO/release od root. Source claim zůstává držený kvůli stabilnímu kandidátu a navazujícímu měření, nepředává se jako dokončená výkonová přejímka.
+
+## Dokončení HTML ověření
+
+Po výslovném root GO proběhl samostatně rezervovaný A/B/A probe; [validační předání](rag-auto-20261028-html-profile.md) zachycuje přesné processing pokusy, hashe, časy, paritu a omezení fázové atribuce. A1 22,818 s, B16,828 s, A2 21,854 s. Celý obsah/envelope mimo parserProfile je shodný i s původním uloženým výsledkem; v profile se liší jen očekávaný implementation configurationHash. Zachovány bloky, text, spans, IDs, chunky, quality i všechny odkazy. Oproti průměru A bylo B v tomto jediném instrumentovaném HTML vzorku o24,66 % rychlejší; není to obecný benchmark ani přepis starého65,8s měření.
+
+Nezávislé úzké čtecí review `/root/implement_html_extraction/review_html_lifecycle` nenašlo opravitelné regrese v InputDocument/ConversionResult, limitech, cleanup ani metadata paritě. Reviewer testy ani profiling nespouštěl. Původní testy13PASS a source manifest zůstávají platné; během A/B se zdrojový kandidát neupravoval. Všechny vlastní pomocné procesy skončily, žádné změny jiných formátů či modelového manifestu. Po dokončení obou předání budou source i heavy claims uvolněné; root přebírá přesně uvedené dva kódové soubory, nový test a aktualizovaný handoff pro další kontrolu/integraci. Nic nebylo stagováno ani commitováno tímto agentem.
