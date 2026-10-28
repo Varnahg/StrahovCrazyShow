@@ -6,81 +6,103 @@ import {
   WelcomeScreen,
   observePublicPresence,
   type PublicPresenceState,
+  type WelcomeScreenProps,
 } from "../client/welcome-screen";
 import { DEFAULT_PROFILE } from "../shared/types";
 
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
-
-test("home exposes both entry choices before mounting the detailed editor in CZ and EN", () => {
-  let editorRenders = 0;
-  const Editor = () => {
-    editorRenders++;
-    return createElement("p", {}, "heavy editor");
-  };
-  for (const locale of ["cs", "en"] as const) {
-    const html = renderToStaticMarkup(
-      createElement(WelcomeScreen, {
-        locale,
-        profile: DEFAULT_PROFILE,
-        onChange() {},
-        enter() {},
-        busy: false,
-        editor: createElement(Editor),
-        map: createElement("svg"),
-        language: "language",
-        feedback: "feedback",
-        presence: { status: "ready", online: 0 },
-      }),
-    );
-    assert.equal(
-      editorRenders,
-      0,
-      "collapsed editor must not initialize a 3D preview",
-    );
-    assert.match(html, /aria-expanded="false"/);
-    assert.match(html, /<label[^>]+for=/);
-    assert.match(html, /maxLength="24"/i);
-    assert.match(
-      html,
-      locale === "cs"
-        ? /Vstoupit do společného světa/
-        : /Enter the shared world/,
-    );
-    assert.match(
-      html,
-      locale === "cs"
-        ? /Prohlédnout si Strahov sám/
-        : /Explore Strahov on your own/,
-    );
-    assert.match(html, /<strong>0<\/strong>/);
-    assert.doesNotMatch(html, /heavy editor|crazy-chat/);
-  }
-});
-
-test("unavailable count remains unknown and independent assistant is an optional slot", () => {
-  const html = renderToStaticMarkup(
+function home(props: Partial<WelcomeScreenProps> = {}) {
+  return renderToStaticMarkup(
     createElement(WelcomeScreen, {
       locale: "cs",
       profile: DEFAULT_PROFILE,
-      onChange() {},
       enter() {},
-      busy: true,
-      error: "Server neodpovídá",
+      busy: false,
       editor: null,
-      map: null,
-      language: null,
-      feedback: null,
-      assistant: createElement("p", {}, "Optional assistant"),
-      presence: { status: "unavailable" },
+      language: "language",
+      feedback: "feedback",
+      presence: { status: "ready", online: 0 },
+      ...props,
     }),
   );
-  assert.match(html, /Počet připojených teď není dostupný/);
-  assert.doesNotMatch(html, /<strong>0<\/strong>/);
-  assert.match(html, /Optional assistant/);
-  assert.match(html, /role="alert"/);
-  assert.equal((html.match(/disabled=""/g) ?? []).length, 2);
+}
+
+test("home has one multiplayer entry and defers the live editor in CZ and EN", () => {
+  let editorRenders = 0;
+  const Editor = () => {
+    editorRenders++;
+    return createElement("canvas", { "data-live-editor": true });
+  };
+  for (const locale of ["cs", "en"] as const) {
+    const html = home({ locale, editor: createElement(Editor) });
+    assert.equal(editorRenders, 0, "home must not initialize a GPU preview");
+    assert.match(html, /data-screen="home"/);
+    assert.equal(
+      (html.match(/class="home-primary home-enter"/g) ?? []).length,
+      1,
+    );
+    assert.match(html, locale === "cs" ? />Pusť mě dovnitř</ : />Let me in</);
+    assert.match(html, /<strong>0<\/strong>/);
+    assert.match(
+      html,
+      locale === "cs" ? /Strahováků online/ : /Strahov players online/,
+    );
+    assert.doesNotMatch(
+      html,
+      /data-live-editor|<canvas|<input|Explore Strahov|Prohlédnout si|DEMO|Na kopci|Ve svém živlu|↗|class="brand"/,
+    );
+  }
 });
 
+test("unavailable and loading presence stay unknown, and chat is initially only a launcher", () => {
+  for (const status of ["unavailable", "loading"] as const) {
+    const html = home({
+      presence: { status },
+      assistant: createElement("p", {}, "Private assistant contents"),
+    });
+    assert.match(html, /<strong>—<\/strong>/);
+    assert.doesNotMatch(
+      html,
+      /<strong>0<\/strong>|Private assistant contents|home-chat-popup/,
+    );
+    assert.match(html, /aria-expanded="false"/);
+    assert.match(html, /Crazy Typka/);
+    assert.match(html, /class="home-ai-tag">AI</);
+    assert.match(
+      html,
+      status === "loading"
+        ? /Zjišťuji počet připojených/
+        : /Počet připojených teď není dostupný/,
+    );
+  }
+});
+
+test("real player count handles Czech plural forms without claiming verified identities", () => {
+  for (const [online, wording] of [
+    [1, "Strahovák online"],
+    [3, "Strahováci online"],
+    [12, "Strahováků online"],
+  ] as const) {
+    const html = home({ presence: { status: "ready", online } });
+    assert.ok(html.includes(wording));
+    assert.ok(html.includes("<strong>" + online + "</strong>"));
+  }
+});
+
+test("background is decorative, dialogs stay closed and genuine feedback/language slots remain", () => {
+  const html = home({ busy: true, error: "Server neodpovídá" });
+  assert.match(html, /class="home-map-viewport" aria-hidden="true"/);
+  assert.match(html, /class="home-map-art"/);
+  assert.match(html, /focusable="false"/);
+  assert.match(html, /language/);
+  assert.match(html, /feedback/);
+  assert.match(html, /role="alert">Server neodpovídá/);
+  assert.match(html, /class="home-primary home-enter" disabled=""/);
+  assert.doesNotMatch(
+    html,
+    /<dialog|OpenStreetMap|<text|<canvas|class="leaflet/,
+  );
+});
 test("presence cancellation aborts one request and ignores its late result", async () => {
   const states: PublicPresenceState[] = [];
   let finish!: (response: Response) => void;

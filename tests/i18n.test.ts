@@ -65,11 +65,14 @@ test("switching publishes once, persists only locale, updates document language 
     setLocale("cs");
     calls = 0;
     setLocale("en");
+    assert.equal(document.title, "Strahov Crazy Show");
+    document.title = "stale title";
+    document.documentElement.lang = "stale";
     setLocale("en");
     assert.equal(calls, 1);
     assert.equal(getLocale(), "en");
     assert.equal(document.documentElement.lang, "en");
-    assert.equal(document.title, "Strahov • together on the hill");
+    assert.equal(document.title, "Strahov Crazy Show");
     assert.equal(storage.get(LOCALE_STORAGE_KEY), "en");
     assert.equal(storage.get("strahov.session"), "existing-session");
     assert.equal(storage.get("strahov.profile"), "unchanged-profile");
@@ -83,7 +86,7 @@ test("switching publishes once, persists only locale, updates document language 
     });
     assert.doesNotThrow(() => setLocale("cs"));
     assert.equal(getLocale(), "cs");
-    assert.equal(document.title, "Strahov • společně na kopci");
+    assert.equal(document.title, "Strahov Crazy Show");
     assert.equal(calls, 2);
     unsubscribe();
     setLocale("en");
@@ -96,6 +99,93 @@ test("switching publishes once, persists only locale, updates document language 
     if (savedDocument)
       Object.defineProperty(globalThis, "document", savedDocument);
     else Reflect.deleteProperty(globalThis, "document");
+  }
+});
+
+test("the registered storage handler preserves the brand for unchanged and changed fallback locales", async () => {
+  const globals = ["window", "document", "navigator", "localStorage"] as const;
+  const saved = globals.map(
+    (key) => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const,
+  );
+  const registered: ((event: StorageEvent) => void)[] = [];
+  let writes = 0;
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: {
+      addEventListener(type: string, listener: (event: StorageEvent) => void) {
+        assert.equal(type, "storage");
+        registered.push(listener);
+      },
+    },
+  });
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: { documentElement: { lang: "" }, title: "" },
+  });
+  Object.defineProperty(globalThis, "navigator", {
+    configurable: true,
+    value: { languages: ["cs-CZ"] },
+  });
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: () => "cs",
+      setItem: () => writes++,
+    },
+  });
+  let unsubscribe: (() => void) | undefined;
+  try {
+    // An isolated module registers the real browser callback without a new API.
+    const url = new URL("../client/i18n.ts", import.meta.url);
+    url.searchParams.set("test", "storage-title");
+    const isolated: typeof import("../client/i18n") = await import(url.href);
+    assert.equal(registered.length, 1);
+    const [onStorage] = registered;
+    assert.ok(onStorage);
+    let calls = 0;
+    unsubscribe = isolated.subscribeLocale(() => calls++);
+
+    // Reproduce a clear after App set the brand: browser fallback is still cs.
+    document.title = "Strahov Crazy Show";
+    onStorage({ key: null, newValue: null } as StorageEvent);
+    assert.equal(document.title, "Strahov Crazy Show");
+    assert.equal(document.documentElement.lang, "cs");
+    assert.equal(isolated.getLocale(), "cs");
+    assert.equal(calls, 0);
+
+    document.title = "stale title";
+    document.documentElement.lang = "stale";
+    onStorage({ key: LOCALE_STORAGE_KEY, newValue: null } as StorageEvent);
+    assert.equal(document.title, "Strahov Crazy Show");
+    assert.equal(document.documentElement.lang, "cs");
+    assert.equal(calls, 0);
+
+    onStorage({ key: LOCALE_STORAGE_KEY, newValue: "en" } as StorageEvent);
+    assert.equal(document.title, "Strahov Crazy Show");
+    assert.equal(document.documentElement.lang, "en");
+    assert.equal(isolated.getLocale(), "en");
+    assert.equal(calls, 1);
+    onStorage({ key: LOCALE_STORAGE_KEY, newValue: "en" } as StorageEvent);
+    assert.equal(calls, 1);
+
+    onStorage({ key: LOCALE_STORAGE_KEY, newValue: null } as StorageEvent);
+    assert.equal(document.title, "Strahov Crazy Show");
+    assert.equal(document.documentElement.lang, "cs");
+    assert.equal(isolated.getLocale(), "cs");
+    assert.equal(calls, 2);
+
+    onStorage({ key: "strahov.profile", newValue: "en" } as StorageEvent);
+    assert.equal(isolated.getLocale(), "cs");
+    assert.equal(document.documentElement.lang, "cs");
+    assert.equal(document.title, "Strahov Crazy Show");
+    assert.equal(calls, 2);
+    assert.equal(writes, 0, "storage notifications must not persist again");
+  } finally {
+    unsubscribe?.();
+    for (const [key, descriptor] of saved) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    }
   }
 });
 

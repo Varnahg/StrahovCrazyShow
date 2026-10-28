@@ -1,0 +1,13 @@
+# Jantar LFS materializace · předání 28. 10. 2026
+
+Vlastník jantar-lfs-owner-01a16b37; příjemce koordinátor KEY-66, thread01a17fd8-017a-7852-87f9-cd1538e1bde2. Cíl C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, neměnný HEAD e09d60fa24419a93b26f15e21c862e95e44aff2f. Výslovně předaných609LFS cest:597 pod9obnovenými původními root asset claims,12 přesně ve vlastním materializačním tasku.
+
+Před zápisem ověřen HEAD/index pointer, OID, deklarovaná velikost, skutečný SHA-256 místního LFS objektu a bezpečná cílová cesta bez symlink/junction. Zdroj D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025/.cache/trees-20261025/runtime/lfs; všech609 objektů bylo dostupných místně. Každý cíl byl původně samostatný pointer. Instalovaná git-lfs3.7.1 dokumentuje checkout jako lokální operaci bez downloadu a bez přepsání upravených souborů. Čtecí nezávislý audit skutečného609pointer plánu bez blokujícího nálezu.
+
+Výsledek PASS:609/609 pointerů materializovaných,7 470 341 803B. Standardní git-lfs checkout proběhl v31sekvenčních dávkách s konkrétními literal cestami. Každý cíl poté prošel novým SHA-256/size/nlink ověřením, má jednu fyzickou kopii bez hardlinku na LFS objekt. Zdrojové objektové identity zůstaly shodné. Journal obsahuje609unikátních verified záznamů. Asset index a HEAD zůstaly stejné; Git diff všech609assetů je čistý.
+
+Navazující node scripts/check-lfs-assets.mjs:609files ready, exit0 (size/pointer kontrola); plné SHA-256 kontroly pocházejí z materializačního helperu, nikoli z tohoto preflightu. Původní apply proces dokončil exit0 i přes kapacitní chybu modelové relace; nebyl opakován. Následná čtecí kontrola nepotvrdila žádný vlastní běžící materialize.mjs proces. Neproběhl fetch, regenerace, hardlinkování, build, GPU, herní server ani placené API. Pomocník zapisoval pouze povolené asset cesty a vlastní důkazy; souběžné welcome/compact UI WIP se nepřebíralo, nestagovalo ani necommitovalo. Main a chráněná4182 nebyly měněné.
+
+Důkazy jsou v .cache/jantar-home-20261028-lfs-materialization/: materialize.mjs, plan.json, operations.jsonl, checkout.log, result.json a repo-preflight.log. Plan SHA-256 7153f1506963706dd48849a1be8789d387add94f1a7306f1fbd16a2f43a1d013; evidence-manifest.json SHA-256 11ee6102b87983defcea6260cd7fb6e9d6e790efa1855ae1485264ba4e42ec82. Manifest připíná6důkazních souborů včetně skutečného helperu. Toto je úspěšná příprava asset vstupů, nikoli herní/CI/GPU přejímka.
+
+Předány pouze tento handoff a nový task JSON k případnému explicitnímu stagingu koordinátorem; fyzická asset materializace nevytváří obsahový Git diff. Po předání následuje release jen jantar-home-20261028-lfs-materialization; původní root asset rezervace zůstávají svým vlastníkům.

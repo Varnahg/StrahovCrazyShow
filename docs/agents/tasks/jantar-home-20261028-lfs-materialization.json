@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-lfs-materialization",
+  "title": "Jantar: přesná místní materializace LFS vstupů z přijatého HEAD",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb",
+    ".cache/jantar-home-20261028-lfs-materialization/",
+    "docs/agents/handoffs/jantar-home-20261028-lfs-materialization.md"
+  ],
+  "resources": [
+    "lfs-materialization"
+  ],
+  "acceptance": [
+    "Pouze C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, HEAD e09d60fa24419a93b26f15e21c862e95e44aff2f. Zapsat pouze pointerem doložené přesné Git LFS bajty; již shodné soubory neměnit.",
+    "Tento task vlastní jen12 dosud volných přesných asset cest a důkazy; ostatních597 cest materializuje původní root v rámci svých9 obnovených asset claims. Nikdo jiný tím nezískává jejich rozsah.",
+    "Zdroj je stávající místní LFS store, všech609 objektů musí mít správný OID/size/hash před kopírováním i v cíli po něm. Žádný fetch/download, regenerace, hardlink, cizí inode, node_modules, změna package/lock či herní proces.",
+    "Zachovat souběžné UI WIP, index assetů, ostatní worktrees a chráněnou4182. Před zápisem ověřit cesty bez junction/symlink a změnu HEAD odmítnout."
+  ],
+  "verification": [
+    "Sekvenční kopírování standardním git-lfs checkout nad schválenými cestami; vlastní důkaz inventory/OID/hash/size a čistého asset diffu.",
+    "Žádná plná testovací sada, build, GPU nebo server; readonly preflight je pouze kontrola asset vstupů, nikoli herní přejímka."
+  ],
+  "notes": [
+    "Výslovné předání Jantar koordinátora 01a17fd8-017a-7852-87f9-cd1538e1bde2 z28.10.2026, zdrojové UI změny zůstávají jeho vlastníkům. Původní root 01a16b37 provádí pouze přesnou materializaci.",
+    "7 470 341 803B/609HEADcest bylo nalezeno ve stávajícím D lokálním LFS store; tento read-only údaj se před použitím znovu ověří. Předchozí scan ani samotný pointer nejsou dokladem materializace.",
+    "Původní asset claims: trees-20261026-catalog-export, trees-20261025-r5-bake, trees-20261026-r6-crown, trees-20261026-r6-far, trees-20261026-r6-shape, trees-20261025-pilot, trees-20261025-r5-stream-export, trees-20261026-r6-export, trees-20261025-streaming-export. Po práci release pouze nového materializačního tasku, původní claims se nepřebírají.",
+    "Přijato28.10.2026:609/609 fyzických LFS kopií,7 470 341 803B, zdrojové i cílové SHA-256/velikosti PASS, asset index/HEAD beze změny, čistý asset diff; repository preflight609ready. Handoff jantar-home-20261028-lfs-materialization.md, evidence-manifest SHA-256 11ee6102b87983defcea6260cd7fb6e9d6e790efa1855ae1485264ba4e42ec82. Žádný fetch/regenerace/hardlink/build/GPU/server; jde o připravené vstupy, ne herní přejímku."
+  ]
+}

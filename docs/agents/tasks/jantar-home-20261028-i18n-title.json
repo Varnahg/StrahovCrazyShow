@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-i18n-title",
+  "title": "Jantar: jednotná publikace lokalizovaného titulku",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/i18n.ts",
+    "tests/i18n.test.ts",
+    ".cache/jantar-home-20261028-i18n-title/",
+    "docs/agents/handoffs/jantar-home-20261028-i18n-title.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Opravit doložené přepsání titulku při storage eventu se stejným locale: canonical publisher musí zachovat správný title i při early return bez React notify.",
+    "Přidat cílenou regresi stejného i změněného locale; zachovat zbytek lokalizačního kontraktu. Duplicitní App effect odstraňuje koordinátor ve svém UI scope, tento task do client/ui.tsx nezapisuje.",
+    "Pouze lehké CPU testy přes přímý Node; žádný nový listener, build, GPU nebo překladová plošná změna."
+  ],
+  "verification": [
+    "Ověřit skutečný kód a reprodukční důkaz před opravou; zachovat původní výsledkové asserty a omezit diff na vlastní scope.",
+    "Příslušné kontroly a cleanup popsat v handoffu. Procesní, buildové a GPU operace jen s odpovídajícími současně drženými rezervacemi."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, větev codex/jantar-home. Přímé navazující review zadání KEY-66 od koordinátora01a17fd8-017a-7852-87f9-cd1538e1bde2; při přidělení source HEAD987bcd9242f747a6dd78c83a68b127a60ab90f19.",
+    "Současný neměnný klient/server4278 se během zdrojových oprav nepřepisuje; chráněná4182 zůstává beze změny. Starý4276 byl po dependency incidentu ukončen a neobnovuje se tímto taskem.",
+    "Žádná změna renderer budgetů/readiness, serverového API nebo PostgreSQL/RAG architektury. Žádné placené API. Package-manager příkazy nesmějí synchronizovat host root node_modules; používat přímé explicitní Node vstupy a oddělené fyzické snapshot dependencies.",
+    "Před zápisem vlastní disjunktní claim; konkrétní dítě neopakuje BMAD workflow. Předat změny, cílený refaktoring, důkazy i omezení, neoznačovat dílčí kontroly za přijetí celé hry."
+  ]
+}

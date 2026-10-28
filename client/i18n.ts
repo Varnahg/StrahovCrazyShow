@@ -43,10 +43,7 @@ export const getLocale = (): Locale => locale;
 function publishLocale(next: Locale) {
   if (typeof document !== "undefined") {
     document.documentElement.lang = next;
-    document.title =
-      next === "cs"
-        ? "Strahov • společně na kopci"
-        : messages["Strahov • společně na kopci"];
+    document.title = "Strahov Crazy Show";
   }
   if (next === locale) return;
   locale = next;

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-setup",
+  "title": "Jantar: samostatná fyzická frozen instalace závislostí",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "node_modules/",
+    ".cache/jantar-home-20261028-setup/",
+    "docs/agents/handoffs/jantar-home-20261028-setup.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze fyzická instalace do vlastní jantar-home worktree podle jejího přesného package.json/pnpm-lock.yaml; piny a patche zůstávají beze změny.",
+    "Před instalací ověřit skutečné vlastnictví node_modules; žádný junction/symlink nebo zápis skrz cizí node_modules. Vlastníci globálního node_modules scope musí nejprve předat rezervaci.",
+    "Task nepovoluje LFS hydrataci, fetch, regeneraci či hardlinkování assetů. Jejich přesná materializace vyžaduje samostatně doložený rozsah a původní vlastníky.",
+    "Výsledkem je izolovaná závislostní instalace s doloženou verzí runtime a zachovaným lockfilem; žádný build/GPU/herní server."
+  ],
+  "verification": [
+    "Nejdřív vlastní claim a kontrola skutečných procesů, portů a scén; žádné přebírání podle stáří. Zachovat přesnou identitu buildu/testů a původní selhání.",
+    "Výsledky uvést podle skutečně provedené kontroly; funkční spuštění není FPS benchmark. Cleanup/continuing service a release předat výslovně podle účelu tasku."
+  ],
+  "notes": [
+    "Přímý lidský požadavek zachovat Jantar návrh, implementovat jej do projektu a spustit celou hru i výslovný souhlas s koordinací obou souvisejících chatů ověřeny v relaci Navrhni lepší úvodní stránku, 01a17fd8-017a-7852-87f9-cd1538e1bde2. Linear KEY-66.",
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, větev codex/jantar-home, přijatá výchozí revize de6f87a2efbf8596bb03efae863e8d6763e22774. Před zápisem vlastní claim; nepřebírat primary WIP ani rozpracovaný RAG z jiné worktree.",
+    "V13 a server na portu4182 zůstávají chráněné. Žádná změna AI transportu, serverového API, RAG, rendereru nebo avatar-editor/preview bez nové konkrétní dohody.",
+    "Úpravy, cílený refaktoring, cache/lifecycle kontrolu a relevantní ověření předat společně. Dítě nespouští další BMAD workflow a nezapisuje do cizího scope. Main integrační okno a centrální docs koordinovat zvlášť.",
+    "28. 10. 2026 skutečně uvolněn rag-vector-setup claim a ukončeny jeho pnpm procesy; node_modules/ odebrán z jeho scope podle doloženého handoffu. Samostatný fyzický frozen/offline setup Jantar má nyní vlastní ready task bez heavy resources, bez změn package/lock a bez LFS hydratace."
+  ]
+}

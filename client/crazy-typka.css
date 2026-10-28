@@ -236,3 +236,277 @@
   padding: 16px;
   border-radius: 14px;
 }
+
+/* Opt-in welcome popup. The ordinary in-game presentation stays unchanged. */
+.crazy-chat.crazy-compact {
+  --crazy-text: var(--home-text, #fff3e4);
+  --crazy-muted: var(--home-muted, #cfbfb2);
+  --crazy-accent: var(--home-accent, #ffcf92);
+  --crazy-button-ink: var(--home-button-ink, #49301d);
+  --crazy-tint: var(--home-tint, 243, 200, 156);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px;
+  color: var(--crazy-text);
+  background: var(--home-panel, rgba(37, 27, 26, 0.93));
+  border: 1px solid rgba(var(--crazy-tint), 0.22);
+  border-radius: 20px;
+}
+.crazy-compact .crazy-heading {
+  gap: 10px;
+  min-height: 36px;
+  margin: 0 0 9px;
+  padding-right: 40px;
+}
+.crazy-compact .crazy-heading > div:last-child {
+  min-width: 0;
+}
+.crazy-compact .crazy-heading h2 {
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--crazy-text);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+.crazy-compact .crazy-avatar {
+  display: block;
+  flex-basis: 36px;
+  height: 36px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--crazy-tint), 0.35);
+  border-radius: 50%;
+  background: rgba(var(--crazy-tint), 0.12);
+}
+.crazy-compact .crazy-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.crazy-compact .crazy-ai-badge {
+  padding: 3px 5px;
+  border-color: rgba(var(--crazy-tint), 0.28);
+  border-radius: 4px;
+  background: rgba(var(--crazy-tint), 0.1);
+  color: var(--crazy-accent);
+  font-size: 10px;
+}
+.crazy-compact .crazy-availability {
+  gap: 7px;
+  padding: 0 0 8px;
+  border: 0;
+  color: var(--crazy-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.crazy-compact .crazy-availability.disabled,
+.crazy-compact .crazy-availability.error {
+  color: var(--crazy-accent);
+}
+.crazy-compact .crazy-availability button,
+.crazy-compact .crazy-starters button,
+.crazy-compact .crazy-recovery button {
+  color: var(--crazy-text);
+  background: rgba(var(--crazy-tint), 0.07);
+  border: 1px solid rgba(var(--crazy-tint), 0.2);
+  font-size: 11px;
+}
+.crazy-compact .crazy-availability button:hover,
+.crazy-compact .crazy-starters button:hover,
+.crazy-compact .crazy-recovery button:hover {
+  background: rgba(var(--crazy-tint), 0.14);
+}
+.crazy-compact .crazy-privacy {
+  margin: 0 0 5px;
+  color: var(--crazy-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.crazy-compact .crazy-privacy summary {
+  width: fit-content;
+  padding: 3px 0;
+  color: var(--crazy-muted);
+  cursor: pointer;
+}
+.crazy-compact .crazy-definition,
+.crazy-compact .crazy-disclosure {
+  margin: 7px 0;
+  color: var(--crazy-muted);
+  font-size: 11px;
+}
+.crazy-compact .crazy-log {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-height: 90px;
+  max-height: min(36vh, 260px);
+  margin: 10px 0;
+  padding: 2px;
+  scrollbar-width: thin;
+}
+.crazy-compact .crazy-message {
+  align-self: flex-start;
+  max-width: 92%;
+  padding: 10px 12px;
+  border: 1px solid rgba(var(--crazy-tint), 0.14);
+  border-radius: 14px 14px 14px 4px;
+  background: rgba(var(--crazy-tint), 0.1);
+  color: var(--crazy-text);
+}
+.crazy-compact .crazy-message.user {
+  align-self: flex-end;
+  margin-left: 0;
+  border-color: transparent;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--crazy-accent);
+  color: var(--crazy-button-ink);
+}
+.crazy-compact .crazy-message > strong {
+  gap: 5px;
+  font-size: 11px;
+}
+.crazy-compact .crazy-message p {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.crazy-compact .crazy-sources {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-color: rgba(var(--crazy-tint), 0.2);
+}
+.crazy-compact .crazy-sources small {
+  color: var(--crazy-muted);
+}
+.crazy-compact .crazy-sources a {
+  color: var(--crazy-accent);
+}
+.crazy-compact .crazy-starters {
+  margin: 10px 0 14px;
+}
+.crazy-compact .crazy-starters > p {
+  width: fit-content;
+  padding: 9px 12px;
+  border: 1px solid rgba(var(--crazy-tint), 0.14);
+  border-radius: 14px 14px 14px 4px;
+  background: rgba(var(--crazy-tint), 0.1);
+  font-size: 13px;
+}
+.crazy-compact .crazy-starters > div {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
+}
+.crazy-compact .crazy-starters button {
+  padding: 7px 10px;
+}
+.crazy-compact .crazy-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: end;
+  margin-top: 8px;
+}
+.crazy-compact .crazy-form > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.crazy-compact .crazy-form textarea {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 42px;
+  max-height: 140px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(var(--crazy-tint), 0.25);
+  border-radius: 11px;
+  background: rgba(10, 7, 12, 0.23);
+  color: var(--crazy-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.crazy-compact .crazy-form textarea::placeholder {
+  color: var(--crazy-muted);
+}
+.crazy-compact .crazy-form-actions {
+  display: contents;
+}
+.crazy-compact .crazy-form-actions small {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  color: var(--crazy-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.crazy-compact .crazy-form-actions button {
+  display: grid;
+  grid-column: 2;
+  grid-row: 1;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border: 1px solid rgba(var(--crazy-tint), 0.65);
+  border-radius: 11px;
+  background: var(--crazy-accent);
+  color: var(--crazy-button-ink);
+  font-size: 21px;
+}
+.crazy-compact .crazy-working {
+  margin: 8px 0;
+  color: var(--crazy-muted);
+  font-size: 11px;
+}
+.crazy-compact .error {
+  margin: 8px 0;
+  color: #ffd2bf;
+  font-size: 12px;
+}
+.crazy-compact .crazy-recovery {
+  margin: 8px 0;
+  padding: 11px;
+  border-color: rgba(var(--crazy-tint), 0.2);
+  border-radius: 11px;
+  background: rgba(var(--crazy-tint), 0.06);
+}
+.crazy-compact .crazy-recovery > p {
+  color: var(--crazy-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+.crazy-compact .crazy-reset {
+  align-self: flex-start;
+  margin-top: 8px;
+  color: var(--crazy-muted);
+  font-size: 11px;
+}
+.crazy-compact button:focus-visible,
+.crazy-compact a:focus-visible,
+.crazy-compact summary:focus-visible,
+.crazy-compact textarea:focus-visible {
+  outline: 2px solid var(--crazy-accent);
+  outline-offset: 3px;
+}
+@media (pointer: coarse) {
+  .crazy-compact .crazy-form {
+    grid-template-columns: minmax(0, 1fr) 44px;
+  }
+  .crazy-compact .crazy-form-actions button {
+    width: 44px;
+    height: 44px;
+  }
+  .crazy-compact .crazy-form textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

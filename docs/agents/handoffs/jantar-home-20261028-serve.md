@@ -1,0 +1,9 @@
+# Předání: jantar-home-20261028-serve
+
+- Vlastník jantar-serve-01a17fd8; příjemce/integrátor jantar-root-01a17fd8, KEY-66.
+- Původní loopback4276 obsluhoval candidate-02 zdrojů bd8174d3ac0f12fae647ec250a8b88dd269e6da7 a build-03, bez HMR. Snapshot8577da066a4d66b985a4a10a273f6a75ec8e34d7af91ecdf820ad40493ce3afe obsahuje9477souborů včetně testů. Klient sha256-8c0eca61947db53625fca76334cc9b523135bc5bf81325db15a364780848d057, index-B7_XERSl.js.
+- Proces46766/NodePID38860, frozen cwd .cache/jantar-home-20261028-validation/snapshots/candidate-02, STATIC_DIR build-03. HOST127.0.0.1, PORT4276, FEEDBACK_DIR vlastní serve cache. Žádný skutečný AI nebo feedback credential nebyl nastaven ani odeslán.
+- UI scénáře a původní renderový timeout patří do validační evidence; server200 ani připojená relace nepotvrzují spuštění 3D světa. Plný start nebyl přijat.
+- Při navazujícím delegovaném tree testu cizí agent použil pnpm exec. Automatická synchronizace zasáhla root node_modules (+15cached balíků), na který ukazoval dependency junction tohoto snapshotu. Zdrojové/asset soubory a původní package/lock ve snapshotu zůstaly zachované; samostatný předchozí byte manifest node_modules neexistuje. Tvrzení o neměnných závislostech se proto nevydává. Nevznikla automatická oprava, mazání nebo reinstalace.
+- Po novém inventáři bez loopback karty/Blenderu a skutečném GET /api/presence online0 byl vlastní server38860 ověřen podle příkazu i parent STATIC_DIR a ukončen. Receipt s UTC okamžikem a aktuálním .modules.yaml hashem: .cache/jantar-home-20261028-serve/dependency-incident.json. Původní snapshoty, logy a screenshoty se nemažou ani nepřepisují. Chráněná4182 nebyla měněna.
+- Tento portový task se po předání a kontrole ukončení uvolňuje. Nová kombinace má samostatný task/port4278 a vlastní fyzickou frozen instalaci; nejde o přijetí tohoto retired kandidáta.
