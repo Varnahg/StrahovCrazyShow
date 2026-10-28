@@ -101,7 +101,7 @@ const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamer
 const methods=declaration.members.filter(n=>n.name&&selected.includes(n.name.getText(tree)));assert.equal(methods.length,selected.length);
 report.methods=methods.map(n=>({name:n.name!.getText(tree),sha256:sha(n.getText(tree))}));
 const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)).join("\n")}}`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
-const make=new Script(`(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,clampOrbitPitch,performance,window,document,sessionDiagnostics={isRecording:false}}=env;${code};return ProofGame;}`).runInThisContext();
+const make=new Script(`(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,clampOrbitPitch,performance,window,document}=env;${code};return ProofGame;}`).runInThisContext();
 const anchor=Date.parse("2026-10-18T12:45:00Z"),select=(mode:Parameters<typeof selectLightingPreview>[0])=>selectLightingPreview(mode,anchor);
 
 for(const initialQuality of ["low","medium"] as const) test(`native cold opposite fog view, initial ${initialQuality}`,async (t:import("node:test").TestContext)=>{

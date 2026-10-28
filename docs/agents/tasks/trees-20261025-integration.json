@@ -13,22 +13,21 @@
     "Vlastní claim před zápisem, přesný disjunktní scope. Rozhraní předat navazujícím autorům, nepsat do jejich souborů.",
     "Ground litter module/test byly před prvním zápisem předané samostatnému trees-20261025-litter; root zachovává jejich Game/Vegetation propojení přes koordinovaný runtime scope. Own dirty převzetí viz integration handoff.",
     "Čtyři dosud nezměněné QA soubory předány trees-20261025-qa-views; viz handoff. Root integruje resolver a skutečný startup.",
-    "27.10 předání client/ui.tsx do home-ai-20261027-integration po checkpointu a9a1e3b5f15a2cee037117752230d5d8b3200c72; root dále tuto cestu neupravuje.",
-    "28.10 po doloženém handoffu předány pouze client/game.ts, tests/game-webgpu-startup.test.ts do jantar-startup-20261028-game pro nový startup timeout. Původní root již tyto cesty neupravuje; ostatní scope beze změny.",
-    "28.10 minimální startup footprint: do původního scope vráceny čisté, startupem neupravované cesty tests/game-webgpu-startup.test.ts. Game zůstává předaný, pipeline/ostatní diagnostické fixture se v nové fázi nemění."
+    "27.10 předání client/ui.tsx do home-ai-20261027-integration po checkpointu a9a1e3b5f15a2cee037117752230d5d8b3200c72; root dále tuto cestu neupravuje."
   ],
   "id": "trees-20261025-integration",
   "title": "KEY-62: společný čas, menu sezón, opad a statická přejímka",
   "writePaths": [
+    "client/game.ts",
     "client/i18n-messages.ts",
     "client/ground-flowers.ts",
     "client/photographic-grass.ts",
     "tests/ground-flowers.test.ts",
     "tests/photo-grass.test.ts",
+    "tests/game-webgpu-startup.test.ts",
     "docs/trees/20261025/integration.md",
     "docs/agents/handoffs/trees-20261025-integration.md",
-    ".cache/trees-integration-20261025/",
-    "tests/game-webgpu-startup.test.ts"
+    ".cache/trees-integration-20261025/"
   ],
   "acceptance": [
     "Game posílá stromům a astronomii tentýž effective UTC instant. Původní baseLighting se uchová, DEMO season readout jej nesmí přepsat a pokazit návrat do real.",

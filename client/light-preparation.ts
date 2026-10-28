@@ -13,38 +13,6 @@ const stageCpu = () => ({
   checkBatch: timing(),
   render: timing(),
 });
-/** Numeric observations of existing work, not additional readiness probes. */
-export type LightPreparationReadiness = {
-  collections: number;
-  queueLength: number;
-  queuePeak: number;
-  cursor: number;
-  retryLength: number;
-  retryPeak: number;
-  retryPasses: number;
-  meshFalse: number;
-  batchYields: number;
-  effectsFalseBeforeDraw: number;
-  effectsFalseAfterDraw: number;
-  readyDraws: number;
-  capped: 0 | 1;
-};
-const readinessLimit = 1_000_000;
-const stageReadiness = (): LightPreparationReadiness => ({
-  collections: 0,
-  queueLength: 0,
-  queuePeak: 0,
-  cursor: 0,
-  retryLength: 0,
-  retryPeak: 0,
-  retryPasses: 0,
-  meshFalse: 0,
-  batchYields: 0,
-  effectsFalseBeforeDraw: 0,
-  effectsFalseAfterDraw: 0,
-  readyDraws: 0,
-  capped: 0,
-});
 export type LightPreparationResult = {
   status: "complete" | "timeout" | "disposed" | "failed";
   elapsedMs: number;
@@ -74,8 +42,6 @@ export type LightPreparationResult = {
     checks: number;
     renders: number;
     restarts: number;
-    /** Present only with explicit diagnostics; contains no scene object references. */
-    readiness?: LightPreparationReadiness;
   }[];
 };
 type ReadyMesh = {
@@ -101,8 +67,6 @@ export type LightPreparationOptions = {
   /** Settings/asset identity changes restart only the current bounded stage. */
   revision(): readonly unknown[];
   revisionKeys?: readonly string[];
-  /** Observe existing results only; no extra checks, draws or clock reads. */
-  diagnostics?: boolean;
   /** Without visibility integration, preparation retains its visible deadline. */
   isVisible?(): boolean;
   onVisibilityChange?(callback: () => void): () => void;
@@ -170,26 +134,6 @@ export function prepareLightVariants(
     let rafGap = { count: 0, totalMs: 0, maxMs: 0 };
     let cpu = stageCpu();
     let restartReasons: Record<string, number> = Object.create(null);
-    let readiness: LightPreparationReadiness | undefined;
-    const diagnostics = options.diagnostics === true;
-    const capObservation = (value: number) => {
-      if (value > readinessLimit) {
-        if (readiness) readiness.capped = 1;
-        return readinessLimit;
-      }
-      return value;
-    };
-    const observe = (
-      key:
-        | "collections"
-        | "retryPasses"
-        | "meshFalse"
-        | "batchYields"
-        | "effectsFalseBeforeDraw"
-        | "effectsFalseAfterDraw",
-    ) => {
-      if (readiness) readiness[key] = capObservation(readiness[key] + 1);
-    };
     let needsApply = true;
     let queue: readonly ReadyMesh[] = [],
       retry: ReadyMesh[] = [],
@@ -229,20 +173,7 @@ export function prepareLightVariants(
       timerArmed = false;
       timer = undefined;
     };
-    const snapshotReadiness = (): LightPreparationReadiness | undefined => {
-      if (!readiness) return undefined;
-      // An apply failure before collection must not report the preceding stage's queue.
-      readiness.queueLength = readiness.collections
-        ? capObservation(queue.length)
-        : 0;
-      readiness.cursor = readiness.collections ? capObservation(cursor) : 0;
-      readiness.retryLength = readiness.collections
-        ? capObservation(retry.length)
-        : 0;
-      readiness.readyDraws = readyRenders;
-      return { ...readiness };
-    };
-    const saveStage = (snapshot?: LightPreparationReadiness) => {
+    const saveStage = () => {
       if (index >= 0 && index < stages.length) {
         const at = options.now();
         const elapsed = clock(at);
@@ -258,14 +189,12 @@ export function prepareLightVariants(
           checks,
           renders,
           restarts,
-          ...(snapshot ? { readiness: snapshot } : {}),
         });
       }
     };
     const finish = (status: LightPreparationResult["status"]) => {
       if (done) return;
       done = true;
-      const terminalReadiness = snapshotReadiness();
       for (const cleanup of [
         () => options.stop(tick),
         clearWatchdog,
@@ -279,7 +208,7 @@ export function prepareLightVariants(
           failureStep = "cleanup";
         }
       }
-      saveStage(terminalReadiness);
+      saveStage();
       if (!options.isDisposed()) {
         try {
           options.restore();
@@ -394,20 +323,12 @@ export function prepareLightVariants(
       rafGap = { count: 0, totalMs: 0, maxMs: 0 };
       cpu = stageCpu();
       restartReasons = Object.create(null);
-      readiness = diagnostics ? stageReadiness() : undefined;
     };
     const collect = () => {
       operation = "meshes";
       queue = [...options.meshes()];
       retry = [];
       cursor = 0;
-      if (readiness) {
-        observe("collections");
-        readiness.queuePeak = Math.max(
-          readiness.queuePeak,
-          capObservation(queue.length),
-        );
-      }
     };
     const draw = () => {
       if (!canWork()) return false;
@@ -485,25 +406,12 @@ export function prepareLightVariants(
             if (mesh.isDisposed() || !mesh.isEnabled() || !mesh.isVisible)
               continue;
             checks++;
-            if (!options.check(mesh)) {
-              retry.push(mesh);
-              if (readiness) {
-                observe("meshFalse");
-                readiness.retryPeak = Math.max(
-                  readiness.retryPeak,
-                  capObservation(retry.length),
-                );
-              }
-            }
+            if (!options.check(mesh)) retry.push(mesh);
           }
         });
         if (!canWork()) return;
-        if (cursor < queue.length) {
-          if (readiness) observe("batchYields");
-          return;
-        }
+        if (cursor < queue.length) return;
         if (retry.length) {
-          if (readiness) observe("retryPasses");
           queue = retry;
           retry = [];
           cursor = 0;
@@ -513,7 +421,6 @@ export function prepareLightVariants(
         }
         operation = "effects";
         if (!options.effectsReady()) {
-          if (readiness) observe("effectsFalseBeforeDraw");
           readyRenders = 0;
           draw();
           return;
@@ -527,14 +434,12 @@ export function prepareLightVariants(
         // The first real draw can discover a new material/instance/shadow effect.
         // Recheck its actual active meshes before declaring this stage complete.
         operation = "effects";
-        const effectsReady = options.effectsReady();
-        readyRenders = effectsReady ? readyRenders + 1 : 0;
-        if (!effectsReady && readiness) observe("effectsFalseAfterDraw");
+        readyRenders = options.effectsReady() ? readyRenders + 1 : 0;
         if (readyRenders < 2) {
           collect();
           return;
         }
-        saveStage(snapshotReadiness());
+        saveStage();
         index++;
         if (index === stages.length) return finish("complete");
         startStage();

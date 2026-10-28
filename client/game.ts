@@ -342,12 +342,6 @@ export class Game {
     quality: string; stage: string; lastGate: string | null;
     mesh: string | null; material: string | null;
     waits: { mesh: number; precipitation: number; pipeline: number; health: number; effects: number };
-    observations?: {
-      scope: "actual-readiness-results";
-      identity: "anonymous-stage-local-mesh-ordinal";
-      samples: { stage: string; gate: string; ready: false; meshOrdinal: number | null; waits: number }[];
-      replacedSamples: number; droppedMeshOrdinals: number; capped: 0 | 1;
-    };
   };
   onSelection?: (selection: WorldSelection | null) => void;
   selectedTarget: WorldSelection | null = null;
@@ -1060,7 +1054,7 @@ export class Game {
         ...(await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation))),
         ...(this.lightingReadiness ? {
           readiness: this.lightingReadiness,
-          ...(this.terrainReview && !this.network ? { pipeline: pipelinePreparation.snapshot() } : {}),
+          pipeline: pipelinePreparation.snapshot(),
         } : {}),
       };
       this.assertStartupActive();
@@ -2719,69 +2713,21 @@ export class Game {
     pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
     options?: { timeoutMs: number; restoreQuality?: () => void },
   ) {
-    // The existing profile is loopback + explicit profileEnvironment opt-in.
-    // Keep named fixed guest QA separate from the anonymous recorded path.
-    const anonymous = this.environmentProfile !== undefined && sessionDiagnostics.isRecording;
-    const namedQA = !!this.terrainReview && !this.network;
-    const readiness: NonNullable<Game["lightingReadiness"]> | undefined = namedQA || anonymous ? {
-      quality: anonymous && !namedQA && !["low", "medium", "high"].includes(this.quality) ? "unknown" : this.quality,
-      stage: "initial", lastGate: null,
+    // Local fixed guest QA only. Reuse the actual gate results; no extra mesh,
+    // Effect or pipeline probes and no retained renderer object references.
+    const readiness = this.terrainReview && !this.network ? {
+      quality: this.quality, stage: "initial", lastGate: null as string | null,
       mesh: null as string | null, material: null as string | null,
       waits: { mesh: 0, precipitation: 0, pipeline: 0, health: 0, effects: 0 },
-      ...(anonymous && !namedQA ? { observations: {
-        scope: "actual-readiness-results" as const,
-        identity: "anonymous-stage-local-mesh-ordinal" as const,
-        samples: [], replacedSamples: 0, droppedMeshOrdinals: 0, capped: 0 as 0 | 1,
-      } } : {}),
     } : undefined;
     this.lightingReadiness = readiness;
-    // Weak keys never keep a mesh alive; the persisted snapshot contains scalars
-    // only. Do not inspect names, metadata, methods, getters or effect caches.
-    const sampleLimit = 8, ordinalLimit = 4096, counterLimit = 1_000_000;
-    let meshOrdinals = readiness?.observations ? new WeakMap<object, number>() : undefined;
-    let nextMeshOrdinal = 0;
-    const increment = (value: number) => {
-      if (value >= counterLimit) {
-        if (readiness?.observations) readiness.observations.capped = 1;
-        return counterLimit;
-      }
-      return value + 1;
-    };
     const gate = (name: "mesh" | "precipitation" | "pipeline" | "health" | "effects", ready: boolean, mesh?: unknown) => {
       if (!ready && readiness) {
-        readiness.lastGate = name; readiness.waits[name] = increment(readiness.waits[name]);
-        const observations = readiness.observations;
-        if (observations) {
-          let meshOrdinal: number | null = null;
-          if (name === "mesh" && meshOrdinals && mesh !== null && typeof mesh === "object") {
-            const known = meshOrdinals.get(mesh);
-            if (known !== undefined) meshOrdinal = known;
-            else if (nextMeshOrdinal < ordinalLimit) {
-              meshOrdinal = ++nextMeshOrdinal;
-              meshOrdinals.set(mesh, meshOrdinal);
-            } else {
-              observations.capped = 1;
-              observations.droppedMeshOrdinals = increment(observations.droppedMeshOrdinals);
-            }
-          }
-          const previous = observations.samples.at(-1);
-          if (previous?.stage === readiness.stage && previous.gate === name && previous.meshOrdinal === meshOrdinal)
-            previous.waits = increment(previous.waits);
-          else {
-            if (observations.samples.length === sampleLimit) {
-              observations.samples.shift();
-              observations.replacedSamples = increment(observations.replacedSamples);
-            }
-            observations.samples.push({ stage: readiness.stage, gate: name, ready: false, meshOrdinal, waits: 1 });
-          }
-        } else if (name === "mesh") {
+        readiness.lastGate = name; readiness.waits[name]++;
+        if (name === "mesh") {
           const m = mesh as { name?: unknown; material?: { name?: unknown } | null } | undefined;
-          // Optional legacy labels cannot turn a completed check into a failure.
-          try {
-            const meshName = m?.name, materialName = m?.material?.name;
-            readiness.mesh = typeof meshName === "string" ? meshName.slice(0, 120) : null;
-            readiness.material = typeof materialName === "string" ? materialName.slice(0, 120) : null;
-          } catch { readiness.mesh = readiness.material = null; }
+          readiness.mesh = typeof m?.name === "string" ? m.name.slice(0, 120) : null;
+          readiness.material = typeof m?.material?.name === "string" ? m.material.name.slice(0, 120) : null;
         } else {
           readiness.mesh = readiness.material = null;
         }
@@ -2936,7 +2882,6 @@ export class Game {
       }
     };
     return prepareLightVariants({
-      diagnostics: anonymous,
       timeoutMs: options?.timeoutMs,
       // Keep the helper's 4ms slice; cheap WebGPU checks should use that slice
       // rather than yield a whole RAF after only128 meshes. Retain a count cap.
@@ -2947,7 +2892,6 @@ export class Game {
         if (readiness && readiness.stage !== stage) {
           readiness.stage = stage; readiness.lastGate = readiness.mesh = readiness.material = null;
           const w = readiness.waits; w.mesh = w.precipitation = w.pipeline = w.health = w.effects = 0;
-          if (meshOrdinals) { meshOrdinals = new WeakMap<object, number>(); nextMeshOrdinal = 0; }
         }
         if (stage === "restore") return restore();
         const vehicle = stage.startsWith("vehicle-");
@@ -3027,7 +2971,6 @@ export class Game {
         window.setTimeout(callback, milliseconds),
       clearTimer: (timer) => window.clearTimeout(timer as number),
     }).finally(() => {
-      meshOrdinals = undefined;
       try { restoreVehicle(); } finally {
         try { restoreAuthoredPreparation(); } finally {
           try { authoredPreparation?.dispose(); } finally { stopGrassPreparation(); }
