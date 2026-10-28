@@ -120,6 +120,7 @@ def run(request: Request) -> dict:
                 lines = ["\t".join(canonical(cell) for cell in row) for row in rows]
                 block = plain_block(request, "table", "\n".join(lines), f"{fmt.upper()} rows 1-{len(rows)}")
                 block["_table"] = {"header": "", "rows": lines, "context": ""}
+                block["tableChunking"] = {"contextLineCount": 0, "headerLineIndexes": []}
                 blocks, tables = [block], 1
             result["quality"]["inputTextCharacters"] = len(text)
             result["parserProfile"]["pipeline"] = "strict-text" if fmt == "txt" else "strict-csv"

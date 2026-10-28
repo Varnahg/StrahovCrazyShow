@@ -64,6 +64,14 @@ Skutečný SÚZ HTML hub z bounded acquisition probe má 45088 B a SHA `c4629e7f
 
 Root nyní předává vlastní změnu tohoto handoffu a celý doložený source checkpoint novému příjemci `/root/implement_html_extraction`. Po release převezme task `rag-auto-20261028-extraction` vlastním claimem s adopt-dirty. Úzký kódový scope v rámci původních writePaths: docling_adapter.py, worker.py, odpovídající testy a tento handoff; žádná instalace, modelový download, síť, OpenAI nebo změna modelového manifestu. Před přijetím významné cílené regrese a samostatně koordinovaný bounded A/B/A probe nad stejnými bytes/venv, srovnávající skutečný výstup. Výkonový závěr až podle měření, ne podle importního grafu. Vlastní root helpery již skončily.
 
+## Root doplnění explicitní tabulkové vazby
+
+Po přijetí HTML refaktoringu `dfeb1916` našlo navazující foundation review potřebu prokázat vztah chunk textu ke zdrojovému bloku. Prostá prefixová heuristika nestačí: skutečný serializer může přesunout nesouvislé/nepočáteční hlavičkové řádky před data. Root a foundation proto dohodli explicitní `tableChunking:{contextLineCount,headerLineIndexes}` v tabulkovém bloku. Python přidává skutečné indexy do výsledného block.text; Node je používá k přesné lineární rekonstrukci, nikoli k odhadování obsahu.
+
+Serializer nyní používá stejnou množinu renderovaných řádků pro source text i chunk header/body. Deklarovaná řádka bez parsed cells dostane quality issue `unrepresented-table-row`; běžné prázdné buňky s explicitními souřadnicemi se zachovají. CSV/TSV nedostávají vymyšlené hlavičky. Texty/chunk IDs běžných úplných tabulek se tím nemění, metadata umožňují ověřit jejich vztah. Parser implementation fingerprint se přirozeně změní; modelový manifest se nemění.
+
+Nové skutečné RED3/3 před opravou jsou v `table-lineage-red.log`; GREEN3/3 v `table-lineage-green.log`. Test používá skutečné DoclingDocument/TableData/TableCell a skutečný Chunker, ověřuje nesouvislé hlavičky s kontextem, přesnou body rekonstrukci s multiplicitou, sparse parser row a CSV/TSV. Následná sada nových i relevantních HTML/DOCX/table regresí prošla **17/17** za28,94 s, log `table-lineage-regressions.log`. Žádná síť, modelová inference, instalace, API nebo změna cizího scope; pomocníci skončili. Nový test je `tools/rag_ingestion/tests/test_table_lineage.py`.
+
 ## HTML kandidát — 28. 10. 2026, 21:42 UTC
 
 Příjemce `/root/implement_html_extraction` převzal původní task claimem `rag-html-refactor-01a17e9d --adopt-dirty`, pouze předaný handoff byl dirty. Upravuje `docling_adapter.py`, `worker.py`, nový `tests/test_html_backend.py` a tento záznam; žádné staging/commity. Současný nadřazený HEAD se mezitím posunul na `a5ac67d199be1a94ba8d05df16610f857e31e6a9`; jiné změny agent nepřebírá.
