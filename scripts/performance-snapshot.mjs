@@ -48,6 +48,9 @@ const entries = [
   "docs/reality-pack/b4-facade-panels-20261012/blender-export-audit.json",
   "docs/building-modeling-20261012/references/market-kit-blender-audit.json",
   "docs/trees/20261025/catalog-release.json",
+  // Fixed source cases consumed by the frozen RAG retrieval regression.
+  "docs/home-ai/20261028/sh/retrieval-cases.json",
+  "docs/home-ai/20261028/suz/retrieval-cases.json",
   "index.html",
   "package.json",
   "pnpm-lock.yaml",
