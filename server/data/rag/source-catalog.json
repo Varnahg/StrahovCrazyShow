@@ -1,0 +1,4097 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026-10-28.1",
+  "sourceReport": {
+    "fileName": "zprava-hluboky-vyzkum (5).md",
+    "sha256": "34701ce643aa3e6fc93e3e8bf1e2cb07bdb3327e2e955f8192d09ae505c1179b",
+    "urlRowsSha256": "e6f2b0404605bd06c7e473d9703551c34494e7eb264ce8e7d4032e055dac0a5d",
+    "sections": {
+      "Studentská unie ČVUT": 20,
+      "Silicon Hill, projekty a strahovské provozy": 58,
+      "Správa účelových zařízení ČVUT a Strahov": 26,
+      "Centrální ČVUT": 11
+    }
+  },
+  "publishers": [
+    {
+      "id": "silicon-hill",
+      "name": "Silicon Hill and catalogued associated projects",
+      "hostnames": [
+        "3dtisk.sh.cvut.cz",
+        "avc.sh",
+        "fotbalek.sh.cvut.cz",
+        "gym.siliconhill.cz",
+        "hudebny.sh.cvut.cz",
+        "is.sh.cvut.cz",
+        "klubcajovna.cz",
+        "macgyver.sh.cvut.cz",
+        "old-wiki.siliconhill.cz",
+        "pinec.sh.cvut.cz",
+        "sherna.siliconhill.cz",
+        "show.sh.cvut.cz",
+        "vcely.sh.cvut.cz",
+        "wiki.sh.cvut.cz",
+        "www.facebook.com",
+        "www.rechargingbar.cz",
+        "www.siliconhill.cz",
+        "zapisy.sh.cvut.cz"
+      ]
+    },
+    {
+      "id": "suz",
+      "name": "Správa účelových zařízení ČVUT",
+      "hostnames": [
+        "agata.suz.cvut.cz",
+        "web.suz.cvut.cz",
+        "www.suz.cvut.cz"
+      ]
+    },
+    {
+      "id": "su",
+      "name": "Studentská unie ČVUT",
+      "hostnames": [
+        "stoh.su.cvut.cz",
+        "su.cvut.cz",
+        "wiki.su.cvut.cz",
+        "www.strahovopenair.cz"
+      ]
+    },
+    {
+      "id": "cvut",
+      "name": "České vysoké učení technické v Praze",
+      "hostnames": [
+        "akce.cvut.cz",
+        "www.cvut.cz"
+      ]
+    }
+  ],
+  "seeds": [
+    {
+      "id": "seed-001",
+      "url": "https://su.cvut.cz/cs",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        15
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Hlavní veřejný rozcestník. Částečně strukturovaný; navigace na kluby, projekty, aktuality, akce a dokumenty. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-002",
+      "url": "https://su.cvut.cz/cs/dokumenty",
+      "title": "SU ČVUT – Dokumenty",
+      "publisher": "su",
+      "catalogRows": [
+        16
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/dokumenty/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Hlavní dokumentový seed: stanovy, výroční zprávy a interní předpisy; odkazy na konkrétní dokumenty/PDF. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-003",
+      "url": "https://wiki.su.cvut.cz/",
+      "title": "SU ČVUT Wiki",
+      "publisher": "su",
+      "catalogRows": [
+        17
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/group/dokumenty/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/group/dokumenty/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Další dokumentace SU; oficiální web na wiki odkazuje jako na zdroj dalších dokumentů. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-004",
+      "url": "https://wiki.su.cvut.cz/_media/group/dokumenty/vyrocni_zpravy/vyrocni_zprava_su_cvut_2019.pdf",
+      "title": "SU Wiki – výroční zprávy",
+      "publisher": "su",
+      "catalogRows": [
+        18
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/group/dokumenty/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Příklad veřejného PDF v dokumentovém/media prostoru wiki; vhodné jako seed pro discovery okolních výročních zpráv. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-005",
+      "url": "https://su.cvut.cz/cs/aktuality",
+      "title": "SU ČVUT – Aktuality",
+      "publisher": "su",
+      "catalogRows": [
+        19
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/aktuality/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Aktuality a oznámení; částečně strukturované, vhodné pro časově citlivé odpovědi. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-006",
+      "url": "https://su.cvut.cz/cs/aktuality.rss",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        20
+      ],
+      "role": "feed",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "xml",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/aktuality/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Feed aktualit; vhodnější pro detekci nových položek než opakovaný full crawl. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-007",
+      "url": "https://su.cvut.cz/cs/aktuality.atom",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        21
+      ],
+      "role": "feed",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "xml",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/aktuality/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Alternativní Atom feed aktualit. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-008",
+      "url": "https://su.cvut.cz/cs/udalosti.rss",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        22
+      ],
+      "role": "feed",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "xml",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/udalosti/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Veřejný feed událostí SU. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-009",
+      "url": "https://su.cvut.cz/cs/udalosti.atom",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        23
+      ],
+      "role": "feed",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "xml",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/udalosti/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Alternativní Atom feed událostí. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-010",
+      "url": "https://su.cvut.cz/cs/kalendare",
+      "title": "SU ČVUT – Kalendáře",
+      "publisher": "su",
+      "catalogRows": [
+        24
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Rozcestník interního a veřejného SUnijního kalendáře; veřejný kalendář je používán pro propagaci akcí. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-011",
+      "url": "https://su.cvut.cz/cs/kluby",
+      "title": "SU ČVUT – Kluby",
+      "publisher": "su",
+      "catalogRows": [
+        25
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/kluby/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Autoritativní katalog kolejních, zájmových a externích klubů. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-012",
+      "url": "https://su.cvut.cz/cs/projekty",
+      "title": "SU ČVUT – Projekty",
+      "publisher": "su",
+      "catalogRows": [
+        26
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/cs/projekty/"
+        ],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Katalog projektů SU, včetně kulturních, sportovních a informačních aktivit. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-013",
+      "url": "https://su.cvut.cz/cs/projekty/informacni-udalosti",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        27
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Informační projekty/události, například aktivity orientované na studenty a prváky. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-014",
+      "url": "https://su.cvut.cz/cs/kontakty",
+      "title": "SU ČVUT – Kontakty",
+      "publisher": "su",
+      "catalogRows": [
+        28
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Aktuální kontakty na centrálu a funkce; silně strukturovat jako osoby/role/kontakty. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-015",
+      "url": "https://su.cvut.cz/cs/o-studentske-unii-cvut/organizacni-struktura/centrala-su-cvut",
+      "title": "SU ČVUT – Centrála",
+      "publisher": "su",
+      "catalogRows": [
+        29
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Organizační struktura a aktuální funkce. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-016",
+      "url": "https://su.cvut.cz/cs/o-studentske-unii-cvut/organizacni-struktura/rada-studentskych-samosprav",
+      "title": "SU ČVUT – RSS",
+      "publisher": "su",
+      "catalogRows": [
+        30
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. RSS SU, vazba na kolejní samosprávy a SÚZ; stránka odkazuje na příslušný interní předpis. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-017",
+      "url": "https://su.cvut.cz/cs/o-studentske-unii-cvut/organizacni-struktura/studentsky-parlament",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        31
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Orgán SU a organizační informace. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-018",
+      "url": "https://su.cvut.cz/cs/o-studentske-unii-cvut/historie",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        32
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Historie a historické funkce; strukturované chronologicky, ale pro běžný chatbot méně důležité. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-019",
+      "url": "https://su.cvut.cz/cs/o-studentske-unii-cvut/podrobna-historie-studentske-unie-cvut",
+      "title": "SU ČVUT",
+      "publisher": "su",
+      "catalogRows": [
+        33
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Detailnější historie. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-020",
+      "url": "https://su.cvut.cz/cs/logobanka/studentska-unie",
+      "title": "SU ČVUT – logobanka",
+      "publisher": "su",
+      "catalogRows": [
+        34
+      ],
+      "role": "asset-directory",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "wiki.su.cvut.cz",
+            "pathPrefixes": [
+              "/_media/group/dokumenty/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": false
+      },
+      "evidenceNote": "Catalog section: Studentská unie ČVUT. Grafické materiály a loga; obvykle neindexovat do znalostního RAG. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-021",
+      "url": "https://www.siliconhill.cz/",
+      "title": "Silicon Hill",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        46
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Hlavní veřejný web a discovery root. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-022",
+      "url": "https://www.siliconhill.cz/koleje-strahov",
+      "title": "Silicon Hill – Koleje Strahov",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        47,
+        106
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Mimořádně hodnotný souhrnný zdroj pro projekty, služby, hospody, bary, čajovnu, sport, jídlo, obchody a Strahov obecně. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-023",
+      "url": "https://www.siliconhill.cz/pages/dokumenty",
+      "title": "Silicon Hill – Dokumenty",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        48
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Základní předpisy SH, zápisy, výroční zprávy a odkazy do wiki. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-024",
+      "url": "https://wiki.sh.cvut.cz/",
+      "title": "Silicon Hill Wiki",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        49
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/vedeni/dokumenty/",
+          "/vedeni/narizeni_predsedy/",
+          "/klub/projekty/",
+          "/kolej/bloky/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Hlavní veřejná provozní znalostní báze SH. Přihlášení je nabízeno pro editaci, veřejné stránky jsou čitelné bez něj. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-025",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty",
+      "title": "SH Wiki – Dokumenty",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        50
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/vedeni/dokumenty/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Centrální katalog předpisů klubu: stanovy, členství, síť, jednací/volební řád, projekty, rozpočet, kamery, sankce, zápisy a další. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-026",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/stanovy",
+      "title": "SH – Stanovy",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        51
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Stanovy / normativní dokument. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-027",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/o_clenstvi",
+      "title": "SH – členství",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        52
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Pravidla členství; klíčové pro dotazy studentů. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-028",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/pravidla_site",
+      "title": "SH – síť",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        53
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Pravidla klubové sítě. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-029",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/jednaci_rad",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        54
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Jednací řád. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-030",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/volebni_rad",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        55
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Volební řád. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-031",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/rad_projektu",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        56
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Pravidla/řád projektů. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-032",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/rozpoctovy_rad",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        57
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Rozpočtový řád. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-033",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/pravidla_kameroveho_systemu",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        58
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Pravidla kamerového systému. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-034",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/sazebnik_trestu",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        59
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Sazebník sankcí/trestů. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-035",
+      "url": "https://wiki.sh.cvut.cz/vedeni/narizeni_predsedy",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        60
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/vedeni/narizeni_predsedy/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Nařízení předsedy klubu. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-036",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/manual_registratora",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        61
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Provozní manuál registrátora; bohatý praktický zdroj. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-037",
+      "url": "https://wiki.sh.cvut.cz/vedeni/dokumenty/pravidla_registratoru",
+      "title": "SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        62
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Pravidla registrátorů. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-038",
+      "url": "https://zapisy.sh.cvut.cz/",
+      "title": "SH – zápisy",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        63
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/prilohy/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Veřejné zápisy a přílohy orgánů klubu. Dokumentově velmi důležité. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-039",
+      "url": "https://zapisy.sh.cvut.cz/prilohy/20251201-Stanovy_SH.pdf",
+      "title": "SH – Stanovy",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        64
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/prilohy/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Aktuální stanovy odkazované dokumentovým rozcestníkem. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-040",
+      "url": "https://zapisy.sh.cvut.cz/prilohy/20180605-Priloha3-Pravidla_site_klubu_Silicon_Hill.pdf",
+      "title": "SH – síť",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        65
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/prilohy/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. PDF pravidel klubové sítě. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-041",
+      "url": "https://www.siliconhill.cz/rss",
+      "title": "Silicon Hill",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        66
+      ],
+      "role": "feed",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "xml",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. RSS/XML zdroj novinek. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-042",
+      "url": "https://is.sh.cvut.cz/budgets",
+      "title": "SH IS – rozpočty",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        67
+      ],
+      "role": "access-point",
+      "access": "authentication",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": false
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Stránka přesměrovává na přihlášení; nepoužívat ve veřejném RAG crawleru bez výslovného oprávnění. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-043",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty",
+      "title": "Všechny projekty SH – master index",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        75
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/klub/projekty/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Stav, vedoucí, kontakt, umístění, weby, výroční zprávy; hlavní discovery seed. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-044",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/3d_tisk",
+      "title": "3D tisk SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        76
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Popis, podmínky použití, kontakt, umístění a provozní informace. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-045",
+      "url": "https://3dtisk.sh.cvut.cz/",
+      "title": "3D tisk SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        77
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Samostatný projektový web uvedený oficiálním projektovým registrem. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-046",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/avc",
+      "title": "AVC.SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        78
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Wiki landing page a odkaz na samostatný projektový web. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-047",
+      "url": "https://avc.sh/",
+      "title": "AVC.SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        79
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Oficiální samostatný projektový web z registru SH. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-048",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/fotbalek",
+      "title": "Fotbálek SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        80
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Provoz, vybavení, přístup, kontakty a rezervace. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-049",
+      "url": "https://fotbalek.sh.cvut.cz/users/sign_in",
+      "title": "Fotbálek – rezervace",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        81
+      ],
+      "role": "access-point",
+      "access": "authentication",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": false
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Přihlašovací systém rezervací; samotný neveřejný obsah není pro crawler. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-050",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/fotokomora",
+      "title": "Fotokomora",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        82
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/klub/projekty/fotokomora/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Projektová wiki. Projekt je v aktuálním master seznamu otevřený. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-051",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/fotoatelier",
+      "title": "Fotoateliér SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        83
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/klub/projekty/fotoatelier/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Archiv projektu; master registr uvádí zrušení od 1. 7. 2026. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-052",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/gamedev",
+      "title": "GameDev",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        84
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/klub/projekty/gamedev/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Odkaz je evidován v master projektovém registru, ale při kontrole byl cílový wiki endpoint nedostupný/404; jako zdroj používat hlavně master index, dokud nebude opraven. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-053",
+      "url": "https://hudebny.sh.cvut.cz/",
+      "title": "Hudebny SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        85
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Samostatný projektový web uvedený aktuálním registrem. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-054",
+      "url": "https://macgyver.sh.cvut.cz/",
+      "title": "MacGyver / Bastlírna",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        86
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Projektový web uvedený master registrem; při výzkumu endpoint časoval, takže crawler musí tolerovat výpadky. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-055",
+      "url": "https://pinec.sh.cvut.cz/",
+      "title": "SH liga ve stolním tenise",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        87
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Oficiální projektový web z registru SH. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-056",
+      "url": "https://sherna.siliconhill.cz/",
+      "title": "SHerna",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        88
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Veřejný web s aktuálním stavem, rezervacemi, provozním řádem, vybavením a výročními zprávami. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-057",
+      "url": "https://show.sh.cvut.cz/",
+      "title": "SHOW",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        89
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Oficiální web festivalového projektu podle aktuálního registru. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-058",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/show",
+      "title": "SHOW",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        90
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Projektová wiki a archivní informace. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-059",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/vcely",
+      "title": "Včely na Strahově",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        91
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Projektová dokumentace. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-060",
+      "url": "https://vcely.sh.cvut.cz/",
+      "title": "Včely na Strahově",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        92
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Samostatný projektový web uvedený v aktuálním registru. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-061",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/zahradky",
+      "title": "Zahrádky",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        93
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Hlavní projektová wiki; v registru je projekt aktuálně otevřený. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-062",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/modelland",
+      "title": "Modelland",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        94
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Archivní projekt; oficiální registr jej uvádí jako zaniklý v roce 2026. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-063",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/kompanie-monsilica",
+      "title": "Kompanie MonSilica",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        95
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Archivní projekt 2020–2024. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-064",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/vyrocni-zpravy-2018",
+      "title": "Výroční zprávy projektů",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        96
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/klub/projekty/vyrocni-zpravy-2018/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Příklad ročního katalogu; obsahuje samostatné zprávy mnoha projektů. Master index obsahuje roky 2009–2025. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-065",
+      "url": "https://www.rechargingbar.cz/",
+      "title": "Recharging Bar / R-ko",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        107
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Oficiální web R-ka; vhodný pro otevírací dobu, nápojovou nabídku a akce. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-066",
+      "url": "https://www.facebook.com/RechargingBar/",
+      "title": "R-ko – sociální zdroj",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        108
+      ],
+      "role": "document",
+      "access": "needs-policy-review",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": false
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Doplňkové aktuality/akce; není vhodné jako hlavní autorita kvůli měnící se dostupnosti sociální sítě. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-067",
+      "url": "https://klubcajovna.cz/",
+      "title": "Klub Čajovna",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        109
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Oficiální web studentského Klubu Čajovna. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-068",
+      "url": "https://old-wiki.siliconhill.cz/%C4%8Cajovna",
+      "title": "Čajovna – archiv",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        110
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Historická wiki stránka; nepoužívat pro současné ceny/otevíračku bez ověření proti aktuálnímu webu. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-069",
+      "url": "https://www.facebook.com/Desitka.bar.Strahov/",
+      "title": "Hospoda / Bar Desítka",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        111
+      ],
+      "role": "document",
+      "access": "needs-policy-review",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": false
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Veřejná sociální stránka provozu; SH průvodce uvádí hospodu na B10 jako hudební místo. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-070",
+      "url": "https://wiki.sh.cvut.cz/klub:sluzby:grilovaci_centrum",
+      "title": "Grill centrum SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        112
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. SH průvodce odkazuje na klubovou stránku pro rezervaci Grill centra; původní intranetový odkaz přesměrovává na veřejnou SH wiki. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-071",
+      "url": "https://wiki.sh.cvut.cz/KLUB:Sluzby:Pipa",
+      "title": "Výpůjčka pípy SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        113
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Strahovský průvodce odkazuje na wiki informace k půjčování pípy. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-072",
+      "url": "https://stoh.su.cvut.cz/",
+      "title": "STOH – stolní hry",
+      "publisher": "su",
+      "catalogRows": [
+        114
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Projekt/klub stolních her uváděný Strahovským průvodcem. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-073",
+      "url": "https://gym.siliconhill.cz/",
+      "title": "Sportovní sekce SH",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        115
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "unknown",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. SH průvodce odkazuje na samostatný web sportovní sekce; při ověření byl endpoint dočasně nedostupný. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-074",
+      "url": "https://www.strahovopenair.cz/",
+      "title": "Strahov OpenAir",
+      "publisher": "su",
+      "catalogRows": [
+        116
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Festival Studentské unie ČVUT, na který SH přímo odkazuje. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-075",
+      "url": "https://wiki.sh.cvut.cz/kolej/okoli",
+      "title": "SH Wiki – okolí Strahova",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        117
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Přehled okolních služeb, jídla a míst; doplňkový zdroj. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-076",
+      "url": "https://wiki.sh.cvut.cz/kolej/bloky/",
+      "title": "SH Wiki – jednotlivé bloky",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        118
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/kolej/bloky/"
+        ],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Kořen informací o blocích; místnosti, služby a lokální pravidla. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-077",
+      "url": "https://wiki.sh.cvut.cz/kolej/bloky/blok_11/mistnosti11a12",
+      "title": "SH – příklad blokové stránky",
+      "publisher": "silicon-hill",
+      "catalogRows": [
+        119
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/_media/vedeni/",
+          "/_media/klub/projekty/",
+          "/_media/kolej/"
+        ],
+        "attachmentScopes": [
+          {
+            "hostname": "zapisy.sh.cvut.cz",
+            "pathPrefixes": [
+              "/prilohy/"
+            ]
+          },
+          {
+            "hostname": "wiki.sh.cvut.cz",
+            "pathPrefixes": [
+              "/_media/vedeni/",
+              "/_media/klub/projekty/",
+              "/_media/kolej/"
+            ]
+          }
+        ],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Silicon Hill, projekty a strahovské provozy. Příklad podrobné blokové dokumentace zahrnující místnosti/provozní informace. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-078",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ceniky-dokumenty",
+      "title": "SÚZ – Ceníky a dokumenty",
+      "publisher": "suz",
+      "catalogRows": [
+        131
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Nejdůležitější SÚZ discovery root: ceníky, scénář, harmonogram, VUP, postupy, smlouvy, ubytovací/domovní/požární řády, vybavení atd. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-079",
+      "url": "https://www.suz.cvut.cz/cz/media/file/scenar-ubytovani-2026-2027",
+      "title": "SÚZ – Scénář ubytování",
+      "publisher": "suz",
+      "catalogRows": [
+        132
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Aktuální scénář pro 2026/2027 a vazby na přílohy/podmínky. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-080",
+      "url": "https://www.suz.cvut.cz/cz/media/file/postupy-pravidla-pri-poskytovani-ubytovani-na-kolejich-cvut-2026-2027",
+      "title": "SÚZ – Postupy a pravidla",
+      "publisher": "suz",
+      "catalogRows": [
+        133
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Aktuální postupy pro ubytování 2026/2027. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-081",
+      "url": "https://www.suz.cvut.cz/cz/media/file/vseobecne-ubytovaci-podminky-priloha-c3-scenare-ubytovani-2026-2027",
+      "title": "SÚZ – VUP",
+      "publisher": "suz",
+      "catalogRows": [
+        134
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Aktuální práva/povinnosti ubytovaných a SÚZ. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-082",
+      "url": "https://www.suz.cvut.cz/cz/media/file/metodika-rezervaci-ubytovani-ar-2026-2027",
+      "title": "SÚZ – rezervace",
+      "publisher": "suz",
+      "catalogRows": [
+        135
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Praktická metodika rezervací ubytování. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-083",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ubytovani-faq",
+      "title": "SÚZ – FAQ",
+      "publisher": "suz",
+      "catalogRows": [
+        136
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Praktické otázky a odpovědi pro ubytované. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-084",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/koleje-strahov",
+      "title": "SÚZ – Koleje Strahov",
+      "publisher": "suz",
+      "catalogRows": [
+        137
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Oficiální stránka konkrétní koleje; kontakty, bloky a provozní údaje. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-085",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/zakladni-informace",
+      "title": "SÚZ",
+      "publisher": "suz",
+      "catalogRows": [
+        138
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Základní informace k kolejnímu ubytování. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-086",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/zakladni-informace/oddeleni-pro-ubytovani",
+      "title": "SÚZ – OpU",
+      "publisher": "suz",
+      "catalogRows": [
+        139
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Kontakty a informace oddělení pro ubytování. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-087",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/jak-ziskat-ubytovani",
+      "title": "SÚZ",
+      "publisher": "suz",
+      "catalogRows": [
+        140
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Aktuální postup, jak získat ubytování. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-088",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/jak-ziskat-ubytovani/pokyny-k-nastupu-na-ubytovani-na-kolejich-cvut",
+      "title": "SÚZ",
+      "publisher": "suz",
+      "catalogRows": [
+        141
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Pokyny k nástupu na kolej. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-089",
+      "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/platebni-metody",
+      "title": "SÚZ",
+      "publisher": "suz",
+      "catalogRows": [
+        142
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Platební metody a praktické informace. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-090",
+      "url": "https://www.suz.cvut.cz/cz/hotely-hostely/hostel-strahov",
+      "title": "SÚZ – Strahov",
+      "publisher": "suz",
+      "catalogRows": [
+        143
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Další oficiální stránka areálu Strahov a jeho vybavenosti. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-091",
+      "url": "https://www.suz.cvut.cz/cz/komercni-sluzby/pronajem-sportovist",
+      "title": "SÚZ – sportoviště",
+      "publisher": "suz",
+      "catalogRows": [
+        144
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Pronájem strahovských sportovišť, kontakty/otevírací doby/ceníky. SH na tento typ informací odkazuje na SÚZ. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-092",
+      "url": "https://www.suz.cvut.cz/cz/archiv-aktualit",
+      "title": "SÚZ – Aktuality",
+      "publisher": "suz",
+      "catalogRows": [
+        145
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Archiv oznámení; vhodné pro dynamické změny provozu. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-093",
+      "url": "https://www.suz.cvut.cz/cz/menzy-stravovani",
+      "title": "SÚZ – Stravování",
+      "publisher": "suz",
+      "catalogRows": [
+        146
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [
+          "/cz/menzy-stravovani/"
+        ],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Hlavní rozcestník menz a stravovacích zařízení. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-094",
+      "url": "https://www.suz.cvut.cz/cz/menzy-stravovani/menza-strahov",
+      "title": "Menza Strahov",
+      "publisher": "suz",
+      "catalogRows": [
+        147
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Oficiální stránka menzy Strahov. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-095",
+      "url": "https://www.suz.cvut.cz/cz/menzy-stravovani/snack-bar-bufet",
+      "title": "Snack Bar / Bufet Strahov",
+      "publisher": "suz",
+      "catalogRows": [
+        148
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Oficiální stránka strahovského bufetu. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-096",
+      "url": "https://agata.suz.cvut.cz/jidelnicky/",
+      "title": "SÚZ Agáta – jídelníčky",
+      "publisher": "suz",
+      "catalogRows": [
+        149
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Hlavní dynamický systém jídelníčků. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-097",
+      "url": "https://agata.suz.cvut.cz/jidelnicky/index.php?clPodsystem=1",
+      "title": "Menza Strahov – aktuální menu",
+      "publisher": "suz",
+      "catalogRows": [
+        150
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Strahovský subsystem jídelníčku. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-098",
+      "url": "https://agata.suz.cvut.cz/jidelnicky/indexTyden.php?clPodsystem=1",
+      "title": "Menza Strahov – týden",
+      "publisher": "suz",
+      "catalogRows": [
+        151
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Týdenní jídelníček. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-099",
+      "url": "https://agata.suz.cvut.cz/jidelnicky/jidelnicek_pdf.php?lang=cs&podsystem=1",
+      "title": "Menza Strahov – PDF menu",
+      "publisher": "suz",
+      "catalogRows": [
+        152
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Dynamicky generovaný PDF jídelníček. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-100",
+      "url": "https://agata.suz.cvut.cz/jidelnicky/oteviraci-doby.php",
+      "title": "SÚZ stravování",
+      "publisher": "suz",
+      "catalogRows": [
+        153
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Otevírací doby provozoven. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-101",
+      "url": "https://agata.suz.cvut.cz/jidelnicky/kontakty.php",
+      "title": "SÚZ stravování",
+      "publisher": "suz",
+      "catalogRows": [
+        154
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Kontakty provozoven. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-102",
+      "url": "https://web.suz.cvut.cz/Login",
+      "title": "ISKAM4 / SÚZ",
+      "publisher": "suz",
+      "catalogRows": [
+        155
+      ],
+      "role": "access-point",
+      "access": "authentication",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": false
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Přihlášené rozhraní pro rezervace a osobní údaje; veřejné metodiky na něj odkazují. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-103",
+      "url": "https://www.suz.cvut.cz/cz/dlouhodobe-ubytovani/dokumenty-0",
+      "title": "SÚZ – starší dokumenty",
+      "publisher": "suz",
+      "catalogRows": [
+        156
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/cz/media/file/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Správa účelových zařízení ČVUT a Strahov. Starší/archivní dokumentový rozcestník; současné informace brát z aktuálního `/ceniky-dokumenty`. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-104",
+      "url": "https://www.cvut.cz/",
+      "title": "ČVUT",
+      "publisher": "cvut",
+      "catalogRows": [
+        166
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Centrální veřejný web; discovery root. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-105",
+      "url": "https://www.cvut.cz/vnitrni-predpisy",
+      "title": "ČVUT – Vnitřní předpisy",
+      "publisher": "cvut",
+      "catalogRows": [
+        167
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Hlavní autoritativní katalog Statutu, studijního, stipendijního, disciplinárního a dalších řádů. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-106",
+      "url": "https://www.cvut.cz/legislativa-tykajici-se-studia",
+      "title": "ČVUT – studentská legislativa",
+      "publisher": "cvut",
+      "catalogRows": [
+        168
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Centrální rozcestník předpisů týkajících se studia. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-107",
+      "url": "https://www.cvut.cz/poplatky-spojene-se-studiem",
+      "title": "ČVUT – poplatky",
+      "publisher": "cvut",
+      "catalogRows": [
+        169
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Aktuální informace a dokumenty k poplatkům za studium. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-108",
+      "url": "https://www.cvut.cz/sites/default/files/content/d1dc93cd-5894-4521-b799-c7e715d3c59e/cs/20260304-poplatky-spojene-se-studiem-pro-rok-20262027.pdf",
+      "title": "ČVUT – poplatky 2026/27",
+      "publisher": "cvut",
+      "catalogRows": [
+        170
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Konkrétní aktuální PDF pro akademický rok 2026/2027. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-109",
+      "url": "https://www.cvut.cz/sites/default/files/content/d1dc93cd-5894-4521-b799-c7e715d3c59e/cs/20251009-harmonogram-akademickeho-roku-20262027.pdf",
+      "title": "ČVUT – akademický rok",
+      "publisher": "cvut",
+      "catalogRows": [
+        171
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Harmonogram akademického roku 2026/2027. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-110",
+      "url": "https://www.cvut.cz/sites/default/files/content/74c76d2e-7f4d-4cb1-ac28-b0765c7f88f2/cs/20260113-studijni-a-zkusebni-rad-pro-studenty-cvut-xi-uplne-zneni-ucinnost-od-14112025-do-30112025.pdf",
+      "title": "ČVUT – studijní řád",
+      "publisher": "cvut",
+      "catalogRows": [
+        172
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "archived",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Veřejná centrální PDF verze Studijního a zkušebního řádu; kvůli datům účinnosti musí crawler vždy preferovat dokument odkázaný aktuálním rozcestníkem před pevně zakódovanou starší verzí. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-111",
+      "url": "https://www.cvut.cz/sites/default/files/content/74c76d2e-7f4d-4cb1-ac28-b0765c7f88f2/cs/20220503-eticky-kodex-cvut-v-praze-ucinnost-od-7-5-2022.pdf",
+      "title": "ČVUT – Etický kodex",
+      "publisher": "cvut",
+      "catalogRows": [
+        173
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Centrální Etický kodex ČVUT. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-112",
+      "url": "https://www.cvut.cz/eticka-komise",
+      "title": "ČVUT – Etická komise",
+      "publisher": "cvut",
+      "catalogRows": [
+        174
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Aktuální komise a odkazy na relevantní dokumenty včetně kodexu/jednacího řádu. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-113",
+      "url": "https://www.cvut.cz/sites/default/files/content/d1dc93cd-5894-4521-b799-c7e715d3c59e/cs/20240813-ubytovaci-stipendium-ucinnost-od-1102024.pdf",
+      "title": "ČVUT – ubytovací stipendium",
+      "publisher": "cvut",
+      "catalogRows": [
+        175
+      ],
+      "role": "document",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "pdf",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [
+          "/sites/default/files/content/"
+        ],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 1,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Centrální dokument k ubytovacímu stipendiu. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    },
+    {
+      "id": "seed-114",
+      "url": "https://akce.cvut.cz/",
+      "title": "Kalendář akcí ČVUT",
+      "publisher": "cvut",
+      "catalogRows": [
+        176
+      ],
+      "role": "discovery",
+      "access": "public",
+      "stateHint": "current",
+      "expectedFormat": "html",
+      "discovery": {
+        "pathPrefixes": [],
+        "documentPathPrefixes": [],
+        "attachmentScopes": [],
+        "denyPathPrefixes": [
+          "/login",
+          "/admin",
+          "/users/sign_in",
+          "/Login"
+        ],
+        "maxDepth": 3,
+        "followDocuments": true
+      },
+      "evidenceNote": "Catalog section: Centrální ČVUT. Centrální veřejný kalendář provozovaný ČVUT/VIC; jednotlivé akce mají detailní stránky. Access and state are unverified report hints; HTTP success is not evidence of legal validity."
+    }
+  ]
+}
