@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-vector-20261028-database",
+  "title": "RAG: samostatný životní cyklus místní pgvector databáze",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-vector-20261028-database/",
+    "docs/agents/handoffs/rag-vector-20261028-database.md"
+  ],
+  "resources": [
+    "port:5468",
+    "rag-postgres-local"
+  ],
+  "acceptance": [
+    "Spravovat pouze vlastní kontejner strahov-rag-20261028 a volume strahov-rag-20261028-data podle předání rag-vector-20261028-validation; před startem ověřit skutečnou identitu, stav a volný bind 127.0.0.1:5468.",
+    "Zachovat dosavadní volume a identitu/digest image. Předání uvádí pgvector/pgvector:0.8.7-pg17-bookworm, sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d; skutečný stav ověřit před použitím.",
+    "Task dovoluje lifecycle vlastní DB a lehké cílené DB kontroly s fake embedding providerem. Nedává heavy-validation, build, fullsuite, zátěžové měření, herní server, editor ani GPU oprávnění.",
+    "Docker Desktop je sdílená platforma, která při předání zůstává spuštěná. Nepřiděluje se právo jej zastavit nebo měnit cizí kontejnery/volumes. Privátní DB konfiguraci ani OpenAI klíč nevypisovat nebo commitovat.",
+    "Před předáním zaznamenat skutečný stav vlastního kontejneru a zachovaného volume; ukončit vlastní pomocníky, koordinovat zastavení vlastní DB a uvolnit claim bez mazání sdílené platformy."
+  ],
+  "verification": [
+    "Před spuštěním vlastní claim, kontrola portu a vlastnictví kontejneru; doložit použitý PostgreSQL/pgvector profil a zdraví služby bez tajných údajů.",
+    "Skutečné DB testy zaznamenat odděleně od mock CPU kontrol a od placeného OpenAI ověření. Plnou sadu/build/SDK integraci koordinuje samostatný rag-vector-20261028-validation.",
+    "Původní validation handoff potvrzuje zastavený kontejner exited a zachovaný volume; historický údaj nenahrazuje novou kontrolu skutečného stavu."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/rag-sources-sh-suz. Přímý požadavek na embeddingy a vector DB je již autorizován; toto je pouze oddělení rezervací pro souběh s Jantar UI.",
+    "Předání root KEY-65 je v docs/agents/handoffs/rag-vector-20261028-validation.md; původní claim byl skutečně uvolněn před změnou definice.",
+    "Samotný DB lifecycle nyní rezervuje tento task namísto původního validation tasku. Heavy-validation/workspace-build/port2568/port4268 zůstávají v rag-vector-20261028-validation a před plnou pipeline vyžadují vlastní dohodnuté okno.",
+    "Admin pouze přiděluje metadata a žádný kontejner, volume, Docker Desktop ani port sám nemění. Nový owner si claim získá samostatně."
+  ]
+}

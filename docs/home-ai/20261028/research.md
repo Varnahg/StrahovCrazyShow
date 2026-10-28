@@ -1,5 +1,7 @@
 # Průzkum importu SH a SÚZ · KEY-65
 
+**Aktuální zadání po výslovné opravě uživatele:** požadovaná pipeline používá OpenAI embeddingy a vektorovou databázi. Níže uvedená původní volba textového indexu je historický chybný výklad, nikoli konečné rozhodnutí. Ověřená data, archiv a v2 metadata zůstávají použitelné; navazuje PostgreSQL/pgvector, inkrementální embedding cache a skutečný databázový retrieval. Úspěch textových testů neznamená dokončení této pipeline.
+
 Uživatel 28. 10. 2026 výslovně zadal skutečný import ověřených SH/SÚZ zdrojů z připraveného katalogu, s oddělením archivu. Základ je přijatý main `de6f87a2efbf8596bb03efae863e8d6763e22774`; původní katalog má 114 URL a sám není důkaz jejich současné platnosti. Nová větev `codex/rag-sources-sh-suz`, samostatné disjunktní rezervace. Linear KEY-65; nástroj shared agent context vrátil serverové Tool not found, použity vlastní předchozí evidence a aktuální kód.
 
 ## Mechanismus a varianty

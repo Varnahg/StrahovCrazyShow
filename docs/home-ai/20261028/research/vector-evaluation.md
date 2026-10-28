@@ -18,6 +18,8 @@ Známé omezení: anglické „Where can I develop my photographic film?“ spr�
 
 Strojová evidence: [small](vector-evaluation-small.json), [large](vector-evaluation-large.json). Obsahuje výhradně syntetické testovací dotazy, IDs nalezených úryvků, vzdálenosti a místní časy SQL. Uživatelské dotazy a jejich embeddingy runtime neukládá. Místní časy tohoto průchodu nejsou zátěžový benchmark.
 
+Po review odstraněno odvozování instituce/tématu z přirozeného dotazu, protože kombinované služby mohly ztratit část kandidátů. [Opakované SQL vyhledání bez těchto filtrů](vector-evaluation-unfiltered.json) nad stejnými zaplacenými vektory zachovalo39/39 předprahem,38/39 při0.60 a6/6 negativních bez evidence; toto opakování nevolalo OpenAI. Údaje usage v souboru patří původnímu získání vektorů a nejsou novou útratou.
+
 ## Skutečný import a HTTP odpovědi
 
 Aktivní large revize `76922848bbaf791b366a87dc7b8985f5b995d9542b512948697b301edb3dbfdb`, profil `48298f1f727a87ab57999ec2584b79c4d7a3f8c39060cdb03f635d226ae5bcbc`. [Importní potvrzení](live-import.json) doložilo první import45/2calls a druhý import45reused/0calls. Administrativní import běžel omezeným ingester loginem; reader získal stejný publikovaný head.
@@ -33,3 +35,5 @@ Aktivní large revize `76922848bbaf791b366a87dc7b8985f5b995d9542b512948697b301ed
 První spuštění harnessu skončilo ještě před vytvořením relace kvůli záměně jeho očekávání `available` versus skutečného status pole `enabled`; žádné placené volání. Opravena pouze testovací pomůcka. To nebyla chyba produkčního HTTP kontraktu.
 
 Databázová regrese se syntetickým providerem zvlášť prošla11/11: exact cosine, metadata-only0, změněný vstup1, odstranění0, starý head při neúplném importu, persistentní cache, uncertain guard, souběh, profil/dimenze, archiv/future/expiry, abort a přerušení přesně vlastněného SQL spojení. Plná sada/build/SDK a CI jsou samostatný navazující důkaz.
+
+Navazující review doplnilo skutečný mixed-authority/topic scénář předLIMIT; celý nový DB test prošel12/12,0skip. [Restart skutečného kontejneru](restart-proof.json) zachoval aktivnílarge revizi a opakovaný import opět použil45 existujících vstupů s0API voláními.

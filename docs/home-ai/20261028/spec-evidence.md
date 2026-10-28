@@ -34,3 +34,16 @@ Data pracovníci přidávají 33 konkrétních source-grounded dotazů do sh/ret
 Po stabilním checkpointu nejvýše tři syntetická generování, serverový strop 3. Konverzace má ověřit první návštěvu Fotokomory, SÚZ kolejné a navazující cenu bez vymyšlené sazby. HTTP/klientské zdroje musí být skutečně použité. Kontrola po resetu nezpřístupní původní historii. Pouze vlastní rezervovaný proces, bez připojení do 3D hry; klíč načíst soukromě mimo Git bez výpisu.
 
 Konečný záznam oddělí modelový výsledek, deterministic retrieval, celý build/SDK a CI. Všechny původní limity soukromí, moderace a absence runtime crawleru platí.
+
+## Obsahové review dat
+
+Nezávislý reviewer ověřil podstatné SÚZ smluvní/provozní pasáže, všechny nové SH parafráze a důvody sedmi archivních záznamů. Nekontroloval každý vedlejší kontakt a neověřené cenové řádky nebyly importované.
+
+| Nález | Verdikt / důkaz | Výsledek |
+| --- | --- | --- |
+| Inkaso při navazujícím ubytování údajně odporuje VUP | false: sousední III/4 výslovně pokrývá rezervované navazující období stejným postupem bez inkasa; reviewer hypotézu stáhl | Obsah se neměnil |
+| FAQ SH mělo starou atribuci/revizi z indexované verze | medium: nový footer potvrzen běžným origin GET200 bez challenge, SHA cb6699aaf25ff1c2b9fec0ae7365510047884510692e971b48983f78cd5e42bc; použité sekce zůstaly shodné | author lastope2 a sourceUpdatedAt 2026-10-17 18:47 opraveny; datový validátor PASS |
+
+První nezávislé holdout měření skutečného retrievalu mělo10/11PASS: formulace „Potřebuji při převzetí pokoje občanku?“ nedohledala správný nástupní dokument. Původní výsledek je v `.cache/rag-sources-20261028/holdout-initial.json`, nález převzal runtime autor k opravě slovníku/tematického směrování a přidání regrese. Nejde o chybu zdrojové parafráze; očekávání se nemění.
+
+Po opravě PASS11/11 a84/84AItestů. Koordinační čtení směrování dále odhalilo směšování hřiště a posilovny: normalizace hřiště→sport a výchozí sport→SH posílaly oba dotazy „Chci si pronajmout hřiště na Strahově“ / „Kolik stojí pronájem fotbalového hřiště?“ pouze na sh-sport, přestože odpovídající SÚZ podklad existuje. Pouhé přidání keywords by nezměnilo chybný filtr instituce. Volba: zachovat hřiště jako samostatný lexikální pojem, rozlišit konkrétní klubovou posilovnu od pronájmu hřišť a ověřit i navazující cenu. Bez změny zdrojových faktů, API nebo dalšího indexu; náklad je několik lokálních výrazů bez nové cache či I/O.
