@@ -21,9 +21,12 @@ import {
   type AiHistoryMessage,
 } from "./crazy-typka-provider";
 import {
-  getKnowledgeRegistry,
-  type KnowledgeRegistry,
-} from "./crazy-typka-retrieval";
+  createConfiguredEvidenceBackend,
+  prepareEvidenceQuery,
+  RagEvidenceError,
+  type AsyncEvidenceBackend,
+  type EvidenceSnapshot,
+} from "./rag-evidence-backend";
 
 export type CrazyTypkaServiceLimits = {
   requestBytes: number;
@@ -40,10 +43,12 @@ export type CrazyTypkaServiceLimits = {
   globalRequestsPerMinute: number;
   messagesPerMinutePerSession: number;
   generationsPerProcess: number;
+  embeddingsPerProcess: number;
+  embeddingTokenBudget: number;
 };
 export type CrazyTypkaServiceOptions = {
   env?: NodeJS.ProcessEnv;
-  loadKnowledge?: () => KnowledgeRegistry;
+  evidenceBackend?: AsyncEvidenceBackend;
   fetch?: typeof globalThis.fetch;
   now?: () => number;
   limits?: Partial<CrazyTypkaServiceLimits>;
@@ -63,6 +68,8 @@ const DEFAULT_LIMITS: CrazyTypkaServiceLimits = {
   globalRequestsPerMinute: 120,
   messagesPerMinutePerSession: 6,
   generationsPerProcess: 500,
+  embeddingsPerProcess: 500,
+  embeddingTokenBudget: 500000,
 };
 type Session = {
   expiresAt: number;
@@ -73,8 +80,8 @@ type Session = {
   lastMessage?: { hash: string; at: number };
   nextRequestSeq: number;
   lastOperation?: Operation;
-  /** Includes accepted failed USER attempts so a newer unknown topic is not skipped. */
-  retrievalUsers: AiHistoryMessage[];
+  /** Failed or blocked attempts clear this boundary without retaining rejected text. */
+  previousSuccessfulUser?: string;
 };
 type TerminalResult = {
   status: number;
@@ -83,7 +90,7 @@ type TerminalResult = {
 type Operation = {
   seq: number;
   payloadHash: string;
-  evidenceSourceIds: string[];
+  evidence?: EvidenceSnapshot;
   terminal?: TerminalResult;
 };
 type Address = { requests: number[]; sessions: number[] };
@@ -96,7 +103,8 @@ function rememberTerminal(
   // silently fall back to older successful dialogue, or resend rejected text.
   if (result.status >= 400) {
     session.history.length = 0;
-    operation.evidenceSourceIds = [];
+    operation.evidence = undefined;
+    session.previousSuccessfulUser = undefined;
   }
   operation.terminal = result;
 }
@@ -257,13 +265,21 @@ export function createCrazyTypkaService(
       Number(configuredCap),
     );
   }
+  for (const [key, variable] of [
+    ["embeddingsPerProcess", "CRAZY_TYPKA_EMBEDDINGS_PER_PROCESS"],
+    ["embeddingTokenBudget", "CRAZY_TYPKA_EMBEDDING_TOKEN_BUDGET"],
+  ] as const) {
+    const raw = env[variable];
+    if (raw !== undefined) {
+      if (!/^[1-9]\d{0,8}$/.test(raw))
+        throw new Error("Invalid AI budget configuration");
+      limits[key] = Math.min(limits[key], Number(raw));
+    }
+  }
   const enabled =
     env.CRAZY_TYPKA_ENABLED === "1" &&
     !!env.OPENAI_API_KEY?.trim() &&
     !!env.OPENAI_MODEL?.trim();
-  const knowledge = enabled
-    ? (options.loadKnowledge ?? getKnowledgeRegistry)()
-    : undefined;
   const origins = parseOrigins(env.CRAZY_TYPKA_ALLOWED_ORIGINS);
   const reasoningEffort = env.OPENAI_REASONING_EFFORT?.trim() || undefined;
   if (
@@ -281,13 +297,20 @@ export function createCrazyTypkaService(
     timeoutMs: limits.providerTimeoutMs,
     responseBytes: limits.providerResponseBytes,
   });
+  const backend = enabled
+    ? (options.evidenceBackend ??
+      createConfiguredEvidenceBackend(env, options.fetch))
+    : undefined;
   const sessions = new Map<string, Session>(),
     addresses = new Map<string, Address>();
   const globalRequests: number[] = [];
   const active = new Set<AbortController>();
   const pending = new Set<Promise<boolean>>();
   let closed = false,
-    generations = 0;
+    generations = 0,
+    embeddingAttempts = 0,
+    reservedEmbeddingTokens = 0,
+    confirmedEmbeddingTokens = 0;
   function prune() {
     const instant = now();
     for (const [key, session] of sessions)
@@ -393,7 +416,8 @@ export function createCrazyTypkaService(
         if (req.headers.origin && !origin)
           return reply(403, { error: "origin-rejected" });
         if (origin) res.setHeader("Access-Control-Allow-Origin", origin);
-        return reply(200, { enabled: enabled && !closed });
+        const available = enabled && !closed && (await backend!.ready());
+        return reply(200, { enabled: available && !closed });
       }
       const origin = originFor(req, origins);
       if (!origin) return reply(403, { error: "origin-rejected" });
@@ -443,7 +467,7 @@ export function createCrazyTypkaService(
         sessions.delete(key);
         session.inflight?.abort();
         session.history.length = 0;
-        session.retrievalUsers.length = 0;
+        session.previousSuccessfulUser = undefined;
         session.lastOperation = undefined;
         return reply(204);
       }
@@ -465,6 +489,10 @@ export function createCrazyTypkaService(
         throw new RequestError(409, "cancelled");
       if (!object(body)) throw new RequestError(400, "invalid-request");
       if (issueSession) {
+        if (!(await backend!.ready(controller.signal)))
+          throw new RequestError(503, "unavailable");
+        if (closed || controller.signal.aborted)
+          throw new RequestError(409, "cancelled");
         if (Object.keys(body).length)
           throw new RequestError(400, "invalid-request");
         // Recheck after asynchronous uploads: other admitted requests may have issued sessions.
@@ -478,7 +506,7 @@ export function createCrazyTypkaService(
           history: [],
           messages: [],
           nextRequestSeq: 1,
-          retrievalUsers: [],
+          previousSuccessfulUser: undefined,
         });
         return reply(201, { token, expiresAt });
       }
@@ -502,12 +530,25 @@ export function createCrazyTypkaService(
         if (previous.payloadHash !== payloadHash)
           throw new RequestError(409, "request-conflict");
         if (!previous.terminal) throw new RequestError(409, "busy");
+        if (session.inflight) throw new RequestError(409, "busy");
+        session.inflight = controller;
+        inflight = session;
+        const current =
+          previous.terminal.status >= 400 ||
+          !previous.evidence ||
+          (await backend!.validate(
+            previous.evidence,
+            now(),
+            controller.signal,
+          ));
         if (
-          previous.terminal.status < 400 &&
-          previous.evidenceSourceIds.some(
-            (id) => !knowledge!.isSourceUsable(id, now()),
-          )
+          controller.signal.aborted ||
+          sessions.get(key) !== session ||
+          session.lastOperation !== previous ||
+          session.expiresAt <= now()
         )
+          throw new RequestError(401, "session-expired");
+        if (!current)
           rememberTerminal(session, previous, {
             status: 409,
             body: { error: "response-expired", requestSeq: previous.seq },
@@ -538,22 +579,11 @@ export function createCrazyTypkaService(
       const operation: Operation = {
         seq: body.requestSeq,
         payloadHash,
-        evidenceSourceIds: [],
+        evidence: undefined,
       };
       session.lastOperation = operation;
       session.nextRequestSeq++;
       accepted = { key, session, operation };
-      const evidence = knowledge!.retrieveConversation(
-        message,
-        session.retrievalUsers,
-        CRAZY_TYPKA_LIMITS.sources,
-        now(),
-      );
-      session.retrievalUsers.push({ role: "user", content: message });
-      session.retrievalUsers.splice(
-        0,
-        Math.max(0, session.retrievalUsers.length - 3),
-      );
       if (greeting) {
         session.history.push(
           { role: "user", content: message },
@@ -566,10 +596,48 @@ export function createCrazyTypkaService(
           requestSeq: operation.seq,
         });
       }
-      operation.evidenceSourceIds = [
-        ...new Set(evidence.map((chunk) => chunk.source.id)),
-      ];
-      const answer = await provider.answer({
+      const query = prepareEvidenceQuery(
+        message,
+        session.previousSuccessfulUser,
+      );
+      await provider.moderateInput(query.text, controller.signal);
+      operation.evidence = await backend!.search(query, {
+        signal: controller.signal,
+        now: now(),
+        user: key,
+        onEmbeddingAttempt: (inputBytes) => {
+          if (
+            sessions.get(key) !== session ||
+            session.expiresAt <= now() ||
+            controller?.signal.aborted
+          )
+            throw new RagEvidenceError("cancelled");
+          if (
+            !Number.isSafeInteger(inputBytes) ||
+            inputBytes < 1 ||
+            embeddingAttempts >= limits.embeddingsPerProcess ||
+            reservedEmbeddingTokens + inputBytes > limits.embeddingTokenBudget
+          )
+            throw new RagEvidenceError("budget-exhausted");
+          embeddingAttempts++;
+          reservedEmbeddingTokens += inputBytes;
+        },
+        onEmbeddingUsage: (usage) => {
+          confirmedEmbeddingTokens += usage.totalTokens;
+        },
+      });
+      if (
+        !(await backend!.validate(operation.evidence, now(), controller.signal))
+      )
+        throw new RequestError(409, "response-expired");
+      if (
+        previous?.evidence &&
+        previous.evidence.snapshot.revisionId !==
+          operation.evidence.snapshot.revisionId
+      )
+        session.history.length = 0;
+      const evidence = operation.evidence.chunks;
+      const answer = await provider.generate({
         message,
         locale: body.locale as "cs" | "en",
         history: session.history,
@@ -595,11 +663,16 @@ export function createCrazyTypkaService(
       )
         throw new RequestError(409, "cancelled");
       if (
-        operation.evidenceSourceIds.some(
-          (id) => !knowledge!.isSourceUsable(id, now()),
-        )
+        !(await backend!.validate(operation.evidence, now(), controller.signal))
       )
         throw new RequestError(409, "response-expired");
+      if (
+        controller.signal.aborted ||
+        sessions.get(key) !== session ||
+        session.expiresAt <= now()
+      )
+        throw new RequestError(409, "cancelled");
+      session.previousSuccessfulUser = query.filterText;
       session.history.push(
         { role: "user", content: message },
         { role: "assistant", content: answer.text },
@@ -630,7 +703,8 @@ export function createCrazyTypkaService(
       const code = operationTimedOut
         ? "request-timeout"
         : error instanceof RequestError ||
-            error instanceof CrazyTypkaProviderError
+            error instanceof CrazyTypkaProviderError ||
+            error instanceof RagEvidenceError
           ? error.code
           : "provider-unavailable";
       const status = operationTimedOut
@@ -639,11 +713,13 @@ export function createCrazyTypkaService(
           ? error.status
           : code === "blocked"
             ? 422
-            : code === "cancelled"
+            : code === "cancelled" || code === "response-expired"
               ? 409
               : code === "request-timeout"
                 ? 504
-                : 502;
+                : code === "budget-exhausted"
+                  ? 503
+                  : 502;
       if (code === "rate-limited") res.setHeader("Retry-After", "60");
       return terminalReply(status, {
         error: code,
@@ -673,6 +749,14 @@ export function createCrazyTypkaService(
       void work.finally(() => pending.delete(work)).catch(() => {});
       return work;
     },
+    usage() {
+      return {
+        embeddingAttempts,
+        reservedEmbeddingTokens,
+        confirmedEmbeddingTokens,
+        generationAttempts: generations,
+      };
+    },
     async close() {
       closed = true;
       clearInterval(expiryTimer);
@@ -680,7 +764,7 @@ export function createCrazyTypkaService(
       sessions.clear();
       addresses.clear();
       globalRequests.length = 0;
-      await Promise.allSettled([...pending]);
+      await Promise.allSettled([...pending, backend?.close()]);
     },
   };
 }

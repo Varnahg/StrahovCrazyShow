@@ -4,26 +4,329 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { createServer } from "node:http";
 import { Readable } from "node:stream";
 import test from "node:test";
-import {
-  createKnowledgeRegistry,
-  loadKnowledgeRegistry,
-  getKnowledgeRegistry,
-} from "../server/crazy-typka-retrieval";
+import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
 
-test("invalid or malformed lazy corpus disables only optional AI without provider calls", async () => {
-  for (const loadKnowledge of [
-    () => loadKnowledgeRegistry(() => "{"),
-    () =>
-      createKnowledgeRegistry([
-        { version: 2, sources: [{ id: "bad" }], chunks: [] },
-      ]),
-  ]) {
+import { createEmbeddingProfile } from "../server/rag-embeddings";
+import {
+  RagEvidenceError,
+  type AsyncEvidenceBackend,
+  type EvidenceSnapshot,
+  type PreparedEvidenceQuery,
+} from "../server/rag-evidence-backend";
+
+function fakeEvidenceBackend(): AsyncEvidenceBackend {
+  const registry = getKnowledgeRegistry(),
+    profile = createEmbeddingProfile();
+  return {
+    profile,
+    async ready() {
+      return true;
+    },
+    async search(query, options) {
+      options.onEmbeddingAttempt(Buffer.byteLength(query.text, "utf8"));
+      options.onEmbeddingUsage?.({ promptTokens: 1, totalTokens: 1 });
+      const message = query.text.split("\nCurrent user question:\n").at(-1)!;
+      const previous =
+        query.filterText === message
+          ? []
+          : [{ role: "user", content: query.filterText }];
+      const chunks = registry.retrieveConversation(
+        message,
+        previous,
+        4,
+        options.now,
+      );
+      return {
+        snapshot: { revisionId: "a".repeat(64), profile },
+        chunks,
+        sourceVersionIds: [...new Set(chunks.map((chunk) => chunk.source.id))],
+        embeddingUsage: { promptTokens: 1, totalTokens: 1 },
+      };
+    },
+    async validate(evidence, instant) {
+      return evidence.sourceVersionIds.every((id) =>
+        registry.isSourceUsable(id, instant),
+      );
+    },
+    async close() {},
+  };
+}
+
+test("the exact bounded query is moderated before embedding and failed or blocked USER text never becomes follow-up input", async () => {
+  const base = fakeEvidenceBackend(),
+    events: string[] = [],
+    queries: string[] = [],
+    moderated: string[] = [];
+  let failGeneration = false;
+  const backend: AsyncEvidenceBackend = {
+    ...base,
+    async search(query, options) {
+      events.push("embedding");
+      queries.push(query.text);
+      return base.search(query, options);
+    },
+  };
+  const f = fixture({
+    evidenceBackend: backend,
+    now: () => Date.parse("2026-10-28T12:00:00Z"),
+    fetch: async (url, init) => {
+      const body = JSON.parse(String(init?.body));
+      if (String(url).endsWith("/moderations")) {
+        events.push("moderation");
+        moderated.push(body.input);
+        const flagged = body.input.includes("BLOCKED USER");
+        return Response.json({
+          results: [{ flagged, categories: { harassment: flagged } }],
+        });
+      }
+      events.push("generation");
+      if (failGeneration) {
+        failGeneration = false;
+        throw new Error("private failure");
+      }
+      return responseText("Schválená odpověď.");
+    },
+  });
+  try {
+    const token = await f.session();
+    const send = (requestSeq: number, message: string) =>
+      f.send("/api/ai/chat", { token, requestSeq, message, locale: "cs" });
+    await send(1, "Kde je Fotokomora?");
+    await send(2, "A kolik to stojí?");
+    assert.deepEqual(events.slice(0, 8), [
+      "moderation",
+      "embedding",
+      "generation",
+      "moderation",
+      "moderation",
+      "embedding",
+      "generation",
+      "moderation",
+    ]);
+    assert.equal(queries[0], moderated[0]);
+    assert.equal(queries[1], moderated[2]);
+    assert.match(queries[1], /Kde je Fotokomora/);
+    assert.equal((await send(3, "BLOCKED USER text")).body.error, "blocked");
+    await send(4, "A kolik to stojí?");
+    assert.equal(queries.at(-1), "A kolik to stojí?");
+    assert.ok(queries.every((query) => !query.includes("BLOCKED USER")));
+    failGeneration = true;
+    assert.equal(
+      (await send(5, "FAILED USER nové téma")).body.error,
+      "provider-unavailable",
+    );
+    await send(6, "Kde to najdu?");
+    assert.equal(queries.at(-1), "Kde to najdu?");
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("transient DB failure while replaying keeps the cached success without any additional API work", async () => {
+  const backend = fakeEvidenceBackend();
+  let unavailable = false,
+    searches = 0;
+  const baseSearch = backend.search,
+    baseValidate = backend.validate;
+  backend.search = async (query, options) => {
+    searches++;
+    return baseSearch(query, options);
+  };
+  backend.validate = async (evidence, now, signal) => {
+    if (unavailable) throw new Error("postgres://private-password");
+    return baseValidate(evidence, now, signal);
+  };
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session(),
+      body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+    const first = await f.send("/api/ai/chat", body);
+    assert.equal(first.status, 200);
+    unavailable = true;
+    const retry = await f.send("/api/ai/chat", body);
+    assert.deepEqual(retry.body, { error: "provider-unavailable" });
+    unavailable = false;
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, first.body);
+    assert.equal(searches, 1);
+    assert.equal(f.calls.length, 3);
+    assert.equal(f.service.usage().embeddingAttempts, 1);
+    assert.equal(f.service.usage().generationAttempts, 1);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("async replay validation is serialized with new operations and reset cannot resurrect its old answer", async () => {
+  const backend = fakeEvidenceBackend();
+  let gate = false,
+    release!: (value: boolean) => void,
+    reached!: () => void;
+  const entered = new Promise<void>((resolve) => {
+    reached = resolve;
+  });
+  backend.validate = async () => {
+    if (!gate) return true;
+    reached();
+    return new Promise<boolean>((resolve) => {
+      release = resolve;
+    });
+  };
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session(),
+      body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+    await f.send("/api/ai/chat", body);
+    gate = true;
+    const replay = f.send("/api/ai/chat", body);
+    await entered;
+    assert.deepEqual(
+      (
+        await f.send("/api/ai/chat", {
+          ...body,
+          requestSeq: 2,
+          message: "Další",
+        })
+      ).body,
+      { error: "busy" },
+    );
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, {
+      error: "busy",
+    });
+    await f.send("/api/ai/session", undefined, "DELETE", {
+      authorization: `Bearer ${token}`,
+    });
+    release(true);
+    assert.deepEqual((await replay).body, { error: "session-expired" });
+    assert.equal(f.calls.length, 3);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("embedding attempt and conservative token caps are independent of generation and cached errors never refund or retry", async () => {
+  const f = fixture({
+    env: {
+      ...env,
+      CRAZY_TYPKA_EMBEDDINGS_PER_PROCESS: "1",
+      CRAZY_TYPKA_EMBEDDING_TOKEN_BUDGET: "100",
+    },
+    limits: { generationsPerProcess: 3 },
+  });
+  try {
+    const token = await f.session();
+    await f.send("/api/ai/chat", {
+      token,
+      requestSeq: 1,
+      message: "Hello there",
+      locale: "en",
+    });
+    const body = { token, requestSeq: 2, message: "More facts", locale: "en" };
+    const blocked = await f.send("/api/ai/chat", body);
+    assert.deepEqual(blocked.body, {
+      error: "budget-exhausted",
+      requestSeq: 2,
+    });
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, blocked.body);
+    assert.deepEqual(f.service.usage(), {
+      embeddingAttempts: 1,
+      reservedEmbeddingTokens: 11,
+      confirmedEmbeddingTokens: 1,
+      generationAttempts: 1,
+    });
+    assert.equal(f.calls.length, 4);
+  } finally {
+    await f.service.close();
+  }
+  const bounded = fixture({ limits: { embeddingTokenBudget: 1 } });
+  try {
+    const token = await bounded.session();
+    assert.equal(
+      (
+        await bounded.send("/api/ai/chat", {
+          token,
+          requestSeq: 1,
+          message: "Dotaz",
+          locale: "cs",
+        })
+      ).body.error,
+      "budget-exhausted",
+    );
+    assert.deepEqual(bounded.service.usage(), {
+      embeddingAttempts: 0,
+      reservedEmbeddingTokens: 0,
+      confirmedEmbeddingTokens: 0,
+      generationAttempts: 0,
+    });
+    assert.equal(bounded.calls.length, 1, "only free moderation ran");
+  } finally {
+    await bounded.service.close();
+  }
+});
+
+test("backend readiness never falls back and DELETE remains usable during a DB outage", async () => {
+  const backend = fakeEvidenceBackend();
+  let available = true;
+  backend.ready = async () => available;
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session();
+    available = false;
+    assert.deepEqual((await f.send("/api/ai/status", undefined, "GET")).body, {
+      enabled: false,
+    });
+    assert.deepEqual((await f.send("/api/ai/session", {})).body, {
+      error: "unavailable",
+    });
+    assert.equal(
+      (
+        await f.send("/api/ai/session", undefined, "DELETE", {
+          authorization: `Bearer ${token}`,
+        })
+      ).status,
+      204,
+    );
+    assert.equal(f.calls.length, 0);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("a revision expiring inside vector retrieval is confirmed as a conflict and replays without another embedding", async () => {
+  const backend = fakeEvidenceBackend();
+  let searches = 0;
+  backend.search = async (_query, options) => {
+    searches++;
+    options.onEmbeddingAttempt(5);
+    throw new RagEvidenceError("response-expired");
+  };
+  const f = fixture({ evidenceBackend: backend });
+  try {
+    const token = await f.session(),
+      body = {
+        token,
+        requestSeq: 1,
+        message: "Kde je Fotokomora?",
+        locale: "cs",
+      };
+    const first = await f.send("/api/ai/chat", body);
+    assert.equal(first.status, 409);
+    assert.deepEqual(first.body, { error: "response-expired", requestSeq: 1 });
+    assert.deepEqual(await f.send("/api/ai/chat", body), first);
+    assert.equal(searches, 1);
+    assert.equal(f.calls.length, 1, "only input moderation ran");
+    assert.equal(f.service.usage().generationAttempts, 0);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("missing or invalid vector configuration disables optional AI without provider calls", async () => {
+  for (const database of [undefined, "not-a-database-url"]) {
     let diagnostics = 0,
       calls = 0;
     const service = createOptionalCrazyTypkaService(
       {
-        env,
-        loadKnowledge,
+        env: { ...env, RAG_DATABASE_URL: database },
         fetch: async () => {
           calls++;
           throw new Error("must not call");
@@ -33,33 +336,23 @@ test("invalid or malformed lazy corpus disables only optional AI without provide
         diagnostics++;
       },
     );
-    try {
-      const result = response();
+    const result = response();
+    await service.handle(
+      request("/api/ai/status", undefined, "GET"),
+      result.res,
+    );
+    assert.deepEqual(result.result().body, { enabled: false });
+    assert.equal(
       await service.handle(
-        request("/api/ai/status", undefined, "GET"),
-        result.res,
-      );
-      assert.deepEqual(result.result().body, { enabled: false });
-      assert.equal(
-        await service.handle(
-          request("/api/health", undefined, "GET"),
-          response().res,
-        ),
-        false,
-      );
-      assert.equal(diagnostics, 1);
-      assert.equal(calls, 0);
-    } finally {
-      await service.close();
-    }
+        request("/api/health", undefined, "GET"),
+        response().res,
+      ),
+      false,
+    );
+    assert.equal(diagnostics, 1);
+    assert.equal(calls, 0);
+    await service.close();
   }
-  const disabled = createCrazyTypkaService({
-    env: {},
-    loadKnowledge() {
-      throw new Error("disabled feature must not load corpus");
-    },
-  });
-  await disabled.close();
 });
 
 test("new SH and SUZ facts reach provider and compatible client citations through the service", async () => {
@@ -306,6 +599,7 @@ function fixture(options: CrazyTypkaServiceOptions = {}) {
   const service = createCrazyTypkaService({
     env,
     fetch: fetcher,
+    evidenceBackend: fakeEvidenceBackend(),
     now: () => Date.parse("2026-10-27T12:00:00Z"),
     ...options,
   });

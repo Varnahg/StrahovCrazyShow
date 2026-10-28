@@ -171,7 +171,9 @@ export function createCrazyTypkaProvider(options: CrazyTypkaProviderOptions) {
       throw new CrazyTypkaProviderError("blocked");
   }
   return {
-    async answer(input: {
+    moderateInput: moderate,
+    /** Caller must moderate the exact retrieval query before paying for embedding. */
+    async generate(input: {
       message: string;
       locale: "cs" | "en";
       history: readonly AiHistoryMessage[];
@@ -180,7 +182,6 @@ export function createCrazyTypkaProvider(options: CrazyTypkaProviderOptions) {
       signal: AbortSignal;
       onGenerationStart: () => void;
     }): Promise<{ text: string; sourceIds: string[] }> {
-      await moderate(input.message, input.signal);
       if (input.signal.aborted) throw new CrazyTypkaProviderError("cancelled");
       input.onGenerationStart();
       const result = await post(

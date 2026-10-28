@@ -55,7 +55,7 @@ export type KnowledgeChunk = {
   contentSha256: string;
   topic: KnowledgeTopic;
 };
-type RawChunk = {
+export type RawKnowledgeChunk = {
   id: string;
   sourceId: string;
   text: string;
@@ -161,9 +161,9 @@ function citationFor(source: KnowledgeDocument): CrazyTypkaSource {
     adaptation: "curated-paraphrase",
   });
 }
-function validateDatasets(datasets: readonly unknown[]) {
+export function validateKnowledgeDatasets(datasets: readonly unknown[]) {
   const sources: KnowledgeDocument[] = [],
-    chunks: RawChunk[] = [];
+    chunks: RawKnowledgeChunk[] = [];
   const sourceIds = new Set<string>(),
     chunkIds = new Set<string>();
   for (const data of datasets) {
@@ -282,7 +282,7 @@ function validateDatasets(datasets: readonly unknown[]) {
       const source = sources.find((item) => item.id === raw.sourceId)!;
       if (!raw.id.startsWith(source.authority === "suz" ? "suz-" : "sh-"))
         invalid();
-      chunks.push({ ...raw, keywords: [...raw.keywords] } as RawChunk);
+      chunks.push({ ...raw, keywords: [...raw.keywords] } as RawKnowledgeChunk);
       chunkIds.add(raw.id);
     }
   }
@@ -488,7 +488,7 @@ function isFollowUp(message: string): boolean {
 
 /** Validation/index creation are lazy and testable; no data read during module import. */
 export function createKnowledgeRegistry(datasets: readonly unknown[]) {
-  const data = validateDatasets(datasets);
+  const data = validateKnowledgeDatasets(datasets);
   const sources = new Map(
     data.sources.map(
       (source) =>

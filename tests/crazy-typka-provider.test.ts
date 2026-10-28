@@ -10,6 +10,14 @@ import {
   getKnowledgeRegistry,
 } from "../server/crazy-typka-retrieval";
 
+async function moderatedAnswer(
+  provider: ReturnType<typeof createCrazyTypkaProvider>,
+  input: Parameters<ReturnType<typeof createCrazyTypkaProvider>["generate"]>[0],
+) {
+  await provider.moderateInput(input.message, input.signal);
+  return provider.generate(input);
+}
+
 test("provider receives institution and legal interval for each actual selected source", async () => {
   const evidence = getKnowledgeRegistry().chunks.filter((chunk) =>
     ["sh-printing-location", "suz-housing-allocation"].includes(chunk.id),
@@ -30,7 +38,7 @@ test("provider receives institution and legal interval for each actual selected 
       );
     },
   });
-  await provider.answer({
+  await moderatedAnswer(provider, {
     message: "Jak rozlišit služby?",
     locale: "cs",
     history: [],
@@ -113,7 +121,7 @@ function fixture(
   const controller = new AbortController();
   let starts = 0;
   const answer = () =>
-    provider.answer({
+    moderatedAnswer(provider, {
       message: "Kde je kancelář?",
       locale: "cs",
       history: [],
@@ -263,7 +271,7 @@ test("deadline covers a stalled provider body, and caller cancellation ends a pe
     model: "test",
     fetch: (() => new Promise(() => {})) as typeof fetch,
   });
-  const work = provider.answer({
+  const work = moderatedAnswer(provider, {
     message: "Ahoj",
     locale: "cs",
     history: [],

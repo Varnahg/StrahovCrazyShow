@@ -53,3 +53,34 @@ Po zapsání tohoto handoffu a ukončení procesů vlastník uvolní claim CLI. 
 Root převzal claim i doložený dirty scope. Vlastní 85/85 testů PASS zahrnuje dodatečnou reprodukci pronájmu hřiště bez jména instituce: hřiště se už neslévá s klubovou posilovnou; příslušná regrese ověřuje i navazující cenu. Změněny pouze retrieval a jeho test, podklady zůstaly beze změny. Root holdout11/11PASS a původní10/11zachován.
 
 Uživatel následně výslovně požaduje OpenAI embeddingy a vektorovou DB. Tento v2 mezistav se ukládá jako infrastruktura provenance/platnosti, nikoli jako dokončený požadovaný RAG. Žádný build/server/GPU/placený endpoint této nové etapy neběžel. Root předává čistý checkpoint navazujícímu runtime autorovi; stávající task bude před novým claimem rozšířen o async vektorový backend. Textové vyhledávání se nesmí použít jako tichý náhradní backend při výpadku DB.
+
+## Vektorový runtime: předání po obnovení 28. 10. 2026
+
+Původní vektorový autor `/root/audit_security` skončil při chybě kapacity modelu bez dokončeného předání. Koordinátor po kontrole `list_agents` výslovně předal jeho WIP novému `/root/vector_runtime_resume`; původní agent již neběžel. Předchozí task nespouštěl dlouhé helpery ani porty, aktuální node procesy při převzetí začínaly až po přerušení. Žádný cizí proces nebyl ukončen. Evidovaná rezervace `rag-vector-runtime-01a17e9d` byla uvolněna a úspěšně převzata jako `rag-vector-runtime-resume-20261028` s doloženým `--adopt-dirty` sedmi TS cest. Výchozí HEAD tohoto předání je `986ab3d82caf0ebf0297d3a684caa42ad22f2359`; žádný commit nebyl proveden.
+
+Převzatá a dokončená implementace:
+
+- `server/rag-evidence-backend.ts` propojuje přesný moderovaný query text, OpenAI embedder a skutečné SQL kandidáty. Ověřuje profil před zaplacením, používá pouze konzervativní metadata filtry, uchovává source-version dependencies a rozlišuje prázdnou relevanci od chyby backendu. Žádný JSON/BM25 fallback.
+- `server/crazy-typka.ts` používá async backend a oddělené embedding/generation rozpočty. Přesný replay ověřuje pouze SQL; přechodný výpadek nesmaže úspěch ani nepotvrdí novou chybu. Session lease chrání replay proti souběhu/resetu. Potvrzený neúspěch je hranicí předchozího USER tématu; historii odstraní i nová DB revize. DELETE a shutdown fungují při výpadku DB.
+- `server/crazy-typka-provider.ts` odděluje vstupní moderaci od generování; výstupní moderace zůstává. `server/crazy-typka-retrieval.ts` exportuje čistý v2 validátor pro import/store, produkční služba nevolá jeho textový registry.
+- Testy: `tests/rag-evidence-backend.test.ts`, `tests/crazy-typka-provider.test.ts`, `tests/crazy-typka.test.ts`.
+- Aktuální vysvětlení: `docs/home-ai/20261028/runtime/README.md`. Dřívější lexikální popis v tomto souboru byl nahrazen, historické důkazy výše zůstaly.
+
+Přesný dirty scope příjemce je uvedených sedm TS souborů, runtime README a toto předání. Žádná změna klienta, transportu citací, server/index, konfigurace, package/lock, SQL/ingest, embedding adaptéru nebo zdrojových dat v této navazující fázi.
+
+### Rozhodnutí a cílený refaktoring
+
+Veškeré asynchronní operace backendu sdílí jeden timeout/abort/error-cleanup wrapper a idempotentní close. Readiness spojuje souběžné kontroly s krátkou 2sekundovou cache; nemá embedding náklady. Runtime ukládá pouze poslední terminální operaci a její evidence snapshot, nenavyšuje počet intervalů ani perzistenci dotazů.
+
+Při obnovení byly opraveny dvě doložené hrany: (1) expirace vyhozená přímo při vector search vracela502, nyní stejně jako ostatní confirmed expiration409; RED502≠409 a následné GREEN jsou zachované. (2) Explicitní SH ve smíšené větě o kolejném nebo anglická Fotokomora jako orientační bod ubytování zbytečně omezovaly SQL filtr. Široká kontextová slova nyní mohou pouze odstranit optional filtr, nikdy vybrat IDs nebo vytvořit nový tematický filtr; české i anglické příklady jsou v testu.
+
+### Skutečné důkazy tohoto převzetí
+
+- Úvodní společná cílená sada:97/97PASS, exit0, `.cache/rag-sources-20261028-runtime/resume-targeted-initial.log`; počáteční scoped strict tsc PASS.
+- Cílená reprodukce expirace: `resume-expiry-red.log` exit1 kvůli skutečnému502; po opravě `resume-expiry-green.log`1/1PASS, exit0. `resume-filter-test.log`7/7PASS.
+- Finální příkaz `node --import tsx --test tests/rag-evidence-backend.test.ts tests/crazy-typka-provider.test.ts tests/crazy-typka.test.ts tests/crazy-typka-retrieval.test.ts tests/crazy-typka-ui.test.ts`: **98/98PASS**, žádný skip/cancel, exit0,1380.495ms. Log `resume-targeted-final.log`.
+- Scoped strict TypeScript nad pěti runtime/shared zdroji a pěti testy s ES2022/ESNext/Bundler/resolveJsonModule/strict/react-jsx: **PASS**, exit0, bez diagnostiky; `resume-types-final.log`.
+- Prettier pouze osm vlastních zdrojů/testů/docs: exit0, `resume-format.log`. `git diff --check` vlastních tracked cest: PASS.
+- Manifest osmi předaných zdrojů/docs a deseti čtených dependencies: `.cache/rag-sources-20261028-runtime/resume-manifest.json`, checkedAt `2026-10-28T11:48:28.090Z`, SHA256 `{sources,inputs}`: `5e91ffe88d482490ca780bb85a5fbc3eee1069074ad210fb7351820752c04fc4`.
+
+Žádné live OpenAI/DB volání, privátní konfigurace, síťový proces, build, full suite ani GPU nebyly v tomto převzetí použity. Všechny vlastní krátké procesy skončily. Cílené fake-store testy nejsou důkazem SQL integrace nebo sémantické kvality. Práh `RAG_MAX_COSINE_DISTANCE` zůstává explicitně volitelný a bez odhadnutého defaultu; root jej případně nastaví podle skutečného eval. Prázdná hodnota je úmyslně vadná konfigurace. Root dokončí skutečný import/eval, společné kontroly a review/integraci; release tohoto tasku není Done celého KEY-65.
