@@ -114,7 +114,11 @@ async function verifyWelcomeChat(
       );
       return field && !field.disabled;
     });
-    assert.equal(await launcher.getAttribute("aria-expanded"), "true");
+    // CSS hides the open launcher from role lookup; its DOM state is still present.
+    assert.equal(
+      await page.locator(".home-chat-launcher").getAttribute("aria-expanded"),
+      "true",
+    );
   };
   const closed = async () => {
     await popup.waitFor({ state: "hidden" });
