@@ -21,9 +21,8 @@ import {
   type AiHistoryMessage,
 } from "./crazy-typka-provider";
 import {
-  retrieveConversationKnowledge,
-  isKnowledgeCurrent,
-  KNOWLEDGE_REVIEW_AFTER,
+  getKnowledgeRegistry,
+  type KnowledgeRegistry,
 } from "./crazy-typka-retrieval";
 
 export type CrazyTypkaServiceLimits = {
@@ -44,6 +43,7 @@ export type CrazyTypkaServiceLimits = {
 };
 export type CrazyTypkaServiceOptions = {
   env?: NodeJS.ProcessEnv;
+  loadKnowledge?: () => KnowledgeRegistry;
   fetch?: typeof globalThis.fetch;
   now?: () => number;
   limits?: Partial<CrazyTypkaServiceLimits>;
@@ -83,6 +83,7 @@ type TerminalResult = {
 type Operation = {
   seq: number;
   payloadHash: string;
+  evidenceSourceIds: string[];
   terminal?: TerminalResult;
 };
 type Address = { requests: number[]; sessions: number[] };
@@ -93,7 +94,10 @@ function rememberTerminal(
 ) {
   // A failed newer USER attempt is a topic boundary. Do not let the generator
   // silently fall back to older successful dialogue, or resend rejected text.
-  if (result.status >= 400) session.history.length = 0;
+  if (result.status >= 400) {
+    session.history.length = 0;
+    operation.evidenceSourceIds = [];
+  }
   operation.terminal = result;
 }
 export function isCrazyTypkaPath(url: string | undefined) {
@@ -257,6 +261,9 @@ export function createCrazyTypkaService(
     env.CRAZY_TYPKA_ENABLED === "1" &&
     !!env.OPENAI_API_KEY?.trim() &&
     !!env.OPENAI_MODEL?.trim();
+  const knowledge = enabled
+    ? (options.loadKnowledge ?? getKnowledgeRegistry)()
+    : undefined;
   const origins = parseOrigins(env.CRAZY_TYPKA_ALLOWED_ORIGINS);
   const reasoningEffort = env.OPENAI_REASONING_EFFORT?.trim() || undefined;
   if (
@@ -495,16 +502,10 @@ export function createCrazyTypkaService(
         if (previous.payloadHash !== payloadHash)
           throw new RequestError(409, "request-conflict");
         if (!previous.terminal) throw new RequestError(409, "busy");
-        const cached = previous.terminal.body;
         if (
-          "sources" in cached &&
-          cached.sources.some(
-            (source) =>
-              !isKnowledgeCurrent(
-                source.checkedAt,
-                KNOWLEDGE_REVIEW_AFTER,
-                now(),
-              ),
+          previous.terminal.status < 400 &&
+          previous.evidenceSourceIds.some(
+            (id) => !knowledge!.isSourceUsable(id, now()),
           )
         )
           rememberTerminal(session, previous, {
@@ -534,11 +535,15 @@ export function createCrazyTypkaService(
       session.lastMessage = { hash: digest, at: now() };
       session.inflight = controller;
       inflight = session;
-      const operation: Operation = { seq: body.requestSeq, payloadHash };
+      const operation: Operation = {
+        seq: body.requestSeq,
+        payloadHash,
+        evidenceSourceIds: [],
+      };
       session.lastOperation = operation;
       session.nextRequestSeq++;
       accepted = { key, session, operation };
-      const evidence = retrieveConversationKnowledge(
+      const evidence = knowledge!.retrieveConversation(
         message,
         session.retrievalUsers,
         CRAZY_TYPKA_LIMITS.sources,
@@ -561,6 +566,9 @@ export function createCrazyTypkaService(
           requestSeq: operation.seq,
         });
       }
+      operation.evidenceSourceIds = [
+        ...new Set(evidence.map((chunk) => chunk.source.id)),
+      ];
       const answer = await provider.answer({
         message,
         locale: body.locale as "cs" | "en",
@@ -587,13 +595,8 @@ export function createCrazyTypkaService(
       )
         throw new RequestError(409, "cancelled");
       if (
-        evidence.some(
-          (chunk) =>
-            !isKnowledgeCurrent(
-              chunk.source.checkedAt,
-              KNOWLEDGE_REVIEW_AFTER,
-              now(),
-            ),
+        operation.evidenceSourceIds.some(
+          (id) => !knowledge!.isSourceUsable(id, now()),
         )
       )
         throw new RequestError(409, "response-expired");

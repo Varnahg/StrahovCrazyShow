@@ -5,6 +5,166 @@ import { createServer } from "node:http";
 import { Readable } from "node:stream";
 import test from "node:test";
 import {
+  createKnowledgeRegistry,
+  loadKnowledgeRegistry,
+  getKnowledgeRegistry,
+} from "../server/crazy-typka-retrieval";
+
+test("invalid or malformed lazy corpus disables only optional AI without provider calls", async () => {
+  for (const loadKnowledge of [
+    () => loadKnowledgeRegistry(() => "{"),
+    () =>
+      createKnowledgeRegistry([
+        { version: 2, sources: [{ id: "bad" }], chunks: [] },
+      ]),
+  ]) {
+    let diagnostics = 0,
+      calls = 0;
+    const service = createOptionalCrazyTypkaService(
+      {
+        env,
+        loadKnowledge,
+        fetch: async () => {
+          calls++;
+          throw new Error("must not call");
+        },
+      },
+      () => {
+        diagnostics++;
+      },
+    );
+    try {
+      const result = response();
+      await service.handle(
+        request("/api/ai/status", undefined, "GET"),
+        result.res,
+      );
+      assert.deepEqual(result.result().body, { enabled: false });
+      assert.equal(
+        await service.handle(
+          request("/api/health", undefined, "GET"),
+          response().res,
+        ),
+        false,
+      );
+      assert.equal(diagnostics, 1);
+      assert.equal(calls, 0);
+    } finally {
+      await service.close();
+    }
+  }
+  const disabled = createCrazyTypkaService({
+    env: {},
+    loadKnowledge() {
+      throw new Error("disabled feature must not load corpus");
+    },
+  });
+  await disabled.close();
+});
+
+test("new SH and SUZ facts reach provider and compatible client citations through the service", async () => {
+  const cases = [
+    {
+      question: "Kde je dílna 3D tisku?",
+      id: "sh-printing-location",
+      authority: "silicon-hill",
+      host: "wiki.sh.cvut.cz",
+    },
+    {
+      question: "Do kdy platím kolejné SÚZ?",
+      id: "suz-housing-payment-due",
+      authority: "suz",
+      host: "www.suz.cvut.cz",
+    },
+  ];
+  for (const item of cases) {
+    let delivered: any;
+    const f = fixture({
+      now: () => Date.parse("2026-10-28T12:00:00Z"),
+      fetch: async (url, init) => {
+        if (String(url).endsWith("/moderations"))
+          return Response.json({
+            results: [{ flagged: false, categories: { harassment: false } }],
+          });
+        delivered = JSON.parse(String(init?.body));
+        return responseText("Stručná odpověď s ověřeným podkladem.", [item.id]);
+      },
+    });
+    try {
+      const token = await f.session();
+      const result = await f.send("/api/ai/chat", {
+        token,
+        requestSeq: 1,
+        message: item.question,
+        locale: "cs",
+      });
+      assert.equal(result.status, 200);
+      assert.ok(isCrazyTypkaChatResponse(result.body));
+      assert.ok(delivered.input.at(-1).content.includes(item.id));
+      assert.ok(delivered.input.at(-1).content.includes(item.authority));
+      assert.equal(new URL(result.body.sources[0].url).hostname, item.host);
+      assert.equal(
+        Object.hasOwn(result.body.sources[0], "effectiveFrom"),
+        false,
+        "internal source metadata must not change the public citation shape",
+      );
+    } finally {
+      await f.service.close();
+    }
+  }
+});
+
+for (const expiry of ["during", "replay"] as const)
+  test(`all evidence dependencies expire ${expiry}, including an answer with no public citations`, async () => {
+    const cutoff = Date.parse("2026-11-04T00:00:00Z");
+    let instant = cutoff - 1000,
+      calls = 0;
+    const f = fixture({
+      now: () => instant,
+      fetch: async (url) => {
+        calls++;
+        if (String(url).endsWith("/moderations"))
+          return Response.json({
+            results: [{ flagged: false, categories: { harassment: false } }],
+          });
+        if (expiry === "during") instant = cutoff;
+        return responseText("S tímto tématem ti pomůžu.", []);
+      },
+    });
+    try {
+      const token = await f.session(),
+        body = {
+          token,
+          requestSeq: 1,
+          message: "Kde je 3D tisk?",
+          locale: "cs",
+        };
+      assert.ok(
+        getKnowledgeRegistry().retrieve(body.message, 4, instant).length > 0,
+      );
+      const first = await f.send("/api/ai/chat", body);
+      assert.equal(first.status, expiry === "during" ? 409 : 200);
+      if (expiry === "replay") assert.deepEqual(first.body.sources, []);
+      instant = cutoff;
+      const replay = await f.send("/api/ai/chat", body);
+      assert.deepEqual(replay.body, {
+        error: "response-expired",
+        requestSeq: 1,
+      });
+      assert.deepEqual((await f.send("/api/ai/chat", body)).body, replay.body);
+      assert.equal(calls, 3);
+      assert.equal(
+        getKnowledgeRegistry().isSourceUsable(
+          "suz-scenario-2026-2027",
+          instant,
+        ),
+        true,
+      );
+    } finally {
+      await f.service.close();
+    }
+  });
+import {
   createCrazyTypkaService,
   createOptionalCrazyTypkaService,
   attachCrazyTypkaHttpRoute,
@@ -708,7 +868,7 @@ test("history is bounded to six turns, and source links come only from curated m
   for (let i = 0; i < 8; i++) {
     const result = await f.send("/api/ai/chat", {
       token,
-      message: `Kancelář dotaz ${i}`,
+      message: `Kancelář SH dotaz ${i}`,
       locale: "cs",
     });
     assert.equal(result.status, 200);
@@ -720,7 +880,7 @@ test("history is bounded to six turns, and source links come only from curated m
     instant += 61000;
   }
   assert.equal(generationBodies[7].input.length, 13);
-  assert.equal(generationBodies[7].input[0].content, "Kancelář dotaz 1");
+  assert.equal(generationBodies[7].input[0].content, "Kancelář SH dotaz 1");
   await f.service.close();
 });
 
@@ -1025,7 +1185,7 @@ test("a moderation block is a confirmed replayable attempt and does not leave a 
 });
 
 test("evidence expiring during generation is never published and the rejection replays without another call", async () => {
-  const cutoff = Date.parse("2026-11-27T00:00:00Z");
+  const cutoff = Date.parse("2026-11-03T00:00:00Z");
   let instant = cutoff - 1000,
     calls = 0;
   const f = fixture({
@@ -1042,7 +1202,7 @@ test("evidence expiring during generation is never published and the rejection r
   });
   try {
     const token = await f.session(),
-      body = { token, requestSeq: 1, message: "Kancelář", locale: "cs" };
+      body = { token, requestSeq: 1, message: "Kancelář SH", locale: "cs" };
     const expired = await f.send("/api/ai/chat", body);
     assert.equal(expired.status, 409);
     assert.deepEqual(expired.body, {
@@ -1057,7 +1217,7 @@ test("evidence expiring during generation is never published and the rejection r
 });
 
 test("reset and expiry forget operations; cited replay loses freshness without regenerating", async () => {
-  const cutoff = Date.parse("2026-11-27T00:00:00Z");
+  const cutoff = Date.parse("2026-11-03T00:00:00Z");
   let instant = cutoff - 1000,
     calls = 0;
   const f = fixture({
@@ -1072,7 +1232,7 @@ test("reset and expiry forget operations; cited replay loses freshness without r
     },
   });
   const token = await f.session(),
-    body = { token, requestSeq: 1, message: "Kancelář", locale: "cs" };
+    body = { token, requestSeq: 1, message: "Kancelář SH", locale: "cs" };
   assert.equal((await f.send("/api/ai/chat", body)).status, 200);
   instant = cutoff;
   const expired = await f.send("/api/ai/chat", body);
