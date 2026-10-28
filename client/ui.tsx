@@ -163,6 +163,9 @@ const initialActivity: ActivityState = {
 };
 export function App() {
   const feedbackLocale = useLocale();
+  useEffect(() => {
+    document.title = "Strahov Crazy Show";
+  }, [feedbackLocale]);
   const ai = useCrazyTypka();
   const [aiChatActive, setAiChatActive] = useState(false);
   const [startupStage, setStartupStage] = useState("import");
@@ -1193,7 +1196,7 @@ export function App() {
           profile={profile} enter={enter} busy={busy}
           error={error ? localizeNotice(error) : undefined} locale={feedbackLocale}
           editor={avatarEditor} language={<LanguagePicker />}
-          feedback={<button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
+          feedback={<button type="button" className="home-quiet" onClick={openFeedback} aria-keyshortcuts="F8">
             {feedbackLocale === "cs" ? "Zpětná vazba" : "Feedback"}
           </button>}
           assistant={<CrazyTypkaChat state={ai} locale={feedbackLocale} variant="compact" />}
