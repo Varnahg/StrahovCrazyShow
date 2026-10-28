@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-validation",
+  "title": "Jantar: stabilní build, integrace a ověření celé hry",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "dist/",
+    ".cache/jantar-home-20261028-validation/",
+    "docs/home-design/20261028/verification.md",
+    "docs/agents/handoffs/jantar-home-20261028-validation.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "gpu",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Claimnout až po dohodnutém uvolnění RAG heavy/build/2568 okna. Ověřit stabilní zdrojovou revizi včetně testů a přesnou identitu produkčního klienta.",
+    "Spustit relevantní cílené kontroly, plnou sadu, build a celý izolovaný integrační běh; asset-dependent kontroly až po přesné domluvené materializaci vstupů.",
+    "Přejímka Edge/GTX1060 zůstává otevřená. Uživatel 28.10 výslovně povolil pro novou produkční verzi na4278 doplňkové funkční ověření celé hry ve viditelném IAB. Zaznamenat skutečný browser, URL, source/build a podmínky; žádný Edge, GTX1060 ani FPS PASS se tím netvrdí. Před kontrolou inventura běžících scén, pouze jedna3Dscéna, zachovat chráněný4182 a neobcházet readiness či policy guard.",
+    "Po validačním GPU okně předat neměnný produkční build samostatnému serve/playtest tasku a ukončit vlastní dočasné procesy."
+  ],
+  "verification": [
+    "Nejdřív vlastní claim a kontrola skutečných procesů, portů a scén; žádné přebírání podle stáří. Zachovat přesnou identitu buildu/testů a původní selhání.",
+    "Výsledky uvést podle skutečně provedené kontroly; funkční spuštění není FPS benchmark. Cleanup/continuing service a release předat výslovně podle účelu tasku."
+  ],
+  "notes": [
+    "Přímý lidský požadavek zachovat Jantar návrh, implementovat jej do projektu a spustit celou hru i výslovný souhlas s koordinací obou souvisejících chatů ověřeny v relaci Navrhni lepší úvodní stránku, 01a17fd8-017a-7852-87f9-cd1538e1bde2. Linear KEY-66.",
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, větev codex/jantar-home, přijatá výchozí revize de6f87a2efbf8596bb03efae863e8d6763e22774. Před zápisem vlastní claim; nepřebírat primary WIP ani rozpracovaný RAG z jiné worktree.",
+    "V13 a server na portu4182 zůstávají chráněné. Žádná změna AI transportu, serverového API, RAG, rendereru nebo avatar-editor/preview bez nové konkrétní dohody.",
+    "Úpravy, cílený refaktoring, cache/lifecycle kontrolu a relevantní ověření předat společně. Dítě nespouští další BMAD workflow a nezapisuje do cizího scope. Main integrační okno a centrální docs koordinovat zvlášť.",
+    "28.10.2026 přímá odpověď uživatele v modelovém chatu: „Ano, povolit doplňkovou funkční kontrolu v IAB“. Otázka výslovně ponechala Edge/GTX1060 přejímku otevřenou bez tvrzení o výkonu. Tato výjimka se týká nové4278 funkční kontroly; není automatickým Done ani povolením jiné změny rozsahu."
+  ]
+}

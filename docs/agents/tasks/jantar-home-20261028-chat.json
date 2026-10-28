@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-chat",
+  "title": "Jantar: volitelný kompaktní pohled Crazy Typky",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/crazy-typka.tsx",
+    "client/crazy-typka.css",
+    "tests/crazy-typka-compact.test.ts",
+    ".cache/jantar-home-20261028-chat/",
+    "docs/agents/handoffs/jantar-home-20261028-chat.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Výchozí prop zachová původní herní pohled; kompaktní prezentaci zapíná explicitní optional compact prop.",
+    "Zachovat requestSeq, recovery, relace, reset, fokus, označení AI, citace a soukromí; neměnit transport ani serverové kontrakty.",
+    "Regrese přidat pouze do odděleného crazy-typka-compact.test.ts. tests/crazy-typka-ui.test.ts zůstává vlastníku RAG a v tomto tasku se neupravuje."
+  ],
+  "verification": [
+    "Lehké cílené testy a čtecí kontrola skutečných vazeb podle změny; celý build, integrační pipeline a GPU patří samostatné validation rezervaci.",
+    "Zachovat původní lifecycle assertions, přístupnost a CZ/EN; doložit soubory, zdrojové podklady a skutečné výsledky v handoffu."
+  ],
+  "notes": [
+    "Přímý lidský požadavek zachovat Jantar návrh, implementovat jej do projektu a spustit celou hru i výslovný souhlas s koordinací obou souvisejících chatů ověřeny v relaci Navrhni lepší úvodní stránku, 01a17fd8-017a-7852-87f9-cd1538e1bde2. Linear KEY-66.",
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, větev codex/jantar-home, přijatá výchozí revize de6f87a2efbf8596bb03efae863e8d6763e22774. Před zápisem vlastní claim; nepřebírat primary WIP ani rozpracovaný RAG z jiné worktree.",
+    "V13 a server na portu4182 zůstávají chráněné. Žádná změna AI transportu, serverového API, RAG, rendereru nebo avatar-editor/preview bez nové konkrétní dohody.",
+    "Úpravy, cílený refaktoring, cache/lifecycle kontrolu a relevantní ověření předat společně. Dítě nespouští další BMAD workflow a nezapisuje do cizího scope. Main integrační okno a centrální docs koordinovat zvlášť."
+  ]
+}

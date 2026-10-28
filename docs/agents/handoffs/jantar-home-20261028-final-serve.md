@@ -1,0 +1,13 @@
+# Předání finálního Jantaru na4280
+
+Vlastník `jantar-final-serve-d-01a17fd8`, task `jantar-home-20261028-final-serve`, claimworktree `D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025`. Dparent checkout/branch ani jeho node_modules nejsou zdrojem hry a nebyly touto prací měněné. Metadata tohoto předání se publikuje vCjantar větvi.
+
+Fyzický output `D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025/.cache/jantar-home-20261028-final-serve/snapshots/final-01`. Zdroj `0d957a1ba0f53baeeef894b13791da857663d6fe`, source manifest `6bfb508e6361023bbe3e1cccbfbdb6f89de0714908e8c3da4788ce780e3ebcba`/9494souborů včetně testů. Před buildem byla nehraná příprava f570 aktualizována pouze pro hostový testscript a celý Cbefore/Cafter/Dhash znovu shodný; původní manifest i script zůstaly vpreparation-history. Žádný asset reuse/junction/hardlink.
+
+Dependency inputs package/lock/workspace/patches byly skutečně shodné. Dependencies fyzicky zkopírované z immutablecombined02, ID `8782a45c1fa0247e7370453e5af9970a411391792c89c35a540285bddec71591`,16288souborů,0links/0hardlinks. Root node_modules ani starý snapshot se neinstaloval/nepřepsal. Kontrolní bytecheck po SDK totožný.148/148targeted, plný build, celáSDK a celá standardní Docker03/source0d PASS; runtime příprava má vlastníresults/logy vDcache.
+
+ClientID `sha256-efca68de0348122b8183a0b2b7b1e68953bf3b45a77b9c8006856f5a150c90c6`; script `index-qYbuOxJo.js`, CSS `index-Bgz_x2sS.css`, VITE_SOURCE_SNAPSHOT_ID=6bfb508e… a multiplayerURL=/. Finální běžná adresa http://127.0.0.1:4280/ je ponechaná vEdge. Uživatel přímo potvrdil funkčnost této adresy a požádal dokončit původní stránku.
+
+Pokračuje pouze vlastní produkční server PID31936/exec93732, příkaz používá absolutní `.../final-01/server/index.ts`; HOST127.0.0.1,PORT4280,STATIC_DIR explicitníDdist,FEEDBACK/TMP vlastníDcache. Bootstrap metadata nastavená STRAHOV_SOURCE_SNAPSHOT_ID=6bfb508e… a Git discovery ceiling zabraňuje cizímu parentGitHead. Předchozí prázdný server48456 byl při této metadata korekci ukončen poonline0; source/deps/assets se neměnily. Další source/build změny tohoto runtime se neprovádějí. Portovou rezervaci držet po dobu služby; release až po jejím ukončení či explicitním předání.
+
+AI a feedback jsou vtéto izolované službě pravdivě neaktivní bez soukromých klíčů. Skutečná soukromáchat interakce je automaticky ověřená s lokálním fakeAPI, neplacená odpověď nebyla vydávána za živouAI. Historické vynucenéGL2 timeouty zůstávají veverification, renderer se neměnil. Diagnostický commit e819 byl uživatelem vyřazen a revertem b67ec21e je výsledný source/test obsah opět0d. Žádný4282runtime nevznikl. Žádné FPS/p95/p99/performance přijetí se netvrdí.
