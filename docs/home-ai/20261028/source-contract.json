@@ -1,0 +1,52 @@
+{
+  "version": 2,
+  "purpose": "Ověřené krátké faktické parafráze pro skutečný RAG; archiv není součástí aktuálního indexu.",
+  "activeFiles": ["server/data/silicon-hill-knowledge.json", "server/data/rag/silicon-hill.json", "server/data/rag/suz.json"],
+  "archiveFiles": ["server/data/rag/silicon-hill-archive.json", "server/data/rag/suz-archive.json"],
+  "datasetShape": { "version": 2, "sources": [], "chunks": [] },
+  "sourceFields": {
+    "id": "Globálně unikátní řetězec; nové SH sh-*, SÚZ suz-*; původních šest source IDs zůstává.",
+    "title": "Čitelný název s institucí a případným rokem/verzí.",
+    "url": "Přesná ověřená veřejná HTTPS adresa dokumentu, bez přihlašovacích údajů.",
+    "discoveryUrl": "Ověřený rodičovský rozcestník či oficiální detail odkazující dokument; může být shodný s URL.",
+    "authority": "silicon-hill | suz",
+    "status": "current v aktivním souboru; archived v odděleném archivu.",
+    "checkedAt": "YYYY-MM-DD, kontrolní den v UTC, není datum účinnosti.",
+    "reviewAfter": "YYYY-MM-DD, výlučná administrativní hranice UTC; typicky měsíc, provozní postupy/kontakty nejvýše týden.",
+    "effectiveFrom": "null nebo ISO okamžik s výslovným offsetem. České datum účinnosti převést na půlnoc Europe/Prague, např. 2026-09-01T00:00:00+02:00. Nevymýšlet datum z názvu souboru.",
+    "effectiveUntil": "null nebo ISO okamžik s offsetem, EXCLUSIVE. Jen doložený konec platnosti; do konce dne znamená následující půlnoc Europe/Prague.",
+    "author": "Instituce či doložený wiki autor, případně null.",
+    "license": "CC BY-SA 4.0 pro doloženou wiki; jinak null, nikdy domnělá otevřená licence.",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/ nebo null.",
+    "sourceUpdatedAt": "Doložený čas poslední úpravy nebo null; časovou zónu nevymýšlet.",
+    "documentDate": "Doložené datum schválení/vydání YYYY-MM-DD nebo null, oddělené od účinnosti.",
+    "authorityLevel": "statutes | internal-rule | official-document | official-service | overview | directory | wiki",
+    "versionNote": "Krátké vysvětlení verze, účinnosti, známých výluk a povahy parafráze. Nejvýše 1000 znaků.",
+    "archiveReason": "Jen pro archiv: doložený důvod vyřazení. Archiv nemusí mít chunky; historické ceny nemusíme rozmnožovat."
+  },
+  "chunkFields": {
+    "id": "Globálně unikátní sh-* či suz-*.",
+    "sourceId": "ID zdroje v tomto souboru.",
+    "text": "Vlastní stručná věcná parafráze v češtině, nejvýše 800 znaků; zachovat podmínky a nepřevzít sporný údaj.",
+    "sourceLocator": "Nadpis sekce nebo článek a stránka PDF.",
+    "topic": "Jedna hodnota z topics.",
+    "keywords": "Stručné relevantní české/anglické výrazy pro dohledání; bez plošných obecných slov.",
+    "contentSha256": "SHA-256 přesných UTF-8 bytů textu, malá hex písmena."
+  },
+  "topics": ["membership", "network", "office", "projects", "sport", "documents", "housing", "housing-payments", "housing-arrival", "housing-termination", "housing-maintenance", "dining", "photography", "printing", "game-room"],
+  "evidenceRules": [
+    "Každý přijatý zdroj má v child docs záznam URL, skutečného ověření, locators, licence a konfliktů/výluk; nepřebírat soukromé údaje ani celé nejasně licencované texty.",
+    "Respektovat publikační/quoting limity podkladu; krátké faktické parafráze nejsou kopie dokumentů.",
+    "Starý FAQ nemůže přepsat aktuální předpis. SH členství není ubytování SÚZ. Sporné částky, neověřené tabulkové vazby a otevření v reálném čase se neimportují.",
+    "Aktuální menza může mít text s umístěním a odkazem na dynamický jídelníček; dnešní jídla/ceny se neukládají jako trvalá znalost.",
+    "Dítě uloží docs/.../retrieval-cases.json jako pole {query, expectedChunkIds, forbiddenSourceIds?}; použít reálné parapráze včetně navazujících témat v popisu evidence."
+  ],
+  "runtimeRules": [
+    "Tři current soubory explicitně, žádný glob ani import archive JSON. Původní dataset převést na stejnou v2 strukturu bez ztráty IDs a podkladů; žádné duplikování původních šesti sources v novém SH souboru.",
+    "Interní registry a datumové hranice sestavit jednou, API citace zachovat kompatibilní. Source validity ověřit při výběru, po provideru a při replay.",
+    "Replay musí držet interní source IDs všech předaných evidence, i když model vrátí prázdné citace. Chyba/pozdrav žádnou novou závislost nevytváří.",
+    "Vadná data musí vypnout volitelnou AI v createOptionalCrazyTypkaService, ne shodit hru při top-level importu. Lazy validovaný registry bez per-request disk I/O.",
+    "Zmatené generické platby/registrace bez instituce nehádat. Konkrétní projekt, kolejné a členství držet odděleně i v follow-up.",
+    "Žádný scheduler, DB, embedding API, runtime fetch URL nebo automatické placené retry."
+  ]
+}

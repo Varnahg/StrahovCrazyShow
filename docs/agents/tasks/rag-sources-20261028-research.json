@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-sources-20261028-research",
+  "title": "RAG: průzkum katalogu, zdrojový kontrakt a koordinace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/home-ai/20261028/research.md",
+    "docs/home-ai/20261028/spec-evidence.md",
+    "docs/home-ai/20261028/verification.md",
+    "docs/home-ai/20261028/source-contract.json",
+    "docs/home-ai/20261028/research/",
+    "_bmad-output/implementation-artifacts/rag-sources-20261028/",
+    ".cache/rag-sources-20261028/",
+    "_bmad/render/bmad-build/strahovcrazyshow-50835127d9e0/",
+    "docs/agents/handoffs/rag-sources-20261028-research.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Stanovit kontrakt zdrojů, provenance, platnosti a oddělení archivu podle skutečně ověřených primárních dokumentů; porovnat rozumné varianty importu a jejich dopady.",
+    "Výzkumné dokumenty zůstávají pouze v uvedených konkrétních cestách; docs/home-ai/20261028/sh/, suz/ a runtime/ vlastní oddělená zadání.",
+    "Evidence zachová přesné zdrojové revize, licence či rozsah použití, důvody přijetí/odmítnutí a omezení. Integrace do main a centrální dokumentace se koordinují zvlášť."
+  ],
+  "verification": [
+    "Primární zdroje a stávající řetězec prozkoumat před změnou; rozlišit platný obsah, archiv, hypotézu a nedostupný či neověřený zdroj.",
+    "Lehké cílené CPU/schema/lifecycle kontroly podle rozsahu s fake providerem; plnou sadu/build/integraci předat samostatné validation rezervaci."
+  ],
+  "notes": [
+    "Přiděleno koordinátorovi chatu Vylepši úvodní obrazovku a AI chat (01a17e9d-dd4a-7fe3-91ac-4f3bc548982d). Přímé uživatelské zadání z 28. 10. 2026 ověřeno: import použitelných zdrojů z katalogu do skutečného RAG, začít Silicon Hillem a SÚZ, oddělit aktuální dokumenty od archivu.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Výchozí přijatá implementace PR32: main de6f87a2efbf8596bb03efae863e8d6763e22774. Před zápisem vlastní disjunktní claim; ready samo nepotvrzuje běžící práci. Původní primary WIP a snapshot 4182 se nemění.",
+    "Žádné GPU, hra ani editor; žádný scheduler ani provoz automatického crawleru. Přímé ověření veřejných primárních zdrojů je součást výzkumu. Placený provider není součást izolovaných testů.",
+    "Koordinátor sjednotí source-contract před propojením výstupů SH/SÚZ s runtime. Dítě nemění cizí soubory ani task katalog a nespouští další BMAD workflow; implementaci, cílený refaktoring a relevantní důkazy předá společně."
+  ]
+}
