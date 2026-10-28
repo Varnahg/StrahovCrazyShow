@@ -57,7 +57,7 @@ export function createEmbeddingProfile(
 ): EmbeddingProfile {
   if (!object(options)) throw new EmbeddingError("invalid-profile");
   const model =
-    options.model === undefined ? "text-embedding-3-small" : options.model;
+    options.model === undefined ? "text-embedding-3-large" : options.model;
   if (typeof model !== "string") throw new EmbeddingError("invalid-profile");
   const maximum = Object.hasOwn(MODEL_DIMENSIONS, model)
     ? MODEL_DIMENSIONS[model]

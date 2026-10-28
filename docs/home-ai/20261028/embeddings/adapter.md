@@ -13,7 +13,7 @@ Porovnáno použití SDK, samostatný fetch a rozšíření chat provideru. Zvol
 ## Identita a vstup
 
 - Profil je zmrazený objekt s SHA-256 nad přesným `JSON.stringify(["openai", model, dimensions, "title-locator-text-v1"])`.
-- Povolené modely jsou ověřené `text-embedding-3-small` (1–1536 dimenzí) a `text-embedding-3-large` (1–3072). Bez parametrů se vytvoří small/1536; zadaný large bez rozměru má 3072. Další model potřebuje explicitní podporu, nikoli automatický fallback.
+- Povolené modely jsou ověřené `text-embedding-3-small` (1–1536 dimenzí) a `text-embedding-3-large` (1–3072). Po [skutečné A/B evaluaci](../research/vector-evaluation.md) se bez parametrů vytvoří large/3072; explicitní small má 1536. Další model potřebuje explicitní podporu, nikoli automatický fallback.
 - `documentEmbeddingInput` vrací přesně `JSON.stringify([chunk.document.title, chunk.sourceLocator, chunk.text])`. Žádné trimování, normalizace diakritiky ani připojení dat kontroly.
 - `embeddingInputHash` je SHA-256 přesného UTF-8 vstupu. Neobsahuje čas kontroly, source IDs ani profil; import musí klíč cache skládat z input hash **a** profile ID.
 - Prázdné/whitespace vstupy a neplatné UTF-16 surrogate sekvence se odmítnou. Platné emoji a české/Unicode texty se nemění. Profile přijatý zvenku se znovu ověří a zkopíruje do vlastního immutable objektu.

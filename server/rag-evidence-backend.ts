@@ -193,7 +193,10 @@ export function createRagEvidenceBackend(options: {
   now?: () => number;
 }): AsyncEvidenceBackend {
   const { store, embedder } = options;
-  const maxDistance = options.maxDistance;
+  // Calibrated on the approved Czech corpus and separate CZ/EN paraphrases.
+  // Keep a conservative cutoff; a nearest neighbour is not always evidence.
+  const maxDistance =
+    options.maxDistance === undefined ? 0.6 : options.maxDistance;
   if (
     maxDistance !== undefined &&
     (!Number.isFinite(maxDistance) || maxDistance < 0 || maxDistance > 2)

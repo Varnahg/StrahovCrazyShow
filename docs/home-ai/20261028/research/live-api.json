@@ -1,0 +1,107 @@
+{
+  "startedAt": "2026-10-28T12:01:19.019Z",
+  "model": "gpt-6-luna",
+  "embeddingModel": "text-embedding-3-large",
+  "dimensions": 3072,
+  "maxDistance": 0.6,
+  "status": {
+    "status": 200,
+    "body": {
+      "enabled": true
+    }
+  },
+  "results": [
+    {
+      "question": "Co si mám připravit před registrací do Silicon Hill?",
+      "elapsedMs": 4849,
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "Před návštěvou registrátora si připrav předregistraci, papírový registrační formulář a MAC adresy zařízení, která chceš připojit. Postup najdeš ve veřejném FAQ Silicon Hill.",
+        "sources": [
+          {
+            "id": "sh-faq-onboarding",
+            "title": "Silicon Hill – FAQ: registrace a stěhování",
+            "url": "https://wiki.sh.cvut.cz/faq",
+            "checkedAt": "2026-10-28",
+            "author": "lastope2 / Silicon Hill Wiki",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "adaptation": "curated-paraphrase"
+          }
+        ],
+        "requestSeq": 1
+      },
+      "replayEqual": true,
+      "replayUnpaid": true,
+      "usage": {
+        "embeddingAttempts": 1,
+        "reservedEmbeddingTokens": 56,
+        "confirmedEmbeddingTokens": 17,
+        "generationAttempts": 1
+      }
+    },
+    {
+      "question": "Na pokoji na Strahově jsou štěnice, komu to hlásit?",
+      "elapsedMs": 4300,
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "Výskyt štěnic neprodleně oznam hospodářce či hospodáři koleje. Pokud jsou mimo pracovní dobu, nahlas to na recepci. Identifikaci a zásah zajišťuje odborná firma přes správu koleje; řiď se také pokyny, které dostaneš pro svůj pokoj.",
+        "sources": [
+          {
+            "id": "suz-housing-faq",
+            "title": "SÚZ – FAQ ubytování, vybrané provozní informace",
+            "url": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ubytovani-faq",
+            "checkedAt": "2026-10-28",
+            "author": "Správa účelových zařízení ČVUT v Praze",
+            "license": null,
+            "licenseUrl": null,
+            "adaptation": "curated-paraphrase"
+          }
+        ],
+        "requestSeq": 2
+      },
+      "replayEqual": true,
+      "replayUnpaid": true,
+      "usage": {
+        "embeddingAttempts": 2,
+        "reservedEmbeddingTokens": 111,
+        "confirmedEmbeddingTokens": 39,
+        "generationAttempts": 2
+      }
+    },
+    {
+      "question": "What is the capital of Peru?",
+      "elapsedMs": 3177,
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "The capital of Peru is Lima.",
+        "sources": [],
+        "requestSeq": 3
+      },
+      "replayEqual": true,
+      "replayUnpaid": true,
+      "usage": {
+        "embeddingAttempts": 3,
+        "reservedEmbeddingTokens": 139,
+        "confirmedEmbeddingTokens": 46,
+        "generationAttempts": 3
+      }
+    }
+  ],
+  "finishedAt": "2026-10-28T12:01:31.365Z"
+}

@@ -1,6 +1,6 @@
 # Nasazení vektorového RAG
 
-Crazy Typka vyžaduje při zapnutí AI publikovanou PostgreSQL/pgvector revizi, OpenAI klíč a samostatně zvolený model odpovědí. Embeddingový profil je ve výchozím stavu `text-embedding-3-small`/1536. JSON je kurátorovaný importní vstup; změny v souborech se projeví až po úspěšném importu. Výpadek DB nespouští textový fallback.
+Crazy Typka vyžaduje při zapnutí AI publikovanou PostgreSQL/pgvector revizi, OpenAI klíč a samostatně zvolený model odpovědí. Embeddingový profil je po [evaluaci](../research/vector-evaluation.md) ve výchozím stavu `text-embedding-3-large`/3072 s cosine distance prahem0.60. JSON je kurátorovaný importní vstup; změny v souborech se projeví až po úspěšném importu. Výpadek DB nespouští textový fallback.
 
 ## Oddělení služeb a oprávnění
 

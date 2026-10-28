@@ -41,12 +41,13 @@
     "Aktuální menza může mít text s umístěním a odkazem na dynamický jídelníček; dnešní jídla/ceny se neukládají jako trvalá znalost.",
     "Dítě uloží docs/.../retrieval-cases.json jako pole {query, expectedChunkIds, forbiddenSourceIds?}; použít reálné parapráze včetně navazujících témat v popisu evidence."
   ],
+  "vectorContract": "docs/home-ai/20261028/research/vector-contract.md",
   "runtimeRules": [
-    "Tři current soubory explicitně, žádný glob ani import archive JSON. Původní dataset převést na stejnou v2 strukturu bez ztráty IDs a podkladů; žádné duplikování původních šesti sources v novém SH souboru.",
-    "Interní registry a datumové hranice sestavit jednou, API citace zachovat kompatibilní. Source validity ověřit při výběru, po provideru a při replay.",
-    "Replay musí držet interní source IDs všech předaných evidence, i když model vrátí prázdné citace. Chyba/pozdrav žádnou novou závislost nevytváří.",
-    "Vadná data musí vypnout volitelnou AI v createOptionalCrazyTypkaService, ne shodit hru při top-level importu. Lazy validovaný registry bez per-request disk I/O.",
-    "Zmatené generické platby/registrace bez instituce nehádat. Konkrétní projekt, kolejné a členství držet odděleně i v follow-up.",
-    "Žádný scheduler, DB, embedding API, runtime fetch URL nebo automatické placené retry."
+    "Administrativní import načítá explicitně tři current a dva archive soubory; archiv publikuje pouze jako metadata bez embeddingů a aktuálních chunků. JSON není runtime fallback.",
+    "OpenAI embeddingy jsou persistované podle neměnného profilu a hashe přesného vstupu. PostgreSQL/pgvector je autorita publikované revize a vybírá kandidáty cosine SQL dotazem.",
+    "Current/public/profil/časové hranice se filtrují v SQL. Source validity a všechny source-version dependencies se znovu ověřují po provideru a při replay, i bez modelových citací.",
+    "Výpadek nebo vadná konfigurace volitelné AI nesmí shodit hru. Chyba DB není prázdný úspěch ani pokyn k textovému fallbacku.",
+    "Embedding dotazu následuje po moderaci přesného omezeného USER kontextu. Odpovědi asistenta ani zablokované dotazy nejsou zdrojem faktů nebo query historie.",
+    "Žádný scheduler, runtime fetch uživatelských URL nebo automatické placené retry. Aktuální zdroje a archiv zůstávají oddělené."
   ]
 }

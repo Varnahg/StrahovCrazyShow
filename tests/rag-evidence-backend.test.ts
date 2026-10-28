@@ -216,6 +216,23 @@ test("missing or mismatched active profile cannot spend an embedding call", asyn
   );
 });
 
+test("default relevance cutoff accepts its boundary and rejects unrelated nearest neighbours", async () => {
+  for (const distance of [0.6, 0.6001, 0.85]) {
+    const f = fixture({
+      store: {
+        async search() {
+          return [{ ...hit, distance }];
+        },
+      },
+    });
+    try {
+      assert.equal((await f.search()).chunks.length, distance <= 0.6 ? 1 : 0);
+    } finally {
+      await f.backend.close();
+    }
+  }
+});
+
 test("low similarity is an empty successful search; DB failure and stale revision stay distinct", async () => {
   const f = fixture({ maxDistance: 0.1 });
   try {

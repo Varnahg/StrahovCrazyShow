@@ -54,16 +54,16 @@ function fixture(
 
 test("profile identity includes provider/model/dimensions/format and is immutable", () => {
   const standard = createEmbeddingProfile();
-  assert.equal(standard.model, "text-embedding-3-small");
-  assert.equal(standard.dimensions, 1536);
+  assert.equal(standard.model, "text-embedding-3-large");
+  assert.equal(standard.dimensions, 3072);
   assert.equal(
     standard.id,
     createHash("sha256")
       .update(
         JSON.stringify([
           "openai",
-          "text-embedding-3-small",
-          1536,
+          "text-embedding-3-large",
+          3072,
           "title-locator-text-v1",
         ]),
       )
@@ -72,13 +72,13 @@ test("profile identity includes provider/model/dimensions/format and is immutabl
   assert.ok(Object.isFrozen(standard));
   assert.deepEqual(
     standard,
-    createEmbeddingProfile({ dimensions: 1536, model: standard.model }),
+    createEmbeddingProfile({ dimensions: 3072, model: standard.model }),
   );
   assert.notEqual(standard.id, profile.id);
   assert.notEqual(
     standard.id,
     createEmbeddingProfile({
-      model: "text-embedding-3-large",
+      model: "text-embedding-3-small",
       dimensions: 1536,
     }).id,
   );
@@ -93,7 +93,7 @@ test("profile identity includes provider/model/dimensions/format and is immutabl
     { model: null },
     { dimensions: 0 },
     { dimensions: 1.5 },
-    { dimensions: 1537 },
+    { dimensions: 3073 },
     { dimensions: null },
     { dimensions: NaN },
     { dimensions: Infinity },
@@ -215,7 +215,7 @@ test("factory validates and snapshots profile/configuration without leaking secr
   for (const bad of [
     null,
     { ...profile, id: "bad" },
-    { ...profile, model: "text-embedding-3-large" },
+    { ...profile, model: "text-embedding-3-small" },
     { ...profile, provider: "other" },
     { ...profile, inputVersion: "old" },
   ])
@@ -335,7 +335,7 @@ const malformed: [string, (value: any) => unknown][] = [
   ["null response", () => null],
   ["array response", () => []],
   ["wrong object", (value) => ({ ...value, object: "embedding" })],
-  ["wrong model", (value) => ({ ...value, model: "text-embedding-3-large" })],
+  ["wrong model", (value) => ({ ...value, model: "text-embedding-3-small" })],
   ["missing vector", (value) => ({ ...value, data: [] })],
   [
     "extra vector",
