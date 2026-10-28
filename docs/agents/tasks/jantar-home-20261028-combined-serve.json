@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-combined-serve",
+  "title": "Jantar: neměnná kombinovaná produkční verze na4278",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/jantar-home-20261028-combined-serve/",
+    "docs/agents/handoffs/jantar-home-20261028-combined-serve.md"
+  ],
+  "resources": [
+    "port:4278"
+  ],
+  "acceptance": [
+    "Obsluhovat pouze vlastní novou neměnnou produkční kombinaci Jantar+mainRAG na loopback4278 s přesně doloženým source/build ID; žádné HMR.",
+    "Starý candidate02/build03/server4276 i jeho závislosti zůstávají nezměněné; stejně chráněná4182. Kombinovaný snapshot má vlastní fyzické frozen dependencies, žádný zápis skrz starý sdílený node_modules junction.",
+    "Samotný task nevlastní GPU/build; start vyžaduje ověřený vlastní port a příslušný hotový build. Vlastní server předat nebo ukončit před release."
+  ],
+  "verification": [
+    "Před startem claim a skutečný listener; zaznamenat vlastní proces, URL a identitu servírovaného klienta.",
+    "Přijetí celé kombinované hry je samostatný validační důkaz; server nebo HTTP200 sám přejímku nepotvrzuje."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow. Výslovná koordinovaná žádost Jantar01a17fd8-017a-7852-87f9-cd1538e1bde2 po přijetíRAG86e4dd6.",
+    "Admin pouze vytvořil zadání; procesy ani původní snapshoty neměnil."
+  ]
+}
