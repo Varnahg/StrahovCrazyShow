@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-decisions-20261028-runtime",
+  "title": "AI: zapojení omezeného směrování simple/complex do služby",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/crazy-typka.ts",
+    "server/crazy-typka-provider.ts",
+    "tests/crazy-typka.test.ts",
+    "tests/crazy-typka-provider.test.ts",
+    "compose.ai.yaml",
+    ".cache/rag-decisions-runtime-20261028/",
+    "docs/agents/handoffs/rag-decisions-20261028-runtime.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zapojit validované Decisions rozhodnutí do skutečné služby: server vybírá pevně nakonfigurovaný simple/complex model a potřebu lokálních podkladů; oddělený cap/metriky jsou doložené.",
+    "Zachovat moderaci jako samostatnou bezpečnostní hranici, requestSeq replay, expiry, citace, source guardy, soukromí a abort/shutdown. Přesný replay nesmí znovu platit routing, embedding nebo generování.",
+    "Prázdný RAG sám není důvodem eskalovat. Timeout/nejistota routing operace nesmí otevřít drahou cestu ani potlačit požadavek doložených místních faktů.",
+    "Zachovat přesný přijatý Jantar onboarding: jediný multiplayer vstup a následná volba přezdívky/postavy. Neměnit jeho text zpět na sólo možnost; potřeby routeru řešit bez rozšíření Jantar scope.",
+    "Pouze vlastní service/provider/test/compose.ai změny. Žádný shared/UI/SQL/CI zásah a žádné smíchání automatického ingest WIP do router PR."
+  ],
+  "verification": [
+    "Prokázat skutečnou výběrovou cestu i nízkonákladové chybové chování fake Decisions/provider testy; původní moderace/replay/expiry asserty nesmí být oslabené.",
+    "Před první úpravou provideru porovnat úzký onboarding diff a jeho regresi z c38661f618ac6778d615c99a7ea383032ee3f526; nepřebírat celý commit s jinými UI/test/metadata soubory.",
+    "Cílený refaktoring, cache/alokace/lifecycle a odpovídající CPU kontroly předat společně. Full pipeline a případný omezený živý test mají samostatné koordinované okno."
+  ],
+  "notes": [
+    "Přímou prioritu uživatele „hlavní je ten routing podle složitosti na decisions api“ ověřil koordinátor v chatu01a17e9d-dd4a-7fe3-91ac-4f3bc548982d. Jde o samostatný checkpoint; automatický ingest a archiv zůstávají otevřenou oddělenou prací KEY-67.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, současná větev codex/automated-document-rag. Commitovat/exportovat pouze vlastní router změny, ne untracked ingest WIP; žádný checkout/reset/stash nad cizími změnami.",
+    "Specifikace a podklady zůstávají v již rezervovaném research prefixu koordinátora. Před implementací ověřit skutečný aktuální kontrakt Decisions API z primárních podkladů; samotný plán nebo fake provider nedokládá funkční živý endpoint.",
+    "Testy přes přímý explicitní Node/tsx vstup, bez pnpm exec/run synchronizace dependencies. Žádná instalace, GPU, DB, listener, fullsuite nebo placené API v těchto izolovaných task testech.",
+    "Main integrační okno nadále patří Jantar PR33. Před vlastní publikací domluvit aktuální přijatou base a zachovat jeho onboarding; žádné UI/shared/SQL/CI změny v tomto router checkpointu.",
+    "Živý registr při přidělení neobsahoval writera na provider/service/testech/compose.ai. Jantar provider handoff je docs/agents/handoffs/jantar-home-20261028-provider-onboarding.md v jeho worktree; konkrétní prompt+provider test změna je v c38661f6, zdrojový diff aktuálně čistý. Jeho oddělený compact UI test ani metadata tohoto commitu nejsou součást převodu."
+  ]
+}
