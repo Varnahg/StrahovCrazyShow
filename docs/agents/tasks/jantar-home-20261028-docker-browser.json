@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-docker-browser",
+  "title": "Jantar: Docker browser onboarding a popup regrese",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/integration-docker.ts",
+    ".cache/jantar-home-20261028-docker-browser/",
+    "docs/agents/handoffs/jantar-home-20261028-docker-browser.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Aktualizovat skutečný povinný --browser tok podle Jantar UI: explicitní otevření profilu/nová vstupní akce před nickname. Nehledat zrušené prvky po samotném goto.",
+    "Přidat skutečnou interakční regresi popup open/close/Escape/focus, případně přes omezené fake API routes. Zachovat existující testované chování a nepoužívat reálné placené volání.",
+    "Nezapisovat do produkčního UI, test-docker launcheru, Dockerfile nebo konfigurace. Běh celého Docker harnessu patří samostatnému process tasku a koordinovanému validation oknu."
+  ],
+  "verification": [
+    "Ověřit skutečný kód a reprodukční důkaz před opravou; zachovat původní výsledkové asserty a omezit diff na vlastní scope.",
+    "Příslušné kontroly a cleanup popsat v handoffu. Procesní, buildové a GPU operace jen s odpovídajícími současně drženými rezervacemi."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, větev codex/jantar-home. Přímé navazující review zadání KEY-66 od koordinátora01a17fd8-017a-7852-87f9-cd1538e1bde2; při přidělení source HEAD987bcd9242f747a6dd78c83a68b127a60ab90f19.",
+    "Současný neměnný klient/server4278 se během zdrojových oprav nepřepisuje; chráněná4182 zůstává beze změny. Starý4276 byl po dependency incidentu ukončen a neobnovuje se tímto taskem.",
+    "Žádná změna renderer budgetů/readiness, serverového API nebo PostgreSQL/RAG architektury. Žádné placené API. Package-manager příkazy nesmějí synchronizovat host root node_modules; používat přímé explicitní Node vstupy a oddělené fyzické snapshot dependencies.",
+    "Před zápisem vlastní disjunktní claim; konkrétní dítě neopakuje BMAD workflow. Předat změny, cílený refaktoring, důkazy i omezení, neoznačovat dílčí kontroly za přijetí celé hry."
+  ]
+}
