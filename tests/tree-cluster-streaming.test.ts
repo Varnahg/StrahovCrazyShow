@@ -100,7 +100,7 @@ async function waitForDetails(h: ReturnType<typeof harness>) {
   }
   // These are the original loadDetail promises, including Response/SHA/decode
   // and mesh publication. Event-loop turns do not establish that boundary.
-  await Promise.all(calls.map(call => call.result));
+  await Promise.all(calls.map((call: { result: unknown }) => call.result));
   for (const { arguments: [group, lod] } of calls) {
     assert.equal(group.active, lod);
     assert.ok(group.lods[lod].some((mesh: Mesh) => mesh.metadata.treeRole === "foliage"), "completed detail must contain foliage");

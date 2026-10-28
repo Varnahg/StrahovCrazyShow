@@ -72,3 +72,9 @@ Tyto shody potvrzují pouze uvedené zdrojové manifesty, nikoli stav sdílenýc
 - Vlastní procesy: pouze ukončené foreground CLI, všechny výstupy jsou výše. Žádný vlastní background proces, port ani GPU zdroj. Žádný commit/staging.
 - Rezervace během práce: `tree-cluster-streaming-wait-20261028`, owner `tree-stream-wait-01a16b37`. Po čtecím review a předání ji autor uvolní; skutečný release potvrzuje registr a finální zpráva koordinátorovi.
 - Integrátor převezme pouze tento test a jeho evidenci/handoff, zkontroluje diff a provede společné ověření/integraci. Stav tasku a společnou evidenci aktualizuje integrátor. Neprohlašovat celek za Done podle zdejšího cíleného PASS; zvlášť vyřešit incident sdíleného snapshotu.
+
+## Navazující společná typová kontrola integrátora
+
+První fyzicky izolovaný combined-01 build odhalil TS7006 na callbacku map(call), protože původní privátní renderer fixture používá any a mock context tento typ přenášel. Failed build log se zachovává v .cache/jantar-home-20261028-validation/combined-build-01.log; neprošel do Vite fáze. Po novém vlastním claimu stejného tasku integrátor doplnil výhradně explicitní čtený tvar `{ result: unknown }`. Runtime testu, Promise čekání a původní výsledkové asserty se nemění.
+
+Následný přímý celý `node node_modules/typescript/bin/tsc --noEmit --pretty false` prošel exit0 (combined-root-typecheck.log) a celý soubor10/10PASS,0skip,exit0 (tree-type-fix-tests.log). Tato kontrola používá současné root dependencies po doloženém incidentu; nepotvrzuje jejich historickou neměnnost. Finální izolovaný snapshot se vytváří z opraveného testu znovu a musí projít svým vlastním buildem. Původní failed combined-01 se nepřepisuje.
