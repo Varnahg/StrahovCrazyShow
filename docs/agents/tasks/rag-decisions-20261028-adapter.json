@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-decisions-20261028-adapter",
+  "title": "AI: samostatný Decisions adaptér pro složitost a potřebu podkladů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/crazy-typka-decisions.ts",
+    "tests/crazy-typka-decisions.test.ts",
+    ".cache/rag-decisions-adapter-20261028/",
+    "docs/agents/handoffs/rag-decisions-20261028-adapter.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat skutečný kontrakt /v1/decisions s gpt-6-luna pro klasifikaci složitosti a potřeby lokálních podkladů podle ověřené primární dokumentace; nepředstírat tento endpoint generováním přes jiný endpoint.",
+    "Výstup je omezené validované rozhodnutí; neautorizuje libovolný model, nástroj, síťový cíl ani změnu pravidel. Pevný simple/complex model následně vybírá serverový kód.",
+    "Oddělit vlastní cap/metriky, timeout/abort a nejasný výsledek. Timeout, chybějící/invalidní rozhodnutí nebo nejistota nesmějí povolit drahou eskalaci ani neomezený placený retry.",
+    "Dodat fake transport testy úspěchu, odmítnutí, nejasné odpovědi, cap a lifecycle; žádná tajná hodnota ani upstream tělo se nesmí dostat do logu/klienta."
+  ],
+  "verification": [
+    "Cílený kontrakt adapteru ověřit bez živých placených volání; zaznamenat přesný zdroj API kontraktu a lokální výsledky.",
+    "Cíleně sjednotit opakovanou validaci a cleanup, předat pouze vlastní soubory/důkazy. Podagent neopakuje BMAD workflow."
+  ],
+  "notes": [
+    "Přímou prioritu uživatele „hlavní je ten routing podle složitosti na decisions api“ ověřil koordinátor v chatu01a17e9d-dd4a-7fe3-91ac-4f3bc548982d. Jde o samostatný checkpoint; automatický ingest a archiv zůstávají otevřenou oddělenou prací KEY-67.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, současná větev codex/automated-document-rag. Commitovat/exportovat pouze vlastní router změny, ne untracked ingest WIP; žádný checkout/reset/stash nad cizími změnami.",
+    "Specifikace a podklady zůstávají v již rezervovaném research prefixu koordinátora. Před implementací ověřit skutečný aktuální kontrakt Decisions API z primárních podkladů; samotný plán nebo fake provider nedokládá funkční živý endpoint.",
+    "Testy přes přímý explicitní Node/tsx vstup, bez pnpm exec/run synchronizace dependencies. Žádná instalace, GPU, DB, listener, fullsuite nebo placené API v těchto izolovaných task testech.",
+    "Main integrační okno nadále patří Jantar PR33. Před vlastní publikací domluvit aktuální přijatou base a zachovat jeho onboarding; žádné UI/shared/SQL/CI změny v tomto router checkpointu."
+  ]
+}

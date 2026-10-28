@@ -5,9 +5,19 @@ import { createServer } from "node:http";
 import { Readable } from "node:stream";
 import test from "node:test";
 import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
-
-import { createEmbeddingProfile } from "../server/rag-embeddings";
 import {
+  createDecisionRouter,
+  DecisionRouterError,
+  type DecisionRouter,
+} from "../server/crazy-typka-decisions";
+
+import {
+  createEmbeddingProfile,
+  createOpenAIEmbedder,
+} from "../server/rag-embeddings";
+import type { VectorKnowledgeStore } from "../server/rag-vector-store";
+import {
+  createRagEvidenceBackend,
   RagEvidenceError,
   type AsyncEvidenceBackend,
   type EvidenceSnapshot,
@@ -51,12 +61,80 @@ function fakeEvidenceBackend(): AsyncEvidenceBackend {
     async close() {},
   };
 }
-
+function fakeDecisionRouter(
+  complexProbability = 0.1,
+  localSourcesProbability = 0.1,
+  calls: string[] = [],
+): DecisionRouter {
+  return {
+    async classify(text, options) {
+      calls.push(text);
+      options.onAttempt?.(Buffer.byteLength(text, "utf8") + 100);
+      return {
+        complexProbability,
+        localSourcesProbability,
+        usage: {
+          inputTokens: 3,
+          outputTokens: 1,
+          totalTokens: 4,
+          cachedInputTokens: 0,
+          cacheWriteTokens: 0,
+          reasoningTokens: 0,
+        },
+      };
+    },
+  };
+}
+function expectedRoutingUsage(
+  decisionAttempts: number,
+  reservedInputBytes: number,
+  simpleAttempts: number,
+) {
+  const empty = {
+    attempts: 0,
+    confirmedUsageResponses: 0,
+    inputTokens: 0,
+    outputTokens: 0,
+    totalTokens: 0,
+    cachedInputTokens: 0,
+    cacheWriteTokens: 0,
+    reasoningTokens: 0,
+    unconfirmedUsageAttempts: 0,
+  };
+  return {
+    decisions: {
+      ...empty,
+      attempts: decisionAttempts,
+      confirmedUsageResponses: decisionAttempts,
+      reservedInputBytes,
+      inputTokens: decisionAttempts * 3,
+      outputTokens: decisionAttempts,
+      totalTokens: decisionAttempts * 4,
+    },
+    generations: {
+      simple: {
+        ...empty,
+        attempts: simpleAttempts,
+        unconfirmedUsageAttempts: simpleAttempts,
+      },
+      complex: empty,
+    },
+    routingFallbacks: {
+      "decision-budget": 0,
+      "decision-timeout": 0,
+      "decision-error": 0,
+      "low-confidence": simpleAttempts,
+      "missing-local-evidence": 0,
+      "complex-budget": 0,
+    },
+  };
+}
 test("the exact bounded query is moderated before embedding and failed or blocked USER text never becomes follow-up input", async () => {
   const base = fakeEvidenceBackend(),
     events: string[] = [],
     queries: string[] = [],
     moderated: string[] = [];
+  const decisions: string[] = [], router = fakeDecisionRouter(0.1, 0.1, decisions);
   let failGeneration = false;
   const backend: AsyncEvidenceBackend = {
     ...base,
@@ -67,6 +145,12 @@ test("the exact bounded query is moderated before embedding and failed or blocke
     },
   };
   const f = fixture({
+    decisionRouter: {
+      classify(text, options) {
+        events.push("decisions");
+        return router.classify(text, options);
+      },
+    },
     evidenceBackend: backend,
     now: () => Date.parse("2026-10-28T12:00:00Z"),
     fetch: async (url, init) => {
@@ -93,23 +177,27 @@ test("the exact bounded query is moderated before embedding and failed or blocke
       f.send("/api/ai/chat", { token, requestSeq, message, locale: "cs" });
     await send(1, "Kde je Fotokomora?");
     await send(2, "A kolik to stojí?");
-    assert.deepEqual(events.slice(0, 8), [
+    assert.deepEqual(events.slice(0, 10), [
       "moderation",
+      "decisions",
       "embedding",
       "generation",
       "moderation",
       "moderation",
+      "decisions",
       "embedding",
       "generation",
       "moderation",
     ]);
     assert.equal(queries[0], moderated[0]);
     assert.equal(queries[1], moderated[2]);
+    assert.deepEqual(decisions, queries);
     assert.match(queries[1], /Kde je Fotokomora/);
     assert.equal((await send(3, "BLOCKED USER text")).body.error, "blocked");
     await send(4, "A kolik to stojí?");
     assert.equal(queries.at(-1), "A kolik to stojí?");
     assert.ok(queries.every((query) => !query.includes("BLOCKED USER")));
+    assert.deepEqual(decisions, queries);
     failGeneration = true;
     assert.equal(
       (await send(5, "FAILED USER nové téma")).body.error,
@@ -193,7 +281,8 @@ for (const phase of ["publish", "replay"] as const)
         }
         return true; // SQL evaluated its caller-supplied, earlier timestamp.
       };
-      const f = fixture({ evidenceBackend: backend, now: () => instant });
+      const f = fixture({ evidenceBackend: backend, now: () => instant,
+        decisionRouter: fakeDecisionRouter(0.95, 0.95) });
       try {
         const token = await f.session(),
           body = {
@@ -363,6 +452,7 @@ test("embedding attempt and conservative token caps are independent of generatio
       reservedEmbeddingTokens: 11,
       confirmedEmbeddingTokens: 1,
       generationAttempts: 1,
+      ...expectedRoutingUsage(2, 221, 1),
     });
     assert.equal(f.calls.length, 4);
   } finally {
@@ -387,6 +477,7 @@ test("embedding attempt and conservative token caps are independent of generatio
       reservedEmbeddingTokens: 0,
       confirmedEmbeddingTokens: 0,
       generationAttempts: 0,
+      ...expectedRoutingUsage(1, 105, 0),
     });
     assert.equal(bounded.calls.length, 1, "only free moderation ran");
   } finally {
@@ -612,6 +703,15 @@ test("invalid optional AI configuration leaves a disabled service and cannot bre
     { CRAZY_TYPKA_ALLOWED_ORIGINS: "not a valid origin" },
     { CRAZY_TYPKA_GENERATIONS_PER_PROCESS: "unlimited" },
     { OPENAI_REASONING_EFFORT: "unbounded" },
+    { OPENAI_COMPLEX_REASONING_EFFORT: "unbounded" },
+    { OPENAI_COMPLEX_REASONING_EFFORT: "none" },
+    { OPENAI_COMPLEX_REASONING_EFFORT: "minimal" },
+    { CRAZY_TYPKA_DECISIONS_PER_PROCESS: "NaN" },
+    { CRAZY_TYPKA_DECISION_TOKEN_BUDGET: "-1" },
+    { CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS: "1.5" },
+    { CRAZY_TYPKA_COMPLEX_THRESHOLD: "" },
+    { CRAZY_TYPKA_COMPLEX_THRESHOLD: "NaN" },
+    { CRAZY_TYPKA_COMPLEX_THRESHOLD: "1.1" },
   ]) {
     let notices = 0;
     const service = createOptionalCrazyTypkaService(
@@ -646,9 +746,11 @@ test("invalid optional AI configuration leaves a disabled service and cannot bre
 function responseText(
   text = "Ahoj! Jsem fiktivní AI průvodkyně.",
   sourceIds: string[] = [],
+  usage?: unknown,
 ) {
   return Response.json({
     status: "completed",
+    ...(usage === undefined ? {} : { usage }),
     output: [
       {
         type: "message",
@@ -714,6 +816,7 @@ function response() {
 }
 function fixture(options: CrazyTypkaServiceOptions = {}) {
   const sequence = new Map<string, number>();
+  const decisions: string[] = [];
   const calls: { url: string; body: any; signal: AbortSignal }[] = [];
   const fetcher: typeof fetch = async (url, init) => {
     calls.push({
@@ -731,6 +834,7 @@ function fixture(options: CrazyTypkaServiceOptions = {}) {
     env,
     fetch: fetcher,
     evidenceBackend: fakeEvidenceBackend(),
+    decisionRouter: fakeDecisionRouter(0.1, 0.1, decisions),
     now: () => Date.parse("2026-10-27T12:00:00Z"),
     ...options,
   });
@@ -780,9 +884,724 @@ function fixture(options: CrazyTypkaServiceOptions = {}) {
     assert.ok(isCrazyTypkaSession(result.body));
     return result.body.token as string;
   };
-  return { service, calls, send, session };
+  return { service, calls, decisions, send, session };
 }
 
+function decisionResponse(
+  complexProbability: number,
+  localSourcesProbability = 0.1,
+  reasoningTokens = 0,
+) {
+  return Response.json({
+    model: "gpt-6-luna",
+    answers: [
+      {
+        type: "predicate",
+        name: "complex_reasoning",
+        probability: complexProbability,
+      },
+      {
+        type: "predicate",
+        name: "local_sources_required",
+        probability: localSourcesProbability,
+      },
+    ],
+    usage: {
+      input_tokens: 10,
+      output_tokens: 5,
+      total_tokens: 15,
+      input_tokens_details: { cached_tokens: 3, cache_write_tokens: 2 },
+      output_tokens_details: { reasoning_tokens: reasoningTokens },
+    },
+  });
+}
+const safeModeration = () =>
+  Response.json({
+    results: [{ flagged: false, categories: { harassment: false } }],
+  });
+
+for (const complex of [false, true])
+  test(`real service adapter selects ${complex ? "complex" : "simple"} Responses parameters after moderation and RAG, with private separate usage and no replay charge`, async () => {
+    const events: string[] = [],
+      calls: any[] = [];
+    const backend = fakeEvidenceBackend(),
+      search = backend.search;
+    backend.search = (query, options) => {
+      events.push("embedding");
+      return search(query, options);
+    };
+    const f = fixture({
+      decisionRouter: undefined,
+      evidenceBackend: backend,
+      env: { ...env, OPENAI_REASONING_EFFORT: "none" },
+      fetch: async (url, init) => {
+        const body = JSON.parse(String(init?.body));
+        const path = String(url).split("/").at(-1)!;
+        events.push(path);
+        calls.push({ path, body });
+        if (path === "moderations") return safeModeration();
+        if (path === "decisions")
+          return decisionResponse(complex ? 0.95 : 0.1, 0.1, complex ? 3 : 0);
+        assert.equal(path, "responses");
+        return responseText("Obecné vysvětlení.", [], {
+          input_tokens: 50,
+          output_tokens: 30,
+          total_tokens: 80,
+          input_tokens_details: { cached_tokens: 10, cache_write_tokens: 5 },
+          output_tokens_details: { reasoning_tokens: complex ? 20 : 0 },
+        });
+      },
+    });
+    try {
+      const token = await f.session(),
+        body = {
+          token,
+          requestSeq: 1,
+          message: "Porovnej dvě obecné možnosti.",
+          locale: "cs",
+        };
+      const answer = await f.send("/api/ai/chat", body);
+      assert.equal(answer.status, 200);
+      assert.deepEqual(Object.keys(answer.body).sort(), [
+        "requestSeq",
+        "sources",
+        "speaker",
+        "text",
+      ]);
+      assert.deepEqual(events, [
+        "moderations",
+        "decisions",
+        "embedding",
+        "responses",
+        "moderations",
+      ]);
+      const routed = calls.find((call) => call.path === "responses").body;
+      assert.equal(routed.model, complex ? "gpt-6.1-sol" : env.OPENAI_MODEL);
+      assert.deepEqual(routed.reasoning, { effort: complex ? "low" : "none" });
+      assert.equal(routed.max_output_tokens, complex ? 4096 : 600);
+      assert.equal(calls[1].body.input, calls[0].body.input);
+      assert.match(calls[1].body.safety_identifier, /^[a-f0-9]{64}$/);
+      assert.equal(calls[1].body.safety_identifier, routed.safety_identifier);
+      const usage = f.service.usage(),
+        tier = complex ? "complex" : "simple";
+      assert.equal(usage.decisions.attempts, 1);
+      assert.equal(usage.decisions.confirmedUsageResponses, 1);
+      assert.equal(
+        usage.decisions.reservedInputBytes,
+        Buffer.byteLength(JSON.stringify(calls[1].body)),
+      );
+      assert.equal(usage.decisions.totalTokens, 15);
+      assert.equal(usage.decisions.outputTokens, 5);
+      assert.equal(usage.decisions.reasoningTokens, complex ? 3 : 0);
+      assert.equal(usage.embeddingAttempts, 1);
+      assert.equal(usage.confirmedEmbeddingTokens, 1);
+      assert.equal(usage.generationAttempts, 1);
+      assert.equal(usage.generations[tier].totalTokens, 80);
+      assert.equal(usage.generations[tier].reasoningTokens, complex ? 20 : 0);
+      assert.equal(usage.generations[tier].unconfirmedUsageAttempts, 0);
+      assert.equal(
+        usage.generations[complex ? "simple" : "complex"].attempts,
+        0,
+      );
+      assert.deepEqual(await f.send("/api/ai/chat", body), answer);
+      assert.equal(calls.length, 4);
+      assert.deepEqual(f.service.usage(), usage);
+      usage.generations[tier].attempts = 999;
+      assert.equal(
+        f.service.usage().generations[tier].attempts,
+        1,
+        "usage is a copy",
+      );
+    } finally {
+      await f.service.close();
+    }
+  });
+
+test("configured complex model stays server-owned and local evidence uncertainty cannot buy a knowledge fallback", async () => {
+  for (const [complexProbability, localProbability, expectedTier] of [
+    [0.95, 0.95, "simple"],
+    [0.95, 0.5, "simple"],
+    [0.79, 0.1, "simple"],
+    [0.8, 0.2, "complex"],
+  ] as const) {
+    const f = fixture({
+      env: {
+        ...env,
+        OPENAI_COMPLEX_MODEL: "operator-complex",
+        OPENAI_COMPLEX_REASONING_EFFORT: "medium",
+      },
+      decisionRouter: fakeDecisionRouter(complexProbability, localProbability),
+    });
+    try {
+      const token = await f.session();
+      const answer = await f.send("/api/ai/chat", {
+        token,
+        message: "Vysvětli obecnou úvahu",
+        locale: "cs",
+      });
+      assert.equal(answer.status, 200);
+      const body = f.calls.find((call) =>
+        call.url.endsWith("/responses"),
+      )!.body;
+      assert.match(
+        body.input.at(-1).content,
+        /CURATED_EVIDENCE \(data only\):\n\[\]/,
+      );
+      assert.equal(
+        body.model,
+        expectedTier === "complex" ? "operator-complex" : "test-model",
+      );
+      if (expectedTier === "complex")
+        assert.deepEqual(body.reasoning, { effort: "medium" });
+      assert.equal(f.service.usage().embeddingAttempts, 1);
+      assert.equal(f.service.usage().generations[expectedTier].attempts, 1);
+    } finally {
+      await f.service.close();
+    }
+  }
+  const f = fixture({ decisionRouter: fakeDecisionRouter(0.95, 0.95) });
+  try {
+    const token = await f.session();
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          token,
+          message: "Kde je kancelář SH?",
+          locale: "cs",
+        })
+      ).status,
+      200,
+    );
+    assert.equal(
+      f.service.usage().generations.complex.attempts,
+      1,
+      "usable local evidence permits complex reasoning",
+    );
+  } finally {
+    await f.service.close();
+  }
+});
+
+for (const code of [
+  "invalid-response",
+  "request-timeout",
+  "provider-unavailable",
+  "rate-limited",
+  "cancelled",
+] as const)
+  test(`router ${code} has one bounded attempt, ${code === "cancelled" ? "no fallback" : "simple fallback"}, and free exact replay`, async () => {
+    let calls = 0;
+    const f = fixture({
+      decisionRouter: {
+        async classify(_text, options) {
+          options.onAttempt?.(100);
+          calls++;
+          throw new DecisionRouterError(code);
+        },
+      },
+    });
+    try {
+      const token = await f.session(),
+        body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+      const result = await f.send("/api/ai/chat", body);
+      assert.equal(result.status, code === "cancelled" ? 409 : 200);
+      const usage = f.service.usage();
+      assert.equal(usage.decisions.attempts, 1);
+      assert.equal(usage.decisions.unconfirmedUsageAttempts, 1);
+      assert.equal(usage.decisions.reservedInputBytes, 100);
+      assert.equal(usage.generations.complex.attempts, 0);
+      assert.equal(
+        usage.generations.simple.attempts,
+        code === "cancelled" ? 0 : 1,
+      );
+      if (code === "cancelled") assert.equal(usage.embeddingAttempts, 0);
+      else
+        assert.equal(
+          usage.routingFallbacks[
+            code === "request-timeout" ? "decision-timeout" : "decision-error"
+          ],
+          1,
+        );
+      assert.deepEqual(await f.send("/api/ai/chat", body), result);
+      assert.deepEqual(f.service.usage(), usage);
+      assert.equal(calls, 1);
+    } finally {
+      await f.service.close();
+    }
+  });
+
+test("Decisions attempts, reservation budget and complex caps independently fall back without disabling generation", async () => {
+  for (const config of [
+    { CRAZY_TYPKA_DECISIONS_PER_PROCESS: "1" },
+    { CRAZY_TYPKA_DECISION_TOKEN_BUDGET: "1" },
+    { CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS: "0" },
+  ]) {
+    const f = fixture({
+      env: { ...env, ...config },
+      decisionRouter: fakeDecisionRouter(0.95, 0.1),
+    });
+    try {
+      const token = await f.session();
+      for (const message of ["Obecný rozbor", "Další obecný rozbor"])
+        assert.equal(
+          (await f.send("/api/ai/chat", { token, message, locale: "cs" }))
+            .status,
+          200,
+        );
+      const usage = f.service.usage();
+      assert.equal(usage.generationAttempts, 2);
+      assert.equal(usage.embeddingAttempts, 2);
+      assert.equal(
+        usage.decisions.attempts,
+        config.CRAZY_TYPKA_DECISION_TOKEN_BUDGET
+          ? 0
+          : config.CRAZY_TYPKA_DECISIONS_PER_PROCESS
+            ? 1
+            : 2,
+      );
+      assert.equal(
+        usage.generations.complex.attempts,
+        config.CRAZY_TYPKA_DECISIONS_PER_PROCESS ? 1 : 0,
+      );
+      assert.equal(
+        usage.routingFallbacks[
+          config.CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS
+            ? "complex-budget"
+            : "decision-budget"
+        ],
+        config.CRAZY_TYPKA_DECISIONS_PER_PROCESS ? 1 : 2,
+      );
+    } finally {
+      await f.service.close();
+    }
+  }
+});
+
+test("concurrent reasoning requests reserve only one final complex slot before HTTP", async () => {
+  let arrived = 0,
+    release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const router = fakeDecisionRouter(0.99, 0.1);
+  const f = fixture({
+    limits: { complexGenerationsPerProcess: 1 },
+    env: { ...env, CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS: "999" },
+    decisionRouter: {
+      async classify(text, options) {
+        const decision = await router.classify(text, options);
+        if (++arrived === 2) release();
+        await gate;
+        return decision;
+      },
+    },
+  });
+  try {
+    const first = await f.session(),
+      second = await f.session();
+    const results = await Promise.all(
+      [first, second].map((token) =>
+        f.send("/api/ai/chat", {
+          token,
+          message: "Odvoď obecnou odpověď",
+          locale: "cs",
+        }),
+      ),
+    );
+    assert.deepEqual(
+      results.map((result) => result.status),
+      [200, 200],
+    );
+    assert.deepEqual(
+      f.calls
+        .filter((call) => call.url.endsWith("/responses"))
+        .map((call) => call.body.model)
+        .sort(),
+      ["gpt-6.1-sol", "test-model"],
+    );
+    assert.equal(f.service.usage().generations.complex.attempts, 1);
+    assert.equal(f.service.usage().generations.simple.attempts, 1);
+    assert.equal(f.service.usage().routingFallbacks["complex-budget"], 1);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("operator configuration cannot raise the twenty-attempt complex process ceiling", async () => {
+  const f = fixture({
+    env: { ...env, CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS: "999" },
+    limits: {
+      complexGenerationsPerProcess: 999,
+      messagesPerMinutePerSession: 30,
+    },
+    decisionRouter: fakeDecisionRouter(0.99, 0.1),
+  });
+  try {
+    const token = await f.session();
+    for (let index = 0; index < 21; index++)
+      assert.equal(
+        (
+          await f.send("/api/ai/chat", {
+            token,
+            message: `Obecná úvaha ${index}`,
+            locale: "cs",
+          })
+        ).status,
+        200,
+      );
+    assert.equal(f.service.usage().generations.complex.attempts, 20);
+    assert.equal(f.service.usage().generations.simple.attempts, 1);
+    assert.equal(f.service.usage().routingFallbacks["complex-budget"], 1);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("router admission refuses HTTP after its cap but keeps the paid attempt and ordinary generation", async () => {
+  let routerCalls = 0,
+    generationCalls = 0;
+  const f = fixture({
+    env: { ...env, CRAZY_TYPKA_DECISIONS_PER_PROCESS: "1" },
+    decisionRouter: undefined,
+    fetch: async (url) => {
+      if (String(url).endsWith("/moderations")) return safeModeration();
+      if (String(url).endsWith("/decisions")) {
+        routerCalls++;
+        return decisionResponse(0.99);
+      }
+      generationCalls++;
+      return responseText();
+    },
+  });
+  try {
+    const token = await f.session();
+    for (const message of ["Obecná úvaha", "Obecná druhá úvaha"])
+      assert.equal(
+        (await f.send("/api/ai/chat", { token, message, locale: "cs" })).status,
+        200,
+      );
+    assert.equal(routerCalls, 1);
+    assert.equal(generationCalls, 2);
+    assert.equal(f.service.usage().decisions.attempts, 1);
+    assert.equal(f.service.usage().routingFallbacks["decision-budget"], 1);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("session expiry during actual evidence capture stays cancelled before embedding HTTP", async () => {
+  let instant = Date.parse("2026-10-27T12:00:00Z"),
+    captures = 0,
+    embeddingCalls = 0;
+  const profile = createEmbeddingProfile();
+  const store: VectorKnowledgeStore = {
+    async captureActive() {
+      if (++captures === 2) {
+        await Promise.resolve();
+        instant += 30 * 60000;
+      }
+      return { revisionId: "a".repeat(64), profile };
+    },
+    async search() {
+      throw new Error("cancelled operation cannot query vectors");
+    },
+    async assertCurrent() {
+      throw new Error("cancelled operation cannot validate evidence");
+    },
+    async close() {},
+  };
+  const backend = createRagEvidenceBackend({
+    store,
+    now: () => instant,
+    embedder: createOpenAIEmbedder({
+      profile,
+      apiKey: "fake-only",
+      fetch: async () => {
+        embeddingCalls++;
+        throw new Error("must not pay for embedding");
+      },
+    }),
+  });
+  const f = fixture({ evidenceBackend: backend, now: () => instant });
+  try {
+    const token = await f.session();
+    const result = await f.send("/api/ai/chat", {
+      token,
+      message: "Obecny dotaz",
+      locale: "cs",
+    });
+    assert.equal(result.status, 409);
+    assert.deepEqual(result.body, { error: "cancelled", requestSeq: 1 });
+    assert.equal(
+      captures,
+      2,
+      "expiry occurred after readiness and before embedding admission",
+    );
+    assert.equal(embeddingCalls, 0);
+    assert.equal(f.service.usage().embeddingAttempts, 0);
+    assert.equal(f.service.usage().generationAttempts, 0);
+    assert.deepEqual(
+      f.calls.map((call) => call.url),
+      ["https://api.openai.com/v1/moderations"],
+    );
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("cumulative decision byte cap blocks the second individually admissible request before HTTP", async () => {
+  const messages = ["Obecna uvaha jedna", "Obecna uvaha druha"];
+  assert.equal(Buffer.byteLength(messages[0]), Buffer.byteLength(messages[1]));
+  let bytesPerRequest = 0,
+    decisionCalls = 0;
+  // Derive the full serialized size, including fixed questions and a session hash.
+  const probe = createDecisionRouter({
+    apiKey: "fake-only",
+    fetch: async () => decisionResponse(0.99),
+  });
+  await probe.classify(messages[0], {
+    signal: new AbortController().signal,
+    safetyIdentifier: "a".repeat(64),
+    onAttempt: (bytes) => {
+      bytesPerRequest = bytes;
+    },
+  });
+  const budget = bytesPerRequest * 2 - 1,
+    models: string[] = [];
+  assert.ok(bytesPerRequest < budget);
+  const f = fixture({
+    env: { ...env, CRAZY_TYPKA_DECISION_TOKEN_BUDGET: String(budget) },
+    decisionRouter: undefined,
+    fetch: async (url, init) => {
+      if (String(url).endsWith("/moderations")) return safeModeration();
+      if (String(url).endsWith("/decisions")) {
+        decisionCalls++;
+        assert.equal(Buffer.byteLength(String(init?.body)), bytesPerRequest);
+        return decisionResponse(0.99);
+      }
+      models.push(JSON.parse(String(init?.body)).model);
+      return responseText();
+    },
+  });
+  try {
+    const token = await f.session();
+    for (const message of messages)
+      assert.equal(
+        (await f.send("/api/ai/chat", { token, message, locale: "cs" })).status,
+        200,
+      );
+    assert.equal(decisionCalls, 1);
+    assert.deepEqual(models, ["gpt-6.1-sol", "test-model"]);
+    assert.equal(
+      f.service.usage().decisions.reservedInputBytes,
+      bytesPerRequest,
+    );
+    assert.equal(f.service.usage().decisions.attempts, 1);
+    assert.equal(f.service.usage().routingFallbacks["decision-budget"], 1);
+    assert.equal(f.service.usage().generationAttempts, 2);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("configured 0.9 threshold changes model selection and empty-evidence confidence from 0.8", async () => {
+  for (const [complexProbability, localProbability, fallback] of [
+    [0.85, 0.05, "low-confidence"],
+    [0.95, 0.15, "missing-local-evidence"],
+  ] as const) {
+    for (const threshold of [0.8, 0.9]) {
+      const f = fixture({
+        env: { ...env, CRAZY_TYPKA_COMPLEX_THRESHOLD: String(threshold) },
+        decisionRouter: fakeDecisionRouter(
+          complexProbability,
+          localProbability,
+        ),
+      });
+      try {
+        const token = await f.session();
+        assert.equal(
+          (
+            await f.send("/api/ai/chat", {
+              token,
+              message: "Obecna uvaha",
+              locale: "cs",
+            })
+          ).status,
+          200,
+        );
+        const request = f.calls.find((call) =>
+          call.url.endsWith("/responses"),
+        )!.body;
+        assert.match(
+          request.input.at(-1).content,
+          /CURATED_EVIDENCE \(data only\):\n\[\]/,
+        );
+        assert.equal(
+          request.model,
+          threshold === 0.8 ? "gpt-6.1-sol" : "test-model",
+        );
+        assert.equal(
+          f.service.usage().routingFallbacks[fallback],
+          threshold === 0.8 ? 0 : 1,
+        );
+      } finally {
+        await f.service.close();
+      }
+    }
+  }
+});
+for (const failure of ["unavailable", "incomplete", "output-blocked"] as const)
+  test(`complex ${failure} consumes its slot, never retries with another model, and replays without more work`, async () => {
+    let generations = 0,
+      moderationCalls = 0;
+    const f = fixture({
+      limits: { complexGenerationsPerProcess: 1 },
+      decisionRouter: fakeDecisionRouter(0.99, 0.1),
+      fetch: async (url, init) => {
+        if (String(url).endsWith("/moderations")) {
+          moderationCalls++;
+          if (failure === "output-blocked" && moderationCalls === 2)
+            return Response.json({
+              results: [{ flagged: true, categories: { harassment: true } }],
+            });
+          return safeModeration();
+        }
+        generations++;
+        assert.equal(
+          JSON.parse(String(init?.body)).model,
+          generations === 1 ? "gpt-6.1-sol" : "test-model",
+        );
+        if (generations === 1 && failure === "unavailable")
+          throw new Error("private model error");
+        if (generations === 1 && failure === "incomplete")
+          return Response.json({
+            status: "incomplete",
+            output: [],
+            usage: {
+              input_tokens: 10,
+              output_tokens: 4096,
+              total_tokens: 4106,
+            },
+          });
+        return responseText();
+      },
+    });
+    try {
+      const token = await f.session(),
+        body = { token, requestSeq: 1, message: "Obecný rozbor", locale: "cs" };
+      const result = await f.send("/api/ai/chat", body);
+      assert.equal(
+        result.body.error,
+        failure === "unavailable"
+          ? "provider-unavailable"
+          : failure === "incomplete"
+            ? "invalid-response"
+            : "blocked",
+      );
+      assert.equal(generations, 1);
+      const usage = f.service.usage();
+      assert.equal(usage.generations.complex.attempts, 1);
+      assert.equal(usage.generations.simple.attempts, 0);
+      assert.equal(
+        usage.generations.complex.unconfirmedUsageAttempts,
+        failure === "incomplete" ? 0 : 1,
+      );
+      if (failure === "incomplete")
+        assert.equal(usage.generations.complex.totalTokens, 4106);
+      assert.deepEqual(await f.send("/api/ai/chat", body), result);
+      assert.deepEqual(f.service.usage(), usage);
+      assert.equal(
+        (
+          await f.send("/api/ai/chat", {
+            ...body,
+            requestSeq: 2,
+            message: "Nová obecná úvaha",
+          })
+        ).status,
+        200,
+      );
+      assert.equal(generations, 2);
+      assert.equal(f.service.usage().routingFallbacks["complex-budget"], 1);
+    } finally {
+      await f.service.close();
+    }
+  });
+
+for (const action of [
+  "reset",
+  "shutdown",
+  "disconnect",
+  "deadline",
+  "expiry",
+] as const)
+  test(`${action} during Decisions never enters embedding or fallback generation`, async () => {
+    let entered!: () => void, complete!: (value: Response) => void;
+    const reached = new Promise<void>((resolve) => {
+      entered = resolve;
+    });
+    let instant = Date.parse("2026-10-27T12:00:00Z"),
+      decisionSignal: AbortSignal | undefined;
+    const f = fixture({
+      decisionRouter: undefined,
+      now: () => instant,
+      limits: action === "deadline" ? { operationTimeoutMs: 20 } : {},
+      fetch: async (url, init) => {
+        if (String(url).endsWith("/moderations")) return safeModeration();
+        assert.ok(String(url).endsWith("/decisions"));
+        decisionSignal = init!.signal!;
+        entered();
+        return new Promise<Response>((resolve) => {
+          complete = resolve;
+        });
+      },
+    });
+    const keepAlive = setTimeout(() => {}, 1000);
+    try {
+      const token = await f.session(),
+        res = response();
+      const pending = f.service.handle(
+        request("/api/ai/chat", {
+          token,
+          requestSeq: 1,
+          message: "Složitá úvaha",
+          locale: "cs",
+        }),
+        res.res,
+      );
+      await reached;
+      if (action === "reset")
+        await f.send("/api/ai/session", undefined, "DELETE", {
+          authorization: `Bearer ${token}`,
+        });
+      if (action === "shutdown") await f.service.close();
+      if (action === "disconnect") res.res.emit("close");
+      if (action === "expiry") {
+        instant += 30 * 60000;
+        complete(decisionResponse(0.99));
+      }
+      await pending;
+      assert.equal(
+        res.result().body.error,
+        action === "deadline" ? "request-timeout" : "cancelled",
+      );
+      assert.equal(f.service.usage().embeddingAttempts, 0);
+      assert.equal(f.service.usage().generationAttempts, 0);
+      assert.equal(
+        Object.values(f.service.usage().routingFallbacks).reduce(
+          (a, b) => a + b,
+          0,
+        ),
+        0,
+      );
+      assert.equal(decisionSignal?.aborted, true);
+      complete(decisionResponse(0.99)); // A late response cannot start more work.
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      assert.equal(f.service.usage().generationAttempts, 0);
+    } finally {
+      clearTimeout(keepAlive);
+      await f.service.close();
+    }
+  });
 test("disabled configuration exposes only status and never calls provider", async () => {
   for (const config of [
     {},
@@ -1320,6 +2139,7 @@ test("first whole greeting is local and replayable, later greetings and greeting
   assert.match(local.body.text, /fiktivní AI/);
   assert.deepEqual(local.body.sources, []);
   assert.equal(f.calls.length, 0);
+  assert.equal(f.decisions.length, 0);
   assert.deepEqual(
     (await f.send("/api/ai/chat", { ...first, message: "Ahoj!" })).body,
     local.body,
@@ -1350,6 +2170,7 @@ test("first whole greeting is local and replayable, later greetings and greeting
   });
   assert.match(hello.body.text, /fictional AI/);
   assert.equal(f.calls.length, 6);
+  assert.equal(f.decisions.length, 2);
   await f.service.close();
 });
 
@@ -1362,6 +2183,7 @@ test("last successful operation replays exactly without charging, appending hist
   assert.equal(first.status, 200);
   assert.deepEqual(replay.body, first.body);
   assert.equal(f.calls.length, 3);
+  assert.equal(f.decisions.length, 1);
   assert.ok(isCrazyTypkaChatResponse(first.body));
   assert.equal(
     (
@@ -1401,6 +2223,7 @@ test("last successful operation replays exactly without charging, appending hist
   assert.equal(rejected.status, 429);
   assert.equal(rejected.body.requestSeq, undefined);
   assert.equal(limited.calls.length, 0);
+  assert.equal(limited.decisions.length, 0);
   await limited.service.close();
 });
 

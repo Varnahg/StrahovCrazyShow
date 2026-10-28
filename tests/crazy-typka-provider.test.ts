@@ -4,6 +4,7 @@ import {
   createCrazyTypkaProvider,
   CrazyTypkaProviderError,
   type CrazyTypkaProviderOptions,
+  type CrazyTypkaGenerationUsage,
 } from "../server/crazy-typka-provider";
 import {
   retrieveKnowledge,
@@ -69,6 +70,10 @@ test("provider receives institution and legal interval for each actual selected 
   assert.match(supplied.instructions, /clarifying question/);
   assert.match(
     supplied.instructions,
+    /absence of an earlier answer's supporting passage from the current retrieval does not prove that earlier answer was wrong/,
+  );
+  assert.match(
+    supplied.instructions,
     /welcome screen has a single multiplayer entry/,
   );
   assert.match(
@@ -108,10 +113,10 @@ function complete(text = "Kancelář je na bloku 1.", sourceIds = ["sh-office"])
 }
 function fixture(
   sequence: unknown[],
-  options: Pick<
+  options: Partial<Pick<
     CrazyTypkaProviderOptions,
-    "timeoutMs" | "responseBytes" | "reasoningEffort"
-  > = {},
+    "timeoutMs" | "responseBytes" | "reasoningEffort" | "maxOutputTokens" | "model"
+  >> = {},
 ) {
   const calls: { url: string; body: any; options: RequestInit }[] = [];
   const fetcher: typeof fetch = async (url, init) => {
@@ -132,6 +137,7 @@ function fixture(
   });
   const controller = new AbortController();
   let starts = 0;
+  const usages: CrazyTypkaGenerationUsage[] = [];
   const answer = () =>
     moderatedAnswer(provider, {
       message: "Kde je kancelář?",
@@ -143,9 +149,75 @@ function fixture(
       onGenerationStart: () => {
         starts++;
       },
+      onGenerationUsage: (usage) => usages.push(usage),
     });
-  return { answer, calls, controller, starts: () => starts };
+  return { answer, calls, controller, usages, starts: () => starts };
 }
+
+const generationUsage = {
+  input_tokens: 20,
+  output_tokens: 10,
+  total_tokens: 30,
+  input_tokens_details: { cached_tokens: 5, cache_write_tokens: 4 },
+  output_tokens_details: { reasoning_tokens: 6 },
+};
+test("complex provider uses its fixed model, effort and bounded output; usage stays private and reasoning is a subset", async () => {
+  const f = fixture([safe, { ...complete(), usage: generationUsage }, safe], {
+    model: "gpt-6.1-sol",
+    reasoningEffort: "low",
+    maxOutputTokens: 4096,
+  });
+  assert.deepEqual(await f.answer(), {
+    text: "Kancelář je na bloku 1.",
+    sourceIds: ["sh-office"],
+  });
+  assert.equal(f.calls[1].body.model, "gpt-6.1-sol");
+  assert.deepEqual(f.calls[1].body.reasoning, { effort: "low" });
+  assert.equal(f.calls[1].body.max_output_tokens, 4096);
+  assert.deepEqual(f.usages, [
+    {
+      inputTokens: 20,
+      outputTokens: 10,
+      totalTokens: 30,
+      cachedInputTokens: 5,
+      cacheWriteTokens: 4,
+      reasoningTokens: 6,
+    },
+  ]);
+});
+test("usage is observed for incomplete paid results, absent usage stays unknown and malformed totals cannot poison counters", async () => {
+  const incomplete = fixture([
+    safe,
+    { ...complete(), status: "incomplete", usage: generationUsage },
+  ]);
+  await assert.rejects(
+    incomplete.answer(),
+    (error: any) => error.code === "invalid-response",
+  );
+  assert.equal(incomplete.usages.length, 1);
+  assert.equal(incomplete.calls.length, 2);
+  const absent = fixture([safe, complete(), safe]);
+  await absent.answer();
+  assert.deepEqual(absent.usages, []);
+  for (const usage of [
+    { ...generationUsage, input_tokens: -1 },
+    { ...generationUsage, total_tokens: 31 },
+    { ...generationUsage, output_tokens: NaN },
+    { ...generationUsage, input_tokens_details: { cached_tokens: 21 } },
+    {
+      ...generationUsage,
+      input_tokens_details: { cached_tokens: 15, cache_write_tokens: 6 },
+    },
+    { ...generationUsage, output_tokens_details: { reasoning_tokens: 11 } },
+  ]) {
+    const f = fixture([safe, { ...complete(), usage }]);
+    await assert.rejects(
+      f.answer(),
+      (error: any) => error.code === "invalid-response",
+    );
+    assert.deepEqual(f.usages, []);
+  }
+});
 test("server-only Responses request uses bounded structured output, verified IDs and input/output moderation", async () => {
   const f = fixture([safe, complete(), safe]);
   assert.deepEqual(await f.answer(), {
@@ -181,6 +253,26 @@ test("operator-selected reasoning effort is explicit and keeps the output budget
   await f.answer();
   assert.deepEqual(f.calls[1].body.reasoning, { effort: "none" });
   assert.equal(f.calls[1].body.max_output_tokens, 600);
+});
+
+test("known Sol model refuses unsupported effort during construction before HTTP", () => {
+  for (const reasoningEffort of ["none", "minimal"] as const) {
+    let calls = 0;
+    assert.throws(
+      () =>
+        createCrazyTypkaProvider({
+          apiKey: "fake-only",
+          model: "gpt-6.1-sol",
+          reasoningEffort,
+          fetch: async () => {
+            calls++;
+            throw new Error("must not call HTTP");
+          },
+        }),
+      /Unsupported reasoning effort/,
+    );
+    assert.equal(calls, 0);
+  }
 });
 test("moderation blocks both flagged content and malformed classifiers before generation", async () => {
   for (const payload of [
