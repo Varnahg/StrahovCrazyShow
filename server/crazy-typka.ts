@@ -19,7 +19,14 @@ import {
   CRAZY_TYPKA_REASONING_EFFORTS,
   type CrazyTypkaReasoningEffort,
   type AiHistoryMessage,
+  type CrazyTypkaGenerationUsage,
 } from "./crazy-typka-provider";
+import {
+  createDecisionRouter,
+  DecisionRouterError,
+  type ComplexityDecision,
+  type DecisionRouter,
+} from "./crazy-typka-decisions";
 import {
   createConfiguredEvidenceBackend,
   prepareEvidenceQuery,
@@ -46,10 +53,14 @@ export type CrazyTypkaServiceLimits = {
   generationsPerProcess: number;
   embeddingsPerProcess: number;
   embeddingTokenBudget: number;
+  decisionsPerProcess: number;
+  decisionTokenBudget: number;
+  complexGenerationsPerProcess: number;
 };
 export type CrazyTypkaServiceOptions = {
   env?: NodeJS.ProcessEnv;
   evidenceBackend?: AsyncEvidenceBackend;
+  decisionRouter?: DecisionRouter;
   fetch?: typeof globalThis.fetch;
   now?: () => number;
   limits?: Partial<CrazyTypkaServiceLimits>;
@@ -71,7 +82,49 @@ const DEFAULT_LIMITS: CrazyTypkaServiceLimits = {
   generationsPerProcess: 500,
   embeddingsPerProcess: 500,
   embeddingTokenBudget: 500000,
+  decisionsPerProcess: 500,
+  decisionTokenBudget: 1000000,
+  complexGenerationsPerProcess: 20,
 };
+type GenerationTier = "simple" | "complex";
+type RoutingFallback =
+  | "decision-budget"
+  | "decision-timeout"
+  | "decision-error"
+  | "low-confidence"
+  | "missing-local-evidence"
+  | "complex-budget";
+function usageCounter() {
+  return {
+    attempts: 0,
+    confirmedUsageResponses: 0,
+    inputTokens: 0,
+    outputTokens: 0,
+    totalTokens: 0,
+    cachedInputTokens: 0,
+    cacheWriteTokens: 0,
+    reasoningTokens: 0,
+  };
+}
+function recordUsage(
+  counter: ReturnType<typeof usageCounter>,
+  usage: CrazyTypkaGenerationUsage,
+) {
+  counter.confirmedUsageResponses++;
+  counter.inputTokens += usage.inputTokens;
+  counter.outputTokens += usage.outputTokens;
+  counter.totalTokens += usage.totalTokens;
+  counter.cachedInputTokens += usage.cachedInputTokens ?? 0;
+  counter.cacheWriteTokens += usage.cacheWriteTokens ?? 0;
+  counter.reasoningTokens += usage.reasoningTokens ?? 0;
+}
+function usageSnapshot(counter: ReturnType<typeof usageCounter>) {
+  return {
+    ...counter,
+    unconfirmedUsageAttempts:
+      counter.attempts - counter.confirmedUsageResponses,
+  };
+}
 type Session = {
   expiresAt: number;
   origin: string;
@@ -259,9 +312,15 @@ export function createCrazyTypkaService(
   const env = options.env ?? process.env,
     now = options.now ?? Date.now;
   const limits = { ...DEFAULT_LIMITS, ...options.limits };
-  for (const value of Object.values(limits))
-    if (!Number.isSafeInteger(value) || value < 1)
+  for (const [key, value] of Object.entries(limits)) {
+    const minimum = [
+      "decisionsPerProcess",
+      "decisionTokenBudget",
+      "complexGenerationsPerProcess",
+    ].includes(key) ? 0 : 1;
+    if (!Number.isSafeInteger(value) || value < minimum)
       throw new Error("Invalid AI limits");
+  }
   const configuredCap = env.CRAZY_TYPKA_GENERATIONS_PER_PROCESS;
   if (configuredCap !== undefined) {
     if (!/^[1-9]\d{0,5}$/.test(configuredCap))
@@ -282,27 +341,70 @@ export function createCrazyTypkaService(
       limits[key] = Math.min(limits[key], Number(raw));
     }
   }
+  for (const [key, variable] of [
+    ["decisionsPerProcess", "CRAZY_TYPKA_DECISIONS_PER_PROCESS"],
+    ["decisionTokenBudget", "CRAZY_TYPKA_DECISION_TOKEN_BUDGET"],
+    [
+      "complexGenerationsPerProcess",
+      "CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS",
+    ],
+  ] as const) {
+    const raw = env[variable];
+    if (raw !== undefined && !/^(?:0|[1-9]\d{0,8})$/.test(raw))
+      throw new Error("Invalid routing budget configuration");
+    limits[key] = Math.min(
+      limits[key],
+      DEFAULT_LIMITS[key],
+      raw === undefined ? Infinity : Number(raw),
+    );
+  }
+  // Initial candidate; operator calibration is separate from this routing policy.
+  const complexThreshold = Number(env.CRAZY_TYPKA_COMPLEX_THRESHOLD ?? "0.80");
+  if (
+    !Number.isFinite(complexThreshold) ||
+    complexThreshold < 0.5 ||
+    complexThreshold > 1
+  )
+    throw new Error("Invalid complexity threshold");
   const enabled =
     env.CRAZY_TYPKA_ENABLED === "1" &&
     !!env.OPENAI_API_KEY?.trim() &&
     !!env.OPENAI_MODEL?.trim();
   const origins = parseOrigins(env.CRAZY_TYPKA_ALLOWED_ORIGINS);
   const reasoningEffort = env.OPENAI_REASONING_EFFORT?.trim() || undefined;
-  if (
-    reasoningEffort &&
-    !CRAZY_TYPKA_REASONING_EFFORTS.includes(
-      reasoningEffort as CrazyTypkaReasoningEffort,
+  const complexReasoningEffort =
+    env.OPENAI_COMPLEX_REASONING_EFFORT?.trim() || "low";
+  for (const effort of [reasoningEffort, complexReasoningEffort])
+    if (
+      effort &&
+      !CRAZY_TYPKA_REASONING_EFFORTS.includes(
+        effort as CrazyTypkaReasoningEffort,
+      )
     )
-  )
-    throw new Error("Invalid OPENAI_REASONING_EFFORT");
-  const provider = createCrazyTypkaProvider({
+      throw new Error("Invalid generation reasoning effort");
+  const providerOptions = {
     apiKey: env.OPENAI_API_KEY?.trim() ?? "",
-    model: env.OPENAI_MODEL?.trim() ?? "",
-    reasoningEffort: reasoningEffort as CrazyTypkaReasoningEffort | undefined,
     fetch: options.fetch,
     timeoutMs: limits.providerTimeoutMs,
     responseBytes: limits.providerResponseBytes,
+  };
+  const provider = createCrazyTypkaProvider({
+    ...providerOptions,
+    model: env.OPENAI_MODEL?.trim() ?? "",
+    reasoningEffort: reasoningEffort as CrazyTypkaReasoningEffort | undefined,
   });
+  const complexProvider = createCrazyTypkaProvider({
+    ...providerOptions,
+    model: env.OPENAI_COMPLEX_MODEL?.trim() || "gpt-6.1-sol",
+    reasoningEffort: complexReasoningEffort as CrazyTypkaReasoningEffort,
+    maxOutputTokens: 4096,
+  });
+  const router = enabled
+    ? (options.decisionRouter ?? createDecisionRouter({
+        apiKey: providerOptions.apiKey,
+        fetch: options.fetch,
+      }))
+    : undefined;
   const backend = enabled
     ? (options.evidenceBackend ??
       createConfiguredEvidenceBackend(env, options.fetch))
@@ -312,6 +414,20 @@ export function createCrazyTypkaService(
   const globalRequests: number[] = [];
   const active = new Set<AbortController>();
   const pending = new Set<Promise<boolean>>();
+  const decisions = usageCounter();
+  const generationUsage = {
+    simple: usageCounter(),
+    complex: usageCounter(),
+  };
+  const routingFallbacks: Record<RoutingFallback, number> = {
+    "decision-budget": 0,
+    "decision-timeout": 0,
+    "decision-error": 0,
+    "low-confidence": 0,
+    "missing-local-evidence": 0,
+    "complex-budget": 0,
+  };
+  let reservedDecisionInputBytes = 0;
   let closed = false,
     generations = 0,
     embeddingAttempts = 0,
@@ -608,17 +724,59 @@ export function createCrazyTypkaService(
         session.previousSuccessfulUser,
       );
       await provider.moderateInput(query.text, controller.signal);
+      const operationActive = () =>
+        !closed &&
+        sessions.get(key) === session &&
+        session.expiresAt > now() &&
+        !controller?.signal.aborted;
+      const assertOperationActive = () => {
+        if (!operationActive())
+          throw new RequestError(409, "cancelled");
+      };
+      assertOperationActive();
+      let decision: ComplexityDecision | undefined;
+      try {
+        decision = await router!.classify(query.text, {
+          signal: controller.signal,
+          safetyIdentifier: key,
+          onAttempt: (inputBytes) => {
+            assertOperationActive();
+            if (
+              !Number.isSafeInteger(inputBytes) ||
+              inputBytes < 1 ||
+              decisions.attempts >= limits.decisionsPerProcess ||
+              reservedDecisionInputBytes + inputBytes >
+                limits.decisionTokenBudget
+            )
+              throw new RequestError(503, "budget-exhausted");
+            decisions.attempts++;
+            reservedDecisionInputBytes += inputBytes;
+          },
+        });
+        recordUsage(decisions, decision.usage);
+      } catch (error) {
+        assertOperationActive();
+        if (
+          error instanceof DecisionRouterError && error.code === "cancelled"
+        )
+          throw new RequestError(409, "cancelled");
+        const reason: RoutingFallback =
+          error instanceof RequestError && error.code === "budget-exhausted"
+            ? "decision-budget"
+            : error instanceof DecisionRouterError &&
+                error.code === "request-timeout"
+              ? "decision-timeout"
+              : "decision-error";
+        routingFallbacks[reason]++;
+      }
+      assertOperationActive();
       operation.evidence = await backend!.search(query, {
         signal: controller.signal,
         now: now(),
         user: key,
         onEmbeddingAttempt: (inputBytes) => {
-          if (
-            sessions.get(key) !== session ||
-            session.expiresAt <= now() ||
-            controller?.signal.aborted
-          )
-            throw new RagEvidenceError("cancelled");
+          // Preserve cancellation across the evidence backend's typed boundary.
+          if (!operationActive()) throw new RagEvidenceError("cancelled");
           if (
             !Number.isSafeInteger(inputBytes) ||
             inputBytes < 1 ||
@@ -649,7 +807,27 @@ export function createCrazyTypkaService(
       )
         session.history.length = 0;
       const evidence = operation.evidence.chunks;
-      const answer = await provider.generate({
+      assertOperationActive();
+      let tier: GenerationTier = "simple";
+      if (decision) {
+        if (decision.complexProbability < complexThreshold)
+          routingFallbacks["low-confidence"]++;
+        // An empty retrieval is never a reason to escalate. With no local
+        // evidence require confident absence of a local-facts dependency.
+        else if (
+          !evidence.length &&
+          decision.localSourcesProbability + complexThreshold > 1
+        )
+          routingFallbacks["missing-local-evidence"]++;
+        else if (
+          generationUsage.complex.attempts >=
+          limits.complexGenerationsPerProcess
+        )
+          routingFallbacks["complex-budget"]++;
+        else tier = "complex";
+      }
+      const selectedProvider = tier === "complex" ? complexProvider : provider;
+      const answer = await selectedProvider.generate({
         message,
         locale: body.locale as "cs" | "en",
         history: session.history,
@@ -657,23 +835,17 @@ export function createCrazyTypkaService(
         safetyIdentifier: key,
         signal: controller.signal,
         onGenerationStart: () => {
-          if (
-            sessions.get(key) !== session ||
-            session.expiresAt <= now() ||
-            controller?.signal.aborted
-          )
-            throw new RequestError(409, "cancelled");
+          assertOperationActive();
           if (generations >= limits.generationsPerProcess)
             throw new RequestError(503, "budget-exhausted");
           generations++; // Counts actual generation attempts, including upstream errors; no refund/retry.
+          // Selection and reservation are synchronous; no await allows another
+          // request to take the final complex slot before this HTTP attempt.
+          generationUsage[tier].attempts++;
         },
+        onGenerationUsage: (usage) => recordUsage(generationUsage[tier], usage),
       });
-      if (
-        controller.signal.aborted ||
-        sessions.get(key) !== session ||
-        session.expiresAt <= now()
-      )
-        throw new RequestError(409, "cancelled");
+      assertOperationActive();
       if (
         !(await backend!.validate(
           operation.evidence,
@@ -683,12 +855,7 @@ export function createCrazyTypkaService(
         !evidenceCurrent(operation.evidence, now())
       )
         throw new RequestError(409, "response-expired");
-      if (
-        controller.signal.aborted ||
-        sessions.get(key) !== session ||
-        session.expiresAt <= now()
-      )
-        throw new RequestError(409, "cancelled");
+      assertOperationActive();
       session.previousSuccessfulUser = query.filterText;
       session.history.push(
         { role: "user", content: message },
@@ -772,6 +939,15 @@ export function createCrazyTypkaService(
         reservedEmbeddingTokens,
         confirmedEmbeddingTokens,
         generationAttempts: generations,
+        decisions: {
+          ...usageSnapshot(decisions),
+          reservedInputBytes: reservedDecisionInputBytes,
+        },
+        generations: {
+          simple: usageSnapshot(generationUsage.simple),
+          complex: usageSnapshot(generationUsage.complex),
+        },
+        routingFallbacks: { ...routingFallbacks },
       };
     },
     async close() {
