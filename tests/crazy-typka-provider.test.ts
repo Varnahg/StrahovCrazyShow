@@ -67,6 +67,18 @@ test("provider receives institution and legal interval for each actual selected 
     /Club membership payments are not dormitory rent/,
   );
   assert.match(supplied.instructions, /clarifying question/);
+  assert.match(
+    supplied.instructions,
+    /welcome screen has a single multiplayer entry/,
+  );
+  assert.match(
+    supplied.instructions,
+    /nickname and character on the next screen/,
+  );
+  assert.doesNotMatch(
+    supplied.instructions,
+    /or explore alone from the welcome screen/,
+  );
 });
 
 const safe = {

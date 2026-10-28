@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "jantar-home-20261028-assets",
+  "title": "Jantar: mapové pozadí, lokální font a portrét",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/welcome-map.tsx",
+    "client/welcome-map-geometry.ts",
+    "tests/welcome-map.test.ts",
+    "public/fonts/manrope/",
+    "public/ui/crazy-typka.svg",
+    "docs/home-design/20261028/assets.md",
+    ".cache/jantar-home-20261028-assets/",
+    "docs/agents/handoffs/jantar-home-20261028-assets.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Mapové pozadí vychází z identifikovaných projektových zdrojů; původní map/street/catalog JSON jsou pouze ke čtení.",
+    "Dodat lokální Manrope včetně licence a původu a autorizovaný portrét crazy-typka.svg; žádné cizí bitmapy bez doloženého použití.",
+    "Zachovat lehké dekorativní vykreslení, testovat geometrii map helperu a responzivní chování; nezakládat druhou 3D scénu."
+  ],
+  "verification": [
+    "Lehké cílené testy a čtecí kontrola skutečných vazeb podle změny; celý build, integrační pipeline a GPU patří samostatné validation rezervaci.",
+    "Zachovat původní lifecycle assertions, přístupnost a CZ/EN; doložit soubory, zdrojové podklady a skutečné výsledky v handoffu."
+  ],
+  "notes": [
+    "Přímý lidský požadavek zachovat Jantar návrh, implementovat jej do projektu a spustit celou hru i výslovný souhlas s koordinací obou souvisejících chatů ověřeny v relaci Navrhni lepší úvodní stránku, 01a17fd8-017a-7852-87f9-cd1538e1bde2. Linear KEY-66.",
+    "Cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow, větev codex/jantar-home, přijatá výchozí revize de6f87a2efbf8596bb03efae863e8d6763e22774. Před zápisem vlastní claim; nepřebírat primary WIP ani rozpracovaný RAG z jiné worktree.",
+    "V13 a server na portu4182 zůstávají chráněné. Žádná změna AI transportu, serverového API, RAG, rendereru nebo avatar-editor/preview bez nové konkrétní dohody.",
+    "Úpravy, cílený refaktoring, cache/lifecycle kontrolu a relevantní ověření předat společně. Dítě nespouští další BMAD workflow a nezapisuje do cizího scope. Main integrační okno a centrální docs koordinovat zvlášť."
+  ]
+}

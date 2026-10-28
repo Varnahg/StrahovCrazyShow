@@ -17,7 +17,6 @@ import { encodeSeasonalGlb } from "../scripts/tree-seasonal-stream.mjs";
 
 const hash = (data: Uint8Array) => createHash("sha256").update(data).digest("hex");
 const arrayBuffer = (data: Uint8Array) => data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
-const settle = async () => { for (let i = 0; i < 12; i++) await new Promise<void>(resolve => setImmediate(resolve)); };
 const file = (url: string, data: Uint8Array): TreeAssetFile => ({ url, bytes: data.length, sha256: hash(data) });
 
 function fixture(count = 1, exact = true) {
@@ -74,6 +73,7 @@ function fixture(count = 1, exact = true) {
 function harness(t: TestContext, f = fixture()) {
   const engine = new NullEngine(), scene = new Scene(engine); scene.useRightHandedSystem = true;
   const renderer = new TreeRenderer(scene, { treePilot: { manifestUrl: "/models/vegetation/test-cluster/runtime-contract.json", selections: f.selections } }), r = renderer as any;
+  const detailLoads = t.mock.method(r, "loadDetail");
   for (const key of ["Bark012", "LeafSet024"]) r.materials.set(key, new PBRMaterial(key, scene));
   const calls: string[] = [], textureCalls: { file: TreeAssetFile; gamma: boolean }[] = [];
   t.mock.method(globalThis, "fetch", async (url: unknown) => {
@@ -88,7 +88,23 @@ function harness(t: TestContext, f = fixture()) {
   });
   t.after(() => { renderer.dispose(); scene.dispose(); engine.dispose(); });
   const load = () => { const manifest = parseTreePilotManifest(f.manifest); r.validatePilot(manifest, f.selections); return r.loadPilot(manifest, Object.keys(f.selections)); };
-  return { ...f, scene, engine, renderer, r, calls, textureCalls, load };
+  return { ...f, scene, engine, renderer, r, calls, textureCalls, detailLoads, load };
+}
+
+async function waitForDetails(h: ReturnType<typeof harness>) {
+  const calls = h.detailLoads.mock.calls;
+  assert.ok(calls.length > 0, "the scheduler must start a real detail operation");
+  for (const { arguments: [group, lod] } of calls) {
+    assert.ok(h.r.treeGroups.includes(group));
+    assert.ok(lod === 0 || lod === 1); assert.equal(lod, group.desired);
+  }
+  // These are the original loadDetail promises, including Response/SHA/decode
+  // and mesh publication. Event-loop turns do not establish that boundary.
+  await Promise.all(calls.map((call: { result: unknown }) => call.result));
+  for (const { arguments: [group, lod] } of calls) {
+    assert.equal(group.active, lod);
+    assert.ok(group.lods[lod].some((mesh: Mesh) => mesh.metadata.treeRole === "foliage"), "completed detail must contain foliage");
+  }
 }
 
 test("v4 descriptors reject unknown banks, bad record lengths, older-version extensions and conflicting identities", () => {
@@ -104,7 +120,7 @@ test("v4 descriptors reject unknown banks, bad record lengths, older-version ext
   assert.throws(() => uniqueTreeSourceBytes([f.bankFile, { ...f.bankFile, sha256: "0".repeat(64) }]), /Conflicting/);
 });
 
-test("v4 shares bank/maps once, expands only FAR, preserves exact fallback/detail/litter and unique source accounting", async t => {
+test("v4 shares bank/maps once, expands only FAR, preserves exact fallback/detail/litter and unique source accounting", { timeout: 5000 }, async t => {
   const h = harness(t, fixture(2)); await h.load();
   assert.equal(h.calls.filter(url => url === h.bankFile.url).length, 1);
   assert.equal(h.textureCalls.length, 4); assert.equal(h.r.clusterBanks.size, 1); assert.equal(h.r.clusterMaterials.size, 1);
@@ -124,7 +140,7 @@ test("v4 shares bank/maps once, expands only FAR, preserves exact fallback/detai
   assert.equal(h.renderer.litterMaterials!.leafMaterial, original);
   const winter = getTreeSeasonState(Date.UTC(2026,0,15));
   h.renderer.update({ time: 1, quality: "high", player: { x: groups[0].x, y: 0, z: groups[0].z }, wind: { x:0,z:0,speed:0 }, season: winter });
-  await settle();
+  await waitForDetails(h);
   for (const group of groups) for (const mesh of group.lods.flat() as Mesh[]) if (mesh.metadata.treeRole === "foliage") {
     assert.equal(mesh.isEnabled(), false); assert.equal(mesh.subMeshes[0].indexCount, 0);
     if (mesh.metadata.detailLevel < 2) assert.equal(mesh.material, original);
@@ -230,11 +246,27 @@ test("v4 disposal during atlas IO drains staged promises and leaves no geometry 
   assert.equal(h.r.clusterBanks.size, 0); assert.equal(h.r.clusterMaterials.size, 0);
 });
 
-test("v4 wood-only fallback permits complete card coverage and still preloads original detail foliage", async t => {
+test("v4 wood-only fallback permits complete card coverage and still preloads original detail foliage", { timeout: 5000 }, async t => {
   const h = harness(t, fixture(1, false)); await h.load();
   const group = h.r.treeGroups[0]; assert.equal(group.lods[2].length, 2);
   const id = Object.keys(h.manifest.prototypes)[0], p = h.manifest.prototypes[id];
   assert.deepEqual(treePrototypeFoliageRanks(decodeTreePrototype(arrayBuffer(h.byUrl.get(p.lods[2].url)!), id, p, 2)), []);
-  group.desired = 0; h.r.startDetailLoads(); await settle();
+  let releaseNear!: () => void, reachedNear!: () => void;
+  const heldNear = new Promise<void>(resolve => releaseNear = resolve);
+  const nearRequested = new Promise<void>(resolve => reachedNear = resolve);
+  const fixtureFetch = globalThis.fetch;
+  t.mock.method(globalThis, "fetch", async (...args: Parameters<typeof fetch>) => {
+    if (String(args[0]) === p.lods[0].url) { reachedNear(); await heldNear; }
+    return fixtureFetch(...args);
+  });
+  t.after(releaseNear);
+  group.desired = 0; h.r.startDetailLoads();
+  assert.equal(h.detailLoads.mock.callCount(), 1);
+  try {
+    await nearRequested;
+    assert.equal(group.active, 2); assert.equal(group.lods[0].length, 0);
+    assert.equal(h.r.loader.stats.pending, 1);
+  } finally { releaseNear(); }
+  await waitForDetails(h);
   assert.equal(group.active, 0); assert.equal(group.lods[0][1].material, h.renderer.litterMaterials!.leafMaterial);
 });

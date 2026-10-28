@@ -454,9 +454,11 @@ export function crazyTypkaErrorLabel(code: string, locale: Locale) {
 export function CrazyTypkaChat({
   state,
   locale,
+  variant = "default",
 }: {
   state: CrazyTypkaState;
   locale: Locale;
+  variant?: "default" | "compact";
 }) {
   const id = useId();
   const log = useRef<HTMLDivElement>(null);
@@ -468,20 +470,9 @@ export function CrazyTypkaChat({
   }, [state.messages]);
   const cs = locale === "cs";
   const enabled = state.availability === "enabled";
-  return (
-    <section className="crazy-chat" aria-labelledby={`${id}-title`}>
-      <header className="crazy-heading">
-        <div className="crazy-avatar" aria-hidden="true">
-          ✦
-        </div>
-        <div>
-          <h2 id={`${id}-title`}>
-            {CRAZY_TYPKA_SPEAKER.name}{" "}
-            <span className="crazy-ai-badge">AI</span>
-          </h2>
-          <p>{cs ? "Tvoje průvodkyně po kopci" : "Your guide to the hill"}</p>
-        </div>
-      </header>
+  const compact = variant === "compact";
+  const privacy = (
+    <>
       <p className="crazy-definition">
         {cs
           ? "Fiktivní AI spolužačka, žádná skutečná studentka ani oficiální podpora Silicon Hill."
@@ -492,6 +483,38 @@ export function CrazyTypkaChat({
           ? "Zprávy a kontext této konverzace může zpracovat OpenAI. Ostatní hráči ji nevidí. Neposílej hesla ani osobní údaje. AI si pamatuje jen několik posledních výměn v krátké relaci."
           : "OpenAI may process messages and the context of this conversation. Other players cannot see it. Do not send passwords or personal data. AI remembers only a few recent exchanges in a short session."}
       </p>
+    </>
+  );
+  return (
+    <section
+      className={compact ? "crazy-chat crazy-compact" : "crazy-chat"}
+      aria-labelledby={`${id}-title`}
+    >
+      <header className="crazy-heading">
+        <div className="crazy-avatar" aria-hidden="true">
+          {compact ? (
+            <img
+              src="/ui/crazy-typka.svg"
+              alt=""
+              width="36"
+              height="36"
+              decoding="async"
+            />
+          ) : (
+            "✦"
+          )}
+        </div>
+        <div>
+          <h2 id={`${id}-title`}>
+            {CRAZY_TYPKA_SPEAKER.name}{" "}
+            <span className="crazy-ai-badge">AI</span>
+          </h2>
+          {!compact && (
+            <p>{cs ? "Tvoje průvodkyně po kopci" : "Your guide to the hill"}</p>
+          )}
+        </div>
+      </header>
+      {!compact && privacy}
       <div className={`crazy-availability ${state.availability}`} role="status">
         {state.availability === "checking"
           ? cs
@@ -514,6 +537,12 @@ export function CrazyTypkaChat({
           </button>
         )}
       </div>
+      {compact && (
+        <details className="crazy-privacy">
+          <summary>{cs ? "O AI a soukromí" : "AI and privacy"}</summary>
+          {privacy}
+        </details>
+      )}
       {state.notice === "session-restarted" && (
         <p className="crazy-disclosure" role="status">
           {cs
@@ -667,25 +696,39 @@ export function CrazyTypkaChat({
         }}
       >
         <label htmlFor={`${id}-message`}>
-          {cs ? "Napiš Crazy Typce" : "Message Crazy Typka"}
+          {compact
+            ? cs
+              ? "Zpráva"
+              : "Message"
+            : cs
+              ? "Napiš Crazy Typce"
+              : "Message Crazy Typka"}
         </label>
         <textarea
           ref={composer}
           id={`${id}-message`}
-          rows={2}
+          rows={compact ? 1 : 2}
           maxLength={CRAZY_TYPKA_LIMITS.messageChars}
           value={state.draft}
           disabled={!enabled}
           onChange={(event) => state.setDraft(event.target.value)}
           placeholder={
-            cs
-              ? "Třeba jak začít na Strahově…"
-              : "For example, how to get started at Strahov…"
+            compact
+              ? cs
+                ? "Napiš zprávu…"
+                : "Write a message…"
+              : cs
+                ? "Třeba jak začít na Strahově…"
+                : "For example, how to get started at Strahov…"
           }
           aria-describedby={`${id}-privacy`}
         />
         <div className="crazy-form-actions">
           <small id={`${id}-privacy`}>
+            {compact &&
+              (cs
+                ? "Zprávy může zpracovat OpenAI. "
+                : "OpenAI may process messages. ")}
             {cs
               ? "Odpověď může chybovat. Ověř si citované podklady."
               : "Answers can be wrong. Check the cited sources."}
@@ -693,6 +736,9 @@ export function CrazyTypkaChat({
           <button
             type="submit"
             className="primary"
+            aria-label={
+              compact ? (cs ? "Odeslat zprávu" : "Send message") : undefined
+            }
             disabled={
               !enabled ||
               state.busy ||
@@ -700,7 +746,13 @@ export function CrazyTypkaChat({
               !state.draft.trim()
             }
           >
-            {cs ? "Odeslat" : "Send"} <span aria-hidden="true">↗</span>
+            {compact ? (
+              <span aria-hidden="true">↑</span>
+            ) : (
+              <>
+                {cs ? "Odeslat" : "Send"} <span aria-hidden="true">↗</span>
+              </>
+            )}
           </button>
         </div>
       </form>
