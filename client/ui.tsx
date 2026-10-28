@@ -1190,13 +1190,13 @@ export function App() {
     return (
       <>
         <WelcomeScreen
-          profile={profile} onChange={setProfile} enter={enter} busy={busy}
+          profile={profile} enter={enter} busy={busy}
           error={error ? localizeNotice(error) : undefined} locale={feedbackLocale}
-          editor={avatarEditor} map={<MapView big />} language={<LanguagePicker />}
+          editor={avatarEditor} language={<LanguagePicker />}
           feedback={<button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
             {feedbackLocale === "cs" ? "Zpětná vazba" : "Feedback"}
           </button>}
-          assistant={<CrazyTypkaChat state={ai} locale={feedbackLocale} />}
+          assistant={<CrazyTypkaChat state={ai} locale={feedbackLocale} variant="compact" />}
         />
         {feedbackDialog}
       </>
