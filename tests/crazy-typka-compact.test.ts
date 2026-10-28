@@ -2,8 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { CrazyTypkaChat, type CrazyTypkaState } from "../client/crazy-typka";
-import type { CrazyTypkaSource } from "../shared/crazy-typka";
+import {
+  CrazyTypkaChat,
+  createCrazyTypkaClient,
+  type CrazyTypkaState,
+} from "../client/crazy-typka";
+import {
+  CRAZY_TYPKA_SPEAKER,
+  type CrazyTypkaSource,
+} from "../shared/crazy-typka";
 
 const source: CrazyTypkaSource = {
   id: "membership",
@@ -51,6 +58,66 @@ const incoming = {
   text: "Ahoj <script>alert(1)</script>",
   sources: [source],
 };
+
+test("the real client validates new SUZ and SHerna citations before compact rendering", async () => {
+  const sources: CrazyTypkaSource[] = [
+    {
+      ...source,
+      id: "suz-housing-documents",
+      title: "SÚZ – aktuální ceníky a dokumenty ubytování",
+      url: "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ceniky-dokumenty",
+      checkedAt: "2026-10-28",
+      author: null,
+      license: null,
+      licenseUrl: null,
+    },
+    {
+      ...source,
+      id: "sh-game-room-reservations",
+      title: "Silicon Hill – SHerna: veřejný postup rezervace",
+      url: "https://sherna.siliconhill.cz/pages/reservation",
+      checkedAt: "2026-10-28",
+      author: null,
+      license: null,
+      licenseUrl: null,
+    },
+  ];
+  let chats = 0;
+  const client = createCrazyTypkaClient({
+    request: (async (input, init) => {
+      if (init?.method === "DELETE") return new Response(null, { status: 204 });
+      if (String(input).endsWith("status"))
+        return Response.json({ enabled: true });
+      if (String(input).endsWith("session"))
+        return Response.json({
+          token: "b".repeat(64),
+          expiresAt: Date.now() + 60000,
+        });
+      assert.ok(String(input).endsWith("chat"));
+      chats++;
+      const body = JSON.parse(String(init?.body));
+      return Response.json({
+        requestSeq: body.requestSeq,
+        speaker: CRAZY_TYPKA_SPEAKER,
+        text: "Ověř si podklady příslušné služby.",
+        sources,
+      });
+    }) as typeof fetch,
+  });
+  try {
+    await client.refreshStatus();
+    client.setDraft("Kde najdu podklady k ubytování a SHerně?");
+    await client.send("cs");
+    assert.equal(client.getSnapshot().error, null);
+    assert.deepEqual(client.getSnapshot().messages.at(-1)?.sources, sources);
+    const html = render(state(client.getSnapshot()), "cs", "compact");
+    for (const item of sources)
+      assert.ok(html.includes('href="' + item.url + '"'));
+    assert.equal(chats, 1);
+  } finally {
+    client.dispose();
+  }
+});
 
 test("the compact presentation is opt-in and the default contract stays intact", () => {
   for (const locale of ["cs", "en"] as const) {

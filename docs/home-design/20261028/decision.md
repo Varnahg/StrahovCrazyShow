@@ -24,3 +24,9 @@ Uživatel schválil Jantar po vizuálním porovnání. Vstup, editor a menší C
 ## Rozhodnutí a přijetí
 
 Nejsou otevřené produktové otázky ani nevratná migrace. Uživatel výslovně zadal implementaci přijaté kompozice, takže se nezavádí další běžné schvalování. Dosavadní prototype/UI audit je vstup, nikoli důkaz hotové integrace. Konečné přijetí vyžaduje konkrétní výsledky a čisté vlastní commity; centrální evidenci a main okno koordinuje původní správce katalogu.
+
+## Kombinace s přijatým RAG main
+
+Přijatý main `86e4dd603ca1b91e3eaa5f84573f9481be410a29` se bez konfliktu spojil s Jantarem do `62ba8c870082b1a3897d8f580d81dbd4005ca481`. Čtecí audit potvrdil zachovaný klientský transport/store a našel jedinou navazující obsahovou chybu: provider stále nabízel odstraněný sólo vstup. Pouhé skrytí tlačítka tuto radu AI neřeší; změna serverového guest kontraktu by byla zbytečná. Volba je upravit jen onboarding instrukci a ověřit skutečně odeslaný prompt ve fake provider regresi. Původní vlastník předal oba soubory, uvolnil claims a koordinátor přidělil task `jantar-home-20261028-provider-onboarding`. Nemění se moderace, relace, citace, SQL ani placené volání.
+
+Nový shared validátor přidává SÚZ/SHerna citace; nový backend proto patří ke společně přestavěnému klientovi. Starý immutable bundle se k němu nepřipojuje. Nový lockfile přidává pg; původní node_modules zatím zásobuje junction starého hraného snapshotu. Místo změny tohoto adresáře dostane kombinovaný snapshot vlastní fyzickou frozen instalaci a samostatný build. Tím se zachovají původní bajty, závislosti a lifecycle serveru4276; nový celek bude mít odlišenou URL a identitu.

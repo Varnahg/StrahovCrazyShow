@@ -65,6 +65,9 @@ baseline_commit: 'e09d60fa24419a93b26f15e21c862e95e44aff2f'
 
 ## Spec Change Log
 
+- Přijatý upstream RAG main86e4dd603ca1b91e3eaa5f84573f9481be410a29 byl koordinovaně sloučen do62ba8c870082b1a3897d8f580d81dbd4005ca481. Zmrazený produktový záměr se nemění. Původní technický předpoklad bez serverových editací doplnil nový explicitně přidělený task jantar-home-20261028-provider-onboarding: jediná persona instrukce a regrese musí přestat nabízet odstraněný sólo vstup. Žádná změna serverového guest kontraktu nebo RAG architektury. Původní vlastník předal oba soubory a uvolnil scope.
+- Kombinovaný client transport/compact test nově prochází SÚZ/SHerna citacemi přes skutečný shared validátor. Starý bundle se k novému backendu nepřipojuje; následující checkpoint dostane vlastní fyzické dependencies, aby se nepozměnil původní immutable snapshot.
+
 ## Review Triage Log
 
 - Čtecí source review /root/review_home_flow: opraven prioritní fokus composeru před close a CSS span náhledu; kontrola oprav bez dalších doložených chyb. Vnější chat wrapper je transparentní, aby se neskládaly dvě .93 vrstvy. Samostatný přezkum compact/map kontraktů bez nových nálezů. Praktická browser přejímka a finální workflow review dosud čekají.
