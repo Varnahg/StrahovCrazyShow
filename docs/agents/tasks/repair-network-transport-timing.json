@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-network-transport-timing",
+  "title": "KEY-2/6: časování vlastního serveru a sender nezávislý na hladovějícím timeru",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["server/index.ts", "shared/netcode.ts", "shared/network-diagnostics.ts", "client/network-input-buffer.ts", "tests/network-input-buffer.test.ts", "tests/network-diagnostics.test.ts", "docs/agents/handoffs/repair-network-transport-timing.md"],
+  "resources": [],
+  "acceptance": ["Kompatibilní bounded timing metriky pouze vlastní autentizované relace, explicitníresyncReason, RTT echo srate limitem; bezhostpresenceAPI.", "Frame-coupled sender zachovává pořadí/max8batch a rate budget, odstraňuje růst fronty při běžném render-callbacku beztimeru; lifecycle/recoverystats.", "Nedeklarovat KEY-7 opravený: nový tick/epoch protokol je samostatná následující etapa."],
+  "verification": ["Cílené testy fronty s60Hzprodukcí, různouframe/timercadence a stalledtimers; bounded queue/noextra/missinginput; čistý clear/resync.", "Server telemetry schema/finite inputs/reasons/guest isolation kontrakt a následná skutečnáSDKintegrace podroot."],
+  "notes": ["Rootexplicitněpředává původní server/index.ts diff zautomatic-diagnostics-storage podlejehohandoffu; nynějšíautor je příjemcem a můžeclaimadopt-dirty.", "game.ts/ui.tsx a dosavadnítestsinputbacklog vlastní/nebointegruje root, agentnezasahuje. Nejprvezkoordinovat konkrétníAPI."]
+}

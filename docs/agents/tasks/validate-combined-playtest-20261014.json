@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-combined-playtest-20261014",
+  "title": "Ověřit společný produkční testovací build",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/combined-playtest-20261014/candidate/",
+    ".cache/combined-playtest-20261014/validation/",
+    ".cache/combined-playtest-20261014/live-preview/",
+    "docs/performance/evidence/combined-playtest-20261014/",
+    "docs/agents/handoffs/validate-combined-playtest-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Claim až po předání a release assembly. Ověřit všechny source hashe, pak sekvenčně pnpm test/build/test:integration nad stejným snapshotem. Zachovat každý fail.",
+    "Po pipeline source parity, port2568 volný a vlastní procesy ukončené. Připravit bezpečné start/stop helpery pro nový preview bez změny starých služeb.",
+    "Doložit přesný společný obsah a omezení. Žádné tvrzení hotových červených záblesků/vzdálených světel ani GPU FPS."
+  ],
+  "verification": [
+    "Před každým heavy krokem zkontrolovat4186/2581 a novéJSONL; při aktivním hraní další load odložit. Žádný browser/GPU/Blender/instalace.",
+    "Podrobná automatická diagnostika a collector jsou součástí plného source. Nový testovací server spustí až samostatný portový task po release tohoto validátora."
+  ],
+  "notes": [
+    "Pouze ownership WT. Neměnný společný source připravuje assemble-combined-playtest-20261014; root nepřepisuje vstupní staré snapshoty.",
+    "Ověřeno: společný snapshot1cddfe82303f6d7365df5470fc09f9a3fa71b4c4021150b3c67c131c3401562c,922/922+build+celá integracePASS,515sourcehashů beze změny, vlastnípipelineukončená/2568volný. Assembly a validation claims uvolněné; lze převzít portový start4187/2582."
+  ]
+}

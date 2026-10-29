@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-input-timeline-primitives",
+  "title": "KEY-7: serverová epocha a časově přesný replay bez záměny ack a času",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["shared/input-timeline.ts", "client/network-timeline.ts", "tests/input-timeline.test.ts", "tests/network-timeline.test.ts", "tests/timeline-physics.test.ts", "docs/agents/handoffs/repair-input-timeline-primitives.md"],
+  "resources": [],
+  "acceptance": ["Samostatné primitives plánovaných vstupů seq=tickoffset vserverinputEpoch; ackresolvedtime postupuje ineobsazenýmikroky,receivedSeqodděleně,late/duplicate/oldEpoch nepřehrajíčasdvakrát.", "Initiallead a stalledrebase simulují každý skutečný krok,neutralfiller/vehiclemode/jumphranice, žádné zrychleníautority.", "Reprodukce dvě/triidlecarsteps už nemá stejnouackidentitu různýchčasů; dvojísimulace naRapieru je test, neGPUdůkaz."],
+  "verification": ["Cílené deterministicqueue/lead/replay/epoch tests a malý actualRapier regression se stejnýmivstupy a řízenoulatencí/jitter/stalls.", "StávajícíV10runtime a PROTOCOL_VERSION se vtomto tasku nemění; integraceV11 navazujícímspolečnýmcheckpointem."],
+  "notes": ["Navazuje na potvrzenou repair-network-cause analýzu a transport-timing stage. Rootowns game/UI; nynínení povolenozapisovatserver/index.ts/shared/netcode.ts ani jejich testy.", "APIco nejmenšíkonkrétní, koordinovatpřesnouepoch/lead/replay integracipředkódem. KompletníKEY7 zůstáváotevřenýdoGPUSDKpřejímky."]
+}

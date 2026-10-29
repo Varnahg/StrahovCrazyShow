@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-avatar-preview",
+  "title": "KEY-10: odstranit blokující opakovanou přípravu editorového náhledu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/avatar-editor.tsx", "client/avatar-renderer.ts", "client/avatar-preview-cache.ts", "tests/avatar-preview.test.ts", "tests/avatar-preview-cache.test.ts", "docs/agents/handoffs/repair-avatar-preview.md"],
+  "resources": [],
+  "acceptance": ["Prokázat aktuální příčinu nákladu mount/update/dispose a cache/asset lifecycle před změnou.", "Zachovat plný vzhled, rotaci a face/editor funkce; žádný neomezený cache ani zastavení hlavní simulace. První i opakovanéotevření jsou ověřovacíscénáře."],
+  "verification": ["Relevantní levné funkční/lifecycle regrese; GPU/firstopen trvání pouze koordinátorem.", "Předat implementaci/refaktor/testy a explicitně nevyřešené cold/visual limity."],
+  "notes": ["Game/ui integrování případného optionalengine/canvas host API provádí root, agent přesně domluví kontrakt.", "createAvatarPreview již renderuje on-demand, nepředpokládat stálý druhý renderloop bez důkazu. Nepřepisovat autorské geometrie/modely."]
+}

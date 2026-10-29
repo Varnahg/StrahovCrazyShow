@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-game-startup-fixtures",
+  "title": "KEY-8: ověřit skutečný Game startup lifecycle po přesunu stavby a finálních materiálů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["tests/game-startup.test.ts", "docs/agents/handoffs/repair-game-startup-fixtures.md"],
+  "resources": [],
+  "acceptance": ["Testovat skutečný Game.start/startContent/startupPhase/updatePreloadVisuals/lifecycle kontrakt, nikoli přepsanou kopii algoritmu. Lze AST-extract+VM fake dependencies jako room-callbacks test.", "Final surface/cinematic/avatar/camera setup před preload/loaders, jedna instance, přesná fáze; při failure/cancel korektní Game cleanup, žádné ready po dispose, disposal pozdě dokončených loaderů.", "Callbacky během stagedworld nesmí vytvářet předčasné avatary ani sahat na neexistující parkedCar. Success předá a ponechá pouze živé controllery."],
+  "verification": ["Cílené lehké CPU fixtures a narrow tsc, žádný GPU/fullsuite/port. Zjištěné runtime chyby předat root, který vlastní Game/UI.", "Typy/primární implementaci kontrolovat za běhu práce root; před finálním během požádat o stabilní checkpoint těchto metod."],
+  "notes": ["Root právě upravil Game startup (stagedworld mimo constructor, createWorldPresentation až po něm, finální materiály před preload, own startup error dispose, deferred players/setCar guard); renderer readiness po posledním preload ještě není kompletně vyřešená."]
+}

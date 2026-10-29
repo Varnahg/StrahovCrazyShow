@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-mesh-draw-profile",
+  "title": "KEY-2/5: určit konkrétní zdroje hlavního draw CPU času",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/mesh-draw-profile.ts", "tests/mesh-draw-profile.test.ts", "client/render-cost.ts", "tests/render-cost.test.ts", "docs/agents/handoffs/repair-mesh-draw-profile.md"],
+  "resources": [],
+  "acceptance": [
+    "Samostatný zapojitelný bounded profil rozliší CPU draw práci podle skutečných mesh/material/source skupin přes ověřené Babylon observables; žádné GPU tvrzení.",
+    "Default neaktivní interval, root integruje automatický periodický a action-trigger vzorek bez ručního zapínání uživatelem. Neinstrumentované snímky neměří čas každého draw.",
+    "On-demand render inventory doplní aktivní/frozen/submesh/material/instance vlastnosti s explicitním rozsahem. Testy lifecycle, párování, přerušení a nákladových limitů; cílený refaktoring spolu s implementací."
+  ],
+  "verification": ["Primární nainstalovaný Babylon9.30 kód; levné cílené testy a narrow tsc, žádná GPU/fullsuite/integrace.", "Předat API, vlastnictví listenerů, přesné meze inkluzivních intervalů a zda shadows/instances vstupují do měření; nezaměňovat počet callbacks s draw calls."],
+  "notes": ["Navazuje na doložený produkční baseline mainDraw16.15ms. Root vlastní Game/benchmark/recorder, agent je nesmí měnit.", "Před prvním zápisem čekat na root potvrzení zmrazení wave2, potom vlastní claim. Output je diagnostika k následné optimalizaci, ne přijetí FPS opravy."]
+}
