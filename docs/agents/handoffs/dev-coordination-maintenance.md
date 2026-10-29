@@ -87,3 +87,25 @@ Po skutečném release gate-integratora rozšířen pouze jeho worker task o scr
 ## Konečný checkpoint
 
 21.10 perftransit admin aktualizoval pouze šest vlastních tasků KEY54/KEY53 na done po doložených produktových merge a main CI. Resource-only validation/publication i tento administrativní slot zůstávají ready. Katalogová změna nenahrazuje rezervace ani rušení procesů. Žádné cizí tasky/WIP se neměnily.
+
+## Incident sdílených dependencies při delegaci tree fixture · 28. 10. 2026
+
+Původní root delegoval úzkou testovou opravu do Jantar worktree, ale v implementační delegaci nepředal dostatečně výslovně zásadní fakt, že root node_modules je zároveň junction targetem starého candidate-02/serveru4276, a nevynutil jediný povolený přímý Node příkaz. Agent při prvním RED běhu použil pnpm exec tsx. Automatická kontrola pnpm11.19.0 doplnila15cached balíčků včetně pg8.23.1/@types/pg8.23.1, downloaded0. To je skutečný vedlejší zápis mimo testový scope a porušení ochrany sdílených dependencies; samotný malý počet nových balíčků nedokazuje nezměněnost starých bajtů.
+
+Přesný příkaz: pnpm exec tsx --test --test-name-pattern 'v4 wood-only fallback' .cache/tree-cluster-streaming-wait-20261028/original-wait-held-near.red.test.ts, cwd C:/Users/rezac/.codex/worktrees/jantar-home/StrahovCrazyShow. Původní plný log .cache/tree-cluster-streaming-wait-20261028/red.log má UTC hranice13:42:28–13:42:34 (jde o časy logu, ne úplnou procesní telemetrii). Package.json, pnpm-lock.yaml a pnpm-workspace.yaml zůstaly Gitclean. Předchozí plný dependency-byte manifest neexistuje; source-manifest9477 starého snapshotu obsahuje package/lock/patches, nikoli bajty node_modules.
+
+Root incident ihned předal Jantar koordinátorovi a zakázal další package-manager příkazy i nevyžádanou opravu/reinstalaci/mazání. Následný GREEN proběhl výhradně node node_modules/tsx/dist/cli.mjs --test tests/tree-cluster-streaming.test.ts:10/10PASS. Důkazy a rozsah obsahuje docs/agents/handoffs/tree-cluster-streaming-wait-20261028.md v Jantar worktree. Původní vlastník výslovně převzal incident a zakázal obnovu rootdeps; sám zajistí označení/retirement starého4276 po ověření použití. Nový combined snapshot bude mít vlastní fyzické dependencies. Server4276/4182 root nezastavoval ani nepřepojoval.
+
+Poučení pro další delegaci: vždy předat mapu sdílených závislostí a doslovný povolený příkaz node node_modules/tsx/dist/cli.mjs; zakázat pnpm exec/run v takovém checkoutu, protože pouhé spuštění testu může zapisovat dependencies. Nezaměňovat ověření package/lock verzí za byteovou neměnnost node_modules. Immutable kandidát má mít před spuštěním samostatné fyzické dependencies; pokud je nesdílí bezpečně, následný zápis do jejich cíle vyžaduje koordinaci. Toto přijetí testového diffu není zpětné prohlášení starého snapshotu za immutablePASS.
+
+Následné předání vlastníka Jantaru: server4276 byl po ověření online0, nepřítomnosti loopback karty a identity PID38860 ukončen; portová rezervace byla skutečně uvolněna. Doklad vlastníka je jantar-home-20261028-serve handoff a dependency-incident.json v jeho cache. Koordinátor převzal port4278 pro novou kombinovanou kopii s vlastními fyzickými dependencies. Rootdeps se neobnovovaly a byteová neměnnost starých dependencies se zpětně netvrdí.
+
+## Převzetí přijatého katalogu do KEY67 baseline · 28. 10. 2026
+
+Admin potvrzuje jednorázový byte-identický Git import17 již přijatých taskJSON z main801b2d07c884c51e42b0fc1a890e7a0f9dbc0196 do vlastní C worktree RAG koordinátora při jeho accepted-main syncu. Přesné cesty/blobSHA jsou v .cache/trees-validation-20261025/rag-auto-catalog-import-801b2d07.json. Jde o převzetí publikované baseline, nikoli oprávnění tvořit či měnit obsah katalogu; Dadmin kopie s navazujícím closeoutem se nepřepisují. Příjemce ověří jejich shodu s accepted Gitbloby a ochranu vlastního WIP/indexu. Admin do těchto17Dkopií během synchronizace nezapisuje; obecná správa katalogu zůstává adminovi.
+
+## Offline OpenAI normalizer KEY-67 · katalogové předání
+
+Na konkrétní požadavek RAG koordinátora byl založen rag-auto-20261028-normalizer se sedmi přesně přidělenými writePaths a resources[]. Shodná definice je v D admin i C RAG worktree; potvrzený kontrakt zůstává čtecím vstupem. Katalogová validace v C RAG:439 definic PASS. Ready nepřebírá aktivní extraction prefix: původní vlastník musí nejdřív předat table-lineage checkpoint a skutečně uvolnit rezervaci; následný autor získá vlastní claim.
+
+Nezávislá čtecí kontrola rozsahu a následná kontrola kódu doplnily explicitní offline tokenizer_ready(), izolaci před parsingem, přesměrování temp/pytest/bytecode a zákaz instalací. worker.implementation_hash() zahrnuje všechny package Python soubory, proto nová komponenta změní i identitu nativního parser profilu; tento cache dopad se povinně předává, hashovací mechanismus není v zapisovatelném rozsahu. Image-only kandidát zůstává review-required, gate nativní textové věrnosti se nejprve domluví; dva uložené API vzorky nejsou obecné schválení kvality. Tato změna katalogu nespustila model/API/DB, hru, build ani GPU a neupravila implementaci.

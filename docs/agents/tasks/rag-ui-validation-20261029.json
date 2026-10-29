@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-ui-validation-20261029",
+  "title": "Úvod hry: izolované vizuální ověření viewportů a SCS loaderu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-ui-validation-20261029/",
+    "docs/agents/handoffs/rag-ui-validation-20261029.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "gpu",
+    "port:4290"
+  ],
+  "acceptance": [
+    "Ověřit dokončený UI checkpoint z rag-ui-20261029-viewport-loader v izolovaném lokálním snapshotu/preview4290. Veškeré build, harness, snapshot a evidence výstupy pouze ve vlastní cache; žádný root dist ani zápis do sdílených dependencies.",
+    "Skutečně vizuálně zkontrolovat viewporty390x844,320x568,844x390,1440x900 a1024x600: home, editor a loading včetně error/recovery, okrajů, velikostí a dosažitelnosti CTA. Doložit screenshoty a konkrétní závěry, nikoli pouze CSS/markup assertions.",
+    "Frontend fixture harness lze použít pro reprodukovatelné loading/error stavy; v evidenci jej jasně odlišit od produkčního UI a skutečného dokončení startupu. Následující produkční vizuální přijetí nesmí obcházet readiness nebo předstírat plný herní E2E.",
+    "Bez serverAPI, placeného AI, proxy nebo multiplayer připojení. Neměnit frozen4278/4280, žádný HMR zásah do uživatelské verze. Před GPU prací ověřit skutečné běžící scény a držet jen jednu3D scénu; cizí procesy ani karty neukončovat bez doloženého oprávnění.",
+    "Zachovat přístupnost, reduced-motion, CZ/EN a chování error/recovery. Zaznamenat skutečný browser, URL, source/build hash a rozlišení; výsledek jiného prohlížeče nevydávat za Edge/GTX1060 nebo výkonovou přejímku.",
+    "Po ověření ukončit vlastní preview/pomocníky a ověřit uvolnění portu před release. Má-li být verze ponechána uživateli, předem oddělit trvalý serve task; nepropustit rezervaci běžícího serveru."
+  ],
+  "verification": [
+    "Před buildem získat tento claim, ověřit port4290 a identitu snapshotu včetně testů. Použít explicitní Node/nástroje bez pnpm exec/run a bez instalace nebo nechtěné synchronizace dependencies.",
+    "Vizuální matrix porovnat v reálném browseru podle uživatelovy preference; krátce doložit každý viewport/stav. Browser/harness kontroly nejsou testem RAG, SQL, multiplayeru ani opravy WebGPU timeoutu.",
+    "Produkční build provést až nad hotovým stabilním UI checkpointem ve vlastní cache. Celé ověření a jedno společné review koordinovat odlehčeně, nezdvojovat již provedené cílené testy bez nové změny či nálezu."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Výslovný konkrétní validační požadavek koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d navazuje na uživatelské UI zadání.",
+    "Source patří disjunktnímu UI tasku; tento task neopravňuje měnit client/game.ts, ui.tsx, renderer, server ani produkční startup logiku. Zdrojovou opravu předat autorovi.",
+    "PR37 je přijatý v main8d3e69eccbce326ea198351507b5ea3a52e7cf82. Vlastní C kopie se kvůli43historickým metadata rozdílům nyní nesynchronizuje; koordinátor zvolí ověřený source checkpoint a pozdější čistý UI export nad accepted main.",
+    "Ready je přidělení rozsahu, nikoli automatické spuštění procesu před dokončením source, získáním resources a kontrolou skutečných scén.",
+    "29.10.2026 přijato v PR38/main43175fc4ae1b855686638821b164867fe614a598; celý tree d5f20e7ebb56f4a2ff935fb2fb5fecfb9b6b52d1 shodný s77a2a661, exact-head verify/secrets/project-acceptance success. D main ff-only synchronizovaný, čistý a0/0. Done se týká přijatého UI layout/loader rozsahu; healthy GPU preview, herní startup, WebGPU timeout a celý RAG katalog se tím neuzavírají."
+  ]
+}

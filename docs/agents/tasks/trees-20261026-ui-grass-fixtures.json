@@ -4,9 +4,26 @@
   "title": "KEY-62: opravit skutečné UI a grass lifecycle testové vazby",
   "status": "ready",
   "dependsOn": [],
-  "writePaths": ["tests/room-callbacks.test.ts", "tests/photo-grass-preparation.test.ts", "docs/trees/20261025/ui-grass-fixtures.md", "docs/agents/handoffs/trees-20261026-ui-grass-fixtures.md", ".cache/trees-ui-grass-fixtures-20261026/"],
+  "writePaths": [
+    "tests/photo-grass-preparation.test.ts",
+    "docs/trees/20261025/ui-grass-fixtures.md",
+    "docs/agents/handoffs/trees-20261026-ui-grass-fixtures.md",
+    ".cache/trees-ui-grass-fixtures-20261026/"
+  ],
   "resources": [],
-  "acceptance": ["Doložit příčinu 12 UI lifecycle regresí a Array buffer allocation failed v grass fixture; odlišit chybu fixture od runtime regresí.", "Aktualizovat skutečné VM bindings na nynější UI/season API, zachovat všechna původní očekávání Room cleanup, cancellation, ownership a hlášení původní chyby.", "Grass fixture nesmí neúmyslně načítat nebo alokovat celý produkční stromový katalog, pokud ověřuje pouze helper lifetime. Zachovat skutečný VegetationController a věcnou lifecycle kontrolu; neoslabovat assertion nebo zahodit test.", "Runtime/API změnu nejdřív předat rootovi; scope tohoto tasku je pouze testový. Refaktoring společné fixture logiky a relevantní ověření s handoff."],
-  "verification": ["Nejdříve source/repro důkazy z frozen v9 full logu; cílené oba testové soubory po dohodě krátkého CPU okna s rootem. Žádné GPU/Blender/build/full suite/instalace."],
-  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; node_modules readonly. Full v9 2246 testů:2227 PASS,16 FAIL,3 skip. Těchto13 selhání připadá tomuto tasku; autodev a wind baseline řeší oddělení vlastníci.", "Room fixture stále obsahuje lightingPreviewRef, UI už čte seasonPreviewRef. Hypotézu ověřit v celém řetězci. Grass fail trval116.94s a skončil RangeError allocation; nejdřív zjistit alokační smyčku, neopakovat bez rozmyslu.", "Vlastní claim před zápisem, bez rekurzivního BMAD. Root právě sekvenčně opakuje dva autodev případy v izolaci; do té doby pouze čtení/edity a domluva testů."]
+  "acceptance": [
+    "Doložit příčinu 12 UI lifecycle regresí a Array buffer allocation failed v grass fixture; odlišit chybu fixture od runtime regresí.",
+    "Aktualizovat skutečné VM bindings na nynější UI/season API, zachovat všechna původní očekávání Room cleanup, cancellation, ownership a hlášení původní chyby.",
+    "Grass fixture nesmí neúmyslně načítat nebo alokovat celý produkční stromový katalog, pokud ověřuje pouze helper lifetime. Zachovat skutečný VegetationController a věcnou lifecycle kontrolu; neoslabovat assertion nebo zahodit test.",
+    "Runtime/API změnu nejdřív předat rootovi; scope tohoto tasku je pouze testový. Refaktoring společné fixture logiky a relevantní ověření s handoff."
+  ],
+  "verification": [
+    "Nejdříve source/repro důkazy z frozen v9 full logu; cílené oba testové soubory po dohodě krátkého CPU okna s rootem. Žádné GPU/Blender/build/full suite/instalace."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; node_modules readonly. Full v9 2246 testů:2227 PASS,16 FAIL,3 skip. Těchto13 selhání připadá tomuto tasku; autodev a wind baseline řeší oddělení vlastníci.",
+    "Room fixture stále obsahuje lightingPreviewRef, UI už čte seasonPreviewRef. Hypotézu ověřit v celém řetězci. Grass fail trval116.94s a skončil RangeError allocation; nejdřív zjistit alokační smyčku, neopakovat bez rozmyslu.",
+    "Vlastní claim před zápisem, bez rekurzivního BMAD. Root právě sekvenčně opakuje dva autodev případy v izolaci; do té doby pouze čtení/edity a domluva testů.",
+    "27.10 předání tests/room-callbacks.test.ts do home-ai-20261027-integration po checkpointu a9a1e3b5f15a2cee037117752230d5d8b3200c72; root dále tuto cestu neupravuje."
+  ]
 }

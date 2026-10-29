@@ -4,9 +4,26 @@
   "title": "KEY-62: dokončit výběr WebGPU jako cílové výchozí cesty",
   "status": "ready",
   "dependsOn": [],
-  "writePaths": ["client/render-engine.ts", "tests/render-engine.test.ts", "tests/game-render-engine.test.ts", "docs/trees/20261025/webgpu-default.md", "docs/agents/handoffs/trees-20261026-webgpu-default.md", ".cache/trees-webgpu-default-20261026/"],
+  "writePaths": [
+    "client/render-engine.ts",
+    "tests/render-engine.test.ts",
+    "docs/trees/20261025/webgpu-default.md",
+    "docs/agents/handoffs/trees-20261026-webgpu-default.md",
+    ".cache/trees-webgpu-default-20261026/"
+  ],
   "resources": [],
-  "acceptance": ["Navázat na výslovné uživatelské upřesnění26.10 a existující webgpu-migration kontrakt: běžná production volba bezquery má být WebGPU, ne WebGL2.", "WebGL2 ponechat pouze jako explicitní kompatibilní volbu; žádný tichý fallback, žádný překlad GLSL. Zachovat inicializační/dispose/abort vlastnictví.", "Experiment webgpu-fast zůstane zvláštní explicitní lokální volba, pokud research nedoloží jiný již přijatý kontrakt. Neměnit HTTP/API/origin oprávnění.", "Root zapojí případnou uživatelskou fallback akci v UI, child do UI/Game nepíše; GPU/startup přejímka je stále otevřená a nesmí být označená za úspěch podle unitů."],
-  "verification": ["Cílené CPU backend selection/lifecycle/actual Game factory regrese; žádný GPU/Blender/build/fullsuite."],
-  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, aktivace .cache/trees-20261025/activate.ps1, node_modules jen read.", "Přímá delegace po source výzkumu. Bez rekurzivního BMAD; skutečné timeouty řeší paralelně root přes existující lokální diagnostiku."]
+  "acceptance": [
+    "Navázat na výslovné uživatelské upřesnění26.10 a existující webgpu-migration kontrakt: běžná production volba bezquery má být WebGPU, ne WebGL2.",
+    "WebGL2 ponechat pouze jako explicitní kompatibilní volbu; žádný tichý fallback, žádný překlad GLSL. Zachovat inicializační/dispose/abort vlastnictví.",
+    "Experiment webgpu-fast zůstane zvláštní explicitní lokální volba, pokud research nedoloží jiný již přijatý kontrakt. Neměnit HTTP/API/origin oprávnění.",
+    "Root zapojí případnou uživatelskou fallback akci v UI, child do UI/Game nepíše; GPU/startup přejímka je stále otevřená a nesmí být označená za úspěch podle unitů."
+  ],
+  "verification": [
+    "Cílené CPU backend selection/lifecycle/actual Game factory regrese; žádný GPU/Blender/build/fullsuite."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, aktivace .cache/trees-20261025/activate.ps1, node_modules jen read.",
+    "Přímá delegace po source výzkumu. Bez rekurzivního BMAD; skutečné timeouty řeší paralelně root přes existující lokální diagnostiku.",
+    "27.10 předání tests/game-render-engine.test.ts do home-ai-20261027-integration po checkpointu a9a1e3b5f15a2cee037117752230d5d8b3200c72; root dále tuto cestu neupravuje."
+  ]
 }

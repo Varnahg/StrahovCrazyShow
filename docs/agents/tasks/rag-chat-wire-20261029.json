@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-chat-wire-20261029",
+  "title": "RAG: napojit dokumentové evidence a výslovný archiv do skutečného chatu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/rag-evidence-backend.ts",
+    "server/crazy-typka.ts",
+    "server/crazy-typka-provider.ts",
+    "shared/crazy-typka.ts",
+    "client/crazy-typka.tsx",
+    "client/crazy-typka.css",
+    "tests/rag-evidence-backend.test.ts",
+    "tests/crazy-typka.test.ts",
+    "tests/crazy-typka-provider.test.ts",
+    "tests/crazy-typka-ui.test.ts",
+    "tests/crazy-typka-compact.test.ts",
+    ".cache/rag-chat-wire-20261029/",
+    "docs/agents/handoffs/rag-chat-wire-20261029.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Napojit přijaté captureSearch/searchSnapshot/assertSnapshot a EvidenceKnowledgeChunk union do skutečné cesty Crazy Typky. Číst předání foundation/store a jejich aktuální API; nevytvářet druhý storage nebo citation kontrakt.",
+    "Current je výchozí. Archive/asOf se zapíná výslovným validovaným requestem a malým ovladačem uvnitř současného chatu. Historické evidence musí být označené, citace zachovají verzi, method a provenance; různé verze téhož dokumentu nesmí splynout.",
+    "Knowledge scope včetně asOf patří do request/replay identity. Zachovat requestSeq, moderaci a soukromí, abort/expiry, modelové rozpočty a snapshot/dependency revalidaci. Trusted aktuální čas pochází ze serveru, nikdy z modelu či klientského tvrzení.",
+    "Zachovat celý přijatý Decisions complexity routing beze změny. Nepřidávat novou klasifikační otázku ani další volání modelu před prvním end-to-end průchodem.",
+    "Vynucovat celkový byte budget předávaných evidencí, kontrolovat cache/generační identity a životní cyklus zdrojů. Implementaci a cílený refaktoring předat spolu s lehkými fake/unit regresními důkazy a TypeScript kontrolou.",
+    "Žádný zásah do index.ts, game, UI shellu, SQL/migrací, katalogu zdrojů, konfigurace ani závislostí. Nespouštět klíče/live API, skutečnou DB, server, build nebo GPU; první reálný import a chatový E2E zajistí koordinátor v samostatném okně."
+  ],
+  "verification": [
+    "Přímé Node/tsx cílené fake/unit testy přiděleného backendu, chat runtime/provideru a UI plus strict TypeScript; nepoužívat pnpm exec/run ani jinou synchronizaci dependencies.",
+    "Ověřit default current, explicitní archive/asOf a neplatné scope, více verzí, správné citace/method/archive označení, server time, celkový UTF-8 evidence limit a stale snapshot/dependency odmítnutí.",
+    "Ověřit zachování Decisions routingu/model budgets, moderace, soukromí, requestSeq/replay a změny scope v identitě, abort a expiry. Fake DB nebo unit/UI testy nejsou dokladem skutečného SQL či herního E2E.",
+    "Držet odlehčený postup: jeden stručný plán, průběžné cílené testy a jedno společné nezávislé review funkčního celku před integrací. Všechny nové test/cache/temp výstupy pouze ve vlastním cache prefixu; původní WIP nebalit do předání."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/automated-document-rag, KEY-67. Přímá delegace koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d navazuje na uživatelem zvolený odlehčený postup a skutečný dokument → import → odpověď s citací.",
+    "Foundation a SQL store mají konkrétní handoff a při registraci již nedrží dotčené source claims. Před prvním zápisem přesto získat vlastní claim a potvrdit převzatý checkpoint; ready není převzetí cizího WIP.",
+    "Podklady docs/agents/handoffs/rag-auto-20261028-foundation.md, docs/agents/handoffs/rag-auto-20261028-store.md a docs/rag-ingestion/20261028/store-v3-contract.md jsou čtecí vstupy. Store má32 unit PASS a strict TS, skutečné PostgreSQL/migrace zatím nejsou přijaté.",
+    "Změna celých úvodních dvou obrazovek, viewportu/okrajů/velikostí a loaderu je až následný oddělený úkol po AI/RAG commit/main; tento task ji nezačíná.",
+    "Žádné samostatné staging/commit nebo přepis dalších modulů bez dohody s koordinátorem. Změnu dalšího integračního vstupu nejprve přidělit; nepřidávat zobecňování před prvním skutečným E2E."
+  ]
+}

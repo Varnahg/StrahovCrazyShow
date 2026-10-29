@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-lean-20261029-process",
+  "title": "RAG: lokální odlehčený postup BMAD pro dokončení KEY-67",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "_bmad/custom/bmad-build.user.toml",
+    "docs/agents/handoffs/rag-lean-20261029-process.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze v C RAG worktree vytvořit sparse osobní override bmad-build podle vystaveného customize.toml: jedno nezávislé review funkčního celku a persistent fact o odlehčeném postupu.",
+    "Respektovat přímé zadání uživatele: jeden stručný plán, cílené testy, jedno review před integrací a první skutečný end-to-end průchod před dalším zobecňováním. Nezdvojovat rozbory a dokumentaci bez konkrétní potřeby.",
+    "Zachovat ochranu klíčů, DB, soukromí, platnosti zdrojů, rezervací a cizího WIP. Override nesmí rušit povinné ownership hooks ani tvrdit ověření, které neproběhlo.",
+    "Neměnit týmové/upstream soubory, AGENTS.md, jiné worktrees, renderer nebo instalaci. Osobní .user.toml zůstává lokální a necommitovaný; vlastní stručný handoff doloží účinné hodnoty a limity."
+  ],
+  "verification": [
+    "Oficiálním resolverem ověřit účinnou konfiguraci a jednu review vrstvu bez rendereru, instalace nebo herních procesů; Python spustit s -B či předem vypnutým bytecode, výsledek na stdout.",
+    "Ověřit že osobní override je ignorovaný Gitem a že týmový override/upstream/AGENTS zůstaly beze změny. Výsledek a případné odchylky zaznamenat pouze do vlastního handoffu."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Přímá lidská instrukce ověřena čtením RAG chatu01a17e9d-dd4a-7fe3-91ac-4f3bc548982d: „tak odteď použij odlehčený postup a zlepši způsob práce“.",
+    "Task katalog je zrcadlený také v D admin, samotný osobní override se vytváří pouze v C RAG worktree. Jiné stavební či grafické úkoly se touto delegací nepřepínají.",
+    "Před zápisem získat vlastní claim. Žádné resources, renderer outputs, temp/cache soubory mimo writePaths, paid API, DB, build, GPU nebo porty.",
+    "Nové veřejné zdroje CrossFit/bazén patří navazujícímu obsahovému zadání koordinátora; tento procesní task jejich katalog ani architekturu nemění.",
+    "29.10.2026 převzato podle vlastního handoffu: lokální ignorovaný override, oficiální resolver potvrdil právě jedno aktivní blind-hunter review a zachovaný ownership hook; bez rendereru/instalace, claim released. Toto Done se týká pouze lokálního procesního nastavení."
+  ]
+}

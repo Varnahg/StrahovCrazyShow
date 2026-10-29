@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-main-sync-20261029",
+  "title": "Převzít přijatý Docker PR39 do čisté D main kopie",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/docker-main-sync-20261029.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Pouze byte-identický ff-only přenos publikovaného PR39 do D:/CodexWorkspaces/StrahovCrazyShow-main-20261027 z čistého main43175fc4 na9fbc76477bfd941bc3a71bc8dbc5ad645af4ebd2, bez autorských source změn.",
+    "Ověřit shodu celého tree e3ed142a6b8633f8808adff164d26b7b2b5c9c32 s accepted94a0cc32565aea737af57f030c4dc68e88fdb408, clean a0/0.",
+    "Žádná hra, Docker/build, DB, API, instalace, cleanup image/cache nebo zásah do C checkoutu. Vlastní handoff a release po syncu."
+  ],
+  "verification": [
+    "Git identity/clean před a po, ff-only a nulový diff accepted/merge. Žádný reset/stash/restore.",
+    "GitHub verify/secrets/project-acceptance success na přesném headu; sync není nové funkční ověření."
+  ],
+  "notes": [
+    "Claim a handoff v D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; administrativní stavy pod stávajícím admin claimem.",
+    "Autorizované předání koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d; acceptance https://github.com/Varnahg/StrahovCrazyShow/pull/39#issuecomment-6498351334. Volitelný cleanup po policy rejection neobcházet. Crawler/WebGPU zůstávají otevřené.",
+    "29.10.2026 přijato jako KEY70 v PR39/main9fbc76477bfd941bc3a71bc8dbc5ad645af4ebd2. Exact-head verify/secrets/project-acceptance success na94a0cc32, merge tree e3ed142a6b8633f8808adff164d26b7b2b5c9c32 shodný a D main ff-only/clean/0-0. Skutečné Docker fresh/restart/druhýprojekt/ACL/safe-failure a101vectors/0attempts doložené v handoffu. Done nepokrývá celý crawler, všechny katalogové zdroje, fyzický druhý notebook ani WebGPU timeout. Policy-blokovaný volitelný cleanup se neopakuje."
+  ]
+}

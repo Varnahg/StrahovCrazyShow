@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-normalizer",
+  "title": "RAG: offline normalizace uložených OpenAI PDF kandidátů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tools/rag_ingestion/strahov_rag_ingestion/openai_normalizer.py",
+    "tools/rag_ingestion/strahov_rag_ingestion/normalize_openai.py",
+    "tools/rag_ingestion/strahov_rag_ingestion/docling_adapter.py",
+    "tools/rag_ingestion/tests/test_openai_normalizer.py",
+    "tools/rag_ingestion/README.md",
+    ".cache/rag-auto-normalizer-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-normalizer.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat offline CLI a normalizer podle docs/rag-ingestion/20261028/openai-normalizer-contract.md. Vstupem je uložený celý PDF, candidate a explicitní hash/profile/context; bez sítě, modelu, klíče či placeného API.",
+    "Znovu striktně ověřit celou strukturu, PDF/candidate SHA, profile, počet a hranice stran, úplnost textu/tabulek/provenance a limity. Source ID/URL/title přebírat pouze z důvěryhodného requestu; nevymýšlet bbox, heading level, překlady, souhrny ani opravy obsahu.",
+    "Výstup použije existující WorkerEnvelope, tokenizer/chunker a table lineage po předaném checkpointu. docling_adapter.py lze měnit pouze pro sdílený serializer/header override s beze změny zachovaným výchozím Docling chováním; nevytvářet druhý chunker.",
+    "Normalizační parserProfile a configurationHash pravdivě vážou implementaci, celý API profile/observed model, tokenizer a request/chunk nastavení. Kontextový envelope musí vázat také sourceId, sourceUrl, title, MIME/charset a filename hint; znovupoužitelný placený candidate zůstává oddělený.",
+    "Autor před použitím předá měřitelný konzervativní native-text fidelity gate; validní JSON není důkaz úplnosti. Unresolved, neúplný nebo ztracený obsah musí být review/failed; image-only PDF je v prvním rozsahu review-required se zachovanými bloky/chunky, bez automatického quality approval.",
+    "Použít bounded fresh process, výlučný workDir a atomické no-overwrite. Společně předat cílený refaktoring, resource/cache lifecycle, konkrétní CLI/typy, lehké testy a hranice kvality. Tento komponentový výsledek nedokončuje KEY-67 ani publikaci dokumentů.",
+    "Nový spawn target musí volat process_runtime.isolate() před third-party parsingem/importy. Bounded execution, no-overwrite a cleanup nového entrypointu řešit v normalize_openai.py; společný runtime není zapisovatelný."
+  ],
+  "verification": [
+    "Nejdřív načíst potvrzený kontrakt a konkrétní table-lineage handoff/checkpoint extraktoru. Před prvním zápisem získat vlastní claim; aktivní tools/rag_ingestion/ rezervaci nelze obejít.",
+    "Synteticky ověřit table spans, nepočáteční header row, caption/notes, českou negaci/čísla, duplicated blocks/stabilní ID, source/context/profile/hash mismatch, page bounds, nereprezentovaný obsah, review vs publication a byte/token caps.",
+    "Ověřit timeout, no-overwrite a zákaz síťových/modelových volání; zachovat stávající lehké HTML/PDF/DOCX/table regrese. Použít přímo existující explicitní izolovaný Python interpreter bez instalace a dependency synchronizace.",
+    "Všechny nové pycache/temp/test/cache/state výstupy směrovat výhradně do .cache/rag-auto-normalizer-20261028/ (nebo bytecode zápis vypnout); existující venv a ostatní vstupy jsou pouze pro čtení. Žádný zápis pod cizí extraction cache.",
+    "Malé offline probe mohou číst oba již uložené kandidáty v .cache/rag-auto-pdf-validation-20261028/, ale nemění API ledger ani nevydávají dva příklady za obecnou kvalitu. Žádný benchmark, velký OCR běh, fullsuite/build/GPU/port nebo skutečná DB v tomto bezresource tasku.",
+    "Před startem Pythonu vypnout bytecode (-B nebo PYTHONDONTWRITEBYTECODE=1); pytest použije -p no:cacheprovider a --basetemp ve vlastní cache. Před Chunkerem zavolat tokenizer_ready(), chybějící slovník skončí výslovně bez provisioningu/downloadu."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/automated-document-rag, KEY-67. Přímá konkrétní delegace koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d; podagent neopakuje BMAD workflow.",
+    "Úkol je připravený, ale writePaths kolidují s aktivním prefixem rag-auto-20261028-extraction. Jeho původní vlastník předá hotový table-lineage checkpoint a výslovně uvolní claim před převzetím normalizerem. Status ready neruší živou rezervaci ani nedovoluje souběžného writera.",
+    "Kontrakt/research jsou read-only vstupy koordinátora. Native fidelity gate se nejdřív domluví s ním; do jeho docs prefixu tento autor nezapisuje.",
+    "Žádné staging/commit, API/key reads, instalace/downloady, DB, crawler/orchestrator/provider/UI změny ani nové trvalé či síťové cache. Původní PDF/candidate/placené pokusy zůstávají nezměněné.",
+    "Malý PDF screenshot má pouze ilustrativní datum21.10.2026; není důkazem dnešního termínu či stavu účtu. Pozdější publication/quality policy a Node orchestrace mají vlastní scopes.",
+    "Read-only kontrola doložila, že worker.implementation_hash() hashuje všechny package *.py. Nové soubory tedy změní také identitu nativního profilu/cache; tento dopad explicitně uvést v handoffu a koordinátorovi. Hashovací mechanismus ani worker.py nejsou v tomto scope."
+  ]
+}

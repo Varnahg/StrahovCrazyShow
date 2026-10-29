@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-extraction-validation",
+  "title": "RAG: krátké CPU ověření skutečného OCR a layoutu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-auto-extraction-validation-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-extraction-validation.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Pouze koordinované krátké CPU okno pro vlastní extrakční extras, model prefetch a omezené OCR/layout kontroly několika PDF. Explicitně vynutit CPU a nejvýše1–2CPU pracovníky/vlákna podle použitých knihoven; žádná automatická volba GPU.",
+    "Validation task rezervuje společné prostředky a zapisuje pouze vlastní důkazy/handoff. Zápisy do workeru, venv a model/cache výstupů zůstávají výhradně vlastníkovi rag-auto-20261028-extraction; tento task jeho scope nepřebírá.",
+    "Používat přesný izolovaný Python interpreter a připnutý extrakční profil. Žádná změna globálního Pythonu, node_modules, databáze, serveru, hry nebo placené API.",
+    "Ověřit skutečný obsah, pořadí čtení, tabulky a provenance na vymezených vzorcích. Jeden úspěšný OCR/layout výstup neprokazuje plošné pokrytí katalogu, správnost všech dokumentů ani produkční výkon.",
+    "Po konkrétním probu ukončit vlastní pomocníky, předat skutečné výsledky/modelové identity a skutečně uvolnit heavy-validation pro navazující Jantar Docker/build okno."
+  ],
+  "verification": [
+    "Před procesy vlastní claim a potvrzené uvolnění předchozího heavy vlastníka; neukončovat cizí procesy podle stáří či portu.",
+    "Zaznamenat zdrojový/extrakční profil, vstupní SHA, skutečný model a cache identity, CPU omezení, výsledky a chyby. Původní selhání uchovat.",
+    "Žádný image build, fullsuite ani další hromadná pipeline v tomto úzkém probu. Pokud je potřeba další rozsah, koordinovat jej odděleně před spuštěním."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/automated-document-rag, KEY-67. Přímá konkrétní koordinovaná žádost vlastníka01a17e9d-dd4a-7fe3-91ac-4f3bc548982d po nabídnutí krátkého CPU okna Jantarem.",
+    "V okamžiku přidělení nebyl v registru držitel heavy-validation; skutečné oprávnění začíná až úspěšným claimem příjemce. Extrakční zápisový task dál drží rag-auto-extractor-01a17e9d.",
+    "Samostatný vektorový archiv a posouzení DecisionsAPI jsou navazující výzkumné/implementační otázky; tento process task žádné takové runtime/SQL/provider změny neautorizuje.",
+    "Admin pouze vytvořil metadata, žádný model download, instalaci, OCR či proces sám nespustil."
+  ]
+}

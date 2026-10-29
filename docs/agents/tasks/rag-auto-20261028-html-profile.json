@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-html-profile",
+  "title": "RAG: omezené CPU porovnání HTML workeru A/B/A",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-auto-html-profile-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-html-profile.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Nanejvýš3 čerstvé procesy A/B/A nad přesně stejným již uloženým HTML a stávajícím venv; každý proces má hard deadline150s. Před spuštěním připnout úplný vstupní SHA a oba source/profile checkpointy.",
+    "Rozlišit spawn/metadata/import/convert/normalize/chunk a zachovat stejný HTMLDocumentBackend i celý výstup. Nezavádět nový parser, pool nebo zjednodušený dokument jen kvůli času.",
+    "Porovnat bloky/text/spans/chunkIDs/quality/links a doložit změny či shodu; jediný čas nebo teplá cache není důkaz zrychlení. Zaznamenat pořadí a podmínky všech tří čerstvých procesů.",
+    "Nulová síť/API/DB/GPU/inference/build/instalace/download. Baseline a profilovací výstupy pouze v vlastní cache; venv a ostatní ověřené cache neupravovat.",
+    "Po bounded probu ukončit všechny vlastní procesy, předat logy/identity/omezení a skutečně uvolnit heavy."
+  ],
+  "verification": [
+    "Před profilem claim až po skutečném release předchozího heavy vlastníka; code/unit práce v odděleném extraction scope může pokračovat předtím, ale měřený candidate musí být stabilní.",
+    "Používat přímý explicitní interpreter existujícího venv; žádný package manager. Běžná data a původní worker se během měření nepřepisují.",
+    "Výsledky nepřevádět na obecný výkon produkčního ingestu nebo jiných PDF/DOCX formátů."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, KEY-67. Podnět: dřívější65.8s HTML probe nad45088B uloženým SÚZhubem, nikoli GPU či modelová inference.",
+    "Při registraci heavy drží root dokumentačního checkpointu; tento task si příjemce claimne teprve po jeho release. Vstupní SHA c4629e7f...8dc9f je zatím zkrácený odkaz, před měřením doložit úplný hash z původní evidence.",
+    "Původní extraction task zvlášť vlastní docling_adapter.py/worker.py/testy; profiling task je neautorizuje editovat. Žádné další placené API nebo instalace."
+  ]
+}

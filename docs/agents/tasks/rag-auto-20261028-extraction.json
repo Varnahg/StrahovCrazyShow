@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-extraction",
+  "title": "RAG: izolovaný Python worker pro skutečnou extrakci dokumentů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tools/rag_ingestion/",
+    ".cache/rag-auto-extraction-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-extraction.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat samostatný Python worker se skutečným Docling výstupem podle výslovně předaného JSON kontraktu koordinátora. Placeholder, prázdný text nebo pouze validní JSON nejsou dokladem podpory formátu.",
+    "Ve tools/rag_ingestion/ držet vlastní pinned pyproject/lock, worker, testy a syntetické fixtures. Jediné zapisovatelné venv a instalační/modelové/cache/state výstupy patří do .cache/rag-auto-extraction-20261028/; žádný globální Python, node_modules ani package/lock hry.",
+    "Zachovat obsah, strukturu, tabulky a doloženou provenance. Vrátit jen lokátory/stránky/bbox, které skutečně podporuje použitý parser; neúplnou extrakci, chybějící model nebo unsupported formát hlásit výslovně.",
+    "Výchozí je lokální extrakce/OCR/layout podle potřeby, nikoli generativní přepis všech dokumentů. Žádné placené API. Native větev nesmí být vydávána za ověřené OCR obrazového PDF nebo korektní zpracování složitých tabulek.",
+    "Lehké native PDF/DOCX CPU kontroly jsou povolené. Větší modelové/OCR běhy, hromadná extrakce, image build a zátěžové měření vyžadují následné samostatné heavy okno; tento task nevlastní GPU a nesmí je automaticky zvolit.",
+    "Společně předat implementaci, cílený refaktoring, skutečné formátové důkazy, limity a resource/cache lifecycle. Shared/provider/SQL/CI/fetch/catalog/orchestrator se v tomto tasku nemění."
+  ],
+  "verification": [
+    "Nejdřív načíst aktuální research a předaný JSON kontrakt; ověřit pinned API proti relevantním primárním podkladům.",
+    "Instalaci provést jen v vlastním izolovaném prostředí s explicitními cestami cache; příkazy nesmějí spustit synchronizaci závislostí hry. Lehké testy volají přímo explicitní interpreter vlastního venv.",
+    "Doložit skutečnou extrakci native PDF a DOCX se strukturou/tabulkami na omezených vzorcích a syntetických fixtures; OCR/modelové části bez provedeného běhu jasně označit jako neověřené.",
+    "Před release ukončit vlastní pomocníky a předat přesné verze, soubory, výsledky a zbývající otázky. Nezasahovat do Jantar validačních procesů a snapshotů."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/automated-document-rag. Koordinátor KEY-67 v chatu01a17e9d-dd4a-7fe3-91ac-4f3bc548982d předal konkrétní implementační/prototypový krok po reálných třech formátových vzorcích.",
+    "Podklady docs/rag-ingestion/20261028/research.md a připravovaný JSON kontrakt jsou koordinátorův read-only vstup. Není povolen zápis do jeho výzkumného prefixu; vlastní předání má samostatnou cestu.",
+    "Přímá konkrétní delegace: podagent neopakuje BMAD workflow. Před prvním zápisem získá vlastní disjunktní claim; prázdné resources nejsou oprávnění k větší modelové pipeline.",
+    "Všechny package/model cache směrovat do vlastní cache, včetně případných UV/PIP/HF/Torch výstupů. Neprovádět pnpm exec/run ani jiný package-manager příkaz v kořeni hry; předchozí incident prokázal nechtěnou synchronizaci sdílených dependencies.",
+    "Automatické získávání a následná SQL publikace budou mít vlastní scopes po ustálení rozhraní. Tento task sám nespouští produkční crawler nebo scheduler."
+  ]
+}

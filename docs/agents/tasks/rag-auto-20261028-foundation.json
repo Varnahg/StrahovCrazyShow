@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-foundation",
+  "title": "RAG: kompatibilní dokumentový kontrakt v3, provenance a veřejné citace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/rag-provenance.ts",
+    "shared/rag-citation-policy.ts",
+    "shared/data/rag-citation-policy.json",
+    "server/rag-knowledge-types.ts",
+    "server/rag-document-contract.ts",
+    "scripts/rag-build-citation-policy.ts",
+    "tests/rag-document-contract.test.ts",
+    "tests/rag-citation-policy.test.ts",
+    "tests/rag-provenance.test.ts",
+    ".cache/rag-auto-foundation-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-foundation.md",
+    "shared/crazy-typka.ts",
+    "server/crazy-typka-retrieval.ts",
+    "server/rag-embeddings.ts",
+    "tests/rag-embeddings.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Podle document-v3-contract.md přidat v3 dokument/blok/chunk/sourceVersion/provenance typy a validátory vedle přísného legacy v2. V2 validační chování, limity, authority dvojice a přesné výstupy musí zůstat beze změny.",
+    "Legacy knowledge typy přesunout pouze kompatibilně do serverového listového rag-knowledge-types modulu a původně je reexportovat; nepropojit nový validator se store/retrieval enginem ani browser-safe provenance s Node/DB.",
+    "Nový explicitní embedding inputVersion title-heading-text-v2 zachová všechny staré IDs/hash tuple/defaulty a v1 serializaci. Fyzické page/bbox a kontrolní metadata nesmějí nechtěně vstupovat do embedding textu; staré cache nepřepisovat.",
+    "V3 identita bloků/chunků je kompozitní uvnitř sourceVersionId, takže více archivních verzí může sdílet stabilní lokální ID. Ověřit vazby, úplnost, hash, bounded velikosti, Unicode, data a pravdivé locatory; nevymýšlet DOCX/HTML stránky nebo bbox.",
+    "Generovat jediný veřejný URL policy artifact z již schválených public katalogových pravidel, ne z celého publisher inventáře. Vyloučit auth/social/neprověřené/asset-directory endpointy a prokázat, že generator nerozšiřuje oprávnění.",
+    "Nová citation větev document-extraction musí být pravdivá, s verzově specifickou identitou a platnou veřejnou URL/provenance. Legacy citace zůstávají kompatibilní; samotný foundation nezapíná v3 odpovědi ani archivní chat.",
+    "Žádná SQL/store/provider/Decisions/UI wiring změna, paidAPI, klíče, instalace nebo fullbuild. Případnou potřebnou kompatibilní změnu mimo tento scope nejprve předat, neřešit oslabením validace nebo širokými casts."
+  ],
+  "verification": [
+    "Významné cílené Node unit/fake testy pro v1byte/ID parity, v2striktnost, v3delšítext/composite reference, source spans a policy pozitivní/negativní parity.",
+    "Skutečný count/tokenizer výstup nepředstírat validací deklarovaného čísla; structured ok/complete nejsou samy důkazem publikační věrnosti.",
+    "Cílený refaktoring, strict TypeScript a přesný exportový kontrakt předat společně. Pouze přímé Node vstupy, bez pnpm exec/run synchronizace dependencies."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, KEY-67. Read-only kontrakt docs/rag-ingestion/20261028/document-v3-contract.md vlastní koordinátor.",
+    "Scope je disjunktní s acquisition/extractor/OpenAI PDF; jejich zdroje ani výstupní kontrakty se zde bez dohody nepřepisují. Před implementací sjednotit accepted base s koordinátorem a získat vlastní claim.",
+    "Přímá konkrétní delegace, bez rekurzivního BMAD. Hotový router z PR35 zůstává obsahově i funkčně zachovaný."
+  ]
+}
