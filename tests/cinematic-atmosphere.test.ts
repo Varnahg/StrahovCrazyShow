@@ -73,7 +73,7 @@ function fixture(t: import("node:test").TestContext) {
       ...map.getCustomRenderList!(0, map.renderList!, map.renderList!.length)!,
     ];
   };
-  return { engine, scene, light, atmosphere, input, filter };
+  return { engine, scene, camera, light, atmosphere, input, filter };
 }
 
 test("shadow contrast follows actual sun/moon irradiance, horizon and weather", () => {
@@ -263,4 +263,54 @@ test("allocation-free live snapping retains Babylon transverse projections at so
       assert.ok(Math.abs(projected - Math.round(projected)) < 1e-9);
     }
   }
+});
+
+test("returning from low reuses identical postprocess resources, low dispatches none and teardown releases a suspended chain", (t) => {
+  const { engine, scene, camera, atmosphere, input } = fixture(t);
+  const baselineEffects = engine.postProcesses.length;
+  const baselineObservers = new Set(engine.onResizeObservable.observers);
+  atmosphere.update({ ...input, quality: "medium" });
+  const chain = camera._postProcesses.filter((effect) => effect !== null);
+  const ownedEffects = engine.postProcesses.slice(baselineEffects);
+  const addedObservers = engine.onResizeObservable.observers.filter(
+    (observer) => !baselineObservers.has(observer),
+  );
+  assert.ok(chain.length > 0 && ownedEffects.length >= chain.length);
+  let disposals = 0;
+  for (const effect of ownedEffects)
+    effect.onDisposeObservable.add(() => disposals++);
+  for (let cycle = 0; cycle < 5; cycle++) {
+    atmosphere.update({ ...input, quality: "low" });
+    assert.equal(camera._postProcesses.filter(Boolean).length, 0);
+    assert.equal(atmosphere.stats.pipelineAttached, false);
+    assert.equal(atmosphere.stats.bloomWeight, 0);
+    assert.equal(
+      scene.autoClear,
+      true,
+      "low must clear without the detached first postprocess",
+    );
+    atmosphere.update({ ...input, quality: cycle % 2 ? "high" : "medium" });
+    assert.deepEqual(camera._postProcesses.filter(Boolean), chain);
+    assert.equal(atmosphere.stats.pipelineBuilds, 1);
+    assert.equal(atmosphere.stats.pipelineAttached, true);
+    assert.equal(scene.autoClear, false);
+    assert.equal(disposals, 0);
+    assert.equal(
+      engine.postProcesses.length,
+      baselineEffects + ownedEffects.length,
+    );
+  }
+  atmosphere.update({ ...input, quality: "low" });
+  atmosphere.dispose();
+  assert.equal(disposals, ownedEffects.length);
+  assert.equal(engine.postProcesses.length, baselineEffects);
+  assert.ok(
+    addedObservers.every(
+      (observer) =>
+        observer._willBeUnregistered ||
+        !engine.onResizeObservable.observers.includes(observer),
+    ),
+  );
+  assert.equal(camera._postProcesses.filter(Boolean).length, 0);
+  assert.equal(atmosphere.stats.pipelineAttached, false);
 });

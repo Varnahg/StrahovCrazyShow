@@ -24,6 +24,8 @@ import {
   GRASS_LEVELS,
 } from "../client/photo-grass-budget";
 import { createPhotoGrassPlacement } from "../client/photo-grass-placement";
+import { PhotoGrassTileExecutor, type PhotoGrassWorkerPort } from "../client/photo-grass-tile-executor";
+import { GRASS_WORKER_PROTOCOL, type GrassTileRequest } from "../client/photo-grass-worker-protocol";
 import {
   createPhotoGrassWindState,
   PhotoGrassWind,
@@ -49,7 +51,7 @@ const pack = JSON.parse(
 const recipe = JSON.parse(
   readFileSync("public/models/vegetation/grass/material.json", "utf8"),
 );
-function fixture() {
+function fixture(tileExecutor?: PhotoGrassTileExecutor | null) {
   const engine = new NullEngine({
       renderWidth: 1280,
       renderHeight: 720,
@@ -78,7 +80,7 @@ function fixture() {
       1024,
       () => new Texture(null, scene),
     ),
-    grass = new PhotographicGrass(scene, pack, recipe, resources);
+    grass = new PhotographicGrass(scene, pack, recipe, resources, { tileExecutor });
   return {
     engine,
     scene,
@@ -116,6 +118,165 @@ function settle(f: ReturnType<typeof fixture>, quality = "medium", time = 1) {
   }
   assert.fail("Grass preparation, allocation and fades must eventually finish");
 }
+
+function deferredTiles() {
+  const placement = createPhotoGrassPlacement(), requests = new Map<number, GrassTileRequest>();
+  let terminated = 0;
+  const port: PhotoGrassWorkerPort = {
+    onmessage: null, onerror: null, onmessageerror: null,
+    postMessage(message) {
+      if (message.kind === "reset") requests.clear();
+      else if (message.kind === "cancel") requests.delete(message.requestId);
+      else requests.set(message.requestId, message);
+    },
+    terminate() { terminated++; requests.clear(); placement.dispose(); },
+  };
+  const executor = new PhotoGrassTileExecutor(() => port, () => 0);
+  return {
+    executor, port, requests,
+    get terminated() { return terminated; },
+    ready() { port.onmessage?.({ data: { kind: "ready", protocol: GRASS_WORKER_PROTOCOL } }); },
+    complete() {
+      for (const request of requests.values()) {
+        const tile = placement.tile(request.x, request.z);
+        placement.releaseTile(tile);
+        port.onmessage?.({ data: structuredClone({ ...request, tile, cpuMs: 0 }, { transfer: [tile.matrices.buffer as ArrayBuffer] }) });
+      }
+      requests.clear();
+    },
+  };
+}
+
+test("experimental worker applies only in update, preserves exact settled roots and bounded arrivals", (t) => {
+  fixedPreparationClock(t);
+  const worker = deferredTiles(), f = fixture(worker.executor);
+  worker.ready();
+  try {
+    for (let frame = 0; frame < 1200; frame++) {
+      const previous = f.grass.stats.instances, cache = f.grass.stats.cachedTiles;
+      worker.complete();
+      assert.equal(f.grass.stats.cachedTiles, cache, "message receipt never changes live cache/stats");
+      f.grass.update({ time: 1 + frame / 60, quality: "medium", wind: { x: 0, z: 0 } });
+      assert.ok(f.grass.stats.cachedTiles - cache <= GRASS_PREPARATION.coldTiles);
+      assert.ok(f.grass.stats.instances - previous <= GRASS_PREPARATION.additions);
+      assert.ok(worker.executor.pendingCount <= 2);
+      assert.ok(f.grass.stats.triangles <= 140000);
+      if (!f.grass.stats.preparing && !f.grass.stats.transitionRoots) break;
+    }
+    assert.equal(f.grass.stats.preparing, false);
+    const roots = [...(f.grass as any).roots.values()]
+      .map((r: GrassRootState) => [r.id, r.level, r.x, r.y, r.z])
+      .sort((a, b) => Number(a[0]) - Number(b[0]));
+    assert.equal(createHash("sha256").update(JSON.stringify(roots)).digest("hex"), "481a3b9b1ad136fa18ab9d25e908daa85d0e51652a709ad77ba26014210f15c0");
+    assert.equal(f.grass.stats.instances, 1916);
+    f.grass.dispose();
+    worker.complete();
+    assert.equal(worker.terminated, 1);
+    assert.equal(f.grass.stats.ready, false);
+    assert.equal(f.grass.stats.cachedTiles, 0);
+  } finally { f.dispose(); }
+});
+
+test("worker boot and failure retain native progress, committed roots and readiness", (t) => {
+  fixedPreparationClock(t);
+  const worker = deferredTiles(), f = fixture(worker.executor);
+  try {
+    for (let frame = 0; frame < 30; frame++)
+      f.grass.update({ time: 1 + frame / 60, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.ok(f.grass.stats.cachedTiles > 0, "native generator runs while worker boots");
+    worker.ready();
+    for (let frame = 0; frame < 10 && worker.executor.pendingCount === 0; frame++)
+      f.grass.update({ time: 2 + frame / 60, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.ok(worker.executor.pendingCount > 0);
+    const cache = f.grass.stats.cachedTiles, roots = (f.grass as any).roots;
+    worker.port.onerror?.();
+    f.grass.update({ time: 2.2, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.equal(worker.terminated, 1);
+    assert.equal((f.grass as any).roots, roots);
+    assert.ok(f.grass.stats.cachedTiles >= cache);
+    assert.equal(f.grass.stats.ready, true);
+    settle(f, "medium", 2.3);
+    assert.equal(f.grass.stats.instances, 1916);
+  } finally { f.dispose(); }
+});
+
+test("worker result application observes the 2ms deadline and teleport/quality cancel obsolete tiles", (t) => {
+  const clock = fixedPreparationClock(t), worker = deferredTiles(), f = fixture(worker.executor);
+  worker.ready();
+  try {
+    for (let frame = 0; frame < 20 && worker.executor.pendingCount < 2; frame++)
+      f.grass.update({ time: 1 + frame / 60, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.equal(worker.executor.pendingCount, 2);
+    worker.complete();
+    let elapsed = 0;
+    clock.mock.mockImplementation(() => elapsed += 3);
+    f.grass.update({ time: 1.5, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.equal(f.grass.stats.cachedTiles, 1, "deadline stops the second already completed tile");
+    clock.mock.mockImplementation(() => 0);
+    f.camera.position.set(333.5, groundHeight(333.5, -109.5) + 1.7, -109.5);
+    f.camera.setTarget(new Vector3(333.5, groundHeight(333.5, -109.5), -106.5));
+    for (let frame = 0; frame < 800; frame++) {
+      worker.complete();
+      f.grass.update({ time: 2 + frame / 60, quality: "low", wind: { x: 0, z: 0 } });
+      assert.ok(f.grass.stats.triangles <= 60000);
+      if (!f.grass.stats.preparing && !f.grass.stats.transitionRoots) break;
+    }
+    assert.equal(f.grass.stats.preparing, false);
+    assert.ok(f.grass.stats.instances > 0);
+    for (const root of (f.grass as any).roots.values()) assert.ok(root.x > 300);
+    assert.equal(f.grass.stats.ready, true);
+  } finally { f.dispose(); }
+});
+
+test("ready worker takes over after a native partial tile under advancing deadlines", (t) => {
+  const clock = fixedPreparationClock(t), worker = deferredTiles(), f = fixture(worker.executor);
+  let elapsed = 0, time = 1;
+  // Eight generator steps per 2ms slice: a tile spans slices, and completing
+  // one leaves enough of a slice to incorrectly start the next native tile.
+  clock.mock.mockImplementation(() => elapsed += 0.25);
+  const update = () => f.grass.update({ time: time += 1 / 60, quality: "medium", wind: { x: 0, z: 0 } });
+  try {
+    for (let frame = 0; frame < 200 && !(f.grass as any).tilePreparation; frame++) update();
+    assert.ok((f.grass as any).tilePreparation, "native tile was already partially prepared at readiness");
+    const cached = f.grass.stats.cachedTiles;
+    worker.ready();
+    for (let frame = 0; frame < 100 && f.grass.stats.cachedTiles === cached; frame++) update();
+    assert.equal(f.grass.stats.cachedTiles, cached + 1);
+    assert.equal((f.grass as any).tilePreparation, undefined, "do not start another native tile before handing over");
+    for (let frame = 0; frame < 20 && worker.executor.pendingCount === 0; frame++) update();
+    assert.ok(worker.executor.pendingCount > 0, "worker receives queued tiles despite ongoing deadline pressure");
+    assert.equal((f.grass as any).tilePreparation, undefined);
+  } finally { f.dispose(); }
+});
+
+test("delayed worker tiles retain current near coverage during walking, sprinting and turns", (t) => {
+  fixedPreparationClock(t);
+  for (const mode of ["walk", "sprint", "turn"] as const) {
+    const worker = deferredTiles(), f = fixture(worker.executor);
+    worker.ready();
+    try {
+      for (let frame = 0; frame < 240; frame++) {
+        if (frame % 2 === 0) worker.complete();
+        const speed = mode === "walk" ? 4.6 : mode === "sprint" ? 7 : 0,
+          x = 110, z = 45 + speed * frame / 30, y = groundHeight(x, z),
+          angle = mode === "turn" ? frame * Math.PI / 60 : 0,
+          time = 1 + frame / 30;
+        f.camera.position.set(x, y + 1.7, z);
+        f.camera.setTarget(new Vector3(x + Math.sin(angle) * 3, y, z + Math.cos(angle) * 3));
+        f.grass.update({ time, quality: "high", wind: { x: 0, z: 0 } });
+        assert.ok(worker.executor.pendingCount <= 2);
+        if (frame >= 30 && frame % 10 === 0) {
+          const planes = Frustum.GetPlanes(f.camera.getViewMatrix().multiply(f.camera.getProjectionMatrix()));
+          const visible = [...(f.grass as any).roots.values()].filter((root: GrassRootState) =>
+            grassVisibility(root.fade, time) > 0 &&
+            grassFocusDistance(root.x, root.z, x, z, x, z) < 8 &&
+            planes.every(plane => plane.dotCoordinate(new Vector3(root.x, root.y + 0.025, root.z)) >= -0.16));
+          assert.ok(visible.length >= 100, `${mode} frame ${frame}: ${visible.length} current roots`);
+        }
+      }
+    } finally { f.dispose(); }
+  }
+});
 
 test("cold work and instance arrivals are bounded per update and converge to the original root set", (t) => {
   fixedPreparationClock(t);

@@ -156,14 +156,30 @@ test("both production render callsites canonicalize actual light slots before dr
   for (const call of calls) {
     const statement = call.parent;
     assert.ok(ts.isExpressionStatement(statement));
-    assert.ok(ts.isBlock(statement.parent));
-    const siblings = [...statement.parent.statements];
-    const before = siblings[siblings.indexOf(statement) - 1];
-    const budget = siblings[siblings.indexOf(statement) - 2];
-    assert.equal(before?.getText(source), "this.stableLights.update();");
-    assert.equal(
-      budget?.getText(source),
-      "this.gltfLightBudget.prepareFrame();",
+    // Gameplay retains the foreign diagnostic try/finally around scene.render.
+    // Find the actual preceding calls in its enclosing method, including the
+    // optional controller access needed before staged world initialization.
+    let owner: ts.Node = call;
+    while (!ts.isMethodDeclaration(owner)) owner = owner.parent;
+    const preceding = findNodes(
+      owner,
+      (node): node is ts.CallExpression =>
+        ts.isCallExpression(node) && node.end < call.pos,
+    );
+    const before = preceding
+      .filter((node) =>
+        /^this\.stableLights\??\.update$/.test(node.expression.getText(source)),
+      )
+      .at(-1)!;
+    const budget = preceding
+      .filter((node) =>
+        /^this\.gltfLightBudget\??\.prepareFrame$/.test(
+          node.expression.getText(source),
+        ),
+      )
+      .at(-1)!;
+    assert.ok(
+      budget && before && budget.end < before.pos && before.end < call.pos,
     );
     // Toggle the first canonical light off/on: Babylon appends it to the end.
     const first = mesh.lightSources[0];
@@ -184,7 +200,7 @@ test("both production render callsites canonicalize actual light slots before dr
       );
     };
     compile(
-      `${budget.getText(source)}\n${before.getText(source)}\n${statement.getText(source)}`,
+      `${budget.getText(source)};\n${before.getText(source)};\n${statement.getText(source)}`,
     ).call(game);
     assert.equal(draws, 1);
   }
@@ -194,8 +210,8 @@ test("both production render callsites canonicalize actual light slots before dr
   const frameCalls = findNodes(frame, (node): node is ts.CallExpression =>
     ts.isCallExpression(node),
   );
-  const stabilize = frameCalls.find(
-    (call) => call.expression.getText(source) === "this.stableLights.update",
+  const stabilize = frameCalls.find((call) =>
+    /^this\.stableLights\??\.update$/.test(call.expression.getText(source)),
   )!;
   const environment = frameCalls.find(
     (call) =>
@@ -222,14 +238,14 @@ test("both production render callsites canonicalize actual light slots before dr
 test("actual preload callback does no controller work or render after cancellation", (t) => {
   const game = fixture(t);
   const preload = findNodes(
-    member("start"),
+    member("startContent"),
     (node): node is ts.VariableDeclaration =>
       ts.isVariableDeclaration(node) &&
       node.name.getText(source) === "preloadRender",
   )[0];
   assert.ok(preload?.initializer);
   const drawScene = findNodes(
-    member("start"),
+    member("startContent"),
     (node): node is ts.VariableDeclaration =>
       ts.isVariableDeclaration(node) && node.name.getText(source) === "renderPreloadScene",
   )[0];
@@ -238,10 +254,10 @@ test("actual preload callback does no controller work or render after cancellati
   game.scene.render = () => {
     draws++;
   };
-  const render = compile(`let pipelinePreparation;
+  const render = compile(`let preparingLighting = false; let pipelinePreparation;
     const renderPreloadScene = ${drawScene.initializer.getText(source)};
     return ${preload.initializer.getText(source)};`).call(
-    game,
+    Object.assign(game, { updatePreloadVisuals() {} }),
   );
   render();
   const stats = { ...game.stableLights.stats };
@@ -279,6 +295,7 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
       frameLifecycleProfile: undefined,
       renderHealth: { dispose: () => order.push("health") },
       benchmark: undefined,
+      worldBuildJob: undefined,
       canvas: noop,
       resetDiagnosticContext: noop,
       engine: { stopRenderLoop: () => order.push("stop"), dispose() {} },

@@ -11,6 +11,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import "@babylonjs/core/Meshes/instancedMesh";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Geometry } from "@babylonjs/core/Meshes/geometry";
 import type { AvatarConfig } from "../shared/types";
 import { avatarPreset } from "./avatar-presets";
@@ -957,3 +958,68 @@ export function createAvatarRig(
   leftElbow.rotation.x = rightElbow.rotation.x = -0.12;
   return rig;
 }
+
+/** Own one current rig, preserving shared geometry while replacing its users. */
+export class AvatarPreviewModel {
+  private readonly pool: AvatarPrimitivePool;
+  private config: AvatarConfig;
+  private disposed = false;
+  rig: AvatarRig;
+  readonly stats = { builds: 1, skippedUpdates: 0 };
+
+  constructor(
+    private readonly scene: Scene,
+    initial: AvatarConfig,
+  ) {
+    this.pool = new AvatarPrimitivePool(scene);
+    this.config = { ...initial };
+    this.rig = createAvatarRig(scene, this.config, this.pool, "preview");
+  }
+
+  update(config: AvatarConfig) {
+    if (this.disposed) return false;
+    if (
+      (Object.keys(this.config) as (keyof AvatarConfig)[]).every(
+        (key) => this.config[key] === config[key],
+      ) &&
+      (Object.keys(config) as (keyof AvatarConfig)[]).every(
+        (key) => this.config[key] === config[key],
+      )
+    ) {
+      this.stats.skippedUpdates++;
+      return false;
+    }
+    // Disposing the last geometry user first destroys Babylon's buffers and
+    // garment materials. Acquire their new users before releasing the old rig.
+    const next = createAvatarRig(this.scene, config, this.pool, "preview");
+    const previous = this.rig;
+    this.rig = next;
+    this.config = { ...config };
+    previous.root.dispose(false, false);
+    this.pool.pruneUnused();
+    this.stats.builds++;
+    return true;
+  }
+
+  dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.rig.root.dispose(false, false);
+    this.pool.dispose();
+  }
+}
+
+/** The editor never displays medium LODs or the pool's hidden source meshes. */
+export function avatarPreviewMeshesReady(meshes: readonly AbstractMesh[]) {
+  let ready = true;
+  for (const mesh of meshes)
+    if (
+      mesh.isEnabled() &&
+      mesh.isVisible &&
+      mesh.visibility > 0 &&
+      !mesh.isReady(true)
+    )
+      ready = false;
+  return ready;
+}
+

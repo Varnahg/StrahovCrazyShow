@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "automatic-diagnostics-fixtures",
+  "title": "Aktualizovat izolované síťové a fyzikální fixtures o diagnostický kontrakt",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/room-callbacks.test.ts",
+    "tests/client-recovery.test.ts",
+    "tests/helpers/prediction-replay-fixture.ts",
+    "docs/agents/handoffs/automatic-diagnostics-fixtures.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zachovat všechny původní behaviorální assertions a doplnit nové závislosti skutečných metod v izolovaných fixtures.",
+    "Ověřit síťové callbacks, respawn a prediction replay s novou diagnostikou bez WebGL."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/room-callbacks.test.ts tests/client-recovery.test.ts tests/prediction-replay.test.ts"
+  ],
+  "notes": [
+    "Přiděleno integrátorem po skutečném full suite selhání701/728. Fixtures vytvářejí Game bez constructoru a AST callbacky bez importů.",
+    "Neměnit runtime ani maskovat chyby assertions; předat konkrétní diff a testy."
+  ]
+}

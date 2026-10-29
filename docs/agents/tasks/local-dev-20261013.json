@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "local-dev-20261013",
+  "title": "Ponechat uživateli lokální hru na 5173 a API na 2567",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/local-dev-20261013.md",
+    ".cache/local-dev-20261013/"
+  ],
+  "resources": [
+    "port:5173",
+    "port:2567"
+  ],
+  "acceptance": [
+    "Spustit klienta a server ze stejného aktualizovaného main.",
+    "Evidovat PID, command, cwd, creation time, logy a commit; držet rezervaci po celou dobu běhu."
+  ],
+  "verification": [
+    "HTTP 200 na http://127.0.0.1:5173/ a health endpoint přímo i proxy.",
+    "Ověřit skutečné naslouchání a procesní metadata."
+  ],
+  "notes": [
+    "Uživatel výslovně požaduje spuštění; runtime po předání zůstává běžet pod touto rezervací.",
+    "Před spuštěním byly oba výchozí porty volné.",
+    "Task neprovádí GPU benchmark a nepřebírá staré preview 4179/2570."
+  ]
+}

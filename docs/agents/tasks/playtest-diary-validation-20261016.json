@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "playtest-diary-validation-20261016",
+  "title": "Ověřit produkční pohybový a obrazový deník",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/verification.md",
+    "docs/agents/handoffs/playtest-diary-validation-20261016.md",
+    ".cache/playtest-diary-gpu/",
+    "dist/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4190",
+    "port:2585",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Build an immutable production snapshot including all tests; run full tests/build/isolated integration and whole-game/HUD/real-session screenshot versus no-capture A/B.",
+    "No collection-caused >50ms stall and p95 delta≤2ms; preserve exact GPU/CSS/render resolution, source identity and complete failures/limits."
+  ],
+  "verification": [
+    "Claim only after flashlight root releases heavy/GPU/build/2568. Check actual listeners and existing GPU scenes before launching; never stop a foreign process by port.",
+    "Owned processes must be hidden, identity-recorded, cleaned up before release; never install/update/patch the borrowed immutable dependency target."
+  ],
+  "notes": [
+    "Requested by diary coordinator01a141c7 on16Oct2026. Evidence directory and.cache/playtest-diary-validation belong to the separate integration task; coordinate one writer and transfer that scope explicitly if required.",
+    "Frozen4188/API2583 and borrowed key17node_modules remain immutable. Validation4190/API2585 is separate. Final flashlight main commit must be integrated first."
+  ]
+}

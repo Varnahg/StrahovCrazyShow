@@ -406,6 +406,111 @@ B3 full validation completed:684/684 tests and build PASS; first integration had
 
 Published locally: main7f65653, B3 source e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a6 on4179/API2570. All8357 source files and277 served build files match,0 differences; health/collector PASS and live station weather restored. [Publication evidence](verification-evidence/building-models-20261012/b3-publication.json). Foreign untracked vegetation-audit files were preserved; no whole-checkout-clean claim.
 
+## Lokální aktualizace a spuštění 13.10.2026
+
+Na výslovné zadání uživatele byl main fast-forward aktualizován z a381cf6 na 91ee88f0aaa902c79fad589aeb84bc086a66c9ea, Git LFS pull a pnpm install --frozen-lockfile prošly. Lokální klient 5173, API2567 i Vite /api/health proxy vrátily HTTP200. Solo svět se skutečně vykreslil s avatarem a HUD; browser konzole warning/error0. Kontrolní 3D tab byl uzavřen, uživatelské služby běží pod samostatnou aktivní rezervací. Lokální implementace ani závislosti nebyly upraveny; plné testy/build/integrace se neopakovaly. Toto je smoke kontrola spuštění, nikoli nové měření FPS nebo přejímka řízení/kolizí. [Přesný sync a důkazy](agents/handoffs/remote-sync-20261013.md), [živé procesní předání](agents/handoffs/local-dev-20261013.md).
+
+## Automatické lokální logy hraní — 13.10.2026
+
+Na výslovné zadání uživatele se diagnostika spouští automaticky se stránkou a průběžně ukládá do `.cache/game-diagnostics/`. Záznam pokrývá frame intervaly, CPU fáze/GPU vzorky, nastavení, polohu/kameru, světlo/počasí, UI, chyby a síťové události; neobsahuje chat ani profily. Nezmrazuje adaptivní kvalitu. HUD uvádí skutečný stav ukládání; report vyznačuje mezery, změny zdroje a nedoručený konec. [Použití a limity](performance/automatic-diagnostics.md).
+
+Finální zdrojový checkpoint se všemi testy a jejich fixtures:476 souborů, SHA256 `d3ee76c2eb756a66f992fcd3e1f164c2f48a738932ef0f9603c11671e12a956a`. **728/728 testů, build a izolovaná integrace PASS**. Původní neúspěšné běhy (neúplné izolované fixtures a dvě testové typové nesrovnalosti) jsou zachované samostatně, příčiny i opravy jsou v [přesném předání](agents/handoffs/automatic-diagnostics-integration.md). Runtime nikdo neupravoval za běhu finální pipeline.
+
+Produkční browser na dočasném4176/API2567 automaticky zapsal520 událostí ve37 dávkách,175 frame oken a12456 foreground snímků bez recording-gap. Ověřena sólo i skutečná multiplayerová relace, změna kvality/osvětlení, svítilna, kamera a chůze. GPU GTX1060/ANGLE D3D11, CSS1280×720, interně1280×720 a984×553;0 render/asset chyb. Jediný HTTP404 byl chybějící favicon; zaznamenané3 síťové korekce nejsou skryté. Smíšená funkční relace71.42FPS/p9517.3ms/p9924.7ms obsahovala také2505.9ms zásek (předchozí CPU render2162.3ms). **Není to srovnávací výkonová přejímka**, protože se během ní měnila kvalita, světlo i režim. Příčina rendererového záseku tím ještě není prokázaná ani opravená.
+
+Po tvrdém zavření kontrolní karty chybí session-end a report to správně přiznává; neodeslaný konec může být ztracen. Retence7dní/128MiB je omezená, nejde o neomezený archiv. Souhrny/screenshot/kopie JSONL a source manifest jsou v `.cache/automatic-diagnostics-validation/`. Dočasný preview i GPU karty ukončeny, integrační port2568 uklizen. Uživatelova původní hra5173/API2567 pokračuje a loguje automaticky. Cizí vegetační WIP a původní předání zůstaly zachované.
+## Uživatelský test po zapnutí automatických logů — 13.10.2026
+
+Read-only audit skutečné relace19:43:35–19:50:32 Praha (`c0c87474-6d36-487d-b9c7-a180bb43c5fd`) potvrdil souvislý log2741událostí/70dávek bez mezer a řádné ukončení. Foreground17437snímků:43.25FPS,p9541.7ms,p9989.8ms,12intervalů≥1s,max2713.8ms. Zachyceny sekundové záseky při svítilně, nastupování, low→medium a za jízdy, propady na25–33FPS, další náklady vegetace a editoru8–14FPS. Síť:420tvrdých korekcí,174resynců,8front po65odhozených vstupech; nevyžádaná pěší korekce2.12m. Největší2.965mposun odpovídá vědomému nástupu do auta a nebyl vydáván za chybu teleportu.
+
+Také potvrzeny chyby nové diagnostiky: connection stáleconnecting, resync displacement chybně0, chybějící positioninterakce a podhodnocující souhrn errors0. Chybí serverové timing/RTT/resyncReason a jemné rendererové fáze. Žádné zachycené JS/asset/render/HTTP/WebGL chyby; to neznamená bezproblémové hraní. GTX1060,Edge155,CSS2040×986,manual low/medium/high,multiplayer1avatar,vývojový klient; nejde o produkční srovnávací přejímku. [Nálezy, důkazy, časová osa a pořadí oprav](performance/playtest-diagnostics-20261013.md), [předání a zdrojová identita](agents/handoffs/playtest-diagnostics-20261013.md). Runtime ani původní procesy nebyly v této analýze změněny; opravy zatím nejsou hotové.
+
+
+## Opravy po testování 13.10.2026 — průběžný stav, nepřijatý celek
+
+Původní uživatelský záznam a audit se zachovávají; cílem není skrýt hitches vyhlazováním. [Plán oprav](performance/playtest-repair-plan.md) rozlišuje 11 oblastí v Linearu.
+
+- Immutable wave1: source/config/test/assets snapshot SHA-256 `300f47b09afbba1b6af71d56af69cc4b1c1c5a9c3d6be36b935a99b68a284a3b`, 8389 souborů. `pnpm test` **786/786 PASS**, `pnpm build` **PASS**. `pnpm test:integration` **FAIL**, timeout `D turns the real front wheels right`; původní .cache/playtest-repairs-validation/wave1-integration.log zachován. Nejde o přijatou opravu řízení.
+- Skutečná produkční baseline před novými opravami: GTX1060 / ANGLE D3D11, 1 skutečná relace a celý HUD, medium, CSS i render2040×986, noční preview14.10.2026 00:00 Praha, **33,5 FPS / p95 48,2ms / p99 63,7ms**. Zdrojový snapshot `f2705e4a74273d443dc2bb79f9be5ffd83efe7f54f54ef150b790c8978831410`; shader/driver cache neresetována a počasí živé, tedy referenční bod, nikoli finální A/B. Pilotní1280×720 vzorky vyloučené. Úplný session JSONL uložen, benchmark summary neobsahuje plný modelReview export.
+- Průběžný klientský V11 checkpoint 21:50 Praha: **48/48** cílených recovery/replay/callback/timeline/skutečných Rapier testů PASS a plná `tsc --noEmit` PASS. Ověřené držené vstupy po dlouhém snímku, jedna hrana skoku, bounded recovery, epoch bariéry před sender ack, UTC replay a nenulové opravy v logu. Doplněno porovnání grounded a fyzikálních vlastností vozidla; stejná pozice sama nestačí. Log .cache/playtest-repairs/v11-client-final.log.
+- Volitelný statický předvýběr:10/10 parity/guard testů a narrow TS PASS. V runtime default vypnutý; vyžaduje produkční A/B. Žádný NullEngine výsledek se nevydává za zlepšení FPS.
+
+Server a SDK V11 navazují ve společném checkpointu. Nový browser-to-disk recorder, reálná jízda, studené světlo/editor/startup, vegetace, draw CPU a výsledné FPS ještě nejsou přijaty. Host a původní živé služby5173/2567 zůstávají pod vlastním původním provozním vlastníkem. Viz [průběžné validační předání](agents/handoffs/repair-production-validation.md).
+
+Wave2 (13.10.2026 22:00 Praha): snapshot c3c8164a48f1ac9e02fbf57c4d46c6b67fdfd5ed9c71e817d76d125efdb1a3de, 8392 souborů včetně testů; pnpm test 808/808 PASS a build PASS. Skutečná integrace FAIL nově na exit and park car, předchozí A/D manévry prošly; následné network/backlog scripty neběžely. Původní fail zachovaný, SDK agent prověřuje předčasný holdUntil bez nového brake příkazu. Podrobné výsledky a oddělená chyba původního PowerShell wrapperu jsou v docs/agents/handoffs/repair-production-validation.md. Celková síťová ani GPU přejímka se zatím netvrdí.
+
+## Další hratelný testovací update — wave3, 13.10.2026
+
+### Nepřijatý image-processing kandidát a odložený GUI test — 14.10.2026
+
+**Navazující IMAGE-01 kandidát:** lokální commit `557eb880b6caff433f2d8e87211b20165baa4c12`, nad engine commitem6df08fb. Snapshot `d032be6510b1a94c9bbada421ad84da50ddfc97e0498df4bc4eb896f1145c19f`:8410 vstupů/513 source-config-test, právě3 delty oproti engine checkpointu. Runtime hunk aplikován na frozen wave3 cinematic, takže starší reuse zůstal zachovaný; výsledek SHA64f4c6…. **895/895 testů, build a celá integrace PASS**,513/513 posthashů a engine bytes stejné. Cílený stejný test1/7→7/7, finální23/23 a narrowTS0. Jediná stará assertion kodifikující vypnutý grade změněna na true; ostatní quality/attach/identity kontroly zachovány. Vzhled, LDR clipping/banding, bloom a FPS zůstávají bez GPU důkazu. Není to main ani aktuální4186.
+
+**Skutečná Game phase oprava:** izolovaný snapshot `2aaa3f428bcba9527ab86c61d10cc3b85b40a9a434161683adc7e5fb0bc55e70`,8408 vstupů/511 source-config-test, právě4 Game/Timeline/test delty oproti B6. **892/892 testů, build a celá integrace PASS**,511/511 posthashů stejné. Původní skutečný Game red5FAIL/1PASS se změnil na green;52 cílených testů a narrowTS0. Nový delta zatím není commitnutý: nejprve se oddělí starší diagnostický a atomický V11 klient/server/SDK WIP. Nová čistá publication WT začíná samostatným14-souborovým diagnostickým základem podle import/hunk auditu. Žádné ostatní Game startup/render/light/editor změny se nesmějí přibalit k phase fixu. GPU/viditelné třesení a další RTT/lead/resync/offset příčiny zůstávají otevřené.
+
+**Ověřený engine kandidát:** samostatný lokální commit `6df08fb6b4003bc958a72fd58592ee24fa74dc41` ve worktree image-processing-ownership. Snapshot `8eea61632293796a6ea9a72434d44fc03e8a455c86eb13532590ace23b73fb17` má8409 vstupů/512 source-config-test; oproti B6 jsou přesně4 delty (patch, lock, workspace, nový test). **888/888 testů, build a celá integrace PASS**, po validaci0 změněných zdrojových hashů. Stejný finální test má proti původní knihovně1/10 PASS, proti patche10/10; původní16 testů i čistá frozen reprodukce prošly. Main dependency audit17238entries/0změn a všechny4 aliasy zachované. Nechtěné schema5.0.39 z resolverového pokusu bylo odmítnuté, výsledná verze zůstává5.0.36. Runtime commit není v main ani v hrané4186; skutečná GPU/pixelová přejímka se netvrdí. Přesná evidence je ve vlastnické WT `docs/performance/evidence/babylon-ownership-20261014/`.
+
+**Provozní aktualizace16:33 Praha:** URL4186 zůstává dostupná se stejným B6 candidate. Po opakované kontrole bez TCP klienta a bez herního JSONL byly původní vlastní služby bezpečně zastaveny/ověřeny a znovu spuštěny pod samostatnou portovou rezervací serve-b6-candidate-20261014. Předchozí runtime je ukončený; aktuální identita je pouze ve wave4 `.cache/b6-transform-validation/live-preview/runs/candidate-20261014-143308-606-3e9d8f54/runtime.json`. Health200 a CIM identity ověřené. Tento přesun nezměnil žádný zdroj/build/assets; samotné dostupné preview není aktivní GPU měření. Další CPU ověření má vlastní heavy rezervaci a předstartovní kontrolu skutečné herní aktivity. Grafická přejímka stále neproběhla.
+
+**Aktualizace16:16 Praha — testovací URL znovu běží:** na následný výslovný pokyn uživatele otevřít přímo adresu bez Computer Use je produkční B6 candidate dostupný na http://127.0.0.1:4186/, API2581. Před startem ukončen package agentův vlastní pnpm proces a uvolněno heavy-validation; nyní jej drží původní B6 validační owner. Znovu ověřeno510/510 source/config/test hashů a byte shoda HTTP HTML/JS/CSS, health200. HTTP evidence a přesné PID/startUTC jsou ve wave4 WT `.cache/b6-transform-validation/runs/candidate-20261014-141603-418-37498c6a/`. Snapshot nadále cbc158… a původní dependency instalace nedotčená. Panelové otevření URL vrací queued; žádný nový GPU/obrazový výsledek tím nevzniká. Automatické herní JSONL vzniknou v `candidate/.cache/game-diagnostics/` po načtení stránky. Tato aktualizace nahrazuje starší provozní stav „servery vypnuté“, nikoli jeho historické testové výsledky.
+
+Nový pokus na přímou žádost uživatele kolem16:06 Praha: unified browser inventář stále prázdný a vytvoření iab/Edge nedostupné. Nativní Computer Use (`@oai/sky`) se inicializovalo a našlo jedno Edge okno, ale načtení jeho stavu zastavila automatická kontrola, protože nedokázala bezpečně určit aktuální URL. Ovládání bylo pro tah ukončeno; žádné další UI akce nebyly vydané a hra/server/GPU se nespustily. Toto je důkaz nedokončeného pokusu, nikoli nové herní nebo výkonové ověření. Programátorské CPU ověření může pokračovat samostatně.
+
+Uživatel požádal připravit hraní na později. B6 baseline/candidate a testovací trasa jsou uchované; nové preview/API nyní neběží. Stav portů4186/2581/2568 a dřívějších vlastních PID28740/24024 byl znovu ověřen bez běžících služeb/procesů. Žádná nová GPU přejímka se netvrdí. Start helper prošel PowerShell parserem a18/18 izolovanými mock scénáři (žádné reálné Start/Stop/CIM); kontroluje rezervaci a při částečném selhání chrání vlastní identitu procesů. SHA256 b9d303e7136f34c5102fae1ef4e896ad941399b2dccb9ddce0269941b2a28e0c, výsledky ve WT `.cache/deferred-b6-qa-checks/mock-861ad77440c04d6a872a59811d9a2034/results.json`. Přesné ruční kroky koordinátora a dostupný PowerShell Core7.6.5 uvádí předání prepare-deferred-b6-qa-20261014. Nejde o výkonový výsledek hry.
+
+Ve WT vznikl izolovaný IMAGE-01 kandidát: původní nový test1/7 PASS, kandidát5/7 PASS; dvě disposal regrese FAIL kvůli živému ThinImageProcessingPostProcess observeru v Babylon9.30.0. Původní cinematic testy8/8 a úzkýTypeScript PASS, ale kandidát není přijatý ani commitnutý. Podrobnosti a identita v [rozhodovacím záznamu](performance/research-20261014/decision-register.md), nové prerequisite KEY-17. Sdílené dependencies, main runtime a uložené B6 buildy nezměněné. Následný package patch je pouze připravené zadání; ještě není implementovaný.
+
+### Navazující výzkum a izolovaný B6 kandidát — 14.10.2026
+
+Uživatelský postup výzkum→porovnání variant→rozhodnutí→samostatná oprava/commit/integrace je zaznamenaný v AGENTS a ve třech výzkumných dokumentech. Samostatný dokumentační commit na lokální main: `10fa69b057b90696f1eaadc0b520caceb0dfbf44`. [Rozhodnutí a vazby](performance/research-20261014/decision-register.md).
+
+První B6 fix je pouze na izolované větvi `codex/playtest-repairs-wave4`, commit `f63039b4067d57c8bdbe560ead5719cfc05cbb0d`. Podmíněné čtení editovatelného pivotu odstraňuje doloženou redundantní invalidaci při statické chůzi; skutečné změny transformu zůstávají správné. Předchozí test měl405root/402child přepočtů a selhal, opravený má0/0.34/34 cílených testů a nezávislý review prošly. Stabilní kandidát `cbc158068138e3454a6959a0d7a945465ea2974e6c246e86ed231abf92a4b5dc` (8407vstupů/510source-config-tests) mění oprotiwave3 přesně B6modul a novýtest: **878/878 testů, build a celá integrace PASS**. Samostatný Git archive91ee88f + jen tento fix/test prošel4/4, takže commit nevyžaduje ostatní necommitnutýWIP.
+
+GPU/obrazová přejímka neproběhla: browser nebyl dostupný a uživatel výslovně požádal připravit ověření na později. **Runtimefix není vmain, KEY-16 není uzavřený a žádný přínos FPS se netvrdí.** Ve worktree jsou připravené baseline/candidate buildy, uložené QApočasí a bezpečné start/stopskripty; přesná evidence v `docs/performance/evidence/b6-transform-20261014/`. Dočasné4186/API2581 procesy byly po ověřeníPID+startUTC ukončené, porty včetně2568 volné. Linear byl aktualizován po průzkumu, rozhodnutí, implementaci, ověření a kandidátnímcommitu.
+
+Na žádost uživatele je lokálně dostupný stabilní produkční build na **http://127.0.0.1:4176/** (API2571), source snapshot `0f20b5a7c7ba9ce5ab9aa16bba3b0a6886823152a322be2724fd2cdad41d6248`. **874/874 testů, build a celá izolovaná integrace PASS**. Read-only release audit ověřil všech8406 vstupů proti checkoutu i snapshotu a byte shodu servírovaného HTML/JS/CSS; API i recorder mají správnou identitu. Původní5173 zůstává vývojový server. Jde o lokální testovací vydání, nikoli veřejné nasazení/Git release.
+
+Update obsahuje V11 časování vstupů a predikce, opravy síťových sond/backlogu, světelných limitů a lifecycle, postupnou tvorbu světa/editoru a podrobnější automatickou diagnostiku. Produkční GTX1060 medium2040×986/noční preview/1 reálný avatar: **36FPS,p9540.4ms,p9956.1ms**. Stabilních60FPS není prokázáno. První svítilna pořád způsobila1149.4ms hitch; tato a další výkonová omezení zůstávají otevřená.
+
+Desetiminutový automatický log má3195 souvislých událostí/452 dávek bez mezer. Nečekaný zánik karty nedoručil session-end. Samostatný následný smoke běžného pagehide ve stejném buildu naopak doručil všech35 událostí včetně session-end; ztráta při tvrdém ukončení zůstává best effort. Logování je zapnuté automaticky a nová uživatelská relace se ukládá do `.cache/playtest-repairs-validation/snapshots/wave3/.cache/game-diagnostics/` bez ručního exportu. [Přesná evidence, běžící procesy a omezení](agents/handoffs/repair-production-validation.md).
+
+
+## Samostatný diagnostický feature v main — 14. 10. 2026 18:13 Praha
+
+Lokální main commit **4bd7c4b79bea9dea20b5d8fe0d5bc3467fdbbfcb** obsahuje přesných20 souborů ověřeného feature5f9b011. Snapshot9877f891566af3ec6bb035d2f09de7d18ae2bea4d7e9158434fae22aae3060be:8372 vstupů/475 source-config-test, **750/750 testů, build a celá integrace PASS**, posthash475/475 beze změn. Git runtime/test/config/assets strom main commitu je s tímto zdrojem přesně shodný.
+
+Při integraci všech156 původních dirty/untracked souborů byte-identických; server byl stageovaný přes ověřený collector blob, takže V11 WIP zůstal v pracovním souboru. Žádné závislosti, běžící služby nebo modely nebyly změněné. Jde o diagnostický základ, nikoli kompletní Game context/V11 nebo uzavření herních nálezů. [Přesný audit a předání](agents/handoffs/integrate-wave3-diagnostics-baseline-20261014.md), [pipeline](performance/evidence/wave3-diagnostics-baseline-20261014/README.md).
+
+Na přímý pokyn otevřena URL http://127.0.0.1:4186/ v Codex panelu; nástroj vrací queued, HTTP200 ověřené. Preview nadále servíruje původní B6 snapshotcbc158… pod serve-b6-candidate-20261014. Nová GPU přejímka/render/JSONL zatím nedoložené. Celkový cíl zůstává otevřený.
+
+
+## V11 začleněn do main — 14. 10. 2026 18:55 Praha
+
+Samostatný main commit **6e407ec** odpovídá publication8fd53e9 a snapshotu03b597a6eb5f1bbfe18290f4c5672fc6ad9196898a5fd7bbebdd10186180014a: **819/819 testů, build a celá síťová integrace PASS**,491 hashů po ověření shodných.38 přesných cest; Game/UI pracovní WIP zachovaný, pouze room test doplněný o5 skutečných wiring/lifecycle regresí.148 dalších původních working souborů byte-identických.
+
+Samostatný test-only follow-up main58c8003/publicationc677d47 doplnil chybějící Scene inventory ve FakeGame. Working UI reprodukce20/24→24/24; čisté feature UI24/24. Starých19 testových těl a všechny nové assertions zachované. Full819 důkaz patří původnímu snapshotu, tento2-řádkový testový follow-up má právě uvedenou cílenou přejímku. [Přesné předání](agents/handoffs/integrate-wave3-v11-network-20261014.md), [celá pipeline](performance/evidence/wave3-v11-network-20261014/README.md).
+
+Nová příčina KEY-7 je doložená skutečným frozen counterexample: high533.6ms→epoch→fresh34ms má153 ahead odmítnutí,3 pozitivní kontroly PASS. Nejde o rekonstrukci9 produkčních paketů. Vybrána navazující úzká qualified-calibration prevence, rawRTT freeze je další samostatný problém. [Výzkum a varianty](performance/research-20261014/network-latency-recovery.md). Živá4186 zůstává původní B6 build; nový phase/clock/engine/IMAGE zde nejsou nasazené. GPU ani celý cíl nejsou uzavřené.
+
+
+## Epochová kalibrace začleněna — 14. 10. 2026 19:18 Praha
+
+Samostatný main commit **98ce8fc** =publication4f41b37. Snapshot **b773dc713420ad445379d20e4e968030a835bc49f4c5f7afc037f8580acc026d**,8389 vstupů/492 source-config-test: **827/827 testů, build a celá integrace PASS**,492 posthashů a commitových blobů shodných.59 cílených PASS a narrowTS0; původních5 konkrétních red regresí přešlo na green.
+
+Přeneseny jen3 source/test soubory a přesná evidence;117 původních dirty/untracked souborů byte-identických. Před fyzickou klientskou editací nebyl dev klient5173/2567. Živé B6preview4186 se nezměnilo. [Audit integrace](agents/handoffs/integrate-network-epoch-calibration-20261014.md), [pipeline a limity](performance/evidence/network-epoch-calibration-20261014/README.md).
+
+Opravená je prevence přetrvávající clock kotvy z RTT mimo podporovaný delivery budget. Raw RTT, limity, probe, Game a protokol zůstávají stejné. Dočasné waiting po raw spike, neznámý původ callback delay, freshness bez timestampu, phase jitter a GPU problémy zůstávají samostatně otevřené. Navazuje přenos původního phase delta; jeho dva Game kontextové konflikty jsou jen chybějící profilerové okolí a nesmí přibalit ostatní WIP. Nové room fixture musí vykonávat i skutečný phase helper.
+
+
+## Společný testovací update4187 — 14. 10. 2026 19:52 Praha
+
+NováURL **http://127.0.0.1:4187/**, API2582. Snapshot **1cddfe82303f6d7365df5470fc09f9a3fa71b4c4021150b3c67c131c3401562c** spojuje plnýwave3, automatickou diagnostiku, B6, engineownership, IMAGE, V11, clock prevenci a phase. **922/922 testů, build a celá integrace PASS**,515 posthashů shodných.8 phase členů/40 frame statements AST-shodných spublication,183 dalších Game členů zachovaných.
+
+HTTPhealth/status,5 servírovaných HTML/JS/CSS souborů, client/server sourceID a skutečný collector zápis na disk ověřené. Všechny3 dosavadníJSONL jsou agent-collector-smoke, výslovně nejde o hraní. Otevření app panelu queued, nový render/GPU výsledek zatím nedoložen. Aktuální čas a počasí, automatické logování bez ručního profileru. Staré4186 nezměněné.
+
+Evidence a aktivní procesní handoff jsou v ownership WT docs/performance/evidence/combined-playtest-20261014 a docs/agents/handoffs/serve-combined-playtest-20261014.md. Provozní identity pouze .cache/combined-playtest-20261014/live-preview/runs/candidate-20261014-175032-921-0f6c5a93/runtime.json. Před další heavy/GPU prací kontrolovat i **4187/2582** a nové skutečné herní logy v tomto candidate; syntetické smoke soubory se nesmějí zaměnit za uživatelskourelaci.
+
+Červené záblesky, vzdálené světlo, skutečný vzhled/FPS a všechny hitches zůstávají kherní přejímce, rawRTT spike waitingA otevřené. Phase je v tomto testovacím buildu a má84 cílených testů/scopedTS0; jeho samostatný commit/main přenos ještě následuje. Do právě vydaného snapshotu se při dalším vývoji nezapisuje.
+
 
 ## KEY-17: Babylon ownership fix, 14 October 2026
 

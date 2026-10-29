@@ -6,7 +6,6 @@ import { FrameInputBuffer } from "./network-input-buffer";
 import { AuthorityBuffer, type ReceivedAuthority } from "./authority-buffer";
 import { NetworkProbe } from "./network-probe";
 import type { NetworkProbeReply } from "../shared/network-diagnostics";
-
 import {
   benchmarkPresentation,
   createBenchmarkDownloads,
@@ -226,6 +225,7 @@ export function App() {
     [ready, setReady] = useState(false),
     [error, setError] = useState("");
   const [panel, setPanel] = useState(""),
+    [avatarEditorOpened, setAvatarEditorOpened] = useState(false),
     [events, setEvents] = useState<EventItem[]>(() => makeDemoEvents()),
     [period, setPeriod] = useState("today"),
     [interest, setInterest] = useState(""),
@@ -290,6 +290,10 @@ export function App() {
     weatherRef = useRef(weather),
     chatEnd = useRef<HTMLDivElement>(null),
     carState = useRef<any>(null);
+  useEffect(() => {
+    if (mode === "menu") setAvatarEditorOpened(false);
+    else if (panel === "avatar") setAvatarEditorOpened(true);
+  }, [mode, panel]);
   if (!inputBuffer.current)
     inputBuffer.current = new FrameInputBuffer({
       now: () => performance.now(),
@@ -367,6 +371,7 @@ export function App() {
       : "offline";
   };
   const changeLightingPreview = (mode: LightingPreviewMode) => {
+    sessionDiagnostics.event("lighting-change", { mode });
     const selection = selectLightingPreview(mode);
     lightingPreviewRef.current = selection;
     setLightingPreview(selection);
@@ -460,6 +465,13 @@ export function App() {
   }, []);
   useEffect(() => {
     game.current?.setUiModal(journalOpen || emotesOpen || showForm || !!panel);
+    sessionDiagnostics.event("ui-state", {
+      panel,
+      journalOpen,
+      emotesOpen,
+      formOpen: showForm,
+      ready,
+    });
   }, [journalOpen, emotesOpen, showForm, panel, ready]);
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ block: "nearest" });
@@ -510,29 +522,32 @@ export function App() {
     const startupAbort = new AbortController();
     modeRef.current = mode;
     (async () => {
+      let startupPhase = "game-import";
+      let phaseStarted = performance.now();
       let pendingEngine: AbstractEngine | undefined;
       try {
         const [{ Game }, { createGameEngine }] = await Promise.all([
-          import("./game"),
-          import("./render-engine"),
+          import("./game"), import("./render-engine"),
         ]);
+        sessionDiagnostics.event("startup-phase", { phase: startupPhase, durationMs: performance.now() - phaseStarted });
         if (cancelled || canvas.current !== startupCanvas) return;
-        const engineStarted = performance.now();
-        pendingEngine = await createGameEngine(startupCanvas, {
-          signal: startupAbort.signal,
-        });
-        if (cancelled || canvas.current !== startupCanvas) {
-          pendingEngine.dispose();
-          return;
-        }
+        startupPhase = "renderer-initialization";
+        phaseStarted = performance.now();
+        pendingEngine = await createGameEngine(startupCanvas, { signal: startupAbort.signal });
+        if (cancelled || canvas.current !== startupCanvas) { pendingEngine.dispose(); return; }
         sessionDiagnostics.event("renderer-ready", {
-          durationMs: performance.now() - engineStarted,
-          ...getRendererInfo(pendingEngine),
+          durationMs: performance.now() - phaseStarted, ...getRendererInfo(pendingEngine),
           backend: pendingEngine.isWebGPU ? "webgpu" : "webgl2",
         });
+        startupPhase = "game-construction";
+        phaseStarted = performance.now();
         const g = new Game(startupCanvas, profileRef.current, pendingEngine);
         pendingEngine = undefined;
         game.current = g;
+        sessionDiagnostics.event("startup-phase", {
+          phase: startupPhase, durationMs: performance.now() - phaseStarted,
+          meshes: g.scene.meshes.length, materials: g.scene.materials.length,
+        });
         g.onRendererFailure = (message) => {
           if (cancelled || game.current !== g) return;
           userBenchmark.current = false;
@@ -541,6 +556,8 @@ export function App() {
           inputBuffer.current?.reset("renderer-failure");
         };
         g.network = mode === "multi";
+        // welcome may precede the dynamic import/constructor. Install the
+        // current state instead of waiting for an already processed packet.
         syncNetworkStage(g);
         g.timeOverride = lightingPreviewRef.current.instant;
         g.setLocalId(idRef.current);
@@ -591,11 +608,17 @@ export function App() {
         if (weatherRef.current) g.setWeather(weatherRef.current);
         g.setQuality(quality);
         g.setTargetFps(targetFps);
+        startupPhase = "game-start";
+        phaseStarted = performance.now();
         await g.start();
         if (cancelled || game.current !== g || canvas.current !== startupCanvas) return;
         const health = g.renderHealth.snapshot();
         if (!g.ready || !health.valid)
           throw new Error(health.firstErrors[0]?.message ?? "Renderer nedokončil přípravu.");
+        sessionDiagnostics.event("startup-phase", {
+          phase: startupPhase,
+          durationMs: performance.now() - phaseStarted,
+        });
         sessionDiagnostics.event("game-ready", { mode });
         if (mode === "multi") {
           g.updatePlayers(playersRef.current);
@@ -623,7 +646,7 @@ export function App() {
         pendingEngine?.dispose();
         if (cancelled) return;
         sessionDiagnostics.event("startup-error", {
-          message: String(e),
+          message: String(e), phase: startupPhase, durationMs: performance.now() - phaseStarted,
           stack: e instanceof Error ? e.stack?.slice(0, 2000) : undefined,
         });
         game.current?.dispose();
@@ -986,6 +1009,7 @@ export function App() {
       profile={profile}
       onChange={setProfile}
       compact={mode !== "menu"}
+      active={mode === "menu" || panel === "avatar"}
     />
   );
   if (mode === "menu")
@@ -1261,6 +1285,7 @@ export function App() {
           </span>
         </button>{" "}
         <span className="fps">{stats?.fps || "—"} FPS</span>
+        <DiagnosticsStatus />
       </div>
       <button
         className="hud-flashlight"
@@ -1405,9 +1430,11 @@ export function App() {
           )}
         </section>
       )}
-      {panel && (
+      {(panel || avatarEditorOpened) && (
         <div
           className={panel === "map" ? "map-overlay" : "panel-container"}
+          style={panel ? undefined : { display: "none" }}
+          hidden={!panel}
           onPointerDown={(e) => {
             if (panel === "map" && e.target === e.currentTarget) setPanel("");
           }}
@@ -1802,8 +1829,11 @@ export function App() {
                 </small>
               </div>
             )}
-            {panel === "avatar" && (
-              <>
+            {(panel === "avatar" || avatarEditorOpened) && (
+              <section
+                hidden={panel !== "avatar"}
+                style={panel === "avatar" ? undefined : { display: "none" }}
+              >
                 {avatarEditor}
                 <h3>{t("Co tě baví?")}</h3>
                 <div className="chips">
@@ -1870,7 +1900,7 @@ export function App() {
                     {t("Odměny získáš za průzkum a kvíz.")}
                   </p>
                 )}
-              </>
+              </section>
             )}
             {panel === "people" && (
               <>
@@ -2225,6 +2255,7 @@ export function App() {
             {panel === "settings" && (
               <>
                 <LanguagePicker />
+                <DiagnosticsStatus details />
                 <label>
                   {t("Kvalita vykreslování")}
                   <select
@@ -2619,6 +2650,75 @@ function LanguagePicker() {
     </label>
   );
 }
+function DiagnosticsStatus({ details = false }: { details?: boolean }) {
+  const locale = useLocale();
+  const status = sessionDiagnostics.status();
+  const cs = locale === "cs";
+  const saved = status.state === "recording" && !!status.lastSavedAt;
+  const label =
+    status.dropped > 0
+      ? cs
+        ? "V záznamu jsou mezery"
+        : "Recording has gaps"
+      : status.state === "retrying"
+        ? cs
+          ? "Logy čekají na uložení"
+          : "Logs waiting to save"
+        : saved
+          ? cs
+            ? "Logy se ukládají"
+            : "Logs are saving"
+          : status.state === "disabled" || status.state === "stopped"
+            ? cs
+              ? "Logy se neukládají"
+              : "Logs are not saving"
+            : cs
+              ? "Připravuji logy"
+              : "Preparing logs";
+  const explanation = cs
+    ? "Diagnostika hraní se ukládá automaticky na tomto počítači. Nemusíš zapínat měření ani exportovat soubory."
+    : "Gameplay diagnostics save automatically on this computer. No measurement or export needs to be started.";
+  if (!details)
+    return (
+      <span
+        className="small muted"
+        data-diagnostics-state={status.state}
+        title={explanation}
+      >
+        {label}
+      </span>
+    );
+  return (
+    <div className="small" data-diagnostics-details>
+      <strong>{label}</strong>
+      <p>{explanation}</p>
+      {status.lastSavedAt && (
+        <p>
+          {cs ? "Poslední uložení: " : "Last saved: "}
+          {formatDate(new Date(status.lastSavedAt), {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </p>
+      )}
+      {status.pending > 0 && (
+        <p>
+          {cs ? "Čekající záznamy: " : "Pending records: "}
+          {status.pending} · {Math.ceil(status.pendingBytes / 1024)} KiB
+        </p>
+      )}
+      {status.dropped > 0 && (
+        <p>
+          {cs ? "Vynechané záznamy: " : "Dropped records: "}
+          {status.dropped}
+        </p>
+      )}
+      {status.error && <p>{status.error}</p>}
+    </div>
+  );
+}
+
 function BenchmarkControls({
   game,
   result,

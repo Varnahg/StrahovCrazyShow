@@ -33,6 +33,10 @@ import {
 } from "./photo-grass-wind";
 import { PhotoGrassBatch, type GrassRootState } from "./photo-grass-batch";
 import { PhotoGrassPreparation } from "./photo-grass-preparation";
+import {
+  createExperimentalGrassTileExecutor,
+  type PhotoGrassTileExecutor,
+} from "./photo-grass-tile-executor";
 import type { SourceGrassRecipe } from "./photo-grass-source-material";
 import { grassVisibility, setGrassVisibility } from "./photo-grass-transition";
 import {
@@ -70,6 +74,8 @@ export type PhotoGrassStats = {
   ready: boolean;
   preparing: boolean;
   pendingTiles: number;
+  /** Bounded experiment counters; absent on the default main-thread path. */
+  tileWorker?: PhotoGrassTileExecutor["stats"];
 };
 const qualityKey = (quality: string): CandidateQuality =>
   quality === "high" ? "high" : quality === "low" ? "low" : "medium";
@@ -124,6 +130,7 @@ export class PhotographicGrass {
     work: Generator<void, PhotoGrassTile | undefined>;
   };
   private tileRevision = 0;
+  private tileExecutor?: PhotoGrassTileExecutor;
   private selectionRevision = -1;
   private preferredLevels = new Map<number, CandidateLevel>();
   private preferredRoots = new Set<number>();
@@ -156,8 +163,13 @@ export class PhotographicGrass {
     private pack: RenderPack,
     private recipe: SourceGrassRecipe,
     resources?: GrassResources,
+    options: { tileExecutor?: PhotoGrassTileExecutor | null } = {},
   ) {
     if (resources) this.installResources(resources);
+    this.tileExecutor = options.tileExecutor === undefined
+      ? createExperimentalGrassTileExecutor()
+      : options.tileExecutor ?? undefined;
+    if (this.tileExecutor) this.stats.tileWorker = this.tileExecutor.stats;
     this.disposeObserver = scene.onDisposeObservable.addOnce(() =>
       this.dispose(),
     );
@@ -388,7 +400,8 @@ export class PhotographicGrass {
     this.updateStats();
     this.stats.cachedTiles = this.placement.cacheSize;
     this.stats.pendingTiles =
-      this.tileRequests.size + (this.tilePreparation ? 1 : 0);
+      this.tileRequests.size + (this.tilePreparation ? 1 : 0) +
+      (this.tileExecutor?.pendingCount ?? 0);
     this.stats.preparing =
       !!this.preparation ||
       this.stats.pendingTiles > 0 ||
@@ -438,6 +451,7 @@ export class PhotographicGrass {
     this.tileRequests.clear();
     this.preferredLevels.clear();
     this.preferredRoots.clear();
+    this.tileExecutor?.reset();
   }
   private advanceTilePreparation(
     eye: Vector3,
@@ -449,7 +463,7 @@ export class PhotographicGrass {
       hasFocus = (focus.x - eye.x) ** 2 + (focus.z - eye.z) ** 2 > 1,
       targetX = hasFocus ? focus.x : eye.x + (facing.x / length) * 4,
       targetZ = hasFocus ? focus.z : eye.z + (facing.z / length) * 4;
-    const distance = (request: TileRequest) =>
+    const distance = (request: { x: number; z: number }) =>
       grassFocusDistance(
         request.x + 0.5,
         request.z + 0.5,
@@ -458,6 +472,18 @@ export class PhotographicGrass {
         focus.x,
         focus.z,
       );
+    this.tileExecutor?.checkTimeout();
+    if (this.tileExecutor?.failed) {
+      // Termination precedes fallback; there cannot be two producers per tile.
+      for (const request of this.tileExecutor.requests)
+        if (!this.placement.cachedTile(request.x, request.z))
+          this.tileRequests.set(request.x + ":" + request.z, {
+            x: request.x, z: request.z,
+            y: groundHeight(request.x + 0.5, request.z + 0.5) + 0.04,
+          });
+      this.tileExecutor.dispose();
+      this.tileExecutor = undefined;
+    }
     if (
       this.tilePreparation &&
       distance(this.tilePreparation.request) > range + 0.8
@@ -466,41 +492,35 @@ export class PhotographicGrass {
       this.tilePreparation = undefined;
     }
     const deadline = performance.now() + GRASS_PREPARATION.milliseconds;
+    if (this.tileExecutor?.ready && !this.tilePreparation) {
+      const executor = this.tileExecutor;
+      for (const request of executor.requests)
+        if (distance(request) > range + 0.8 || this.placement.cachedTile(request.x, request.z))
+          executor.cancel(request.x, request.z);
+      for (let completed = 0; completed < GRASS_PREPARATION.coldTiles; completed++) {
+        const started = performance.now();
+        const tile = executor.takeCompleted();
+        if (!tile) break;
+        this.placement.acceptTile(tile);
+        this.tileRevision++;
+        const ended = performance.now();
+        executor.recordApply(ended - started);
+        if (ended >= deadline) return;
+      }
+      // Ready responses still occupy their slots until update consumes them.
+      while (executor.ready && executor.pendingCount < GRASS_PREPARATION.coldTiles) {
+        const request = this.takeNearestTileRequest(distance, range, targetX, targetZ);
+        if (!request) break;
+        executor.request(request.x, request.z);
+        if (performance.now() >= deadline) break;
+      }
+      return;
+    }
     let completed = 0;
     for (let step = 0; step < GRASS_PREPARATION.steps; step++) {
       if (!this.tilePreparation) {
-        let nearestId = "",
-          nearest: TileRequest | undefined,
-          nearestDistance = Infinity;
-        for (const [id, request] of this.tileRequests) {
-          const d = distance(request);
-          if (
-            d > range + 0.8 ||
-            this.placement.cachedTile(request.x, request.z)
-          ) {
-            this.tileRequests.delete(id);
-          } else {
-            // First-person footprints directly below the eye are often outside
-            // the image. Prepare visible foreground slightly ahead of motion;
-            // third person prioritizes the supplied player's ground position.
-            this.point.set(request.x + 0.5, request.y, request.z + 0.5);
-            const fringe = this.planes.some(
-                (plane) => plane.dotCoordinate(this.point) < 0,
-              ),
-              priority =
-                Math.hypot(
-                  request.x + 0.5 - targetX,
-                  request.z + 0.5 - targetZ,
-                ) + (fringe ? range * 2 : 0);
-            if (priority < nearestDistance) {
-              nearestId = id;
-              nearest = request;
-              nearestDistance = priority;
-            }
-          }
-        }
+        const nearest = this.takeNearestTileRequest(distance, range, targetX, targetZ);
         if (!nearest) return;
-        this.tileRequests.delete(nearestId);
         this.tilePreparation = {
           request: nearest,
           work: this.placement.prepareTile(nearest.x, nearest.z),
@@ -510,10 +530,34 @@ export class PhotographicGrass {
       if (result.done) {
         this.tilePreparation = undefined;
         this.tileRevision++;
-        if (++completed >= GRASS_PREPARATION.coldTiles) return;
+        // Finish the native tile already in progress, then hand the queue to
+        // the ready worker. Starting another partial tile here can starve it.
+        if (++completed >= GRASS_PREPARATION.coldTiles || this.tileExecutor?.ready)
+          return;
       }
       if (performance.now() >= deadline) return;
     }
+  }
+  private takeNearestTileRequest(
+    distance: (request: TileRequest) => number,
+    range: number,
+    targetX: number,
+    targetZ: number,
+  ) {
+    let nearestId = "", nearest: TileRequest | undefined, nearestDistance = Infinity;
+    for (const [id, request] of this.tileRequests) {
+      if (distance(request) > range + 0.8 || this.placement.cachedTile(request.x, request.z) || this.tileExecutor?.has(request.x, request.z)) {
+        this.tileRequests.delete(id);
+        continue;
+      }
+      // First person prioritizes visible foreground; third person the player.
+      this.point.set(request.x + 0.5, request.y, request.z + 0.5);
+      const fringe = this.planes.some((plane) => plane.dotCoordinate(this.point) < 0),
+        priority = Math.hypot(request.x + 0.5 - targetX, request.z + 0.5 - targetZ) + (fringe ? range * 2 : 0);
+      if (priority < nearestDistance) { nearestId = id; nearest = request; nearestDistance = priority; }
+    }
+    if (nearest) this.tileRequests.delete(nearestId);
+    return nearest;
   }
   private cancelPreparation() {
     this.preparation?.return();
@@ -589,7 +633,7 @@ export class PhotographicGrass {
         const tile = this.placement.cachedTile(x, z);
         if (!tile) {
           const pending = this.tilePreparation?.request;
-          if (pending?.x !== x || pending.z !== z)
+          if ((pending?.x !== x || pending.z !== z) && !this.tileExecutor?.has(x, z))
             this.tileRequests.set(x + ":" + z, { x, y: this.point.y, z });
           yield 0;
           continue;
@@ -777,6 +821,8 @@ export class PhotographicGrass {
     this.resources?.release();
     this.resources = undefined;
     this.placement.dispose();
+    this.tileExecutor?.dispose();
+    this.tileExecutor = undefined;
     this.cancelPreparation();
     this.cancelTilePreparation();
     this.roots.clear();

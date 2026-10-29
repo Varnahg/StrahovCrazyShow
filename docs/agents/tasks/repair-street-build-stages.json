@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-street-build-stages",
+  "title": "KEY-8: rozdělit změřenou třísekundovou konstrukci ulic bez změny světa",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/streets-renderer.ts", "client/world-renderer.ts", "tests/streets.test.ts", "tests/street-build-stages.test.ts", "tests/world-renderer-startup.test.ts", "docs/agents/handoffs/repair-street-build-stages.md"],
+  "resources": [],
+  "acceptance": ["Zachovat sync buildStreets a stejný zdroj práce pro stagedworld; stejné buffers/indices/UV/material/root metadata/lampy/provenience a stejné pořadí. Žádné skrytí/ochuzení světa.", "Změřit dominanty uvnitř buildStreets a rozdělit skutečně velké operace po source polygons/segments/lampách, nejen obalit3s call jedním yield. Bez zbytečné regrese celkového CPU.", "Cancel/error cleanup a host Scene ownership zůstávají stejné; implementation/refactor+cílené parity testy dohromady."],
+  "verification": ["Výchozí phase data repair-world-build-stages: NullEngine buildStreets2983ms, nejdeGPUdůkaz. Cílené kontrolované CPU testy; delší celosvětová parity pouze po koordinaci root.", "Root vlastní Game/UI a konečné produkční měření; nové vnitřní API předat explicitně."],
+  "notes": ["Stejný autor přebírá vlastní world-renderer/test diff z repair-world-build-stages handoffu, může adopt-dirty. Streets/teststreets byly při průzkumu čisté.", "Neměnit shared terrain/geometry factory bez dalšího scope handshake, pokud se ukáže monolitický vnitřní bottleneck."]
+}

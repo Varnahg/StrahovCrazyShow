@@ -19,6 +19,25 @@ export type PhotoGrassTile = {
   minimumY: number;
   maximumY: number;
 };
+/** Transfer boundary: retain metre-local Float32 matrices, never rounded world roots. */
+export function isPhotoGrassTile(value: unknown): value is PhotoGrassTile {
+  if (!value || typeof value !== "object") return false;
+  const tile = value as PhotoGrassTile;
+  return (
+    typeof tile.x === "number" && typeof tile.z === "number" &&
+    Number.isSafeInteger(tile.x - 0.5) &&
+    Number.isSafeInteger(tile.z - 0.5) &&
+    tile.id === `${tile.x - 0.5}:${tile.z - 0.5}` &&
+    Number.isInteger(tile.count) && tile.count >= 0 && tile.count <= 160 &&
+    tile.matrices instanceof Float32Array &&
+    tile.matrices.buffer instanceof ArrayBuffer &&
+    tile.matrices.byteOffset === 0 &&
+    tile.matrices.length === tile.count * 16 &&
+    tile.matrices.byteLength === tile.matrices.buffer.byteLength &&
+    Number.isFinite(tile.minimumY) && Number.isFinite(tile.maximumY) &&
+    tile.minimumY <= tile.maximumY
+  );
+}
 /** All locations remain within the existing source-backed grass classification.
  * The 78mm macrogeometry already uses metres; old point.size scaling is forbidden. */
 export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128) {
@@ -35,6 +54,11 @@ export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128) {
     normal = Vector3.Up(),
     position = Vector3.Zero();
   const cache = new Map<string, PhotoGrassTile>();
+  const storeTile = (tile: PhotoGrassTile) => {
+    cache.set(tile.id, tile);
+    if (cache.size > cacheLimit) cache.delete(cache.keys().next().value!);
+    return tile;
+  };
   const footprintAllowed = (x: number, z: number) =>
     classifier.grass(x, z) &&
     classifier.grass(x - 0.08, z - 0.08) &&
@@ -99,9 +123,7 @@ export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128) {
         ? maximumY
         : groundHeight(tileX + 0.5, tileZ + 0.5),
     };
-    cache.set(id, value);
-    if (cache.size > cacheLimit) cache.delete(cache.keys().next().value!);
-    return value;
+    return storeTile(value);
   }
   return {
     // A conservative bounding-box prefilter cannot exclude a valid strip just
@@ -111,6 +133,15 @@ export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128) {
         (b) => b.maxX > x && b.minX < x + 1 && b.maxZ > z && b.minZ < z + 1,
       ),
     cachedTile: (x: number, z: number) => cache.get(x + ":" + z),
+    acceptTile(tile: PhotoGrassTile) {
+      if (!isPhotoGrassTile(tile)) throw Error("Invalid prepared grass tile");
+      // Existing hits retain both identity and FIFO position, never become LRU.
+      return cache.get(tile.id) ?? storeTile(tile);
+    },
+    releaseTile(tile: PhotoGrassTile) {
+      if (!isPhotoGrassTile(tile) || cache.get(tile.id) !== tile) return false;
+      return cache.delete(tile.id);
+    },
     prepareTile,
     // Offline callers retain the same synchronous API and byte-identical roots.
     // Runtime advances prepareTile in bounded chunks instead.

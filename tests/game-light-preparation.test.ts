@@ -38,7 +38,10 @@ const declaration = source.statements.find(
 )!;
 const members = declaration.members.filter(
   (node) =>
-    node.name && ["prepareLightingVariants", "isMeshReadyForCamera"].includes(node.name.getText(source)),
+    node.name &&
+    ["prepareLightingVariants", "isMeshReadyForCamera"].includes(
+      node.name.getText(source),
+    ),
 );
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
@@ -96,7 +99,11 @@ function fixture(t: import("node:test").TestContext) {
     arePreparationEffectsReady,
     selectLightingPreview,
     performance: { now: () => now },
-    document: { hidden: false, addEventListener() {}, removeEventListener() {} },
+    document: {
+      hidden: false,
+      addEventListener() {},
+      removeEventListener() {},
+    },
     window: {
       setTimeout(callback: () => void) {
         timer = callback;
@@ -577,10 +584,15 @@ test("actual Game timeout reports incomplete work and restores OFF while allowin
 
 test("production startup awaits preparation before ready and records its outcome; dispose aborts first", () => {
   const start = declaration.members
-    .find((node) => node.name?.getText(source) === "start")!
+    .find((node) => node.name?.getText(source) === "startContent")!
     .getText(source);
-  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender, pipelinePreparation\)/);
-  assert.ok(prepare > start.indexOf("this.updatePlayers([this.localPlayer])"));
+  const prepare = start.search(
+    /await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender, pipelinePreparation\)/,
+  );
+  const avatars = start.indexOf(
+    "this.updatePlayers(this.pendingPlayers ?? [this.localPlayer])",
+  );
+  assert.ok(avatars >= 0 && prepare > avatars);
   assert.ok(
     prepare > start.indexOf("this.engine.stopRenderLoop(preloadRender)"),
   );

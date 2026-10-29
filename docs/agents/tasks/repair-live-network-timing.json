@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-live-network-timing",
+  "title": "KEY-6/7: opravit doložené probe timeouty, zpracování backlogu a vracení odhadu serverového času",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/network-timeline.ts", "client/network-probe.ts", "client/authority-buffer.ts", "tests/network-timeline.test.ts", "tests/network-probe.test.ts", "tests/authority-buffer.test.ts", "tests/timeline-physics.test.ts", "tests/timeline-sender.test.ts", "docs/agents/handoffs/repair-live-network-timing.md"],
+  "resources": [],
+  "acceptance": ["Oddělit state anchor od monotónního server clock estimate; opožděný packet ve stejné epoše nevrací čas. Nová epocha/server drop vytváří novou časovou bázi, boundy a future-only replay zachované.", "AuthorityBuffer nahrazuje jen běžné snapshots, explicitní/new-epoch bariéry předává okamžitě a nevyhazuje respawn/resync. Uchovat skutečný receivedAt; API integruje root do Game/UI.", "NetworkProbe má jeden pending, cooldown od odpovědi, bounded longtask/takeRecords evidenci. Raw RTT zůstává v logu, kontaminované lokální blokací nemění prediction RTT; čisté vysoké RTT se neschovává clampem.", "Implementace+refaktoring+regrese doložených frozen případů:80backlogpkt→max1ordinaryrebase, lateanchor ack103/t150 neprodukujeužvyřešené107–109, startup1sresponseblocked neníwirelatency; epoch/respawn/lifecycle a skutečná Rapier/sender parity."],
+  "verification": ["Read-only cause audit a wave2-session log jsou primární důkazy, explicitněnekompletní777drops. Cílené CPU tests/TS, root vlastní port/GPU/fullsuite.", "Předat API a důkazy, bez Game/UI/shared wire změn. Žádná regresní změna serverové fyziky/rychlosti nebo svévolné zvýšení memory/rate limitů."],
+  "notes": ["Výslovný převod root timeline+2testů je v repair-game-integration handoffu; sender regression je vlastní předaná práce stejného autora z repair-network-v11-server. Adopt-dirty povolen pouze na tyto doložené cesty.", "Nejprve ukončit/release vlastní audit task, potom claim runtime; API potvrzen rootem v delegaci."]
+}

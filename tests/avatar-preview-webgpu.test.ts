@@ -265,6 +265,112 @@ function fixture(t: TestContext) {
   };
 }
 
+test("inactive retained preview pauses work and budget, coalesces edits and reuses its owner", async (t) => {
+  const f = fixture(t);
+  const result = f.start();
+  await settle();
+  await f.frame();
+  const controller = await result;
+  controller.update(B);
+  f.advance(5000);
+  controller.setActive(false);
+  assert.equal(f.queued.size, 0);
+  assert.equal(f.timers.size, 0);
+  const before = f.calls.length;
+  controller.update(A);
+  controller.update(C);
+  controller.rotate(0.2);
+  controller.focus("face");
+  f.advance(60_000);
+  f.visible(false);
+  f.visible(true);
+  f.density(1.5);
+  await settle();
+  assert.equal(f.queued.size, 0, "page visibility cannot wake a closed editor");
+  assert.equal(
+    f.timers.size,
+    0,
+    "closed editor has no preparation budget timer",
+  );
+  assert.equal(f.calls.slice(before).includes("render"), false);
+  assert.equal(f.stats().disposals, 0);
+  controller.setActive(true);
+  assert.equal(f.queued.size, 1);
+  await f.frame();
+  assert.deepEqual(f.profiles, [A.preset, C.preset]);
+  assert.equal(f.stats().creates, 1);
+  assert.equal(controller.health().valid, true);
+  assert.deepEqual(f.sizes.at(-1), [300, 450]);
+  controller.dispose();
+});
+
+test("a dequeued callback from a closed preview cannot clear or submit its reopened frame", async (t) => {
+  const f = fixture(t);
+  const result = f.start();
+  await settle();
+  await f.frame();
+  const controller = await result;
+  controller.rotate(0.3);
+  const stale = f.queued.values().next().value!;
+  controller.setActive(false);
+  controller.setActive(true);
+  const current = f.queued.values().next().value!;
+  const renders = f.calls.filter((call) => call === "render").length;
+  stale();
+  await settle();
+  assert.equal(f.calls.filter((call) => call === "render").length, renders);
+  assert.equal(f.queued.size, 1);
+  assert.equal(f.queued.values().next().value, current);
+  await f.frame();
+  assert.equal(f.calls.filter((call) => call === "render").length, renders + 1);
+  controller.dispose();
+});
+
+test("inactive retained preview never accepts an in-flight update as ready until reopened", async (t) => {
+  const f = fixture(t);
+  const result = f.start();
+  await settle();
+  await f.frame();
+  const controller = await result;
+  const submitted = deferred<void>();
+  f.submission(submitted);
+  controller.update(B);
+  await f.frame();
+  controller.setActive(false);
+  f.advance(60_000);
+  submitted.resolve();
+  await settle();
+  assert.equal(f.queued.size, 0);
+  assert.equal(f.timers.size, 0);
+  assert.equal(f.states.at(-1), "loading");
+  assert.equal(controller.health().valid, false);
+  controller.setActive(true);
+  await f.frame();
+  assert.equal(f.states.at(-1), "ready");
+  assert.equal(f.stats().creates, 1);
+  controller.dispose();
+});
+
+test("an inactive retained preview still observes shader failures and disposes its failed owner", async (t) => {
+  const f = fixture(t);
+  const result = f.start();
+  await settle();
+  await f.frame();
+  const controller = await result;
+  controller.setActive(false);
+  f.engine.onEffectErrorObservable.notifyObservers({
+    errors: "inactive shader failed",
+    effect: null,
+  } as any);
+  await settle();
+  assert.equal(f.states.at(-1), "failed");
+  assert.equal(f.stats().disposals, 1);
+  assert.equal(f.queued.size, 0);
+  assert.equal(f.timers.size, 0);
+  controller.setActive(true);
+  assert.equal(f.queued.size, 0);
+});
+
 test("preview ready follows begin/render/end, submitted work and shader compilation info", async (t) => {
   const f = fixture(t),
     submitted = deferred<void>(),
@@ -661,6 +767,7 @@ const editor = ts.createSourceFile(
   ts.ScriptKind.TSX,
 );
 let effect: ts.ArrowFunction | undefined;
+let unmountEffect: ts.ArrowFunction | undefined;
 function visit(node: ts.Node) {
   if (
     ts.isCallExpression(node) &&
@@ -669,10 +776,24 @@ function visit(node: ts.Node) {
     node.arguments[0].getText(editor).includes('import("./avatar-preview")')
   )
     effect = node.arguments[0];
+  if (
+    ts.isCallExpression(node) &&
+    node.expression.getText(editor) === "useEffect" &&
+    ts.isArrowFunction(node.arguments[0]) &&
+    node.arguments[0].getText(editor).includes("previewGeneration.current++")
+  )
+    unmountEffect = node.arguments[0];
   ts.forEachChild(node, visit);
 }
 visit(editor);
 assert.ok(effect);
+assert.ok(unmountEffect);
+const unmountJs = ts.transpileModule(`(${unmountEffect.getText(editor)})()`, {
+  compilerOptions: {
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.ESNext,
+  },
+}).outputText;
 const effectJs = ts.transpileModule(`(${effect.getText(editor)})()`, {
   compilerOptions: {
     target: ts.ScriptTarget.ES2022,
@@ -702,9 +823,12 @@ function editorFixture() {
   const environment = {
     AbortController,
     Error,
+    active: true,
     canvas: { current: {} as object },
+    pointer: { current: null as { id: number; x: number } | null },
     preview: { current: null as AvatarPreviewController | null },
     previewGeneration: { current: 0 },
+    previewAbort: { current: null as AbortController | null },
     currentAvatar: { current: A },
     states: [] as AvatarPreviewState[],
     errors: [] as string[],
@@ -716,11 +840,111 @@ function editorFixture() {
     },
     loadPreview: () => module.promise,
   };
-  const cleanup = new Script(effectJs).runInContext(
-    createContext(environment),
-  ) as () => void;
-  return { environment, module, cleanup };
+  const context = createContext(environment);
+  const rerun = () =>
+    new Script(effectJs).runInContext(context) as (() => void) | undefined;
+  const cleanup = rerun()!;
+  const unmount = new Script(unmountJs).runInContext(context) as () => void;
+  return { environment, module, cleanup, rerun, context, unmount };
 }
+
+test("persistent editor closes without disposing its completed preview, reopens with current profile and releases pointer capture", async () => {
+  const f = editorFixture();
+  const calls: unknown[][] = [];
+  let creates = 0;
+  let stateChanged:
+    ((state: AvatarPreviewState, error?: Error) => void) | undefined;
+  const controller = {
+    update: (config: typeof A) => calls.push(["update", config.preset]),
+    setActive: (value: boolean) => calls.push(["active", value]),
+    dispose: () => calls.push(["dispose"]),
+  } as unknown as AvatarPreviewController;
+  f.module.resolve({
+    createAvatarPreview: async (_canvas, _config, options) => {
+      creates++;
+      stateChanged = options.onState;
+      options.onState("ready");
+      return controller;
+    },
+  });
+  await settle();
+  assert.equal(f.environment.preview.current, controller);
+  const abort = f.environment.previewAbort.current!;
+  f.cleanup();
+  assert.equal(abort.signal.aborted, false);
+  f.environment.active = false;
+  f.environment.pointer.current = { id: 7, x: 3 };
+  Object.assign(f.environment.canvas.current, {
+    hasPointerCapture: (id: number) => id === 7,
+    releasePointerCapture: (id: number) => calls.push(["release", id]),
+  });
+  f.rerun();
+  assert.equal(f.environment.pointer.current, null);
+  assert.ok(calls.some(([kind, id]) => kind === "release" && id === 7));
+  assert.equal(
+    calls.some(([kind]) => kind === "dispose"),
+    false,
+  );
+  f.environment.currentAvatar.current = C;
+  f.environment.active = true;
+  f.rerun();
+  assert.deepEqual(calls.slice(-2), [
+    ["update", C.preset],
+    ["active", true],
+  ]);
+  assert.equal(creates, 1);
+  stateChanged!("failed", new Error("owned device lost"));
+  assert.equal(
+    f.environment.states.at(-1),
+    "failed",
+    "retained owner's callback remains attached",
+  );
+  f.environment.pointer.current = { id: 7, x: 10 };
+  f.unmount();
+  assert.equal(abort.signal.aborted, true);
+  assert.equal(f.environment.preview.current, null);
+  assert.equal(calls.filter(([kind]) => kind === "dispose").length, 1);
+  assert.equal(calls.filter(([kind]) => kind === "release").length, 2);
+  const count = f.environment.states.length;
+  stateChanged!("ready");
+  assert.equal(
+    f.environment.states.length,
+    count,
+    "unmounted generation cannot publish ready",
+  );
+});
+
+test("closing first creation aborts it and reopening cannot be overwritten by its late result", async () => {
+  const f = editorFixture();
+  const pending = deferred<AvatarPreviewController>();
+  const fresh = {} as AvatarPreviewController;
+  const calls: string[] = [];
+  Object.assign(fresh, { update() {}, setActive() {}, dispose() {} });
+  let created = 0;
+  f.module.resolve({
+    createAvatarPreview: async () =>
+      ++created === 1 ? pending.promise : fresh,
+  });
+  await settle();
+  const cancelled = f.environment.previewAbort.current!;
+  f.cleanup();
+  assert.equal(cancelled.signal.aborted, true);
+  f.environment.active = false;
+  f.rerun();
+  f.environment.active = true;
+  f.rerun();
+  await settle();
+  assert.equal(f.environment.preview.current, fresh);
+  pending.resolve({
+    dispose() {
+      calls.push("late-dispose");
+    },
+  } as AvatarPreviewController);
+  await settle();
+  assert.deepEqual(calls, ["late-dispose"]);
+  assert.equal(f.environment.preview.current, fresh);
+  f.unmount();
+});
 
 test("editor cancels a late import and never substitutes a different canvas", async () => {
   const f = editorFixture();
