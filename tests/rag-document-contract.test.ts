@@ -491,7 +491,7 @@ test("publication rejects chunks whose complete citation cannot be projected", (
   raw.chunks[0].spans = spans;
   invalid(() => bundle(raw), "citation-limit");
 
-  const direct = structuredClone(dataset(bundle()));
+  const direct = JSON.parse(JSON.stringify(dataset(bundle())));
   direct.blocks[0].spans = spans;
   direct.chunks[0].spans = spans;
   rekeySingleDocument(direct);
