@@ -1,6 +1,8 @@
 import { createKnowledgeRegistry, validateKnowledgeDatasets, type KnowledgeChunk, type RawKnowledgeChunk } from "./crazy-typka-retrieval";
 import { documentEmbeddingInput, embeddingInputHash, type Embedder, type EmbeddingProfile } from "./rag-embeddings";
-import { canonicalHash, canonicalJson, sourceVersionId, openRagImportSession, validateProfile, vectorParameter, type PreparedCorpus, type PreparedSource, type RagDatabaseOptions, type RagImportSession, type StoredSource } from "./rag-vector-store";
+import { canonicalHash, canonicalJson, sourceVersionId, openRagImportSession, openRagDocumentImportSession, prepareDocumentSnapshot, validateProfile, vectorParameter, RagStoreError, type PreparedCorpus, type PreparedSource, type PreparedDocumentCorpus, type RagDatabaseOptions, type RagImportSession, type RagDocumentImportSession, type RagDocumentImportContext, type LegacySuppression, type LegacyRestore, type StoredSource } from "./rag-vector-store";
+import { validateKnowledgeDatasetV3 } from "./rag-document-contract";
+import type { KnowledgeDocumentBundleV3 } from "./rag-knowledge-types";
 
 export class RagImportError extends Error {
   constructor(readonly code: "invalid-import-data" | "embedding-budget" | "uncertain-embedding-attempt" | "invalid-embedding-result" | "embedding-failed" | "aborted") { super(code); }
@@ -25,6 +27,7 @@ function inputDataset(value: unknown, archived: boolean) {
 export function prepareRagCorpus(currentDatasets: readonly unknown[], archiveDatasets: readonly unknown[], profile: EmbeddingProfile): PreparedCorpus {
   try {
     validateProfile(profile);
+    if (profile.inputVersion !== "title-locator-text-v1") throw new Error();
     if (!currentDatasets.length || currentDatasets.length > 16 || archiveDatasets.length > 16) throw new Error();
     const current = currentDatasets.map((data) => inputDataset(data, false));
     const archives = archiveDatasets.map((data) => inputDataset(data, true));
@@ -68,6 +71,19 @@ export async function importRagCorpus(options: RagImportOptions): Promise<RagImp
 }
 /** The injected session allows deterministic algorithm/failure tests without a DB or API. */
 export async function importPreparedCorpus(plan: PreparedCorpus, session: RagImportSession, options: AlgorithmOptions): Promise<RagImportResult> {
+  const result: RagImportResult = { revisionId: plan.revisionId, profileId: plan.profile.id, published: false, sources: plan.sources.length, chunks: plan.chunks.length,
+    archivedSources: plan.sources.filter((source) => source.metadata.status === "archived").length,
+    reusedInputs: 0, embeddedInputs: 0, embeddingCalls: 0, embeddingInputBytes: 0, promptTokens: 0, totalTokens: 0 };
+  return importWithSession(plan, session, options, result);
+}
+type EmbeddingPlan = Pick<PreparedDocumentCorpus, "revisionId" | "profile" | "inputs">;
+type ImportRunnerSession<P extends EmbeddingPlan> = Pick<RagImportSession, "cached" | "uncertain" | "startAttempt" | "completeAttempt" | "failAttempt"> & {
+  prepare(plan: P): Promise<"building" | "ready">; publish(plan: P): Promise<void>;
+};
+async function importWithSession<P extends EmbeddingPlan, R extends RagImportResult>(plan: P, session: ImportRunnerSession<P>, options: AlgorithmOptions, result: R): Promise<R> {
+  options = Object.freeze({ embedder: options.embedder, maxEmbeddingInputs: options.maxEmbeddingInputs, maxEmbeddingBytes: options.maxEmbeddingBytes,
+    retryUncertain: options.retryUncertain, signal: options.signal });
+  if (options.retryUncertain !== undefined && typeof options.retryUncertain !== "boolean") throw new RagImportError("invalid-import-data");
   if (![options.maxEmbeddingInputs, options.maxEmbeddingBytes].every((limit) => Number.isSafeInteger(limit) && limit >= 0)
     || options.maxEmbeddingInputs > 10000 || options.maxEmbeddingBytes > 64 * 1024 * 1024) throw new RagImportError("embedding-budget");
   validateProfile(options.embedder.profile);
@@ -75,9 +91,6 @@ export async function importPreparedCorpus(plan: PreparedCorpus, session: RagImp
   const signal = options.signal ?? new AbortController().signal;
   const checkAbort = () => { if (signal.aborted) throw new RagImportError("aborted"); };
   checkAbort();
-  const result: RagImportResult = { revisionId: plan.revisionId, profileId: plan.profile.id, published: false, sources: plan.sources.length, chunks: plan.chunks.length,
-    archivedSources: plan.sources.filter((source) => source.metadata.status === "archived").length,
-    reusedInputs: 0, embeddedInputs: 0, embeddingCalls: 0, embeddingInputBytes: 0, promptTokens: 0, totalTokens: 0 };
   const state = await session.prepare(plan);
   if (state === "ready") { await session.publish(plan); result.published = true; result.reusedInputs = plan.inputs.length; return result; }
   const cached = await session.cached(plan.profile, plan.inputs);
@@ -115,4 +128,113 @@ export async function importPreparedCorpus(plan: PreparedCorpus, session: RagImp
     }
   }
   checkAbort(); await session.publish(plan); result.published = true; return result;
+}
+
+export type RagDocumentChangeSet = Readonly<{
+  collection: "current" | "archive";
+  expectedSnapshotId: string | null;
+  upserts: readonly KnowledgeDocumentBundleV3[];
+  retireSourceVersionIds?: readonly string[];
+  legacyReplacements?: readonly Readonly<{ legacySourceVersionId: string; documentSourceVersionId: string }>[];
+  restoreLegacySourceVersionIds?: readonly string[];
+}>;
+export type RagDocumentImportResult = RagImportResult & {
+  collection: "current" | "archive"; blocks: number; logicalSources: number;
+  suppressedLegacySources: number; restoredLegacySources: number;
+};
+export type RagDocumentImportOptions = RagDatabaseOptions & AlgorithmOptions & { changes: RagDocumentChangeSet };
+function documentChangeIds(value: unknown): readonly string[] {
+  if (value === undefined) return Object.freeze([]);
+  if (!Array.isArray(value) || value.length > 4096 || value.some((id) => typeof id !== "string" || !/^[0-9a-f]{64}$/.test(id)) || new Set(value).size !== value.length) throw new Error();
+  return Object.freeze(value.map((id) => String(id)));
+}
+export function parseDocumentChangeSet(value: unknown): RagDocumentChangeSet {
+  try {
+    if (!object(value) || Object.keys(value).some((key) => !["collection", "expectedSnapshotId", "upserts", "retireSourceVersionIds", "legacyReplacements", "restoreLegacySourceVersionIds"].includes(key))
+      || (value.collection !== "current" && value.collection !== "archive")
+      || !(value.expectedSnapshotId === null || (typeof value.expectedSnapshotId === "string" && /^[0-9a-f]{64}$/.test(value.expectedSnapshotId)))
+      || !Array.isArray(value.upserts) || value.upserts.length > 1024) throw new Error();
+    const upserts: KnowledgeDocumentBundleV3[] = value.upserts.map((bundle) => {
+      if (!object(bundle) || Object.keys(bundle).sort().join(",") !== "blocks,chunks,document") throw new Error();
+      const data = validateKnowledgeDatasetV3({ version: 3, documents: [bundle.document], blocks: bundle.blocks, chunks: bundle.chunks });
+      return Object.freeze({ document: data.documents[0], blocks: data.blocks, chunks: data.chunks });
+    });
+    const replacements: { legacySourceVersionId: string; documentSourceVersionId: string }[] = [];
+    if (value.legacyReplacements !== undefined) {
+      if (!Array.isArray(value.legacyReplacements) || value.legacyReplacements.length > 4096) throw new Error();
+      for (const entry of value.legacyReplacements) {
+        if (!object(entry) || Object.keys(entry).sort().join(",") !== "documentSourceVersionId,legacySourceVersionId"
+          || typeof entry.legacySourceVersionId !== "string" || !/^[0-9a-f]{64}$/.test(entry.legacySourceVersionId)
+          || typeof entry.documentSourceVersionId !== "string" || !/^[0-9a-f]{64}$/.test(entry.documentSourceVersionId)) throw new Error();
+        replacements.push(Object.freeze({ legacySourceVersionId: entry.legacySourceVersionId, documentSourceVersionId: entry.documentSourceVersionId }));
+      }
+    }
+    if (new Set(replacements.map((entry) => entry.legacySourceVersionId)).size !== replacements.length) throw new Error();
+    return Object.freeze({ collection: value.collection, expectedSnapshotId: value.expectedSnapshotId, upserts: Object.freeze(upserts),
+      retireSourceVersionIds: documentChangeIds(value.retireSourceVersionIds), legacyReplacements: Object.freeze(replacements), restoreLegacySourceVersionIds: documentChangeIds(value.restoreLegacySourceVersionIds) });
+  } catch { throw new RagImportError("invalid-import-data"); }
+}
+/** A change set never treats missing/failed documents as deletions. */
+export function prepareDocumentChanges(context: RagDocumentImportContext, input: RagDocumentChangeSet, profile: EmbeddingProfile, now = Date.now()): PreparedDocumentCorpus {
+  try {
+    const changes = parseDocumentChangeSet(input);
+    if (context.collection !== changes.collection || !Number.isFinite(now)) throw new Error();
+    if (changes.expectedSnapshotId !== (context.snapshot?.id ?? null)) throw new RagStoreError("revision-conflict");
+    const old = validateKnowledgeDatasetV3(context.dataset), upserts = validateKnowledgeDatasetV3({ version: 3,
+      documents: changes.upserts.map((bundle) => bundle.document), blocks: changes.upserts.flatMap((bundle) => bundle.blocks), chunks: changes.upserts.flatMap((bundle) => bundle.chunks) });
+    const retired = changes.retireSourceVersionIds ?? [], restored = changes.restoreLegacySourceVersionIds ?? [];
+    const replacements = changes.legacyReplacements ?? [];
+    if (changes.collection === "archive" && (replacements.length || restored.length)) throw new Error();
+    const keep = new Set(old.documents.map((doc) => doc.sourceVersionId));
+    for (const id of retired) {
+      if (!keep.delete(id) || upserts.documents.some((doc) => doc.sourceVersionId === id)) throw new Error();
+    }
+    if (changes.collection === "current") for (const next of upserts.documents) for (const previous of old.documents) {
+      if (next.id === previous.id) { if (next.authority !== previous.authority) throw new Error(); keep.delete(previous.sourceVersionId); }
+    }
+    else for (const next of upserts.documents) keep.delete(next.sourceVersionId);
+    const dataset = { version: 3, documents: [...old.documents.filter((doc) => keep.has(doc.sourceVersionId)), ...upserts.documents],
+      blocks: [...old.blocks.filter((block) => keep.has(block.sourceVersionId)), ...upserts.blocks],
+      chunks: [...old.chunks.filter((chunk) => keep.has(chunk.sourceVersionId)), ...upserts.chunks] };
+    const suppression = new Map(context.suppressions.map((entry) => [entry.legacySourceId, entry])), restores: LegacyRestore[] = [];
+    for (const id of restored) {
+      const live = context.legacySources.find((entry) => entry.sourceVersionId === id);
+      if (!live || !suppression.has(live.document.id)) throw new RagStoreError("revision-conflict");
+      suppression.delete(live.document.id); restores.push({ legacySourceId: live.document.id, legacySourceVersionId: id });
+    }
+    const introduced: string[] = [];
+    for (const replacement of replacements) {
+      const live = context.legacySources.find((entry) => entry.sourceVersionId === replacement.legacySourceVersionId);
+      const target = dataset.documents.find((doc) => doc.sourceVersionId === replacement.documentSourceVersionId);
+      if (!live || !target || target.status !== "current" || target.authority !== live.document.authority || restores.some((entry) => entry.legacySourceId === live.document.id)
+        || !dataset.chunks.some((chunk) => chunk.sourceVersionId === target.sourceVersionId)
+        || now < Date.parse(target.checkedAt + "T00:00:00Z") || now >= Date.parse(target.reviewAfter + "T00:00:00Z")
+        || (target.effectiveFrom !== null && now < Date.parse(target.effectiveFrom)) || (target.effectiveUntil !== null && now >= Date.parse(target.effectiveUntil))) throw new Error();
+      const value: LegacySuppression = { legacySourceId: live.document.id, legacySourceVersionId: live.sourceVersionId, documentSourceVersionId: target.sourceVersionId };
+      if (canonicalJson(suppression.get(value.legacySourceId) ?? null) !== canonicalJson(value)) introduced.push(value.legacySourceVersionId);
+      suppression.set(value.legacySourceId, value);
+    }
+    return prepareDocumentSnapshot({ collection: changes.collection, baseSnapshot: context.snapshot, dataset, profile, suppressions: [...suppression.values()], restores,
+      upsertSourceVersionIds: upserts.documents.map((doc) => doc.sourceVersionId), retireSourceVersionIds: retired, promotionLegacySourceVersionIds: introduced });
+  } catch (error) {
+    if (error instanceof RagStoreError && ["revision-conflict", "profile-conflict"].includes(error.code)) throw error;
+    throw new RagImportError("invalid-import-data");
+  }
+}
+export async function importDocumentChanges(options: RagDocumentImportOptions): Promise<RagDocumentImportResult> {
+  const changes = parseDocumentChangeSet(options.changes);
+  const session = await openRagDocumentImportSession(options, options.signal);
+  try {
+    const context = await session.context(changes.collection);
+    return await importPreparedDocumentCorpus(prepareDocumentChanges(context, changes, options.embedder.profile), session, options);
+  } finally { await session.close(); }
+}
+export async function importPreparedDocumentCorpus(input: PreparedDocumentCorpus, session: RagDocumentImportSession, options: AlgorithmOptions): Promise<RagDocumentImportResult> {
+  const plan = prepareDocumentSnapshot(input);
+  if (canonicalJson(plan) !== canonicalJson(input)) throw new RagImportError("invalid-import-data");
+  const result: RagDocumentImportResult = { revisionId: plan.revisionId, profileId: plan.profile.id, published: false, sources: plan.dataset.documents.length,
+    chunks: plan.chunks.length, archivedSources: plan.collection === "archive" ? plan.dataset.documents.length : 0, reusedInputs: 0, embeddedInputs: 0,
+    embeddingCalls: 0, embeddingInputBytes: 0, promptTokens: 0, totalTokens: 0, collection: plan.collection, blocks: plan.dataset.blocks.length,
+    logicalSources: new Set(plan.dataset.documents.map((doc) => doc.id)).size, suppressedLegacySources: plan.suppressions.length, restoredLegacySources: plan.restores.length };
+  return importWithSession(plan, session, options, result);
 }

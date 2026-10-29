@@ -1,16 +1,21 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Pool } from "pg";
 import original from "../server/data/silicon-hill-knowledge.json";
 import { createEmbeddingProfile, type Embedder } from "../server/rag-embeddings";
-import { importRagCorpus, prepareRagCorpus } from "../server/rag-ingest";
-import { createVectorKnowledgeStore, migrateRagSchema, openRagImportSession, openRagImportSessionWithPool, type RagSqlPool } from "../server/rag-vector-store";
+import { importRagCorpus, prepareRagCorpus, prepareDocumentChanges, importPreparedDocumentCorpus } from "../server/rag-ingest";
+import { createVectorKnowledgeStore, createVectorKnowledgeStoreWithPool, migrateRagSchema, openRagImportSession, openRagImportSessionWithPool, openRagDocumentImportSession, openRagDocumentImportSessionWithPool, type RagSqlPool } from "../server/rag-vector-store";
+import { buildKnowledgeDocumentV3, parserProfileSha256, requirePublishableExtraction, validateWorkerEnvelope } from "../server/rag-document-contract";
+import { RAG_TOKENIZER } from "../shared/rag-provenance";
+import type { DocumentMetadataV3 } from "../server/rag-knowledge-types";
+import type { KnowledgeDocument, RawKnowledgeChunk } from "../server/rag-knowledge-types";
 
 const testUrl = process.env.RAG_TEST_DATABASE_URL;
 const now = Date.parse("2026-10-30T12:00:00Z"), profile = createEmbeddingProfile({ dimensions: 3 });
-function fixture(count = 2) {
-  const source = { ...original.sources[0], id: "sh-db-fixture", title: "Synthetic DB fixture", checkedAt: "2026-10-28", reviewAfter: "2026-11-28", effectiveFrom: null, effectiveUntil: null };
+function fixture(count = 2): { version: 2; sources: KnowledgeDocument[]; chunks: RawKnowledgeChunk[] } {
+  const source: KnowledgeDocument = { ...original.sources[0], id: "sh-db-fixture", title: "Synthetic DB fixture", authority: "silicon-hill", status: "current", checkedAt: "2026-10-28", reviewAfter: "2026-11-28", effectiveFrom: null, effectiveUntil: null };
   return { version: 2, sources: [source], chunks: Array.from({ length: count }, (_, index) => { const text = index === 0 ? "Test bližší." : `Test vzdálenější ${index}.`; return { id: `sh-db-chunk-${index}`, sourceId: source.id, text, sourceLocator: "Test", topic: "membership", keywords: ["test"], contentSha256: createHash("sha256").update(text).digest("hex") }; }) };
 }
 function fakeEmbedder(action?: (calls: number) => Promise<void>): Embedder & { calls: () => number } {
@@ -20,6 +25,20 @@ function fakeEmbedder(action?: (calls: number) => Promise<void>): Embedder & { c
     return { vectors: inputs.map((input) => input.includes("bližší") ? [1, 0, 0] : [0, 1, 0]), usage: { promptTokens: inputs.length, totalTokens: inputs.length } };
   } };
 }
+function completeDocument(text = "Úplný syntetický databázový dokument.", changes: Partial<DocumentMetadataV3> = {}, page = 1) {
+  const metadata: DocumentMetadataV3 = { ...original.sources[0], id: "suz-v3-db-document", title: "Syntetická úplná předloha", authority: "suz", status: "current", archiveReason: null,
+    url: "https://www.suz.cvut.cz/cz/media/file/smlouva-o-ubytovani-pro-studenty", discoveryUrl: "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ceniky-dokumenty",
+    checkedAt: "2026-10-28", reviewAfter: "2026-11-28", effectiveFrom: null, effectiveUntil: null, author: null, license: null, licenseUrl: null, ...changes };
+  const parserProfile = { id: "docling-2.144.0-strahov-v1", packages: { "docling-slim": "2.144.0", tiktoken: "0.12.0" }, pipeline: "docling-native-pdf", configurationHash: "b".repeat(64), modelManifestHash: null, tokenizer: { ...RAG_TOKENIZER, version: "0.12.0" } };
+  const span = { blockId: "b-same", locator: `PDF strana ${page}`, page };
+  const envelope = { schemaVersion: 1, sourceId: metadata.id, inputSha256: createHash("sha256").update(text + page).digest("hex"), status: "ok", format: "pdf", parserProfile,
+    document: { title: metadata.title, pageCount: page, complete: true }, blocks: [{ id: "b-same", kind: "text", text, headingPath: [], spans: [span] }],
+    chunks: [{ id: "c-same", text, headingPath: [], tokenCount: 15, blockIds: ["b-same"], spans: [span] }],
+    quality: { processedPages: page, expectedPages: page, inputTextCharacters: null, outputTextCharacters: [...text].length, tableCount: 0, ocrPages: [], issues: [] }, links: [] };
+  return buildKnowledgeDocumentV3(metadata, requirePublishableExtraction(validateWorkerEnvelope(envelope, { sourceId: metadata.id, inputSha256: envelope.inputSha256, parserProfileSha256: parserProfileSha256(parserProfile) })), "native");
+}
+const documentProfile = createEmbeddingProfile({ dimensions: 3, inputVersion: "title-heading-text-v2" });
+function documentEmbedder(): Embedder & { calls: () => number } { return { ...fakeEmbedder(), profile: documentProfile }; }
 
 test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurrency and abort", { skip: !testUrl, timeout: 120000 }, async (t) => {
   const url = new URL(testUrl!);
@@ -29,6 +48,8 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
   assert.match(schema, /^rag_test_[a-f0-9]{32}$/);
   const admin = new Pool({ connectionString: testUrl, connectionTimeoutMillis: 3000, statement_timeout: 5000 });
   let created = false;
+  const roleSuffix = randomUUID().replaceAll("-", ""), readerRole = "rag_reader_" + roleSuffix, ingesterRole = "rag_ingester_" + roleSuffix, observerRole = "rag_observer_" + roleSuffix;
+  const createdRoles: { name: string; oid: number }[] = [];
   const scoped = new URL(url); scoped.searchParams.set("options", `-c search_path=${schema},public`);
   const connectionString = scoped.href;
   const store = createVectorKnowledgeStore({ connectionString, connectionTimeoutMs: 3000, statementTimeoutMs: 3000, maxConnections: 2 });
@@ -38,8 +59,37 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
     assert.deepEqual(logging.rows[0], { normal: "0", errors: "0" }, "DB bind parameter logging must be disabled");
     await admin.query("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public");
     await admin.query(`CREATE SCHEMA "${schema}"`); created = true;
-    await migrateRagSchema({ connectionString });
-    assert.equal(await store.captureActive(), null);
+    await t.test("populated v1 upgrade preserves head, paid cache and existing ACL while granting only explicit roles", async () => {
+      const setup = new Pool({ connectionString });
+      try {
+        await setup.query(await readFile(new URL("../server/rag-schema.sql", import.meta.url), "utf8"));
+        assert.equal(await store.captureActive(), null);
+        for (const role of [readerRole, ingesterRole, observerRole]) {
+          assert.match(role, /^rag_(reader|ingester|observer)_[a-f0-9]{32}$/);
+          await admin.query(`CREATE ROLE "${role}" NOLOGIN`);
+          const identity = await admin.query("SELECT oid::integer AS oid FROM pg_roles WHERE rolname=$1", [role]);
+          createdRoles.push({ name: role, oid: identity.rows[0].oid });
+          await admin.query(`GRANT USAGE ON SCHEMA "${schema}" TO "${role}"`);
+        }
+        await setup.query(`GRANT SELECT ON rag_heads TO "${observerRole}"`);
+        const seed = fixture(2); seed.sources[0].title = "Pre-migration retained fixture";
+        await run(seed, fakeEmbedder());
+        const before = await store.captureActive(), cached = await setup.query("SELECT profile_id,input_hash,input_text,embedding::text FROM rag_embedding_cache ORDER BY profile_id,input_hash");
+        await migrateRagSchema({ connectionString, readerRole, ingesterRole });
+        assert.deepEqual(await store.captureActive(), before);
+        assert.deepEqual((await setup.query("SELECT profile_id,input_hash,input_text,embedding::text FROM rag_embedding_cache ORDER BY profile_id,input_hash")).rows, cached.rows);
+        assert.deepEqual((await setup.query("SELECT version FROM rag_schema_migrations ORDER BY version")).rows.map((row) => row.version), [1, 2]);
+        const rights = await admin.query(`SELECT has_table_privilege($1,$4,'SELECT') AS observer_kept,
+          has_table_privilege($2,$5,'SELECT') AS reader_select,has_table_privilege($2,$5,'INSERT') AS reader_insert,
+          has_table_privilege($3,$5,'INSERT') AS ingester_insert,has_table_privilege($3,$5,'DELETE') AS ingester_delete,
+          has_column_privilege($3,$5,'sealed','UPDATE') AS ingester_seal,has_column_privilege($3,$5,'metadata','UPDATE') AS ingester_metadata`,
+          [observerRole, readerRole, ingesterRole, `${schema}.rag_heads`, `${schema}.rag_document_versions`]);
+        assert.deepEqual(rights.rows[0], { observer_kept: true, reader_select: true, reader_insert: false, ingester_insert: true, ingester_delete: false, ingester_seal: true, ingester_metadata: false });
+        const publicGrants = await admin.query(`SELECT count(*)::integer AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+          CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault('r',c.relowner))) permission WHERE n.nspname=$1 AND c.relkind='r' AND permission.grantee=0`, [schema]);
+        assert.equal(publicGrants.rows[0].n, 0);
+      } finally { await setup.end(); }
+    });
     const first = fixture(), archives = [{ version: 2, sources: [{ ...first.sources[0], id: "sh-archive-db-fixture", status: "archived", archiveReason: "Synthetic archive" }], chunks: [] }];
     let snapshot: Awaited<ReturnType<typeof store.captureActive>>;
     await t.test("migrate is idempotent, exact SQL cosine ranks vectors, archive remains metadata only", async () => {
@@ -204,6 +254,193 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
       assert.deepEqual(await ids({ authority: "suz", topics: ["printing"], limit: 4 }), []);
       assert.deepEqual(await ids({ topics: [], limit: 4 }), []);
     });
+
+    function rolePool(role: string, onBackend?: (pid: number) => void, beforeCommit?: () => Promise<void>): RagSqlPool {
+      assert.ok(createdRoles.some((entry) => entry.name === role));
+      const pool = new Pool({ connectionString, connectionTimeoutMillis: 3000, statement_timeout: 10000 });
+      return { async connect() {
+        const client = await pool.connect(), observe = () => {};
+        client.on("error", observe);
+        try { await client.query(`SET ROLE "${role}"`); onBackend?.((await client.query("SELECT pg_backend_pid() AS pid")).rows[0].pid); }
+        catch (error) { client.off("error", observe); client.release(true); throw error; }
+        return { async query(sql, values) {
+          if (sql === "COMMIT") await beforeCommit?.();
+          const result = await client.query(sql, values); return { rows: result.rows, rowCount: result.rowCount ?? undefined };
+        }, release() { client.off("error", observe); client.release(true); }, on: (event, callback) => client.on(event, callback), off: (event, callback) => client.off(event, callback) };
+      }, end: () => pool.end(), on: (_event, callback) => pool.on("error", callback) };
+    }
+    const legacySource = fixture(1);
+    legacySource.sources[0] = { ...legacySource.sources[0], id: "suz-v3-legacy", authority: "suz", url: "https://www.suz.cvut.cz/cz/media/file/smlouva-o-ubytovani-pro-studenty", discoveryUrl: "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ceniky-dokumenty", author: null, license: null, licenseUrl: null };
+    legacySource.chunks[0] = { ...legacySource.chunks[0], id: "suz-v3-legacy-chunk", sourceId: "suz-v3-legacy", topic: "housing" };
+    let originalLegacyVersion = "", currentBundle = completeDocument();
+    const documentImport = async (upserts: ReturnType<typeof completeDocument>[], extra: Partial<Parameters<typeof prepareDocumentChanges>[1]> = {}, embedder = documentEmbedder()) => {
+      const session = await openRagDocumentImportSessionWithPool(rolePool(ingesterRole), undefined, () => now);
+      try {
+        const context = await session.context("current");
+        const plan = prepareDocumentChanges(context, { collection: "current", expectedSnapshotId: context.snapshot?.id ?? null, upserts, ...extra }, documentProfile, now);
+        return { plan, result: await importPreparedDocumentCorpus(plan, session, { embedder, maxEmbeddingInputs: 100, maxEmbeddingBytes: 100000 }) };
+      } finally { await session.close(); }
+    };
+    await t.test("limited ingester publishes complete v3 and read-only reader can query both heads without row locks", async () => {
+      await run(legacySource, fakeEmbedder());
+      const legacy = await store.captureActive(); assert.ok(legacy);
+      const v1Rows = await admin.query(`SELECT count(*)::integer AS n FROM "${schema}".rag_embedding_cache WHERE profile_id=$1`, [profile.id]);
+      const published = await documentImport([currentBundle]);
+      assert.equal(published.result.embeddedInputs, 1); assert.deepEqual(await store.captureActive(), legacy);
+      const reader = createVectorKnowledgeStoreWithPool(rolePool(readerRole));
+      try {
+        const snapshot = await reader.captureSearch({ kind: "current" }); assert.ok(snapshot);
+        const hits = await reader.searchSnapshot(snapshot, [1, 0, 0], { limit: 4, now });
+        assert.equal(hits.length, 2); assert.ok(hits.some((hit) => hit.dependency.head === "public")); assert.ok(hits.some((hit) => hit.dependency.head === "public-documents"));
+        assert.equal(await reader.assertSnapshot(snapshot, hits.map((hit) => hit.dependency), now), true);
+        originalLegacyVersion = hits.find((hit) => hit.dependency.head === "public")!.dependency.sourceVersionId;
+      } finally { await reader.close(); }
+      assert.equal((await admin.query(`SELECT count(*)::integer AS n FROM "${schema}".rag_embedding_cache WHERE profile_id=$1`, [profile.id])).rows[0].n, v1Rows.rows[0].n);
+      const unchanged = await documentImport([currentBundle]); assert.equal(unchanged.result.embeddingCalls, 0);
+      currentBundle = completeDocument(undefined, { checkedAt: "2026-10-29" }, 2);
+      const metadata = await documentImport([currentBundle]); assert.equal(metadata.result.embeddingCalls, 0);
+      const sealed = await admin.query(`SELECT sealed FROM "${schema}".rag_document_versions WHERE id=$1`, [currentBundle.document.sourceVersionId]);
+      assert.equal(sealed.rows[0].sealed, true);
+      await assert.rejects(admin.query(`UPDATE "${schema}".rag_document_versions SET metadata=metadata WHERE id=$1`, [currentBundle.document.sourceVersionId]), (error: any) => error.code === "55000");
+      await assert.rejects(admin.query(`UPDATE "${schema}".rag_document_versions SET sealed=false WHERE id=$1`, [currentBundle.document.sourceVersionId]), (error: any) => error.code === "55000");
+    });
+    await t.test("persistent legacy lineage suppression cannot be bypassed by expiry, retirement, metadata or stale rollback", async () => {
+      await documentImport([], { legacyReplacements: [{ legacySourceVersionId: originalLegacyVersion, documentSourceVersionId: currentBundle.document.sourceVersionId }] });
+      let view = await store.captureSearch({ kind: "current" }); assert.ok(view);
+      assert.ok((await store.searchSnapshot(view, [1, 0, 0], { limit: 4, now })).every((hit) => hit.dependency.head !== "public"));
+      await documentImport([], { retireSourceVersionIds: [currentBundle.document.sourceVersionId] });
+      view = await store.captureSearch({ kind: "current" }); assert.ok(view);
+      assert.equal((await store.searchSnapshot(view, [1, 0, 0], { limit: 4, now })).length, 0);
+      legacySource.sources[0].checkedAt = "2026-10-29";
+      await run(legacySource, fakeEmbedder(), { maxEmbeddingInputs: 0, maxEmbeddingBytes: 0 });
+      view = await store.captureSearch({ kind: "current" }); assert.ok(view);
+      assert.equal((await store.searchSnapshot(view, [1, 0, 0], { limit: 4, now })).length, 0);
+      await assert.rejects(documentImport([], { restoreLegacySourceVersionIds: [originalLegacyVersion] }), (error: any) => error.code === "revision-conflict");
+      const live = await store.captureActive(); assert.ok(live);
+      const restoredVersion = (await store.search(live, [1, 0, 0], { limit: 1, now }))[0].sourceVersionId;
+      assert.notEqual(restoredVersion, originalLegacyVersion);
+      const restored = await documentImport([], { restoreLegacySourceVersionIds: [restoredVersion] }); assert.equal(restored.result.embeddingCalls, 0);
+      view = await store.captureSearch({ kind: "current" }); assert.ok(view);
+      assert.equal((await store.searchSnapshot(view, [1, 0, 0], { limit: 4, now })).length, 1);
+    });
+    await t.test("archive source versions share local chunk IDs but remain separate, and asOf requires a known legal interval", async () => {
+      const session = await openRagDocumentImportSessionWithPool(rolePool(ingesterRole), undefined, () => now);
+      try {
+        const base = await session.context("archive");
+        const first = completeDocument("Archivní první verze.", { status: "archived", archiveReason: "Nahrazeno", effectiveFrom: "2024-09-01T00:00:00+02:00", effectiveUntil: "2025-09-01T00:00:00+02:00" });
+        const second = completeDocument("Archivní druhá verze.", { status: "archived", archiveReason: "Nahrazeno", effectiveFrom: "2025-09-01T00:00:00+02:00", effectiveUntil: "2026-09-01T00:00:00+02:00" });
+        const unknown = completeDocument("Archivní nedatovaná verze.", { status: "archived", archiveReason: "Neznámá účinnost" });
+        const plan = prepareDocumentChanges(base, { collection: "archive", expectedSnapshotId: base.snapshot?.id ?? null, upserts: [first, second, unknown] }, documentProfile, now);
+        await importPreparedDocumentCorpus(plan, session, { embedder: documentEmbedder(), maxEmbeddingInputs: 100, maxEmbeddingBytes: 100000 });
+        const archive = await store.captureSearch({ kind: "archive" }); assert.ok(archive);
+        const all = await store.searchSnapshot(archive, [1, 0, 0], { limit: 8, now });
+        assert.equal(all.length, 3); assert.equal(new Set(all.map((hit) => hit.chunk.id)).size, 3);
+        const dated = await store.captureSearch({ kind: "archive", asOf: "2025-10-01T00:00:00.000Z" }); assert.ok(dated);
+        const matches = await store.searchSnapshot(dated, [1, 0, 0], { limit: 8, now });
+        assert.equal(matches.length, 1); assert.equal(matches[0].dependency.sourceVersionId, second.document.sourceVersionId);
+        assert.equal(await store.assertSnapshot(dated, matches.map((hit) => hit.dependency), Date.parse("2027-01-01T00:00:00Z")), false);
+        const current = await store.captureSearch({ kind: "current" }); assert.ok(current);
+        assert.ok((await store.searchSnapshot(current, [1, 0, 0], { limit: 8, now })).every((hit) => hit.dependency.head !== "public-archive"));
+      } finally { await session.close(); }
+    });
+    async function waitBlocked(blockedPid: number, blockerPid: number, completed: () => boolean) {
+      assert.ok(Number.isSafeInteger(blockedPid) && blockedPid > 0 && Number.isSafeInteger(blockerPid) && blockerPid > 0);
+      const deadline = Date.now() + 5000;
+      while (Date.now() < deadline) {
+        if (completed()) throw new Error("Owned operation completed before the expected SQL lock barrier");
+        const result = await admin.query("SELECT pg_blocking_pids($1) AS blockers", [blockedPid]);
+        if (result.rows[0].blockers.includes(blockerPid)) return;
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      throw new Error("Owned SQL blocking relation was not observed");
+    }
+    const extraBlock = (bundle: ReturnType<typeof completeDocument>) => ({ ...bundle.blocks[0], id: "b-race-extra", spans: bundle.blocks[0].spans.map((span) => ({ ...span, blockId: "b-race-extra" })) });
+    const insertExtra = (client: { query: (sql: string, values: unknown[]) => Promise<unknown> }, bundle: ReturnType<typeof completeDocument>) => client.query(
+      `INSERT INTO "${schema}".rag_document_blocks(source_version_id,block_id,ordinal,payload) VALUES($1,'b-race-extra',1,$2::jsonb)`, [bundle.document.sourceVersionId, JSON.stringify(extraBlock(bundle))]);
+    let failedRaceVersion = "", failedRaceRevision = "";
+    await t.test("RC part commit before sealing blocks publication and cannot slip into a ready document", async () => {
+      const bundle = completeDocument("Concurrent part before publication."), previous = await store.captureSearch({ kind: "current" });
+      let publicationPid = 0;
+      const session = await openRagDocumentImportSessionWithPool(rolePool(ingesterRole, (pid) => publicationPid = pid), undefined, () => now);
+      const writer = await admin.connect(); let writerTransaction = false;
+      try {
+        const context = await session.context("current");
+        const plan = prepareDocumentChanges(context, { collection: "current", expectedSnapshotId: context.snapshot!.id, upserts: [bundle] }, documentProfile, now);
+        await session.prepare(plan);
+        const attempt = await session.startAttempt(plan, plan.inputs.map((input) => input.inputHash));
+        await session.completeAttempt(attempt, plan.profile, plan.inputs.map((input) => ({ ...input, vector: [1, 0, 0] })), { promptTokens: plan.inputs.length, totalTokens: plan.inputs.length });
+        await writer.query("BEGIN ISOLATION LEVEL READ COMMITTED"); writerTransaction = true;
+        await writer.query(`SET LOCAL search_path TO "${schema}",public`); await writer.query(`SET LOCAL ROLE "${ingesterRole}"`);
+        const writerPid = (await writer.query("SELECT pg_backend_pid() AS pid")).rows[0].pid;
+        await insertExtra(writer, bundle);
+        let completed = false;
+        const outcome = session.publish(plan).then(() => ({ ok: true as const }), (error: unknown) => ({ ok: false as const, error })).finally(() => completed = true);
+        try { await waitBlocked(publicationPid, writerPid, () => completed); }
+        finally { await writer.query("COMMIT"); writerTransaction = false; }
+        const result = await outcome;
+        assert.equal(result.ok, false);
+        if (!result.ok) assert.equal((result.error as { code?: string }).code, "database-unavailable");
+        assert.equal((await store.captureSearch({ kind: "current" }))!.id, previous!.id);
+        const stored = await admin.query(`SELECT v.sealed,r.state FROM "${schema}".rag_document_versions v JOIN "${schema}".rag_revision_documents d ON d.source_version_id=v.id JOIN "${schema}".rag_revisions r ON r.id=d.revision_id WHERE r.id=$1`, [plan.revisionId]);
+        assert.deepEqual(stored.rows, [{ sealed: false, state: "building" }]);
+        failedRaceVersion = bundle.document.sourceVersionId; failedRaceRevision = plan.revisionId;
+      } finally { if (writerTransaction) await writer.query("ROLLBACK"); writer.release(); await session.close(); }
+    });
+    await t.test("RC sealing before a concurrent part rejects the late insert after the real commit barrier", async () => {
+      const bundle = completeDocument("Concurrent part after publication.");
+      let publicationPid = 0, holdCommit = false, held = false, releaseCommit!: () => void, reachedCommit!: () => void;
+      const heldCommit = new Promise<void>((resolve) => releaseCommit = resolve), commitReached = new Promise<void>((resolve) => reachedCommit = resolve);
+      const session = await openRagDocumentImportSessionWithPool(rolePool(ingesterRole, (pid) => publicationPid = pid, async () => {
+        if (holdCommit && !held) { held = true; reachedCommit(); await heldCommit; }
+      }), undefined, () => now);
+      const writer = await admin.connect(); let writerTransaction = false;
+      try {
+        const context = await session.context("current");
+        const plan = prepareDocumentChanges(context, { collection: "current", expectedSnapshotId: context.snapshot!.id, upserts: [bundle] }, documentProfile, now);
+        await session.prepare(plan);
+        const attempt = await session.startAttempt(plan, plan.inputs.map((input) => input.inputHash));
+        await session.completeAttempt(attempt, plan.profile, plan.inputs.map((input) => ({ ...input, vector: [1, 0, 0] })), { promptTokens: plan.inputs.length, totalTokens: plan.inputs.length });
+        holdCommit = true;
+        const publication = session.publish(plan);
+        await Promise.race([commitReached, publication.then(() => { throw new Error("Publication skipped the controlled commit barrier"); })]);
+        await writer.query("BEGIN ISOLATION LEVEL READ COMMITTED"); writerTransaction = true;
+        await writer.query(`SET LOCAL search_path TO "${schema}",public`); await writer.query(`SET LOCAL ROLE "${ingesterRole}"`);
+        const writerPid = (await writer.query("SELECT pg_backend_pid() AS pid")).rows[0].pid;
+        let completed = false;
+        const outcome = insertExtra(writer, bundle).then(() => ({ ok: true as const }), (error: unknown) => ({ ok: false as const, error })).finally(() => completed = true);
+        try { await waitBlocked(writerPid, publicationPid, () => completed); } finally { releaseCommit(); }
+        await publication;
+        const result = await outcome; assert.equal(result.ok, false);
+        if (!result.ok) assert.equal((result.error as { code?: string }).code, "55000");
+        await writer.query("ROLLBACK"); writerTransaction = false;
+        const sealed = await admin.query(`SELECT sealed FROM "${schema}".rag_document_versions WHERE id=$1`, [bundle.document.sourceVersionId]);
+        assert.equal(sealed.rows[0].sealed, true);
+        const active = await store.captureSearch({ kind: "current" }); assert.equal(active!.heads.documents!.revisionId, plan.revisionId);
+        assert.equal((await admin.query(`SELECT count(*)::integer AS n FROM "${schema}".rag_document_blocks WHERE source_version_id=$1`, [bundle.document.sourceVersionId])).rows[0].n, 1);
+      } finally { releaseCommit(); if (writerTransaction) await writer.query("ROLLBACK"); writer.release(); await session.close(); }
+    });
+    await t.test("unsupported RR document writes are rejected while read-only RR remains usable", async () => {
+      assert.ok(failedRaceVersion && failedRaceRevision);
+      const writer = await admin.connect();
+      try {
+        for (const action of [
+          () => writer.query(`UPDATE "${schema}".rag_document_versions SET sealed=true WHERE id=$1`, [failedRaceVersion]),
+          () => writer.query(`UPDATE "${schema}".rag_revisions SET state='ready' WHERE id=$1`, [failedRaceRevision]),
+          () => writer.query(`INSERT INTO "${schema}".rag_document_blocks(source_version_id,block_id,ordinal,payload) VALUES($1,'b-rr',2,$2::jsonb)`, [failedRaceVersion, JSON.stringify({ id: "b-rr", sourceVersionId: failedRaceVersion, sourceId: "suz-v3-db-document" })]),
+        ]) {
+          await writer.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+          try { await writer.query(`SET LOCAL search_path TO "${schema}",public`); await writer.query(`SET LOCAL ROLE "${ingesterRole}"`); await assert.rejects(action(), (error: any) => error.code === "25000"); }
+          finally { await writer.query("ROLLBACK"); }
+        }
+      } finally { writer.release(); }
+      const reader = createVectorKnowledgeStoreWithPool(rolePool(readerRole));
+      try {
+        const snapshot = await reader.captureSearch({ kind: "current" }); assert.ok(snapshot);
+        const hits = await reader.searchSnapshot(snapshot, [1, 0, 0], { limit: 4, now });
+        assert.ok(hits.some((hit) => hit.dependency.head === "public-documents"));
+        assert.equal(await reader.assertSnapshot(snapshot, hits.map((hit) => hit.dependency), now), true);
+      } finally { await reader.close(); }
+    });
   } finally {
     await store.close();
     if (created) {
@@ -211,6 +448,11 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
       assert.equal(owned.rows[0]?.nspname, schema, "Refusing to remove an unowned test schema");
       // Fresh generated name + successful CREATE + ownership guard; never DROP a database/public schema.
       await admin.query(`DROP SCHEMA "${schema}" CASCADE`);
+    }
+    for (const role of createdRoles.reverse()) {
+      const identity = await admin.query("SELECT oid::integer AS oid FROM pg_roles WHERE rolname=$1", [role.name]);
+      assert.equal(identity.rows[0]?.oid, role.oid, "Refusing to remove a replaced or unowned role");
+      await admin.query(`DROP ROLE "${role.name}"`);
     }
     await admin.end();
   }
