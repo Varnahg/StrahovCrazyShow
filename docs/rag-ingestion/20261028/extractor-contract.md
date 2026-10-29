@@ -62,7 +62,8 @@ type ExtractionResult = {
       vocabularySha256: string } };
   document: { title: string; pageCount: number | null; complete: boolean };
   blocks: Array<{ id: string; kind: string; text: string;
-    headingPath: string[]; spans: SourceSpan[] }>;
+    headingPath: string[]; spans: SourceSpan[];
+    tableChunking?: { contextLineCount: number; headerLineIndexes: number[] } }>;
   chunks: Array<{ id: string; text: string; headingPath: string[];
     tokenCount: number; blockIds: string[]; spans: SourceSpan[] }>;
   quality: { processedPages: number | null; expectedPages: number | null;
@@ -88,6 +89,8 @@ Volitelné doplňky jsou přípustné po domluvě, public DTO/SQL kontrakt nevyt
 - Obrázky/diagramy, které nelze věrně převést na text, přiznat v quality issues a uchovat provenance; nevyrábět domnělé hodnoty. Generativní přepis všech dokumentů není výchozí a není vyžadovaný pro tento worker.
 
 Každý chunk musí odkazovat na existující bloky. IDs chunků jsou deterministické z dokumentovéhoID, sémantického headingPath, textu a pořadí přesných duplicit; změna data stažení ani vložení nesouvisejícího odstavce nesmí změnit všechny IDs. Fyzické page/bbox/block pořadí nepatří do embedding textu. Nový serverový formát bude `title-heading-text-v2`: přesné JSON pole `[title, headingPath, text]`. Worker tento stejný kanonický vstup jen počítá tokenizerem a hlídá byte limit; embedding provádí Node adapter.
+
+Pro tabulkové bloky se nyní exportuje `tableChunking`: počet počátečních kontextových řádků a přesné 0-based indexy skutečných hlavičkových řádků v `block.text.split("\n")`. Hlavičky nemusí tvořit souvislý začátek. Chunker má opakovaný prefix složený z kontextu a těchto hlaviček; zbývající datové řádky zachovávají původní pořadí a multiplicitu. CSV/TSV bez deklarované hlavičky mají contextLineCount0 a prázdné headerLineIndexes. Deklarovaný řádek bez jakýchkoli parsed cells se přizná jako `unrepresented-table-row`, nikoli jako prokázaný prázdný řádek. Metadata se vztahují ke skutečně renderovanému textu a neovlivňují samotný embedding text.
 
 ## HTML/feed discovery
 

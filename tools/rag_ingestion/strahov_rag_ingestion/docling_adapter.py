@@ -63,6 +63,8 @@ def normalize_doc(document, fmt, request):
             tables += 1
             table_data = serialize_table(item, document)
             text = table_data["text"]
+            if table_data["unrepresentedRows"]:
+                issues.append("unrepresented-table-row")
             # Rich cells are part of the table; don't duplicate their descendants.
             for child, _ in document.iterate_items(root=item, included_content_layers=set(ContentLayer)):
                 if child.self_ref != item.self_ref:
@@ -101,6 +103,7 @@ def normalize_doc(document, fmt, request):
         block = {"id": block_id, "kind": kind, "text": text, "headingPath": list(headings), "spans": spans}
         if table_data:
             block["_table"] = table_data
+            block["tableChunking"] = table_data["lineage"]
         blocks.append(block)
         if len(blocks) > request.limits.maxBlocks:
             raise ExtractionError("block-limit")
@@ -130,17 +133,27 @@ def serialize_table(item, document):
         if cell.column_header:
             header_rows.update(range(cell.start_row_offset_idx, cell.end_row_offset_idx))
     lines = ["\t".join(row) for row in rows]
+    # Source text and repeated header/body must share the same rendered rows.
+    # A declared row with no parsed cells is unknown, not evidence of blank data.
+    rendered = [(index, line) for index, line in enumerate(lines) if line]
+    unrepresented = [index for index, line in enumerate(lines) if not line]
     # If the format declares no headers, don't invent them from a data row.
-    header = "\n".join(lines[i] for i in sorted(header_rows))
-    body = [line for i, line in enumerate(lines) if i not in header_rows]
+    header = "\n".join(line for index, line in rendered if index in header_rows)
+    body = [line for index, line in rendered if index not in header_rows]
     caption = item.caption_text(document)
     notes = []
     for note in item.footnotes:
         node = note.resolve(document)
         notes.append(getattr(node, "text", ""))
     context = "\n".join([value for value in [caption, *notes] if value])
+    context_lines = len(context.split("\n")) if context else 0
+    lineage = {"contextLineCount": context_lines,
+               "headerLineIndexes": [context_lines + rendered_index
+                                     for rendered_index, (source_index, _) in enumerate(rendered)
+                                     if source_index in header_rows]}
     return {"header": header, "rows": body, "context": context,
-            "text": "\n".join([value for value in [context, *lines] if value])}
+            "text": "\n".join([value for value in [context, *(line for _, line in rendered)] if value]),
+            "lineage": lineage, "unrepresentedRows": unrepresented}
 
 
 def native_layout_issues(document):
