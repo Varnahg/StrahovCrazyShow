@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
+  STARTUP_STAGES,
   observeStartupProgress,
   paintStartupStage,
   startupStageLabel,
@@ -189,4 +190,32 @@ test("loader preserves compatibility notice and manual recovery only when startu
   assert.match(render(), /WebGL2 compatibility/);
   assert.doesNotMatch(render(), /data-renderer-fallback/);
   assert.match(render("Renderer failed"), /data-renderer-fallback="webgl2"/);
+});
+
+test("SCS loader keeps branding and the actual phase for every stage in both languages", () => {
+  for (const locale of ["cs", "en"] as const) {
+    for (const stage of [...STARTUP_STAGES, "renderer-fallback", "unknown"]) {
+      const html = renderToStaticMarkup(createElement(LoadingScreen, {
+        stage, locale, onLeave() {}, onFeedback() {},
+      }));
+      assert.match(html, /Strahov Crazy Show/);
+      assert.match(html, /class="startup-signal" aria-hidden="true"/);
+      assert.ok(html.includes(startupStageLabel(stage, locale)));
+      assert.doesNotMatch(html, /role="progressbar"|aria-valuenow|\d%|s<span>•/);
+      if (stage === "ready") {
+        assert.match(html, /startup-ready/);
+        assert.doesNotMatch(html, /class="startup-spinner"/);
+      }
+    }
+  }
+});
+
+test("fallback marks the renderer stage current without claiming later work is complete", () => {
+  const html = renderToStaticMarkup(createElement(LoadingScreen, {
+    stage: "renderer-fallback", locale: "en", onLeave() {}, onFeedback() {},
+  }));
+  assert.equal((html.match(/class="complete"/g) ?? []).length, 1);
+  assert.equal((html.match(/aria-current="step"/g) ?? []).length, 1);
+  assert.match(html, /Trying the fallback 3D renderer/);
+  assert.match(html, /class="pending"/);
 });

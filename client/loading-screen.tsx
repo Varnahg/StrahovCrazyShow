@@ -40,15 +40,19 @@ export function LoadingScreen({
   );
   return (
     <section
-      className={`loading startup-screen${error ? " startup-failed" : ""}`}
+      className={`loading startup-screen${error ? " startup-failed" : stage === "ready" ? " startup-ready" : ""}`}
       aria-label={cs ? "Načítání hry" : "Loading the game"}
     >
-      <div className="startup-card">
-        <div className="brand">
-          s<span>•</span>trahov
+      <div className="startup-card home-glass">
+        <div className="startup-identity">
+          <div className="startup-signal" aria-hidden="true">
+            <span className="startup-orbit" />
+            <span className="startup-monogram">SCS</span>
+          </div>
+          <p className="startup-brand">Strahov Crazy Show</p>
         </div>
         <span className="startup-eyebrow">
-          {cs ? "ZA CHVÍLI NA KOPCI" : "SEE YOU ON THE HILL"}
+          {cs ? "TVOJE CESTA NA KOPEC" : "YOUR WAY TO THE HILL"}
         </span>
         <h1>
           {error
@@ -68,6 +72,7 @@ export function LoadingScreen({
             {startupStageLabel(stage, locale)}
           </strong>
         </div>
+        <div className="startup-activity" aria-hidden="true" />
         <p className="startup-time">
           {cs ? "Uplynulo" : "Elapsed"}: {elapsed} s ·{" "}
           {cs

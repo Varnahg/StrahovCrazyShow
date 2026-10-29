@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { WelcomeMap } from "./welcome-map";
+import { useViewportHeight } from "./use-viewport-height";
 import type { Profile } from "../shared/types";
 
 export type PublicPresenceState =
@@ -135,6 +136,7 @@ export function WelcomeScreen({
   assistant,
   presence,
 }: WelcomeScreenProps) {
+  const viewport = useViewportHeight<HTMLElement>();
   const [screen, setScreen] = useState<"home" | "profile">("home");
   const [chatOpen, setChatOpen] = useState(false);
   const [info, setInfo] = useState<"controls" | "about" | null>(null);
@@ -144,6 +146,7 @@ export function WelcomeScreen({
   });
   const entry = useRef<HTMLButtonElement>(null);
   const editorHost = useRef<HTMLDivElement>(null);
+  const profileHeading = useRef<HTMLHeadingElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
   const chat = useRef<HTMLElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -157,11 +160,9 @@ export function WelcomeScreen({
   );
   // The native editor is mounted only on this screen; its cleanup owns the GPU preview.
   useEffect(() => {
-    if (screen === "profile")
-      editorHost.current
-        ?.querySelector<HTMLInputElement>(".ae-nickname input")
-        ?.focus();
-    else if (previousScreen.current === "profile") entry.current?.focus();
+    // Announce the screen without opening a phone keyboard before a field is chosen.
+    if (screen === "profile") profileHeading.current?.focus({ preventScroll: true });
+    else if (previousScreen.current === "profile") entry.current?.focus({ preventScroll: true });
     previousScreen.current = screen;
   }, [screen]);
   useEffect(() => {
@@ -210,6 +211,7 @@ export function WelcomeScreen({
 
   return (
     <main
+      ref={viewport}
       className="welcome-screen"
       data-screen={screen}
       onKeyDown={(event) => {
@@ -319,7 +321,7 @@ export function WelcomeScreen({
             aria-labelledby={id + "-profile"}
           >
             <header className="home-setup-heading">
-              <h1 id={id + "-profile"}>
+              <h1 ref={profileHeading} tabIndex={-1} id={id + "-profile"}>
                 {cs ? "Tvoje postava" : "Your character"}
               </h1>
               <span>{cs ? "Před vstupem do hry" : "Before you enter"}</span>
@@ -339,16 +341,18 @@ export function WelcomeScreen({
                 enter("multi");
               }}
             >
-              <fieldset className="home-profile-fields" disabled={busy}>
-                <div ref={editorHost} className="home-editor">
-                  {editor}
-                </div>
-              </fieldset>
-              {(error || (invalidName && !profile.nickname.trim())) && (
-                <p className="home-error" role="alert">
-                  {error || (cs ? "Doplň přezdívku." : "Enter a nickname.")}
-                </p>
-              )}
+              <div className="home-profile-scroll">
+                <fieldset className="home-profile-fields" disabled={busy}>
+                  <div ref={editorHost} className="home-editor">
+                    {editor}
+                  </div>
+                </fieldset>
+                {(error || (invalidName && !profile.nickname.trim())) && (
+                  <p className="home-error" role="alert">
+                    {error || (cs ? "Doplň přezdívku." : "Enter a nickname.")}
+                  </p>
+                )}
+              </div>
               <div className="home-setup-actions">
                 <button type="submit" className="home-primary" disabled={busy}>
                   {busy
