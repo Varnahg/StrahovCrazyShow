@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-render-instrumentation",
+  "title": "KEY-2: průběžný nízkonákladový profil render fází a shader přípravy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/render-incident-profile.ts", "tests/render-incident-profile.test.ts", "docs/agents/handoffs/repair-render-instrumentation.md"],
+  "resources": [],
+  "acceptance": ["Ve skutečných veřejných Babylon observables rozlišit engine CPU fáze, shader creation calls a material effect churn; jasně odlišit wallCPU od GPU completion.", "Omezená data/alokace, korektní lifecycle, žádné procházení všech meshů za každý frame; integrace root game.ts."],
+  "verification": ["Lehké cílené testy s řízeným časem a skutečnými observable/nullengine objekty; nejsouGPUdůkaz.", "Prostudovat installedBabylon9.30 primární kód a předat API, testy, scope měření."],
+  "notes": ["Přiděleno rootem po uvolnění těchto dvou dosud neexistujících souborů z rootwritePaths. Žádný existující WIP není převzat.", "Fulltests/build/GPU/profily vlastní repair-production-validation."]
+}
