@@ -510,3 +510,42 @@
     font-size: 16px;
   }
 }
+
+.crazy-knowledge {
+  margin: 8px 0;
+  color: var(--crazy-muted, #b7c3c7);
+  font-size: 12px;
+}
+.crazy-knowledge summary {
+  cursor: pointer;
+  width: fit-content;
+}
+.crazy-knowledge label {
+  display: block;
+  margin: 8px 0 4px;
+}
+.crazy-knowledge select,
+.crazy-knowledge input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid rgba(var(--crazy-tint, 185, 204, 210), 0.3);
+  border-radius: 8px;
+  background: #11191c;
+  color: var(--crazy-text, #f5f8f7);
+  font: inherit;
+}
+.crazy-knowledge small {
+  display: block;
+  margin-top: 6px;
+}
+.crazy-archive-label {
+  color: var(--crazy-accent, #efd084);
+  font-size: 11px;
+}
+.crazy-knowledge select:focus-visible,
+.crazy-knowledge input:focus-visible {
+  outline: 2px solid var(--crazy-accent, #efd084);
+  outline-offset: 2px;
+}

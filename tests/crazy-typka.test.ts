@@ -6,6 +6,15 @@ import { Readable } from "node:stream";
 import test from "node:test";
 import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
 import {
+  buildKnowledgeDocumentV3,
+  parserProfileSha256,
+  requirePublishableExtraction,
+  resolveKnowledgeChunkV3,
+  validateWorkerEnvelope,
+} from "../server/rag-document-contract";
+import { RAG_TOKENIZER } from "../shared/rag-provenance";
+import type { DocumentMetadataV3 } from "../server/rag-knowledge-types";
+import {
   createDecisionRouter,
   DecisionRouterError,
   type DecisionRouter,
@@ -15,7 +24,10 @@ import {
   createEmbeddingProfile,
   createOpenAIEmbedder,
 } from "../server/rag-embeddings";
-import type { VectorKnowledgeStore } from "../server/rag-vector-store";
+import type {
+  RagVectorStore,
+  RagSearchSnapshot,
+} from "../server/rag-vector-store";
 import {
   createRagEvidenceBackend,
   RagEvidenceError,
@@ -24,6 +36,97 @@ import {
   type PreparedEvidenceQuery,
 } from "../server/rag-evidence-backend";
 
+function viewSnapshot(id = "a".repeat(64)): RagSearchSnapshot {
+  const profile = createEmbeddingProfile();
+  return {
+    id,
+    scope: { kind: "current" },
+    heads: {
+      legacy: { name: "public", revisionId: id, profile },
+      documents: null,
+      archive: null,
+    },
+    embeddingSpace: {
+      provider: profile.provider,
+      model: profile.model,
+      dimensions: profile.dimensions,
+    },
+  };
+}
+function archiveEvidence(year: number, page = 1) {
+  const metadata: DocumentMetadataV3 = {
+    ...getKnowledgeRegistry().chunks[0].document,
+    id: "suz-archive-wire",
+    title: "Archivní podmínky",
+    authority: "suz",
+    status: "archived",
+    archiveReason: "Novější vydání",
+    url: "https://www.suz.cvut.cz/cz/media/file/smlouva-o-ubytovani-pro-studenty",
+    discoveryUrl:
+      "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ceniky-dokumenty",
+    author: null,
+    license: null,
+    licenseUrl: null,
+    checkedAt: "2026-10-28",
+    reviewAfter: "2026-11-28",
+    effectiveFrom: `${year}-01-01T00:00:00.000Z`,
+    effectiveUntil: `${year + 1}-01-01T00:00:00.000Z`,
+  };
+  const text = `Pravidlo roku ${year}: sleva neplatí.`,
+    inputSha256 = "a".repeat(64);
+  const parserProfile = {
+    id: "wire-test",
+    packages: { tiktoken: "0.12.0" },
+    pipeline: "test",
+    configurationHash: "b".repeat(64),
+    modelManifestHash: null,
+    tokenizer: { ...RAG_TOKENIZER, version: "0.12.0" },
+  };
+  const spans = [{ blockId: "b-one", locator: `PDF strana ${page}`, page }];
+  const envelope = validateWorkerEnvelope(
+    {
+      schemaVersion: 1,
+      sourceId: metadata.id,
+      inputSha256,
+      status: "ok",
+      format: "pdf",
+      parserProfile,
+      document: { title: metadata.title, pageCount: page, complete: true },
+      blocks: [{ id: "b-one", kind: "text", text, headingPath: [], spans }],
+      chunks: [
+        {
+          id: "c-one",
+          text,
+          headingPath: [],
+          tokenCount: 15,
+          blockIds: ["b-one"],
+          spans,
+        },
+      ],
+      quality: {
+        processedPages: page,
+        expectedPages: page,
+        inputTextCharacters: null,
+        outputTextCharacters: [...text].length,
+        tableCount: 0,
+        ocrPages: [],
+        issues: [],
+      },
+      links: [],
+    },
+    {
+      sourceId: metadata.id,
+      inputSha256,
+      parserProfileSha256: parserProfileSha256(parserProfile),
+    },
+  );
+  const bundle = buildKnowledgeDocumentV3(
+    metadata,
+    requirePublishableExtraction(envelope),
+    "native",
+  );
+  return resolveKnowledgeChunkV3(bundle.document, bundle.chunks[0]);
+}
 function fakeEvidenceBackend(): AsyncEvidenceBackend {
   const registry = getKnowledgeRegistry(),
     profile = createEmbeddingProfile();
@@ -47,15 +150,18 @@ function fakeEvidenceBackend(): AsyncEvidenceBackend {
         options.now,
       );
       return {
-        snapshot: { revisionId: "a".repeat(64), profile },
+        snapshot: viewSnapshot(),
+        scope: options.scope ?? { kind: "current" },
         chunks,
-        sourceVersionIds: [...new Set(chunks.map((chunk) => chunk.source.id))],
+        dependencies: [...new Set(chunks.map((chunk) => chunk.source.id))].map(
+          (sourceVersionId) => ({ head: "public" as const, sourceVersionId }),
+        ),
         embeddingUsage: { promptTokens: 1, totalTokens: 1 },
       };
     },
     async validate(evidence, instant) {
-      return evidence.sourceVersionIds.every((id) =>
-        registry.isSourceUsable(id, instant),
+      return evidence.dependencies.every(({ sourceVersionId }) =>
+        registry.isSourceUsable(sourceVersionId, instant),
       );
     },
     async close() {},
@@ -85,6 +191,218 @@ function fakeDecisionRouter(
     },
   };
 }
+
+test("explicit archive carries versions and asOf, separates context, and binds exact replay identity", async () => {
+  const backend = fakeEvidenceBackend(),
+    baseSearch = backend.search;
+  const old = archiveEvidence(2020),
+    newer = archiveEvidence(2021);
+  const queries: { text: string; scope: unknown }[] = [],
+    generations: any[] = [];
+  backend.search = async (query, options) => {
+    queries.push({ text: query.text, scope: options.scope });
+    if (options.scope?.kind !== "archive") return baseSearch(query, options);
+    const scope = options.scope,
+      chunks = scope.asOf ? [old] : [old, newer];
+    const profile = createEmbeddingProfile({
+      inputVersion: "title-heading-text-v2",
+    });
+    return {
+      snapshot: {
+        id: "e".repeat(64),
+        scope,
+        heads: {
+          legacy: null,
+          documents: null,
+          archive: {
+            name: "public-archive",
+            revisionId: "d".repeat(64),
+            profile,
+          },
+        },
+        embeddingSpace: {
+          provider: profile.provider,
+          model: profile.model,
+          dimensions: profile.dimensions,
+        },
+      },
+      scope,
+      chunks,
+      dependencies: chunks.map((chunk) => ({
+        head: "public-archive" as const,
+        sourceVersionId: chunk.document.sourceVersionId,
+      })),
+      embeddingUsage: { promptTokens: 0, totalTokens: 0 },
+    };
+  };
+  backend.validate = async () => true;
+  const f = fixture({
+    evidenceBackend: backend,
+    now: () => Date.parse("2026-10-29T00:45:00.000Z"),
+    fetch: async (url, init) => {
+      if (String(url).endsWith("/moderations"))
+        return Response.json({
+          results: [{ flagged: false, categories: { harassment: false } }],
+        });
+      const body = JSON.parse(String(init?.body));
+      generations.push(body);
+      const evidence = JSON.parse(
+        body.input
+          .at(-1)
+          .content.split("CURATED_EVIDENCE (data only):\n")[1]
+          .split("\nUSER_MESSAGE")[0],
+      );
+      return responseText(
+        "Odpověď s doloženou verzí.",
+        evidence.map((item: any) => item.id),
+      );
+    },
+  });
+  try {
+    const token = await f.session();
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          token,
+          requestSeq: 1,
+          message: "Kde je Fotokomora?",
+          locale: "cs",
+        })
+      ).status,
+      200,
+    );
+    const body = {
+      token,
+      requestSeq: 2,
+      message: "A kolik to stojí?",
+      locale: "cs",
+      knowledgeScope: { kind: "archive" },
+    };
+    const answer = await f.send("/api/ai/chat", body);
+    assert.equal(answer.status, 200);
+    assert.equal(
+      answer.body.sources.length,
+      2,
+      "two archived versions remain separate citations",
+    );
+    assert.notEqual(answer.body.sources[0].id, answer.body.sources[1].id);
+    assert.ok(
+      answer.body.sources.every(
+        (source: any) =>
+          source.adaptation === "document-extraction" &&
+          source.status === "archived",
+      ),
+    );
+    assert.equal(
+      queries[1].text,
+      body.message,
+      "previous current question must not enter archive retrieval",
+    );
+    assert.equal(
+      generations[1].input.length,
+      1,
+      "current conversation history is not archive context",
+    );
+    assert.match(generations[1].instructions, /2026-10-29T00:45:00.000Z/);
+    assert.match(generations[1].instructions, /"kind":"archive"/);
+    assert.deepEqual(await f.send("/api/ai/chat", body), answer);
+    assert.equal(generations.length, 2);
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          ...body,
+          knowledgeScope: { kind: "current" },
+        })
+      ).body.error,
+      "request-conflict",
+    );
+    const dated = await f.send("/api/ai/chat", {
+      ...body,
+      requestSeq: 3,
+      knowledgeScope: { kind: "archive", asOf: "2020-06-01T00:00:00.000Z" },
+    });
+    assert.equal(dated.status, 200);
+    assert.equal(dated.body.sources.length, 1);
+    assert.deepEqual(queries[2].scope, {
+      kind: "archive",
+      asOf: "2020-06-01T00:00:00.000Z",
+    });
+    assert.equal(
+      generations[2].input.length,
+      1,
+      "asOf change is also a context boundary",
+    );
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("invalid knowledge scopes never reach moderation or Decisions", async () => {
+  const f = fixture();
+  try {
+    const token = await f.session();
+    for (const knowledgeScope of [
+      null,
+      "archive",
+      {},
+      { kind: "other" },
+      { kind: "current", asOf: "2020-01-01T00:00:00.000Z" },
+      { kind: "archive", asOf: "2020-02-31T00:00:00.000Z" },
+      { kind: "archive", asOf: "2020-01-01" },
+      { kind: "archive", extra: true },
+    ]) {
+      const response = await f.send("/api/ai/chat", {
+        token,
+        requestSeq: 1,
+        message: "Podmínky",
+        locale: "cs",
+        knowledgeScope,
+      });
+      assert.equal(response.status, 400);
+      assert.equal(response.body.error, "invalid-request");
+    }
+    assert.equal(f.calls.length, 0);
+    assert.equal(f.decisions.length, 0);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("current request cannot publish archived evidence even when an injected asynchronous validator accepts it", async () => {
+  const backend = fakeEvidenceBackend(),
+    archived = archiveEvidence(2020);
+  backend.search = async (_query, options) => ({
+    snapshot: viewSnapshot(),
+    scope: options.scope ?? { kind: "current" },
+    chunks: [archived],
+    dependencies: [
+      {
+        head: "public-archive",
+        sourceVersionId: archived.document.sourceVersionId,
+      },
+    ],
+    embeddingUsage: { promptTokens: 0, totalTokens: 0 },
+  });
+  backend.validate = async () => true;
+  const f = fixture({
+    evidenceBackend: backend,
+    now: () => Date.parse("2026-10-28T12:00:00.000Z"),
+  });
+  try {
+    const token = await f.session();
+    const result = await f.send("/api/ai/chat", {
+      token,
+      requestSeq: 1,
+      message: "Aktuální pravidla",
+      locale: "cs",
+    });
+    assert.equal(result.status, 409);
+    assert.equal(result.body.error, "response-expired");
+    assert.equal(f.service.usage().generationAttempts, 0);
+  } finally {
+    await f.service.close();
+  }
+});
 function expectedRoutingUsage(
   decisionAttempts: number,
   reservedInputBytes: number,
@@ -134,7 +452,8 @@ test("the exact bounded query is moderated before embedding and failed or blocke
     events: string[] = [],
     queries: string[] = [],
     moderated: string[] = [];
-  const decisions: string[] = [], router = fakeDecisionRouter(0.1, 0.1, decisions);
+  const decisions: string[] = [],
+    router = fakeDecisionRouter(0.1, 0.1, decisions);
   let failGeneration = false;
   const backend: AsyncEvidenceBackend = {
     ...base,
@@ -271,7 +590,9 @@ for (const phase of ["publish", "replay"] as const)
       backend.search = async (query, options) => ({
         ...(await baseSearch(query, options)),
         chunks: [dependency],
-        sourceVersionIds: [dependency.source.id],
+        dependencies: [
+          { head: "public", sourceVersionId: dependency.source.id },
+        ],
       });
       backend.validate = async () => {
         validations++;
@@ -281,8 +602,11 @@ for (const phase of ["publish", "replay"] as const)
         }
         return true; // SQL evaluated its caller-supplied, earlier timestamp.
       };
-      const f = fixture({ evidenceBackend: backend, now: () => instant,
-        decisionRouter: fakeDecisionRouter(0.95, 0.95) });
+      const f = fixture({
+        evidenceBackend: backend,
+        now: () => instant,
+        decisionRouter: fakeDecisionRouter(0.95, 0.95),
+      });
       try {
         const token = await f.session(),
           body = {
@@ -328,8 +652,8 @@ for (const changed of [false, true])
       return {
         ...evidence,
         snapshot: {
-          ...evidence.snapshot,
-          revisionId: (changed && searches > 1 ? "b" : "a").repeat(64),
+          ...evidence.snapshot!,
+          id: (changed && searches > 1 ? "b" : "a").repeat(64),
         },
       };
     };
@@ -1294,18 +1618,21 @@ test("session expiry during actual evidence capture stays cancelled before embed
     captures = 0,
     embeddingCalls = 0;
   const profile = createEmbeddingProfile();
-  const store: VectorKnowledgeStore = {
-    async captureActive() {
+  const store: Pick<
+    RagVectorStore,
+    "captureSearch" | "searchSnapshot" | "assertSnapshot" | "close"
+  > = {
+    async captureSearch() {
       if (++captures === 2) {
         await Promise.resolve();
         instant += 30 * 60000;
       }
-      return { revisionId: "a".repeat(64), profile };
+      return viewSnapshot();
     },
-    async search() {
+    async searchSnapshot() {
       throw new Error("cancelled operation cannot query vectors");
     },
-    async assertCurrent() {
+    async assertSnapshot() {
       throw new Error("cancelled operation cannot validate evidence");
     },
     async close() {},

@@ -9,6 +9,10 @@ import {
   CRAZY_TYPKA_LIMITS,
   CRAZY_TYPKA_SPEAKER,
   CRAZY_TYPKA_STARTERS,
+  CURRENT_KNOWLEDGE_SCOPE,
+  crazyTypkaScopeKey,
+  isCrazyTypkaKnowledgeScope,
+  type CrazyTypkaKnowledgeScope,
   isCrazyTypkaChatResponse,
   isCrazyTypkaErrorResponse,
   isCrazyTypkaSession,
@@ -22,6 +26,7 @@ export type CrazyTypkaMessage = {
   role: "user" | "ai";
   text: string;
   sources: CrazyTypkaSource[];
+  knowledgeScope?: CrazyTypkaKnowledgeScope;
 };
 export type CrazyTypkaSnapshot = {
   availability: "checking" | "enabled" | "disabled" | "error";
@@ -29,8 +34,9 @@ export type CrazyTypkaSnapshot = {
   draft: string;
   messages: readonly CrazyTypkaMessage[];
   error: string | null;
-  notice: "session-restarted" | null;
+  notice: "session-restarted" | "scope-changed" | null;
   recovery: "none" | "retry" | "reset";
+  knowledgeScope: CrazyTypkaKnowledgeScope;
 };
 
 export function safeCitationHref(value: string): string | undefined {
@@ -64,12 +70,14 @@ export function createCrazyTypkaClient(
     error: null,
     notice: null,
     recovery: "none",
+    knowledgeScope: CURRENT_KNOWLEDGE_SCOPE,
   };
   let session: { token: string; expiresAt: number } | undefined;
   type PendingChat = {
     requestSeq: number;
     message: string;
     locale: Locale;
+    knowledgeScope?: CrazyTypkaKnowledgeScope;
     token?: string;
   };
   let pending: PendingChat | undefined;
@@ -194,6 +202,7 @@ export function createCrazyTypkaClient(
           role: "ai",
           text: body.text,
           sources: body.sources,
+          knowledgeScope: operation.knowledgeScope ?? CURRENT_KNOWLEDGE_SCOPE,
         };
         confirm(operation);
         update({ messages: [...snapshot.messages, reply].slice(-40) });
@@ -254,6 +263,7 @@ export function createCrazyTypkaClient(
       error: null,
       notice: null,
       recovery: "none",
+      knowledgeScope: CURRENT_KNOWLEDGE_SCOPE,
     });
     if (
       previous &&
@@ -270,6 +280,23 @@ export function createCrazyTypkaClient(
     },
     setDraft(draft: string) {
       update({ draft: draft.slice(0, CRAZY_TYPKA_LIMITS.messageChars) });
+    },
+    setKnowledgeScope(scope: CrazyTypkaKnowledgeScope) {
+      if (
+        snapshot.busy ||
+        pending ||
+        snapshot.recovery !== "none" ||
+        !isCrazyTypkaKnowledgeScope(scope)
+      )
+        return;
+      if (
+        crazyTypkaScopeKey(scope) !==
+        crazyTypkaScopeKey(snapshot.knowledgeScope)
+      )
+        update({
+          knowledgeScope: Object.freeze({ ...scope }),
+          notice: snapshot.messages.length ? "scope-changed" : snapshot.notice,
+        });
     },
     async refreshStatus() {
       statusRequest?.abort();
@@ -311,11 +338,15 @@ export function createCrazyTypkaClient(
         role: "user",
         text: message,
         sources: [],
+        knowledgeScope: snapshot.knowledgeScope,
       };
       const operation: PendingChat = {
         requestSeq: nextRequestSeq,
         message,
         locale,
+        ...(snapshot.knowledgeScope.kind === "archive"
+          ? { knowledgeScope: snapshot.knowledgeScope }
+          : {}),
       };
       if (session) operation.token = session.token;
       pending = operation;
@@ -363,6 +394,7 @@ export function createCrazyTypkaClient(
         error: null,
         notice: null,
         recovery: "none",
+        knowledgeScope: CURRENT_KNOWLEDGE_SCOPE,
       });
     },
   };
@@ -372,7 +404,13 @@ export type CrazyTypkaClient = ReturnType<typeof createCrazyTypkaClient>;
 export type CrazyTypkaState = CrazyTypkaSnapshot &
   Pick<
     CrazyTypkaClient,
-    "setDraft" | "send" | "retry" | "reset" | "cancel" | "refreshStatus"
+    | "setDraft"
+    | "setKnowledgeScope"
+    | "send"
+    | "retry"
+    | "reset"
+    | "cancel"
+    | "refreshStatus"
   >;
 
 export function useCrazyTypka(): CrazyTypkaState {
@@ -389,6 +427,7 @@ export function useCrazyTypka(): CrazyTypkaState {
   return {
     ...snapshot,
     setDraft: client.setDraft,
+    setKnowledgeScope: client.setKnowledgeScope,
     send: client.send,
     retry: client.retry,
     reset: client.reset,
@@ -412,8 +451,8 @@ export function crazyTypkaErrorLabel(code: string, locale: Locale) {
       "This conversation has expired. Your next message starts a new one.",
     ],
     blocked: [
-      "Na tuhle zprávu nemůžu odpovědět. Zkus dotaz na hru nebo Silicon Hill.",
-      "I cannot answer that message. Try a question about the game or Silicon Hill.",
+      "Na tuhle zprávu nemůžu odpovědět. Zkus dotaz na hru nebo služby na Strahově.",
+      "I cannot answer that message. Try a question about the game or services at Strahov.",
     ],
     "request-timeout": [
       "Odpověď se nepodařilo včas doručit.",
@@ -550,6 +589,13 @@ export function CrazyTypkaChat({
             : "The previous session expired. This is a new conversation without its earlier context."}
         </p>
       )}
+      {state.notice === "scope-changed" && (
+        <p className="crazy-disclosure" role="status">
+          {cs
+            ? "Změna podkladů začíná nové téma. Předchozí zprávy zůstávají v přehledu."
+            : "Changing sources starts a new topic. Earlier messages remain visible."}
+        </p>
+      )}
       {state.messages.length > 0 ? (
         <div
           ref={log}
@@ -581,6 +627,14 @@ export function CrazyTypkaChat({
                 )}
               </strong>
               <p>{message.text}</p>
+              {message.knowledgeScope?.kind === "archive" && (
+                <small className="crazy-archive-label">
+                  {cs ? "Archivní podklady" : "Archive sources"}
+                  {message.knowledgeScope.asOf
+                    ? ` · ${message.knowledgeScope.asOf}`
+                    : ""}
+                </small>
+              )}
               {message.sources.length > 0 && (
                 <details className="crazy-sources">
                   <summary>
@@ -606,7 +660,42 @@ export function CrazyTypkaChat({
                           <time dateTime={source.checkedAt}>
                             {source.checkedAt}
                           </time>{" "}
-                          · {cs ? "stručná parafráze" : "short paraphrase"}
+                          ·{" "}
+                          {source.adaptation === "curated-paraphrase"
+                            ? cs
+                              ? "stručná parafráze"
+                              : "short paraphrase"
+                            : cs
+                              ? `extrakce dokumentu (${source.extractionMethod})`
+                              : `document extraction (${source.extractionMethod})`}
+                          {source.adaptation === "document-extraction" && (
+                            <>
+                              {source.status === "archived" && (
+                                <strong className="crazy-archive-label">
+                                  {" "}
+                                  · {cs ? "Archiv" : "Archive"}
+                                </strong>
+                              )}
+                              {source.locators.map((locator, index) => (
+                                <span
+                                  key={`${locator.text}:${locator.page ?? index}`}
+                                >
+                                  {" "}
+                                  · {locator.text}
+                                </span>
+                              ))}
+                              {(source.effectiveFrom ||
+                                source.effectiveUntil) && (
+                                <span>
+                                  {" "}
+                                  · {cs ? "Účinnost" : "Effective"}:{" "}
+                                  {source.effectiveFrom ?? "?"} –{" "}
+                                  {source.effectiveUntil ??
+                                    (cs ? "neuvedeno" : "unspecified")}
+                                </span>
+                              )}
+                            </>
+                          )}
                           {source.author ? ` · ${source.author}` : ""}
                           {source.license && (
                             <>
@@ -687,6 +776,73 @@ export function CrazyTypkaChat({
           </button>
         </div>
       )}
+      <details className="crazy-knowledge">
+        <summary>
+          {cs ? "Podklady" : "Sources"}:{" "}
+          {state.knowledgeScope.kind === "current"
+            ? cs
+              ? "aktuální"
+              : "current"
+            : cs
+              ? "archiv"
+              : "archive"}
+        </summary>
+        <label htmlFor={`${id}-scope`}>
+          {cs ? "Vyhledávat v" : "Search in"}
+        </label>
+        <select
+          id={`${id}-scope`}
+          value={state.knowledgeScope.kind}
+          disabled={!enabled || state.busy || state.recovery !== "none"}
+          onChange={(event) =>
+            state.setKnowledgeScope(
+              event.target.value === "archive"
+                ? { kind: "archive" }
+                : CURRENT_KNOWLEDGE_SCOPE,
+            )
+          }
+        >
+          <option value="current">
+            {cs ? "Aktuální podklady" : "Current sources"}
+          </option>
+          <option value="archive">
+            {cs ? "Archivní podklady" : "Archive sources"}
+          </option>
+        </select>
+        {state.knowledgeScope.kind === "archive" && (
+          <>
+            <label htmlFor={`${id}-asof`}>
+              {cs
+                ? "Účinné k okamžiku (UTC, volitelné)"
+                : "Effective as of (UTC, optional)"}
+            </label>
+            <input
+              id={`${id}-asof`}
+              type="datetime-local"
+              step="1"
+              value={state.knowledgeScope.asOf?.slice(0, 19) ?? ""}
+              disabled={!enabled || state.busy || state.recovery !== "none"}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (!value) state.setKnowledgeScope({ kind: "archive" });
+                else {
+                  const instant = Date.parse(value + "Z");
+                  if (Number.isFinite(instant))
+                    state.setKnowledgeScope({
+                      kind: "archive",
+                      asOf: new Date(instant).toISOString(),
+                    });
+                }
+              }}
+            />
+            <small>
+              {cs
+                ? "Archiv popisuje starší dokumenty; není náhradou aktuálních podmínek."
+                : "Archives describe older documents, not the current terms."}
+            </small>
+          </>
+        )}
+      </details>
       <form
         className="crazy-form"
         onSubmit={(event) => {

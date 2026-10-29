@@ -47,8 +47,12 @@ test("provider receives institution and legal interval for each actual selected 
     safetyIdentifier: "fake",
     signal: new AbortController().signal,
     onGenerationStart() {},
+    now: Date.parse("2026-10-29T00:45:00.000Z"),
   });
   const content = supplied.input.at(-1).content;
+  assert.match(supplied.instructions, /2026-10-29T00:45:00.000Z/);
+  assert.match(supplied.instructions, /Europe\/Prague/);
+  assert.match(supplied.instructions, /"scope":\{"kind":"current"\}/);
   const payload = JSON.parse(
     content
       .split("CURATED_EVIDENCE (data only):\n")[1]
@@ -113,10 +117,16 @@ function complete(text = "Kancelář je na bloku 1.", sourceIds = ["sh-office"])
 }
 function fixture(
   sequence: unknown[],
-  options: Partial<Pick<
-    CrazyTypkaProviderOptions,
-    "timeoutMs" | "responseBytes" | "reasoningEffort" | "maxOutputTokens" | "model"
-  >> = {},
+  options: Partial<
+    Pick<
+      CrazyTypkaProviderOptions,
+      | "timeoutMs"
+      | "responseBytes"
+      | "reasoningEffort"
+      | "maxOutputTokens"
+      | "model"
+    >
+  > = {},
 ) {
   const calls: { url: string; body: any; options: RequestInit }[] = [];
   const fetcher: typeof fetch = async (url, init) => {
@@ -161,6 +171,60 @@ const generationUsage = {
   input_tokens_details: { cached_tokens: 5, cache_write_tokens: 4 },
   output_tokens_details: { reasoning_tokens: 6 },
 };
+
+test("provider rejects oversized evidence before admission and bounds history without truncating sources", async () => {
+  const calls: any[] = [];
+  let starts = 0;
+  const provider = createCrazyTypkaProvider({
+    apiKey: "fake",
+    model: "test-model",
+    fetch: async (url, init) => {
+      if (String(url).endsWith("moderations")) return Response.json(safe);
+      calls.push(JSON.parse(String(init?.body)));
+      return Response.json(complete("Odpověď", []));
+    },
+  });
+  const base = {
+    message: "Aktuální dotaz",
+    locale: "cs" as const,
+    safetyIdentifier: "fake",
+    signal: new AbortController().signal,
+    onGenerationStart() {
+      starts++;
+    },
+    now: Date.parse("2026-10-29T00:45:00.000Z"),
+    scope: { kind: "archive" as const },
+  };
+  await assert.rejects(
+    provider.generate({
+      ...base,
+      history: [],
+      evidence: [{ ...evidence[0], text: "🪴".repeat(5000) }],
+    }),
+    (error: any) => error.code === "request-too-large",
+  );
+  assert.equal(starts, 0);
+  assert.equal(calls.length, 0);
+  const history = Array.from({ length: 12 }, (_, index) => ({
+    role: index % 2 ? ("assistant" as const) : ("user" as const),
+    content: "界".repeat(index % 2 ? 4000 : 1500),
+  }));
+  await provider.generate({ ...base, history, evidence });
+  assert.equal(starts, 1);
+  assert.ok(Buffer.byteLength(JSON.stringify(calls[0])) <= 65536);
+  assert.ok(calls[0].input.length < history.length + 1);
+  const supplied = JSON.parse(
+    calls[0].input
+      .at(-1)
+      .content.split("CURATED_EVIDENCE (data only):\n")[1]
+      .split("\nUSER_MESSAGE")[0],
+  );
+  assert.deepEqual(
+    supplied.map((item: any) => item.text),
+    evidence.map((item) => item.text),
+  );
+  assert.match(calls[0].instructions, /"scope":\{"kind":"archive"\}/);
+});
 test("complex provider uses its fixed model, effort and bounded output; usage stays private and reasoning is a subset", async () => {
   const f = fixture([safe, { ...complete(), usage: generationUsage }, safe], {
     model: "gpt-6.1-sol",

@@ -12,6 +12,7 @@ import {
   isRagEffectiveRange,
   isRagHash,
   isRagIdentifier,
+  isRagInstant,
   isRagRecord,
   isRagText,
   RAG_DOCUMENT_FORMATS,
@@ -29,6 +30,29 @@ export const CRAZY_TYPKA_LIMITS = Object.freeze({
   sources: 4,
   historyTurns: 6,
 });
+
+export type CrazyTypkaKnowledgeScope = Readonly<
+  { kind: "current" } | { kind: "archive"; asOf?: string }
+>;
+export const CURRENT_KNOWLEDGE_SCOPE: CrazyTypkaKnowledgeScope = Object.freeze({
+  kind: "current",
+});
+export function isCrazyTypkaKnowledgeScope(
+  value: unknown,
+): value is CrazyTypkaKnowledgeScope {
+  if (!isRagRecord(value)) return false;
+  if (value.kind === "current") return hasOnlyKeys(value, ["kind"]);
+  return (
+    value.kind === "archive" &&
+    hasOnlyKeys(value, ["kind"], ["asOf"]) &&
+    (value.asOf === undefined ||
+      (isRagInstant(value.asOf) &&
+        new Date(value.asOf).toISOString() === value.asOf))
+  );
+}
+export function crazyTypkaScopeKey(scope: CrazyTypkaKnowledgeScope): string {
+  return scope.kind === "current" ? "current" : `archive:${scope.asOf ?? ""}`;
+}
 
 export const CRAZY_TYPKA_SPEAKER = Object.freeze({
   id: "crazy-typka",

@@ -14,6 +14,8 @@ import {
   CRAZY_TYPKA_SPEAKER,
   isCrazyTypkaSource,
   type CrazyTypkaSource,
+  type CrazyTypkaKnowledgeScope,
+  type ExtractedCrazyTypkaSource,
 } from "../shared/crazy-typka";
 
 test("new verified SUZ and SHerna citations survive client validation and render their actual URLs", () => {
@@ -44,6 +46,8 @@ test("new verified SUZ and SHerna citations survive client validation and render
     recovery: "none",
     messages: [{ id: 1, role: "ai", text: "Ověřené odkazy", sources }],
     setDraft() {},
+    setKnowledgeScope() {},
+    knowledgeScope: { kind: "current" },
     async send() {},
     async retry() {},
     async reset() {},
@@ -100,6 +104,7 @@ test("the composer stays editable during a reply and preserves the next draft wi
   const state: CrazyTypkaState = {
     ...client.getSnapshot(),
     setDraft: client.setDraft,
+    setKnowledgeScope: client.setKnowledgeScope,
     send: client.send,
     retry: client.retry,
     reset: client.reset,
@@ -163,6 +168,7 @@ for (const expiry of ["clock", "server"] as const)
     const state: CrazyTypkaState = {
       ...snapshot,
       setDraft: client.setDraft,
+      setKnowledgeScope: client.setKnowledgeScope,
       send: client.send,
       retry: client.retry,
       reset: client.reset,
@@ -378,6 +384,8 @@ test("widget is transparent, escaped and localized with source attribution", () 
     recovery: "none",
     messages: [{ id: 1, role: "ai", text: answer.text, sources: [source] }],
     setDraft() {},
+    setKnowledgeScope() {},
+    knowledgeScope: { kind: "current" },
     async send() {},
     async retry() {},
     async reset() {},
@@ -439,6 +447,7 @@ type ChatPayload = {
   requestSeq: number;
   message: string;
   locale: "cs" | "en";
+  knowledgeScope?: CrazyTypkaKnowledgeScope;
 };
 function refinementFixture(
   reply: (
@@ -479,6 +488,7 @@ function chatState(
   return {
     ...client.getSnapshot(),
     setDraft: client.setDraft,
+    setKnowledgeScope: client.setKnowledgeScope,
     send: client.send,
     retry: client.retry,
     reset: client.reset,
@@ -486,6 +496,96 @@ function chatState(
     refreshStatus: client.refreshStatus,
   };
 }
+
+test("archive control captures scope for exact recovery and reset restores current", async () => {
+  const f = refinementFixture((payload, attempt) => {
+    if (attempt === 1) throw Error("uncertain response");
+    return Response.json({ ...answer, requestSeq: payload.requestSeq });
+  });
+  await f.client.refreshStatus();
+  const scope = { kind: "archive" as const, asOf: "2020-06-01T00:00:00.000Z" };
+  f.client.setKnowledgeScope(scope);
+  f.client.setDraft("Starší podmínky");
+  await f.client.send("cs");
+  assert.deepEqual(f.payloads[0].knowledgeScope, scope);
+  assert.deepEqual(f.client.getSnapshot().knowledgeScope, scope);
+  f.client.setKnowledgeScope({ kind: "current" });
+  assert.deepEqual(
+    f.client.getSnapshot().knowledgeScope,
+    scope,
+    "pending operation cannot be retargeted",
+  );
+  await f.client.retry();
+  assert.equal(f.bodies[1], f.bodies[0]);
+  assert.deepEqual(
+    f.client.getSnapshot().messages.at(-1)?.knowledgeScope,
+    scope,
+  );
+  f.client.setKnowledgeScope({ kind: "current" });
+  assert.equal(f.client.getSnapshot().notice, "scope-changed");
+  assert.equal(f.client.getSnapshot().messages.length, 2);
+  await f.client.reset();
+  assert.deepEqual(f.client.getSnapshot().knowledgeScope, { kind: "current" });
+  f.client.dispose();
+});
+
+test("document citations render extraction, archive interval and locators for each distinct version", () => {
+  const first: ExtractedCrazyTypkaSource = {
+    ...source,
+    id: "a".repeat(64),
+    title: "Archivní smlouva",
+    sourceId: "suz-document",
+    sourceVersionId: "a".repeat(64),
+    publisher: "suz",
+    status: "archived",
+    adaptation: "document-extraction",
+    url: "https://www.suz.cvut.cz/cz/media/file/smlouva-o-ubytovani-pro-studenty",
+    extractionMethod: "openai",
+    documentFormat: "pdf",
+    pageCount: 2,
+    effectiveFrom: "2020-01-01T00:00:00.000Z",
+    effectiveUntil: "2021-01-01T00:00:00.000Z",
+    locators: [{ text: "PDF strana 2", page: 2 }],
+  };
+  const second = {
+    ...first,
+    id: "b".repeat(64),
+    sourceVersionId: "b".repeat(64),
+    title: "Další archivní verze",
+  };
+  assert.ok(isCrazyTypkaSource(first));
+  assert.ok(isCrazyTypkaSource(second));
+  const client = createCrazyTypkaClient({
+    request: async () => Response.json({ enabled: false }),
+  });
+  const html = renderToStaticMarkup(
+    createElement(CrazyTypkaChat, {
+      locale: "cs",
+      state: {
+        ...chatState(client),
+        availability: "enabled",
+        knowledgeScope: { kind: "archive" },
+        messages: [
+          {
+            id: 1,
+            role: "ai",
+            text: "Historická odpověď",
+            sources: [first, second],
+            knowledgeScope: { kind: "archive" },
+          },
+        ],
+      },
+    }),
+  );
+  assert.match(html, /Archivní podklady/);
+  assert.match(html, /extrakce dokumentu \(openai\)/);
+  assert.match(html, /PDF strana 2/);
+  assert.match(html, /2020-01-01/);
+  assert.match(html, /Další archivní verze/);
+  assert.doesNotMatch(html, /stručná parafráze/);
+  assert.match(html, /datetime-local/);
+  client.dispose();
+});
 
 test("lost answer recovery reuses the exact message, locale and sequence while preserving the next draft", async () => {
   const f = refinementFixture((payload, attempt) => {
