@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "main-canonical-checkout-20261029",
+  "title": "Převést kanonický checkout a runtime konfiguraci na jediný main",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "node_modules/",
+    "dist/",
+    "secrets/",
+    ".env",
+    "_bmad/custom/bmad-build.user.toml",
+    ".cache/recorded-walkthrough/"
+  ],
+  "resources": [
+    "port:4291"
+  ],
+  "acceptance": [
+    "Primární C checkout na main má vlastní uzamčené závislosti bez junction do jiné worktree.",
+    "Soukromé konfigurace přeneseny beze změny obsahu; Docker používá původní named volumes a nový secret bind.",
+    "Všechny ostatní pracovní kopie odstraněny až po ověřeném zachování dat."
+  ],
+  "verification": [
+    "pnpm install --frozen-lockfile; pnpm test; pnpm build; pnpm test:integration.",
+    "Před/po identita Docker datových volumes, zdraví game/DB a secret source path bez výpisu hodnot."
+  ],
+  "notes": [
+    "Primární WIP snapshot67f19c zachován v main ancestryf37040c8, nezávislé ověření všech blobů a LFS dokončeno.",
+    "Claim až v kanonickém C checkoutu, kde node_modules není cizí junction; žádné změny kódu z původního pozastaveného AI zadání.",
+    "Root drží heavy-validation/workspace-build/2568 samostatně. Pro 3D je nutná samostatná GPU rezervace."
+  ]
+}
