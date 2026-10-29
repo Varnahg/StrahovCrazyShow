@@ -345,6 +345,37 @@ export function isCrazyTypkaSource(value: unknown): value is CrazyTypkaSource {
     ? isExtractedCrazyTypkaSource(value)
     : isLegacyCrazyTypkaSource(value);
 }
+
+/** Merge whole citations, or reject the aggregate before paid generation. */
+export function mergeCrazyTypkaSources(
+  values: readonly CrazyTypkaSource[],
+): CrazyTypkaSource[] | null {
+  const merged = new Map<string, CrazyTypkaSource>();
+  for (const source of values) {
+    if (!isCrazyTypkaSource(source)) return null;
+    const previous = merged.get(source.id);
+    const candidate =
+      previous?.adaptation === "document-extraction" &&
+      source.adaptation === "document-extraction"
+        ? {
+            ...source,
+            locators: [
+              ...new Map(
+                [...previous.locators, ...source.locators].map((locator) => [
+                  JSON.stringify(locator),
+                  locator,
+                ]),
+              ).values(),
+            ],
+          }
+        : source;
+    if (!isCrazyTypkaSource(candidate)) return null;
+    merged.set(source.id, candidate);
+  }
+  return merged.size <= CRAZY_TYPKA_LIMITS.sources
+    ? [...merged.values()]
+    : null;
+}
 export function isCrazyTypkaResponse(
   value: unknown,
 ): value is CrazyTypkaResponse {

@@ -18,6 +18,12 @@ import type {
 } from "../server/rag-vector-store";
 import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
 import {
+  isCrazyTypkaSource,
+  mergeCrazyTypkaSources,
+  type ExtractedCrazyTypkaSource,
+} from "../shared/crazy-typka";
+import type { ResolvedKnowledgeChunkV3 } from "../server/rag-knowledge-types";
+import {
   CRAZY_TYPKA_EVIDENCE_BYTES,
   crazyTypkaEvidencePayload,
 } from "../server/crazy-typka-provider";
@@ -490,5 +496,92 @@ test("evidence admission counts UTF-8 metadata and keeps whole chunks under one 
     assert.equal(isEvidenceCurrent(evidence, instant), true);
   } finally {
     await f.backend.close();
+  }
+});
+
+test("evidence admission enforces merged locator count and UTF-8 bytes before generation", async () => {
+  for (const scenario of ["count", "bytes", "overlap"] as const) {
+    const version = "b".repeat(64),
+      id = "suz-citation-budget";
+    const candidates: RagSearchHit[] = [0, 1].map((index) => {
+      const locators = Array.from(
+        { length: scenario === "bytes" ? 2 : 5 },
+        (_, i) => ({
+          page: 1,
+          text:
+            scenario === "bytes"
+              ? "ě".repeat(600) + `${index}-${i}`
+              : `PDF strana 1, část ${scenario === "overlap" ? i : index * 5 + i}`,
+        }),
+      );
+      const source: ExtractedCrazyTypkaSource = {
+        ...chunk.source,
+        id: version,
+        url: "https://www.suz.cvut.cz/cz/media/file/smlouva-o-ubytovani-pro-studenty",
+        adaptation: "document-extraction",
+        publisher: "suz",
+        sourceId: id,
+        sourceVersionId: version,
+        status: "current",
+        effectiveFrom: null,
+        effectiveUntil: null,
+        extractionMethod: "native",
+        documentFormat: "pdf",
+        pageCount: 1,
+        locators,
+      };
+      assert.equal(isCrazyTypkaSource(source), true);
+      const resolved: ResolvedKnowledgeChunkV3 = {
+        ...chunk,
+        schemaVersion: 3,
+        id: `v3-${index}`,
+        localChunkId: `c-${index}`,
+        source,
+        topic: null,
+        headingPath: [],
+        spans: [],
+        document: {
+          ...chunk.document,
+          schemaVersion: 3,
+          id,
+          sourceVersionId: version,
+          url: source.url,
+          archiveReason: null,
+          extraction: {
+            inputSha256: "a".repeat(64),
+            normalizedSha256: "c".repeat(64),
+            parserProfileId: "fixture",
+            parserProfileSha256: "d".repeat(64),
+            format: "pdf",
+            method: "native",
+            complete: true,
+            pageCount: 1,
+          },
+        },
+      };
+      return {
+        chunk: resolved,
+        dependency: { head: "public-documents", sourceVersionId: version },
+        distance: 0.1 + index * 0.1,
+      };
+    });
+    const f = fixture({
+      store: {
+        async searchSnapshot() {
+          return candidates;
+        },
+      },
+    });
+    try {
+      const evidence = await f.search();
+      assert.equal(evidence.chunks.length, scenario === "overlap" ? 2 : 1);
+      const merged = mergeCrazyTypkaSources(
+        evidence.chunks.map((item) => item.source),
+      );
+      assert.ok(merged && merged.every(isCrazyTypkaSource));
+      assert.equal(evidence.chunks[0].text, candidates[0].chunk.text);
+    } finally {
+      await f.backend.close();
+    }
   }
 });

@@ -12,7 +12,7 @@ import {
   CURRENT_KNOWLEDGE_SCOPE,
   crazyTypkaScopeKey,
   isCrazyTypkaKnowledgeScope,
-  isCrazyTypkaSource,
+  mergeCrazyTypkaSources,
   type CrazyTypkaKnowledgeScope,
   type CrazyTypkaSource,
   type CrazyTypkaErrorCode,
@@ -160,31 +160,14 @@ function citedSources(
   evidence: EvidenceSnapshot,
   ids: readonly string[],
 ): CrazyTypkaSource[] {
-  const sources = new Map<string, CrazyTypkaSource>();
-  for (const id of ids) {
+  const sources = ids.map((id) => {
     const source = evidence.chunks.find((chunk) => chunk.id === id)?.source;
     if (!source) throw new RequestError(502, "invalid-response");
-    const previous = sources.get(source.id);
-    const merged =
-      previous?.adaptation === "document-extraction" &&
-      source.adaptation === "document-extraction"
-        ? {
-            ...source,
-            locators: [
-              ...new Map(
-                [...previous.locators, ...source.locators].map((locator) => [
-                  JSON.stringify(locator),
-                  locator,
-                ]),
-              ).values(),
-            ],
-          }
-        : source;
-    if (!isCrazyTypkaSource(merged))
-      throw new RequestError(502, "invalid-response");
-    sources.set(source.id, merged);
-  }
-  return [...sources.values()];
+    return source;
+  });
+  const merged = mergeCrazyTypkaSources(sources);
+  if (!merged) throw new RequestError(502, "invalid-response");
+  return merged;
 }
 function rememberTerminal(
   session: Session,
