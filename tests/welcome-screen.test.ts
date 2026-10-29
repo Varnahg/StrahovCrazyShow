@@ -9,6 +9,7 @@ import {
   type WelcomeScreenProps,
 } from "../client/welcome-screen";
 import { DEFAULT_PROFILE } from "../shared/types";
+import { observeViewportHeight } from "../client/use-viewport-height";
 
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 function home(props: Partial<WelcomeScreenProps> = {}) {
@@ -186,4 +187,151 @@ test("hidden menu pauses presence polling and visibility listeners retire with t
     if (original) Object.defineProperty(globalThis, "document", original);
     else Reflect.deleteProperty(globalThis, "document");
   }
+});
+
+function viewportFixture() {
+  function eventSource<T extends object>(values: T) {
+    const listeners = new Map<string, Set<EventListener>>();
+    const source = Object.assign(values, {
+      addEventListener(type: string, listener: EventListener) {
+        if (!listeners.has(type)) listeners.set(type, new Set());
+        listeners.get(type)!.add(listener);
+      },
+      removeEventListener(type: string, listener: EventListener) {
+        listeners.get(type)?.delete(listener);
+      },
+    });
+    return {
+      source,
+      emit(type: string) {
+        for (const listener of listeners.get(type) ?? []) listener(new Event(type));
+      },
+      listeners,
+    };
+  }
+  const visual = eventSource({ height: 844, offsetTop: 0, scale: 1 });
+  const outer = eventSource({ innerHeight: 900, visualViewport: visual.source });
+  const properties = new Map<string, string>();
+  const attributes = new Set<string>();
+  let writes = 0;
+  const element = {
+    toggleAttribute(name: string, present: boolean) {
+      if (present) attributes.add(name);
+      else attributes.delete(name);
+    },
+    removeAttribute(name: string) { attributes.delete(name); },
+    style: {
+      setProperty(name: string, value: string) {
+        properties.set(name, value);
+        writes++;
+      },
+      removeProperty(name: string) { properties.delete(name); },
+    },
+  } as unknown as HTMLElement;
+  return {
+    visual, outer, properties, attributes, element,
+    source: outer.source as unknown as Window,
+    writes: () => writes,
+  };
+}
+
+test("welcome viewport follows keyboard resize and pan without redundant writes", () => {
+  const view = viewportFixture();
+  const stop = observeViewportHeight(view.element, view.source);
+  assert.equal(view.properties.get("--welcome-viewport-height"), "844px");
+  view.visual.source.height = 360;
+  view.visual.source.offsetTop = 32;
+  view.visual.emit("resize");
+  assert.equal(view.properties.get("--welcome-viewport-height"), "360px");
+  assert.equal(view.properties.get("--welcome-viewport-top"), "32px");
+  const writes = view.writes();
+  view.visual.emit("scroll");
+  view.outer.emit("resize");
+  assert.equal(view.writes(), writes);
+  view.visual.source.offsetTop = 48;
+  view.visual.emit("scroll");
+  assert.equal(view.properties.get("--welcome-viewport-top"), "48px");
+  stop();
+});
+
+test("pinch zoom leaves the layout stable and returning to normal scale resumes fitting", () => {
+  const view = viewportFixture();
+  const stop = observeViewportHeight(view.element, view.source);
+  view.visual.source.scale = 2;
+  view.visual.source.height = 422;
+  view.visual.source.offsetTop = 120;
+  view.visual.emit("resize");
+  view.visual.emit("scroll");
+  view.outer.emit("resize");
+  assert.equal(view.properties.get("--welcome-viewport-height"), "844px");
+  assert.equal(view.properties.get("--welcome-viewport-top"), "0px");
+  view.visual.source.scale = 1;
+  view.visual.source.height = 700;
+  view.visual.source.offsetTop = 0;
+  view.visual.emit("resize");
+  assert.equal(view.properties.get("--welcome-viewport-height"), "700px");
+  stop();
+});
+
+test("viewport teardown removes every listener and rejects queued callbacks", () => {
+  const view = viewportFixture();
+  const stop = observeViewportHeight(view.element, view.source);
+  const queued = [...view.visual.listeners.get("resize")!][0]!;
+  stop();
+  stop();
+  assert.equal(view.properties.size, 0);
+  assert.equal(view.attributes.size, 0);
+  assert.equal(view.visual.listeners.get("resize")?.size, 0);
+  assert.equal(view.visual.listeners.get("scroll")?.size, 0);
+  assert.equal(view.outer.listeners.get("resize")?.size, 0);
+  const writes = view.writes();
+  view.visual.source.height = 200;
+  queued(new Event("resize"));
+  view.visual.emit("scroll");
+  view.outer.emit("resize");
+  assert.equal(view.writes(), writes);
+  const next = observeViewportHeight(view.element, view.source);
+  assert.equal(view.properties.get("--welcome-viewport-height"), "200px");
+  next();
+});
+
+test("viewport fallback follows window resize and ignores invalid measurements", () => {
+  const view = viewportFixture();
+  Object.assign(view.source, { visualViewport: null });
+  const stop = observeViewportHeight(view.element, view.source);
+  assert.equal(view.properties.get("--welcome-viewport-height"), "900px");
+  for (const height of [0, -1, NaN, Infinity]) {
+    view.outer.source.innerHeight = height;
+    view.outer.emit("resize");
+    assert.equal(view.properties.get("--welcome-viewport-height"), "900px");
+  }
+  view.outer.source.innerHeight = 600;
+  view.outer.emit("resize");
+  assert.equal(view.properties.get("--welcome-viewport-height"), "600px");
+  stop();
+});
+
+test("compact flow follows actual keyboard height while pinch zoom preserves the chosen layout", () => {
+  const view = viewportFixture();
+  const stop = observeViewportHeight(view.element, view.source);
+  assert.equal(view.attributes.has("data-compact-viewport"), false);
+  // The layout/window height stays unchanged, as on a phone with its keyboard open.
+  for (const height of [420, 244, 200]) {
+    view.visual.source.height = height;
+    view.visual.emit("resize");
+    assert.equal(view.outer.source.innerHeight, 900);
+    assert.equal(view.attributes.has("data-compact-viewport"), true);
+  }
+  view.visual.source.height = 421;
+  view.visual.emit("resize");
+  assert.equal(view.attributes.has("data-compact-viewport"), false);
+  view.visual.source.scale = 2;
+  view.visual.source.height = 200;
+  view.visual.emit("resize");
+  assert.equal(view.attributes.has("data-compact-viewport"), false);
+  view.visual.source.scale = 1;
+  view.visual.emit("resize");
+  assert.equal(view.attributes.has("data-compact-viewport"), true);
+  stop();
+  assert.equal(view.attributes.has("data-compact-viewport"), false);
 });

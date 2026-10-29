@@ -1,7 +1,7 @@
 :root {
   font-family: "Segoe UI", system-ui, sans-serif;
   color: #193c30;
-  background: #eef0e7;
+  background: #181313;
   font-synthesis: none;
   font-weight: 400;
   --ink: #193c30;
@@ -1297,7 +1297,7 @@ kbd {
 }
 
 /* In-world panels share one restrained material; no per-frame blur/filter. */
-.game-shell button:not(.brand):not(.dock button):not(.profile-button),
+.game-shell button:not(.brand):not(.dock button):not(.profile-button):not(:where(.startup-screen *)),
 .game-shell input,
 .game-shell select,
 .game-shell textarea {
