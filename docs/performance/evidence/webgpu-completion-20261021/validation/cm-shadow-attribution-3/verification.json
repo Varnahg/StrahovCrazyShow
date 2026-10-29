@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T13:38:35.910Z",
+  "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+  "buildId": "c09485f4666986660733bf94092751b8b3451a292113a97e1aad4eecd7a2453d",
+  "helperSha256": "16c21daa50808ef87f9aa3003b6818460a0a85b92e69f34657354054ec68c4ab",
+  "files": {
+    "startup.json": {
+      "bytes": 775769,
+      "sha256": "c13b4a85da361f5b6fdb512d3e45f92d0eb257787484b3a69b1c87a459ad1cc7"
+    },
+    "build-identity.json": {
+      "bytes": 8512,
+      "sha256": "7eff1cd3e84747553f55cf969fee87a26be575a74ef69c83a7cac85f6dda6c22"
+    },
+    "http-identity.json": {
+      "bytes": 6566,
+      "sha256": "912eef22c8093575c91b1819b59f34c54cf82b1a9a07ae302bdd333938048c27"
+    },
+    "terminal.png": {
+      "bytes": 79488,
+      "sha256": "34b1d79111626affe8d6a5ad5a0dc21fa1d54b37216bc607732f41efd49fc73a"
+    }
+  },
+  "outcome": "rejected",
+  "error": {
+    "name": "RenderStartupTimeoutError",
+    "message": "Renderer startup exceeded its visible-time deadline"
+  },
+  "jobTraceComplete": true,
+  "jobs": 2052,
+  "finalJobs": 882,
+  "pendingAtTerminal": 0,
+  "issues": {
+    "observerErrors": 0,
+    "overflow": 517,
+    "traceOverflow": 0,
+    "mappingOverflow": 517,
+    "mappingErrors": 0,
+    "unknownRole": 0,
+    "unknownStage": 0,
+    "unmatchedJobs": 0,
+    "unsupportedPromise": 0,
+    "ownerChanged": 0,
+    "unexpectedReceivers": 0,
+    "restoreConflicts": 0,
+    "restoreFailures": 0,
+    "contract": 0
+  },
+  "mappingInfo": {
+    "effectColumns": [
+      "effectID",
+      "pipelineContextID",
+      "vertexModuleID",
+      "fragmentModuleID",
+      "disposedFlag",
+      "readyFlag"
+    ],
+    "cacheEntries": 551,
+    "meshEntries": 3312,
+    "meshesScanned": 3312,
+    "instancesScanned": 0,
+    "unobservedEffects": 0,
+    "unknownSlots": 0,
+    "redactedNames": 503,
+    "shadowEntriesScanned": 10,
+    "shadowSubMeshLookups": 138,
+    "shadowOwnerMismatches": 0,
+    "legacySubMaterialSlots": 0,
+    "selection": "Pending original jobs first, then submitted-frame, then completed history; bounded candidate links and one bounded mesh scan",
+    "pendingModuleCoverage": {
+      "observed": 0,
+      "linked": 0,
+      "unlinked": 0
+    },
+    "boundedScanComplete": false
+  },
+  "currentEffectsWithFinalModules": 0,
+  "sceneAtTerminal": {
+    "meshes": 3312,
+    "materials": 222,
+    "geometries": 2473,
+    "activeMeshes": 551,
+    "waitingItems": 0
+  },
+  "lastSampleScenes": [
+    {
+      "meshes": 3312,
+      "materials": 222,
+      "geometries": 2473,
+      "activeMeshes": 551,
+      "waitingItems": 0
+    },
+    {
+      "meshes": 3312,
+      "materials": 222,
+      "geometries": 2473,
+      "activeMeshes": 551,
+      "waitingItems": 0
+    },
+    {
+      "meshes": 3312,
+      "materials": 222,
+      "geometries": 2473,
+      "activeMeshes": 551,
+      "waitingItems": 0
+    }
+  ],
+  "conclusion": "Original complete trace contains882final jobs, but no current terminal Effect owns any of those module IDs. Separate shadow/base ownership map scan succeeds. Constant3312meshes/222materials does not establish disposal/replacement cause. Need bounded original creation/release/late-compile lifetime ownership; no orphan or actual instancing cause asserted.",
+  "acceptedCause": false,
+  "acceptedStartup": false,
+  "acceptedPerformance": false
+}

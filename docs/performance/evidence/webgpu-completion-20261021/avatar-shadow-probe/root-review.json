@@ -1,0 +1,33 @@
+{
+  "reviewer": "webgpu_editor_audit independent readonly; root separate author-seal verification",
+  "findings": [],
+  "reviewedAuthorSealSha256": "84e324788eb295e351f1ecc7b53fc38488dd03797a0cddbfd209ddb9c2d1ec74",
+  "authorFilesVerifiedBeforeProduct": 24,
+  "proofSha256": "390140e3d8653b4c16631f077e1eef46acc4133e170f7db2b2906548c9033092",
+  "tapSha256": "5d3a6b50f8c77049c418ca14b34dd564b7cc9b2e0e8a8864bfd7da473951c596",
+  "pass": 3,
+  "desiredLazyRed": 2,
+  "skip": 0,
+  "explicitTypeRoots": 2,
+  "allTransitiveDiagnostics": 0,
+  "syntaxDiagnostics": 0,
+  "guardsStable": { "sources": 22, "native": 39, "helper": 36, "source14Sealed": 113, "capabilitySources": 4 },
+  "bothCaps": {
+    "oldEffectRefCount": [3, 0],
+    "oldDisposedAndCacheAbsent": true,
+    "newRigMainReadyShadowAbsent": true,
+    "lazyFirstShadowPrograms": 1,
+    "targetedOffNativeCalls": 3,
+    "targetedFirstShadowPrograms": 0,
+    "repeatShadowPrograms": 0,
+    "aggregateFirstPrograms": { "lazy": 2, "targeted": 1 }
+  },
+  "targetedResidualContextDifferentFromOwnShadow": true,
+  "decision": "Accept finite CPU reproduction and preserved desired RED; no product or actual GPU acceptance.",
+  "limits": [
+    "NullEngine/GLSL/Poisson and explicit texture capability branch are not actual WGSL/device/image evidence.",
+    "Async render-pass scope is sequential experiment only; product must synchronously restore before yield.",
+    "Original test inputs preserved in source-before; historical seal must not be rewritten after a later deliberate product/regression update."
+  ],
+  "execution": "Read only; no rerun or GPU."
+}

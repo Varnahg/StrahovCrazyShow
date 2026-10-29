@@ -1,0 +1,201 @@
+TAP version 13
+# BJS - [09:09:07]: Babylon.js v9.30.0 - Null engine
+# Subtest: default-off returns without even reading Game
+ok 1 - default-off returns without even reading Game
+  ---
+  duration_ms: 1.4217
+  type: 'test'
+  ...
+# Subtest: one ten-target hierarchy subtracts prepare/create children and counts clean null
+ok 2 - one ten-target hierarchy subtracts prepare/create children and counts clean null
+  ---
+  duration_ms: 1.8013
+  type: 'test'
+  ...
+# Subtest: original return identity undefined
+ok 3 - original return identity undefined
+  ---
+  duration_ms: 0.3352
+  type: 'test'
+  ...
+# Subtest: original return identity null
+ok 4 - original return identity null
+  ---
+  duration_ms: 0.1947
+  type: 'test'
+  ...
+# Subtest: original return identity false
+ok 5 - original return identity false
+  ---
+  duration_ms: 0.1879
+  type: 'test'
+  ...
+# Subtest: original return identity 0
+ok 6 - original return identity 0
+  ---
+  duration_ms: 0.1491
+  type: 'test'
+  ...
+# Subtest: original return identity 
+ok 7 - original return identity 
+  ---
+  duration_ms: 0.1709
+  type: 'test'
+  ...
+# Subtest: original return identity [object Promise]
+ok 8 - original return identity [object Promise]
+  ---
+  duration_ms: 0.2141
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw undefined
+ok 9 - original falsy/error throw undefined
+  ---
+  duration_ms: 0.6776
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw null
+ok 10 - original falsy/error throw null
+  ---
+  duration_ms: 0.2963
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw false
+ok 11 - original falsy/error throw false
+  ---
+  duration_ms: 0.1828
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw 0
+ok 12 - original falsy/error throw 0
+  ---
+  duration_ms: 0.136
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw 
+ok 13 - original falsy/error throw 
+  ---
+  duration_ms: 0.1352
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw Error: original
+ok 14 - original falsy/error throw Error: original
+  ---
+  duration_ms: 0.1135
+  type: 'test'
+  ...
+# Subtest: foreign material barrier and standalone engine calls do not borrow an own parent association
+ok 15 - foreign material barrier and standalone engine calls do not borrow an own parent association
+  ---
+  duration_ms: 0.3083
+  type: 'test'
+  ...
+# Subtest: transaction rejects drift before writes and rolls back a late defineProperty failure exactly
+ok 16 - transaction rejects drift before writes and rolls back a late defineProperty failure exactly
+  ---
+  duration_ms: 0.3366
+  type: 'test'
+  ...
+# Subtest: retained method references pass through after dispose and foreign replacement is never clobbered
+ok 17 - retained method references pass through after dispose and foreign replacement is never clobbered
+  ---
+  duration_ms: 0.1587
+  type: 'test'
+  ...
+# BJS - [09:09:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [09:09:07]: Babylon.js v9.30.0 - Null engine
+# Subtest: native PBR dirty/cache reuse and clean-null branches use actual inherited ThinEngine API
+ok 18 - native PBR dirty/cache reuse and clean-null branches use actual inherited ThinEngine API
+  ---
+  duration_ms: 237.1477
+  type: 'test'
+  ...
+# Subtest: native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback
+ok 19 - native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback
+  ---
+  duration_ms: 0.4204
+  type: 'test'
+  ...
+# Subtest: engine own/foreign origin refuses before prototype mutation; abort restores live hooks
+ok 20 - engine own/foreign origin refuses before prototype mutation; abort restores live hooks
+  ---
+  duration_ms: 3.5222
+  type: 'test'
+  ...
+# BJS - [09:09:07]: Babylon.js v9.30.0 - Null engine
+# Subtest: receipt is distinct/strict while original schema and default-off identity remain unchanged
+ok 21 - receipt is distinct/strict while original schema and default-off identity remain unchanged
+  ---
+  duration_ms: 50.2846
+  type: 'test'
+  ...
+# BJS - [09:09:08]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger
+ok 22 - actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger
+  ---
+  duration_ms: 19.4248
+  type: 'test'
+  ...
+# BJS - [09:09:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [09:09:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [09:09:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [09:09:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [09:09:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [09:09:08]: Babylon.js v9.30.0 - Null engine
+# Subtest: unchanged single deadline includes a long original eighth native frame
+ok 23 - unchanged single deadline includes a long original eighth native frame
+  ---
+  duration_ms: 12.9373
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced generation
+ok 24 - native capture retires replaced generation
+  ---
+  duration_ms: 10.0318
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced engine
+ok 25 - native capture retires replaced engine
+  ---
+  duration_ms: 9.6868
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced actor
+ok 26 - native capture retires replaced actor
+  ---
+  duration_ms: 9.3881
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced device
+ok 27 - native capture retires replaced device
+  ---
+  duration_ms: 9.7251
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced pending
+ok 28 - native capture retires replaced pending
+  ---
+  duration_ms: 10.4037
+  type: 'test'
+  ...
+# Subtest: depth/call caps and diagnostic clock failure never repair or repeat original calls
+ok 29 - depth/call caps and diagnostic clock failure never repair or repeat original calls
+  ---
+  duration_ms: 14.8585
+  type: 'test'
+  ...
+# Subtest: native QA ten-routine button uses the actual waiter/factory/receipt and no old action
+ok 30 - native QA ten-routine button uses the actual waiter/factory/receipt and no old action
+  ---
+  duration_ms: 30.655
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1718.2252

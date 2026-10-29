@@ -1,0 +1,25 @@
+{
+  "atUTC": "2026-10-24T04:16:11.082Z",
+  "head": "48501fc44ea20bcdb3a4c03858a3c8c49a1ae7d0",
+  "main": "2a7b1998ba66b99480a9ee125fd5ec81e56fd1e0",
+  "previewTree": "8439d12c54ede213f8ad25b75affc5580b8b76e4",
+  "conflictCount": 1,
+  "conflict": "Main UI cleanup lacks the migration startupViewsRef reset; both already share the same disconnectRoom control flow.",
+  "choice": "Keep the already verified migration startupViewsRef.current?.reset() and all remaining merged content. Resulting UI equals current migration blob byteexact.",
+  "resolvedUiSha256": "b01b114c2ef1f2076d80d7e81bf232449e1c3003fa9818bf70e40714cbb8b3f9",
+  "currentUiBlob": "44f49c8442f438cec6ef984cf29de0a9d6259dfb",
+  "otherRuntimeDelta": [],
+  "changedDocs": [
+    "docs/agents/handoffs/webgpu-completion-ui-main-integration-20261024.md",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/agents/handoffs/webgpu-completion-ui-cleanup-20261021.md",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/baseline-red.txt",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/research-and-decision.md",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/targeted-final.txt",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/targeted-first.txt",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/targeted-second.txt",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/typecheck.json",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/historical/docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/verification.json",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/inputs.json"
+  ],
+  "actualMerge": "Not performed; shared heavy window required. Source/index/HEAD untouched."
+}

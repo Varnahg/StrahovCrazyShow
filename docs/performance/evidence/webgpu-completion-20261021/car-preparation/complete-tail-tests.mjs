@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const texts=new Map();function change(file,from,to){let s=texts.get(file)??fs.readFileSync(file,'utf8');const e=s.includes('\r\n')?'\r\n':'\n';from=from.replaceAll('\n',e);to=to.replaceAll('\n',e);if(s.split(from).length!==2)throw Error(file+' anchor '+from.slice(0,90));texts.set(file,s.replace(from,to));}
+change('tests/game-quality-preparation.test.ts','  assert.equal(f.applied.at(-1), "high");\n  assert.equal(f.passes.length, 3);','  assert.equal(f.applied.at(-1), "high");\n  assert.equal(f.passes.length, 4);');
+change('tests/game-low-vehicle-preparation.test.ts','for (const ending of [\n  "cancel",','for (const quality of ["low", "medium", "high"])\nfor (const ending of [\n  "cancel",');
+change('tests/game-low-vehicle-preparation.test.ts','test(`vehicle lease releases correctly on ${ending}`, async (t) => {\n    const f = fixture(t),','test(`${quality} vehicle lease releases correctly on ${ending}`, async (t) => {\n    const f = fixture(t, quality),');
+change('tests/game-low-vehicle-preparation.test.ts','for (const disposedRoot of ["car", "parked"] as const)','for (const quality of ["low", "medium", "high"])\nfor (const disposedRoot of ["car", "parked"] as const)');
+change('tests/game-low-vehicle-preparation.test.ts','test(`single live-scene root disposal fails closed: ${disposedRoot}`, async (t) => {\n    const f = fixture(t), pending = f.start();','test(`${quality} single live-scene root disposal fails closed: ${disposedRoot}`, async (t) => {\n    const f = fixture(t, quality), pending = f.start();');
+change('tests/game-low-vehicle-preparation.test.ts','test("replacement roots restart the vehicle stage and never receive the old lease flags", async (t) => {\n  const f = fixture(t),','for (const quality of ["low", "medium", "high"])\ntest(`${quality} replacement roots restart the vehicle stage and never receive the old lease flags`, async (t) => {\n  const f = fixture(t, quality),');
+for(const [file,text]of texts)fs.writeFileSync(file,text);
+const evidence='docs/performance/evidence/webgpu-completion-20261021/car-preparation/';for(const ext of['json','tap'])fs.renameSync(evidence+'green-current.'+ext,evidence+'development-tail-expectation.'+ext);
+console.log('Completed scoped tail expectation and existing all-quality lifecycle fixtures.');

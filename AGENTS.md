@@ -2,6 +2,13 @@
 
 Před implementací ověř očekávané chování, existující kód a vhodné primární podklady. Uživatel výslovně požaduje průzkum před změnami a praktické ověření výsledku.
 
+## Jediná pracovní větev a kopie — výslovné zadání 29. 10. 2026
+
+- Veškerá další práce probíhá přímo na `main` v `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`. Nevytvářej jiné větve, worktrees ani kopie projektu; toto pravidlo má přednost před staršími návody a BMAD/automatizačními výchozími postupy.
+- `main` obsahuje aktuální přijatý kód i dohledatelnou rozpracovanou práci. Každý ověřený celek commituj přímo na main; nenechávej výsledek pouze ve vedlejší kopii. Neověřené prototypy označ pravdivě v `docs/work-in-progress.md`, nesmějí se ztratit ani vydávat za hotovou funkci.
+- Souběžní agenti používají tentýž checkout a disjunktní souborové rezervace. Nezakládej izolovanou větev jako náhradu koordinace. Náročné ověřování zůstává serializované.
+- Před zápisem ověř skutečný checkout a větev. Staré cesty ve výzkumu/handoffech jsou historická evidence, nikoli oprávnění je obnovit. Neměnné testovací buildy smějí být pouze výstupy v `.cache`, nikoli další Git checkouty.
+- Přehled převzatých nedokončených celků a přesných zachovaných zdrojů je v [docs/work-in-progress.md](docs/work-in-progress.md).
 ## Výslovný postup uživatele od 14. 10. 2026
 
 - Před každou opravou či funkcí nejdřív proveď důkladný výzkum celého dotčeného řetězce: příčiny, závislosti a vzájemné dopady. Projdi relevantní primární zdroje a reprodukční důkazy; odliš doložený mechanismus, hypotézu a chybějící měření.

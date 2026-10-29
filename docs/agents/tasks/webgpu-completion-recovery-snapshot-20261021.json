@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-recovery-snapshot-20261021",
+  "title": "KEY-22: nový neměnný source7 pro query/device-loss přejímku",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261021-candidate-7/",
+    "docs/agents/handoffs/webgpu-completion-recovery-snapshot-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Root vytvoří source7 teprve ze stabilního reviewed/commit checkpointu včetnětestů. Původní source6/deps/build a referenceIPR se nezmění.",
+    "Předindependentfreshfrozeninstall odstranit pouze vlastníověřenou newlycreateddependencyjunction non-recursively, nikdysharedtarget. Source/test/patch/lock/dependency identityevidovatvrootvalidation.",
+    "Pokud je potřeba dalšíoprava/new snapshot, rozšířitrezervacikoordinovaněpředzápisem; starésnapshotyse nepřepisují."
+  ],
+  "verification": [
+    "performance-snapshot before/after/frozen SHA včetnětestů a declared historicalIPRreuse; ownfreshinstall/pin/coreSingletonproof a následná rootCPU/build/integration/GPU přejímka."
+  ],
+  "notes": [
+    "Pouze root explicitnínavazujícízadáníKEY22. Heavy-validation/gpu/build/ports jsou vlastnísamostatnérootclaims; tento task je pouze novýoutputsnapshot namespace. Ready sámnenípokyn cizímuagentovi začít."
+  ]
+}

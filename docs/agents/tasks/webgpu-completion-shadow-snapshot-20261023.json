@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-shadow-snapshot-20261023",
+  "title": "KEY-22: neměnný source11 pro přejímku shadow pass ownership",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261023-candidate-11/",
+    "docs/agents/handoffs/webgpu-completion-shadow-snapshot-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze koordinátorem výslovně přijatý stabilní runtime a testy po nezávislém review; failed authored-selection candidate se nefreezeuje jako oprava.",
+    "Snapshot včetně testů, explicitních fixtures, asset a source SHA. Staré source7/8/9/10 ani jejich dependency stromy se nemění; při změně patche nový vlastní dependency install.",
+    "Žádný build/GPU/server z tohoto claimu; ty vlastní root validation/revisions. Přiznat skutečné source a installed native rozdíly; handoff před release."
+  ],
+  "verification": [
+    "Manifest integrity, source10→11 přesný diff, shoda chráněných assetů a singleton/pin identity; praktické kontroly ve vlastním validation tasku."
+  ],
+  "notes": [
+    "Pokračování KEY-22 na výslovné uživatelské zadání. Source11 ještě není vytvořen; tato metadata pouze rezervují unikátní výstupy."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "playtest-diagnostics-20261013",
+  "title": "Identifikovat problémy z dokončeného uživatelského testu 19:43–19:50",
+  "status": "done",
+  "dependsOn": [
+    "automatic-diagnostics-integration"
+  ],
+  "writePaths": [
+    "docs/performance/playtest-diagnostics-20261013.md",
+    "docs/verification.md",
+    "docs/agents/handoffs/playtest-diagnostics-20261013.md",
+    ".cache/playtest-diagnostics-20261013/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Oddělit uživatelskou relaci od menu a předchozí QA; zachovat vstupní log a jeho SHA.",
+    "Doložit zjištěné chyby a záseky, časování, nastavení a souvislosti; rozlišit důkaz od hypotézy.",
+    "Uvést hranice telemetrie, žádná nepodložená záruka úplnosti všech vizuálních/fyzikálních chyb."
+  ],
+  "verification": [
+    "Read-only analýza JSONL a příslušného kódu, nezávislé dílčí audity.",
+    "Kontrola percentilů a četností z raw intervalů, návazností a identity zdrojů; bez GPU/buildu/integrace protože runtime se nemění."
+  ],
+  "notes": [
+    "Přímé zadání uživatele po hraní: identifikovat všechny problémy. Zatím neimplementovat opravy bez dokončené diagnózy.",
+    "Aktuální hra a porty zůstávají původnímu vlastníkovi; vlastní browser ani procesy pro měření se nespouštějí."
+  ]
+}

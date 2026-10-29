@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-snapshot-inputs-20261021",
+  "title": "KEY-22: zahrnout skutečné statické testové vstupy do neměnného snapshotu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["scripts/performance-snapshot.mjs", "tests/performance-snapshot.test.ts", "docs/agents/handoffs/webgpu-completion-snapshot-inputs-20261021.md"],
+  "resources": [],
+  "acceptance": [
+    "Průzkum konkrétních fullsuite ENOENT a skutečných runtime/test consumers; doplnit jen přesné statické vstupy Docker/Compose/diagnostic identity fixture, nikoli celou živou dokumentaci/evidenci.",
+    "Existující reálný freezer CLI fixture ověří kopii, všechny before/after/frozen SHA i chybějící/drift vstupy a zachovanou read-only IPR reuse; žádná úprava zdrojových assetů nebo dependencies.",
+    "Původní baseline/candidate kopie zůstanou neměnné. Nový snapshot tvoří až root po předání; dítě nemá heavy/GPU/build/process resources."
+  ],
+  "verification": ["pnpm --config.verify-deps-before-run=false exec tsx --test tests/performance-snapshot.test.ts", "Žádný skutečný velký source/asset snapshot, server, build, GPU nebo fullsuite v dítěti."],
+  "notes": ["40a363 fullsuite našla absent docs/performance/evidence/diagnostic-identity-20261020/input.jsonl (diagnostics-report.test:590), Dockerfile a navazujícícompose vstup (feedback-deployment.test). Jde o úplnost testového snapshotu, nikoli důkaz renderbugu nebo důvod přeskočit testy."]
+}

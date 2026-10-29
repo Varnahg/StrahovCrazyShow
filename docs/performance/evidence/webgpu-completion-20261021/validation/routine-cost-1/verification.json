@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T16:06:12.420Z",
+  "files": {
+    "build-identity.json": {
+      "bytes": 10221,
+      "sha256": "eca9bc9c9b07f7179d279083b357ed6f3af3d686dcaffeaaa20eba8493730596"
+    },
+    "http-identity.json": {
+      "bytes": 6021,
+      "sha256": "5735f919b8d163197398de86ac30d5560ec42cd3749281691c11b5e5253029f4"
+    },
+    "api-equivalence.json": {
+      "bytes": 382,
+      "sha256": "21c431d86b93c705fc23fb13956b0a31828622bc817604c8b4b5d23d3815cec7"
+    },
+    "startup.json": {
+      "bytes": 231850,
+      "sha256": "c0df3083ec0f78bfac44c6c97cc1413806e3706c1dc34051385416a26dda329c"
+    },
+    "first.json": {
+      "bytes": 48320,
+      "sha256": "9e7e8037f230ac13f14d070727a58248fa2829ea1cd945de6d1812559e6fbb22"
+    },
+    "repeat.json": {
+      "bytes": 48263,
+      "sha256": "783c78924280dda3e5c93be75f6007e59a7b66bc1ce01f9233dc0bb9df0e3adb"
+    },
+    "first-summary.json": {
+      "bytes": 3666,
+      "sha256": "15d40c0065083342636cad4e1cbffc9fced01a388f9c6f2d3fd39ddd4ca9b8e1"
+    },
+    "repeat-summary.json": {
+      "bytes": 2340,
+      "sha256": "c5b012d0f1cedf8f44968e221a606514fd0c2672aec55589f564386a6d06c133"
+    }
+  },
+  "sourceSnapshotId": "36c134e1438c6ca1e1c2bb243edd20e37b1fd3dd90e8df35138d446fea231841",
+  "buildId": "40c56677c369543751b47c100f234e66abf275c3ec5a1b5532170b480e5ddc70",
+  "helperSha256": "3673a9e445bde2c187380c0660d0d9b101d6be0c8152308b366369984a877a63",
+  "backend": "webgpu",
+  "compatibilityMode": true,
+  "query": null,
+  "quality": "medium",
+  "viewport": {
+    "width": 2040,
+    "height": 986,
+    "dpr": 1.0000000149011612
+  },
+  "backbuffer": {
+    "width": 2040,
+    "height": 986,
+    "scaling": 1
+  },
+  "avatars": 1,
+  "flashlight": true,
+  "lighting": 1792533600000,
+  "attempts": [
+    {
+      "attemptId": "efd4bf59-97cd-4d3a-bca8-7acfd5a38e2f",
+      "utc": "2026-10-21T15:54:51.548Z",
+      "frames": 8,
+      "complete": true,
+      "errors": 0,
+      "phaseErrors": 0,
+      "restoreConflicts": 0,
+      "remaining": 0,
+      "health": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      }
+    },
+    {
+      "attemptId": "31ad637f-a64e-4759-b0c1-4254fbf9eb02",
+      "utc": "2026-10-21T16:01:29.747Z",
+      "frames": 8,
+      "complete": true,
+      "errors": 0,
+      "phaseErrors": 0,
+      "restoreConflicts": 0,
+      "remaining": 0,
+      "health": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      }
+    }
+  ],
+  "acceptedDiagnostic": true,
+  "acceptedPerformance": false,
+  "conclusion": "Both actual8frame captures complete with original frame progress, no observer/phase/restore errors, all8routine hooks removed, healthy original Game. Counts consistently show about2022–2030getLOD and2694–2695computeWorldMatrix calls in active phase, versus208_activeMesh; main181PBR/51Standard readiness+bind. The enabled candidate provider is about0ms. This differentiates call paths; it does not establish a profitable rewrite.",
+  "limitations": [
+    "Two timestamps plus wrappers/stack add overhead to every selected call; trivial cached native fast paths can therefore look expensive. First capture also contains larger early timings; no measured3ms saving or FPS conclusion.",
+    "Inclusive and selfSelected timings overlap other scopes and exclude unselected residual; never add them into whole-frame GPU/CPU time.",
+    "Live traffic/NPC differ between captures; not matched backend A/B. Only first capture is within the recorded10minute telemetry window; repeat is outside it.",
+    "Conservative spatial filtering must preserve native LOD/actions/instances/order/culling volume and RTT side effects. Current frozen worldMatrix alone does not prove immutable geometry.",
+    "This independent CM CPU discriminator does not identify NCM buffer37326 or accept the complete migration."
+  ]
+}

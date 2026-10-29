@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-startup-view-20261021",
+  "title": "KEY-22: připravit skutečný obnovený multiplayerový pohled a známý roster před vstupem",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/startup-preparation-view.ts",
+    "tests/startup-preparation-view.test.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "tests/game-render-engine.test.ts",
+    "tests/game-light-lifecycle.test.ts",
+    "tests/room-callbacks.test.ts",
+    "docs/performance/evidence/webgpu-completion-20261021/startup-view/",
+    "docs/agents/handoffs/webgpu-completion-startup-view-20261021.md",
+    "tests/game-authored-light-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    "tests/game-preparation-scheduler.test.ts",
+    "tests/game-preparation-baseline.test.ts",
+    "tests/game-quality-preparation.test.ts",
+    "client/render-startup.ts",
+    "tests/render-startup.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před code zapsat celý source/actual chain a varianty. CM receiptb23e07ea má62/62actorSPAWN a odseq8localtargetB6; efd4/31adprofil užActorB6. UI/current g je dostupné předstartem, AuthorityBuffer/frontier/reconcile drží readyguard a drain je až poststart. Game.start updatePlayers([local]) navíc může odstranit známé peers.",
+    "Vybraný úzký view-only kandidát pro doložený on-foot resume. Scalar projekce výhradně z accepted vlastní authority, finite position/mode/yaw a owner room/self/attempt/epoch guard. Žádný Actor.restore/setPosition, předčasný reconcile, ack/replay/frontier/queue reset či změna shared/network/server API.",
+    "Tentýž prezentační anchor musí pokrýt initial environment, všechny světelné variant apply/restore, world/B6 visibility, kameru, lokální avatar a svítilnu i původní finalgate. Nemá vzniknout přechodný SPAWN render mezi Game.start a původním UI poststartdrain; případný owned lease/handshake zachová ready/physics/input guardy a původní drain pořadí.",
+    "Roster přijatý předstartem se nesmí ztratit initiallocal update. Připravit existující cohortu, změnu membership/profile/owner správně zahrnout; neslibovat předpřípravu neexistujících budoucích avatarů. Guest/singleplayer chování původní.",
+    "Nezvyšovat timeouty, nevynechat41stages/readiness/health/fence a neměnit produkční backend policy. Pose packet20Hz nesmí být sám novou revision při každé zprávě. Stable latch + validace relevantní pozdní view/epoch/roster změny ve stávajícím visible-time rozpočtu; explicitně doložit exact coverage/threshold, žádný nekonečný restart.",
+    "Vehicle je proti foot větší lease: kamera/ignore-body, carroot a headlights dnes čtou actor.vehicle. Pro on-foot scope nesmí jednoduchý pos substitution ovlivnit původní vehicle flow; unsupported/unchanged větev explicitně evidovat, neodmítat dosud platný join nebo předstírat jeho view coverage. Normální server onLeave ukládá foot/exitPosition.",
+    "Abort/dispose/rejoin/late callbacks uvolní pouze svůj presentation owner a původní chyba/Room cleanup zůstanou. Žádný nový global cache/per-frame log/asset regeneration; cílený refaktor sjednotí opakované view selection a lifecycle. Technický preparation-view scalar důkaz dát do bounded diagnostics nebo canvas dataset, nikoliv produktu UI; helpermeasurement prefix child nemění.",
+    "Implementaci+refaktor+smysluplné CPU/null-device regrese+scopedTS předat společně, žádný child fullsuite/build/server/GPU/commit. Root drží immutable source5 a GPU; nový runtime se prakticky přijme až v dalším frozen source včetně testů."
+  ],
+  "verification": [
+    "Skutečná accepted authority buffer/UI→Game startup a on-foot B6 scene/camera prep/finalgates; Actor fyzicky SPANW beze změny do původního poststartdrain. Queue/frontier/epoch/ack/replay se neodebírá či neposouvá projekcí.",
+    "Actual wholeGame startup fixture s novým helperem, existingknownroster zachovaný, Guest defaultbezezměny, invalid/stale authority/mode a unsupportedvehicle explicitní, owner/room/epoch replacement, late projection/roster změna, abort/error/restore a opakovanýstart.",
+    "Původní Game/UI/light/room cílené regrese + scoped TypeScript, original await g.start exact transform kontrakt zachovaný, source/pin/test/log SHA před/po a clear peer handoff. Root později119helper+fullsuite/build/integration a actual první resumedB6 framy/coverage/image/health/pipeline."
+  ],
+  "notes": [
+    "Porovnáno earlyfullreconcile (moc široké physics/timeline zásahy), view-only anchor (zvoleno), nový postdrainloadingstate (nováphase/loopownership), globalwarmup (neomezená prostor×quality×light×avatar kombinace). Root schválil APIwrite client/game.ts a client/ui.tsx výslovně touto disjunktní rezervací.",
+    "Target.y a ActorState.position.y jsouactorcenter; renderfeet odečítá0.8, rozdílSPAWN+1 vsserver+.8201 je settle kapsle, ne transformunits. ExistingAuthorityBuffer validuje frontier, nikoliv všechny state.position; novýviewguardnezmění jeho dosavadnípacket semantics.",
+    "Root bufferhelper119CPU/review byl samostatně commitnut8ee57e4 předcorewrites. Root může buildit proti neměnnému snapshot5/source36 i při této větviWIP. Neměnit helper files/frozen snapshoty/protectedserverenv. Nezkoumatpřístupovýtoken. Žádný rekurzivníBMAD.",
+    "21.10 17:10UTC koordinátor rozšířil přesně8cest po zastavení/release doloženého vlastního WIP. Šest existujících ASTfixtures musí zahrnout faktorizované preparation helper metody. Explicitní ready revalidation v render-startup zachová stejné scope/fence/pending/error/generation/visibility/deadline gates a pouze neopakuje preparing→ready transition; původní initial default beze změny, žádné oslabení RenderHealth. Autor smí novým claim --adopt-dirty převzít výhradně svůj WIP zaznamenaný v handoffu."
+  ]
+}

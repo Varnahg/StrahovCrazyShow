@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-12T11:32:47.607Z",
+  "scope": "Documentation and reproducible static asset analysis only. No runtime changes or new GPU benchmark.",
+  "gitHead": "918a59ce63d7ba7c3a97c209a739cd59a4e00475",
+  "workingTree": "Contains unrelated pre-existing and concurrent work; this is not a frozen full-game checkpoint.",
+  "validations": [
+    {
+      "audit": "tree-audit.json",
+      "checked": 32,
+      "differences": []
+    },
+    {
+      "audit": "ground-audit.json",
+      "checked": 19,
+      "differences": []
+    }
+  ],
+  "localLinks": {
+    "checked": 12,
+    "missing": []
+  },
+  "visualInspection": {
+    "url": "http://127.0.0.1:4179/",
+    "mode": "Solo guest with normal HUD",
+    "time": "2026-10-12 approximately 13:20–13:25 Europe/Prague",
+    "route": "Central parking/court to grass near Klub 007",
+    "freshScreenshotArchive": false,
+    "performanceMeasured": false,
+    "existingImageReviewed": "docs/verification-evidence/campus-depth-20261012-d2/gameplay/d2-trees.jpg"
+  },
+  "tests": {
+    "treeTargeted": "13/13 reported and documented in tree-audit.json; not rerun by this final consistency check",
+    "fullSuite": false,
+    "build": false,
+    "integration": false,
+    "reason": "No game or source asset changes"
+  },
+  "deliverables": [
+    {
+      "path": "docs/vegetation/realism-audit-20261012/README.md",
+      "sha256": "d13e48f9010af66a19b982a500680840fc771cf46cbdd3bd960f32d60c0eac58"
+    },
+    {
+      "path": "docs/vegetation/realism-audit-20261012/tree-audit.mjs",
+      "sha256": "72e7469ea790e8313eedcd67e7e1684ee60ef657f31d546d5b9f0dd7af612bde"
+    },
+    {
+      "path": "docs/vegetation/realism-audit-20261012/tree-audit.json",
+      "sha256": "0365469f47f27b53c1fae220472a9f767ea9fe9cfbb5104aa94c37cfea1cc846"
+    },
+    {
+      "path": "docs/vegetation/realism-audit-20261012/ground-audit.mjs",
+      "sha256": "66ddae804c6dd07fcca74b308b140ad1f385b05cb8f111ad7a091222617625e2"
+    },
+    {
+      "path": "docs/vegetation/realism-audit-20261012/ground-audit.json",
+      "sha256": "73faa90ad03f1bb795cc483fb557fddbce825d783fcf3e63d3a0815a08065e66"
+    }
+  ]
+}

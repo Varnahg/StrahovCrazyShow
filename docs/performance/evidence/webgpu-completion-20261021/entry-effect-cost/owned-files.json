@@ -1,0 +1,716 @@
+{
+  "schemaVersion": 1,
+  "task": "webgpu-completion-entry-effect-cost-20261024",
+  "owner": "webgpu-completion-01a15a3e-entry-effect-cost",
+  "scope": "Pouze vlastní V18 helper/evidence/handoff. Historické development důkazy jsou zachované a oddělené od final complete-inputs. Žádný produkt, dependencies, staré raw ani jiné helper prefixy nejsou vlastněný výstup.",
+  "helperSha256": "509888ebe5e37468a6f32fba1c0888e0ad0a6fd81a4578d584c8043179363465",
+  "proof": {
+    "path": "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/complete-inputs/verification.json",
+    "sha256": "5822a68092b984b6298168cb62f4dffdb528549081e59d5be7e6a465d90acfb9",
+    "bytes": 78273
+  },
+  "handoff": {
+    "path": "docs/agents/handoffs/webgpu-completion-entry-effect-cost-20261024.md",
+    "sha256": "06ed3bdc3ac522f4e7e0720c68a0f3244fdc55d4aca105d24bd2ec943eb243cb",
+    "bytes": 5881
+  },
+  "fileCount": 174,
+  "files": {
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/README.md": {
+      "sha256": "771bb385a75c9a2afb09e60b8eb91b8e351280eb2bbe82f4588b25708fe3c0ae",
+      "bytes": 6070
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/attempt-queue.mjs": {
+      "sha256": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+      "bytes": 2596
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/browser-clock.mjs": {
+      "sha256": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+      "bytes": 2673
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/buffer-lifecycle-core.mjs": {
+      "sha256": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+      "bytes": 2319
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/buffer-lifecycle.mjs": {
+      "sha256": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+      "bytes": 19570
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/buffer-lifecycle.test.mjs": {
+      "sha256": "e9de85bd5e9055deaa492e2a3ab5139242d664b253ac724a4bee5688795f6c30",
+      "bytes": 23877
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/clock.test.mjs": {
+      "sha256": "b459a005783686fbef5e8c0abce1369f88dc251d0285bff8dbf54ffc7eee0638",
+      "bytes": 19217
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/common.mjs": {
+      "sha256": "ad48dd504e8ebc2c5cfa67a1274c9739345bf40fd6d7662d6132baf65b26cc92",
+      "bytes": 9343
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/depth-inputs.test.mjs": {
+      "sha256": "36ff58b6beaae82448a9f8ec976a4035f1bf0682f7d984d930857e1f7008068b",
+      "bytes": 2094
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost-core.mjs": {
+      "sha256": "d9c83f6e47b252b61081773cb34f5745978472e2b0c61fd152caa29f97a25ca6",
+      "bytes": 11713
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.mjs": {
+      "sha256": "e35d7aa99b3c2bb9385cf1aadb8bcdad90279ad5fd94de3dcd43d96a9ae5c979",
+      "bytes": 10456
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.test.mjs": {
+      "sha256": "f00a85be508eb5ae582f652ad7d4a019b634d5559d480d3504e598cc446678ca",
+      "bytes": 30977
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-render-cost.mjs": {
+      "sha256": "25e0c62bab6b1adb3243c428978f9c44c6aad98c38e7bed633b512b39741ef5e",
+      "bytes": 18790
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-render-cost.test.mjs": {
+      "sha256": "3ddb90c00d4094be432f1915baf6ce281ed2b34ed1c884f3ce8ba504c7df8a7c",
+      "bytes": 32217
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-routine-cost.mjs": {
+      "sha256": "8af87d7e39843c29f10d8ff74643beb883941afe179fc037ec2e5ae6f415907c",
+      "bytes": 15868
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-routine-cost.test.mjs": {
+      "sha256": "e596cda67e9b865bf73a692f4e4d1c4bde8026980f458dda751006c5c7d414f5",
+      "bytes": 32957
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/harness.mjs": {
+      "sha256": "e51a1c9a74943c67642eff5423efa7c77180c99fc520fe700a99b4ce4bc99178",
+      "bytes": 27355
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/helper.test.mjs": {
+      "sha256": "10ebbf8186902949ee5f89bc6c2fa6e40f438a5a62d543f966f70437ed86bf94",
+      "bytes": 46849
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/lifecycle-controls.mjs": {
+      "sha256": "98a3e7654ef82de854fa186d6cbbfe52c2991df70ec6eaebdddd4aa225b90740",
+      "bytes": 3937
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/lifecycle-controls.test.mjs": {
+      "sha256": "60768ff901ecee5ca6c674c7ba63020b6afe8ba9a41285e6bc0c627984bbce42",
+      "bytes": 9122
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/pipeline-input-window.mjs": {
+      "sha256": "5a5758e6724fd0a18e8a9e2bb1ce299c067186a3c762cd3d070eee27915c61ff",
+      "bytes": 39977
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/pipeline-input-window.test.mjs": {
+      "sha256": "2ee15119e23ad6d224b6747f6dcff50c4960aa7a34526ee11e74bd47ad4f279a",
+      "bytes": 56183
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/preparation-summary.test.mjs": {
+      "sha256": "adf28201781767225903bb4679703473635237b5cd64cee27f19ac99c2abb2d1",
+      "bytes": 35404
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/qa-overlay.mjs": {
+      "sha256": "39a7a97e1c6a57cb24e3e132229063d253e159c37b4b0fca034df658aa2faba4",
+      "bytes": 38662
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/receipt.mjs": {
+      "sha256": "78636549b6308c54da12c85d2091f7d67ad9ad3b9dd483a051a7e88c3adeade0",
+      "bytes": 10576
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/routine-cost-core.mjs": {
+      "sha256": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+      "bytes": 8617
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/routine-cost.mjs": {
+      "sha256": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+      "bytes": 7568
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/routine-cost.test.mjs": {
+      "sha256": "c038685ffe29b8ddb9f8cb67204bffd730d71d4e129fba9448cdd960f94a4e67",
+      "bytes": 20594
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/server-bootstrap.mjs": {
+      "sha256": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+      "bytes": 6299
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/shader-attribution.mjs": {
+      "sha256": "62af23e40accd197d70eb960b72371de160cff1e7d46077ce3e5aef57a92d0ac",
+      "bytes": 27130
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/shader-attribution.test.mjs": {
+      "sha256": "59e0fa30437d5b6103666ef599aa5cfc350084a5ebd28412f36236b20b337761",
+      "bytes": 27960
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/shader-lifetime.mjs": {
+      "sha256": "dcc19246cd0dbb19d265e3036da72025e19a4ecc6181227723978f9d81938979",
+      "bytes": 22849
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/shader-lifetime.test.mjs": {
+      "sha256": "e6c051fbf3f8e918940351de7c9ed0e030f9a3ff9786631b8e075a5793acdd5a",
+      "bytes": 25885
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/shader-window.test.mjs": {
+      "sha256": "f3290bc97c02f811ad9200a38328d7d29075c22201d679b9316dc5b535d35bf4",
+      "bytes": 3385
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/startup-latency.mjs": {
+      "sha256": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+      "bytes": 7718
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/startup-observer.mjs": {
+      "sha256": "de78187d3ff7cb720f0f6961013e6a8e7414a299a5b550cf748550957e5b01cf",
+      "bytes": 21616
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/transit-clock.mjs": {
+      "sha256": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+      "bytes": 7034
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/weather-fixture.mjs": {
+      "sha256": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+      "bytes": 7804
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/weather-latency.test.mjs": {
+      "sha256": "606a7ee7982a7e8ece2ebbc5f8f74205c1eb590c4a3e779dfc4bde0a2a9d7b82",
+      "bytes": 28318
+    },
+    ".cache/webgpu-completion-20261021/entry-effect-cost/metadata-normalization.json": {
+      "sha256": "8fee229e8ed5fd8353153bdc22f0b90f788fa3fb88be86bbb42770ac2e113b00",
+      "bytes": 2043
+    },
+    "docs/agents/handoffs/webgpu-completion-entry-effect-cost-20261024.md": {
+      "sha256": "06ed3bdc3ac522f4e7e0720c68a0f3244fdc55d4aca105d24bd2ec943eb243cb",
+      "bytes": 5881
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/README.md": {
+      "sha256": "ee4648aa09cbbc73fdfeddf51e0454f07449ee5ba22bdc4cac93a846b04acdf2",
+      "bytes": 7165
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/before.json": {
+      "sha256": "ea9432deba5fca2cd920d93d02faa2b553b930ca609b2220369bafae6b38eec7",
+      "bytes": 18356
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/changes.json": {
+      "sha256": "7bd14ec0009e13463b6d11a010fae8e9fd4cd96be259f839c77ed1d7fda41caf",
+      "bytes": 3092
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/complete-inputs/execution-before.json": {
+      "sha256": "89769aa7ce74db271501762306f1e42b3b8c7121abebeb0f1a0f6a5a712e3e19",
+      "bytes": 33361
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/complete-inputs/targeted-final.tap": {
+      "sha256": "63675a7ee5f3bc93c2a2218a1bd21433c41596fb20198129db176549ed0aab60",
+      "bytes": 9531
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/complete-inputs/verification.json": {
+      "sha256": "5822a68092b984b6298168cb62f4dffdb528549081e59d5be7e6a465d90acfb9",
+      "bytes": 78273
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/README.md": {
+      "sha256": "771bb385a75c9a2afb09e60b8eb91b8e351280eb2bbe82f4588b25708fe3c0ae",
+      "bytes": 6070
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/attempt-queue.mjs": {
+      "sha256": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+      "bytes": 2596
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/browser-clock.mjs": {
+      "sha256": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+      "bytes": 2673
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/buffer-lifecycle-core.mjs": {
+      "sha256": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+      "bytes": 2319
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/buffer-lifecycle.mjs": {
+      "sha256": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+      "bytes": 19570
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/buffer-lifecycle.test.mjs": {
+      "sha256": "e9de85bd5e9055deaa492e2a3ab5139242d664b253ac724a4bee5688795f6c30",
+      "bytes": 23877
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/clock.test.mjs": {
+      "sha256": "b459a005783686fbef5e8c0abce1369f88dc251d0285bff8dbf54ffc7eee0638",
+      "bytes": 19217
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/common.mjs": {
+      "sha256": "ad48dd504e8ebc2c5cfa67a1274c9739345bf40fd6d7662d6132baf65b26cc92",
+      "bytes": 9343
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/depth-inputs.test.mjs": {
+      "sha256": "36ff58b6beaae82448a9f8ec976a4035f1bf0682f7d984d930857e1f7008068b",
+      "bytes": 2094
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/entry-effect-cost-core.mjs": {
+      "sha256": "d9c83f6e47b252b61081773cb34f5745978472e2b0c61fd152caa29f97a25ca6",
+      "bytes": 11713
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/entry-effect-cost.mjs": {
+      "sha256": "e35d7aa99b3c2bb9385cf1aadb8bcdad90279ad5fd94de3dcd43d96a9ae5c979",
+      "bytes": 10456
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/entry-effect-cost.test.mjs": {
+      "sha256": "a4c348b7c01a6bc816c63533d222a105eb892e708e07b24dedca93c1a13089b1",
+      "bytes": 30069
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/entry-render-cost.mjs": {
+      "sha256": "25e0c62bab6b1adb3243c428978f9c44c6aad98c38e7bed633b512b39741ef5e",
+      "bytes": 18790
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/entry-render-cost.test.mjs": {
+      "sha256": "3ddb90c00d4094be432f1915baf6ce281ed2b34ed1c884f3ce8ba504c7df8a7c",
+      "bytes": 32217
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/entry-routine-cost.mjs": {
+      "sha256": "8af87d7e39843c29f10d8ff74643beb883941afe179fc037ec2e5ae6f415907c",
+      "bytes": 15868
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/entry-routine-cost.test.mjs": {
+      "sha256": "e596cda67e9b865bf73a692f4e4d1c4bde8026980f458dda751006c5c7d414f5",
+      "bytes": 32957
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/harness.mjs": {
+      "sha256": "e51a1c9a74943c67642eff5423efa7c77180c99fc520fe700a99b4ce4bc99178",
+      "bytes": 27355
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/helper.test.mjs": {
+      "sha256": "10ebbf8186902949ee5f89bc6c2fa6e40f438a5a62d543f966f70437ed86bf94",
+      "bytes": 46849
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/lifecycle-controls.mjs": {
+      "sha256": "98a3e7654ef82de854fa186d6cbbfe52c2991df70ec6eaebdddd4aa225b90740",
+      "bytes": 3937
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/lifecycle-controls.test.mjs": {
+      "sha256": "60768ff901ecee5ca6c674c7ba63020b6afe8ba9a41285e6bc0c627984bbce42",
+      "bytes": 9122
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/pipeline-input-window.mjs": {
+      "sha256": "5a5758e6724fd0a18e8a9e2bb1ce299c067186a3c762cd3d070eee27915c61ff",
+      "bytes": 39977
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/pipeline-input-window.test.mjs": {
+      "sha256": "2ee15119e23ad6d224b6747f6dcff50c4960aa7a34526ee11e74bd47ad4f279a",
+      "bytes": 56183
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/preparation-summary.test.mjs": {
+      "sha256": "adf28201781767225903bb4679703473635237b5cd64cee27f19ac99c2abb2d1",
+      "bytes": 35404
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/qa-overlay.mjs": {
+      "sha256": "39a7a97e1c6a57cb24e3e132229063d253e159c37b4b0fca034df658aa2faba4",
+      "bytes": 38662
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/receipt.mjs": {
+      "sha256": "78636549b6308c54da12c85d2091f7d67ad9ad3b9dd483a051a7e88c3adeade0",
+      "bytes": 10576
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/routine-cost-core.mjs": {
+      "sha256": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+      "bytes": 8617
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/routine-cost.mjs": {
+      "sha256": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+      "bytes": 7568
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/routine-cost.test.mjs": {
+      "sha256": "c038685ffe29b8ddb9f8cb67204bffd730d71d4e129fba9448cdd960f94a4e67",
+      "bytes": 20594
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/server-bootstrap.mjs": {
+      "sha256": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+      "bytes": 6299
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/shader-attribution.mjs": {
+      "sha256": "62af23e40accd197d70eb960b72371de160cff1e7d46077ce3e5aef57a92d0ac",
+      "bytes": 27130
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/shader-attribution.test.mjs": {
+      "sha256": "59e0fa30437d5b6103666ef599aa5cfc350084a5ebd28412f36236b20b337761",
+      "bytes": 27960
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/shader-lifetime.mjs": {
+      "sha256": "dcc19246cd0dbb19d265e3036da72025e19a4ecc6181227723978f9d81938979",
+      "bytes": 22849
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/shader-lifetime.test.mjs": {
+      "sha256": "e6c051fbf3f8e918940351de7c9ed0e030f9a3ff9786631b8e075a5793acdd5a",
+      "bytes": 25885
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/shader-window.test.mjs": {
+      "sha256": "f3290bc97c02f811ad9200a38328d7d29075c22201d679b9316dc5b535d35bf4",
+      "bytes": 3385
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/startup-latency.mjs": {
+      "sha256": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+      "bytes": 7718
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/startup-observer.mjs": {
+      "sha256": "de78187d3ff7cb720f0f6961013e6a8e7414a299a5b550cf748550957e5b01cf",
+      "bytes": 21616
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/transit-clock.mjs": {
+      "sha256": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+      "bytes": 7034
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/weather-fixture.mjs": {
+      "sha256": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+      "bytes": 7804
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-d81f-sources/weather-latency.test.mjs": {
+      "sha256": "606a7ee7982a7e8ece2ebbc5f8f74205c1eb590c4a3e779dfc4bde0a2a9d7b82",
+      "bytes": 28318
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/development-v1-verify.mjs": {
+      "sha256": "7adf2eb46afb4754952bd78a09d4be0c5d1afec73237f5cc4ba26fc5319219be",
+      "bytes": 4328
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/README.md": {
+      "sha256": "15262b31d7a3f9beed010820857b3770a738a0f0ae67605afcc8c0c6af75bde3",
+      "bytes": 68364
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/attempt-queue.mjs": {
+      "sha256": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+      "bytes": 2596
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/browser-clock.mjs": {
+      "sha256": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+      "bytes": 2673
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/buffer-lifecycle-core.mjs": {
+      "sha256": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+      "bytes": 2319
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/buffer-lifecycle.mjs": {
+      "sha256": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+      "bytes": 19570
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/buffer-lifecycle.test.mjs": {
+      "sha256": "e9de85bd5e9055deaa492e2a3ab5139242d664b253ac724a4bee5688795f6c30",
+      "bytes": 23877
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/clock.test.mjs": {
+      "sha256": "b459a005783686fbef5e8c0abce1369f88dc251d0285bff8dbf54ffc7eee0638",
+      "bytes": 19217
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/common.mjs": {
+      "sha256": "e66f4a1db255ad9d2a63b7de596c8f67b910226cb3670fcf00490c39c9453716",
+      "bytes": 9258
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/depth-inputs.test.mjs": {
+      "sha256": "36ff58b6beaae82448a9f8ec976a4035f1bf0682f7d984d930857e1f7008068b",
+      "bytes": 2094
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/entry-render-cost.mjs": {
+      "sha256": "25e0c62bab6b1adb3243c428978f9c44c6aad98c38e7bed633b512b39741ef5e",
+      "bytes": 18790
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/entry-render-cost.test.mjs": {
+      "sha256": "27ca836b3455b028b791c6322534bf144bc749bbe2f118b2691daf4ab1b0e4c5",
+      "bytes": 32217
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/entry-routine-cost.mjs": {
+      "sha256": "8af87d7e39843c29f10d8ff74643beb883941afe179fc037ec2e5ae6f415907c",
+      "bytes": 15868
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/entry-routine-cost.test.mjs": {
+      "sha256": "98cecaa52098d5afec81c73c769dec7dd22cd33b4b236cb23039d2f5dd5a8038",
+      "bytes": 32957
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/harness.mjs": {
+      "sha256": "796205d9f3458e27e189e2acf89d4dba23468c393e0f13376c43248783601e56",
+      "bytes": 26588
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/helper.test.mjs": {
+      "sha256": "a8722b72dc4df5325387ab61a84874516750d87da812ac1d7b532facd5637d2c",
+      "bytes": 46805
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/lifecycle-controls.mjs": {
+      "sha256": "98a3e7654ef82de854fa186d6cbbfe52c2991df70ec6eaebdddd4aa225b90740",
+      "bytes": 3937
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/lifecycle-controls.test.mjs": {
+      "sha256": "60768ff901ecee5ca6c674c7ba63020b6afe8ba9a41285e6bc0c627984bbce42",
+      "bytes": 9122
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/pipeline-input-window.mjs": {
+      "sha256": "5a5758e6724fd0a18e8a9e2bb1ce299c067186a3c762cd3d070eee27915c61ff",
+      "bytes": 39977
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/pipeline-input-window.test.mjs": {
+      "sha256": "48dfb3b566a76518c5b44a862d020ddefd0de714c0882c0b0b7dce6d9dec1be2",
+      "bytes": 56183
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/preparation-summary.test.mjs": {
+      "sha256": "c3168a6cb8a2432449f132a5708213775feae4fc12f5fe56c2e9cdff51be1c71",
+      "bytes": 35404
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/qa-overlay.mjs": {
+      "sha256": "83460671511d7d991fdd577ab7d239ddf8941bc0c85ce54f58866183229c0432",
+      "bytes": 37017
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/receipt.mjs": {
+      "sha256": "4bbe7af777fd0ccacd6552bb8e40888fe67dfbcc58d765230b143add8bf2b267",
+      "bytes": 9129
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/routine-cost-core.mjs": {
+      "sha256": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+      "bytes": 8617
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/routine-cost.mjs": {
+      "sha256": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+      "bytes": 7568
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/routine-cost.test.mjs": {
+      "sha256": "c038685ffe29b8ddb9f8cb67204bffd730d71d4e129fba9448cdd960f94a4e67",
+      "bytes": 20594
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/server-bootstrap.mjs": {
+      "sha256": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+      "bytes": 6299
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/shader-attribution.mjs": {
+      "sha256": "62af23e40accd197d70eb960b72371de160cff1e7d46077ce3e5aef57a92d0ac",
+      "bytes": 27130
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/shader-attribution.test.mjs": {
+      "sha256": "59e0fa30437d5b6103666ef599aa5cfc350084a5ebd28412f36236b20b337761",
+      "bytes": 27960
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/shader-lifetime.mjs": {
+      "sha256": "dcc19246cd0dbb19d265e3036da72025e19a4ecc6181227723978f9d81938979",
+      "bytes": 22849
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/shader-lifetime.test.mjs": {
+      "sha256": "e6c051fbf3f8e918940351de7c9ed0e030f9a3ff9786631b8e075a5793acdd5a",
+      "bytes": 25885
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/shader-window.test.mjs": {
+      "sha256": "f3290bc97c02f811ad9200a38328d7d29075c22201d679b9316dc5b535d35bf4",
+      "bytes": 3385
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/startup-latency.mjs": {
+      "sha256": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+      "bytes": 7718
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/startup-observer.mjs": {
+      "sha256": "de78187d3ff7cb720f0f6961013e6a8e7414a299a5b550cf748550957e5b01cf",
+      "bytes": 21616
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/transit-clock.mjs": {
+      "sha256": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+      "bytes": 7034
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/weather-fixture.mjs": {
+      "sha256": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+      "bytes": 7804
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17/weather-latency.test.mjs": {
+      "sha256": "606a7ee7982a7e8ece2ebbc5f8f74205c1eb590c4a3e779dfc4bde0a2a9d7b82",
+      "bytes": 28318
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/execution-before.json": {
+      "sha256": "6d6fb06a9fa2461d62827d854fecfeebdf042157fc78e1513cffa7bc551d293a",
+      "bytes": 25199
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/helper.patch": {
+      "sha256": "b646ddf74338f053ae36f63a90fa909954d5f6eceb0cc18627176f3e19bd14c7",
+      "bytes": 160844
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/materialize-check.json": {
+      "sha256": "c10d27ad5996bbb2972fd9e5c3c0b7ecc0d370989aaba73d5af33dc7108e1295",
+      "bytes": 342
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/materialize.mjs": {
+      "sha256": "263687f24982f54faef335b701bb811f093c22cf1b14849b84e394813037c5af",
+      "bytes": 1904
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/portable-sources.json": {
+      "sha256": "dd155019eb51d86473adb50f89ff8847c2524d579b858eeb27b68b76d9b28fff",
+      "bytes": 5876
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/README.md": {
+      "sha256": "771bb385a75c9a2afb09e60b8eb91b8e351280eb2bbe82f4588b25708fe3c0ae",
+      "bytes": 6070
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/attempt-queue.mjs": {
+      "sha256": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+      "bytes": 2596
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/browser-clock.mjs": {
+      "sha256": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+      "bytes": 2673
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/buffer-lifecycle-core.mjs": {
+      "sha256": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+      "bytes": 2319
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/buffer-lifecycle.mjs": {
+      "sha256": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+      "bytes": 19570
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/buffer-lifecycle.test.mjs": {
+      "sha256": "e9de85bd5e9055deaa492e2a3ab5139242d664b253ac724a4bee5688795f6c30",
+      "bytes": 23877
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/clock.test.mjs": {
+      "sha256": "b459a005783686fbef5e8c0abce1369f88dc251d0285bff8dbf54ffc7eee0638",
+      "bytes": 19217
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/common.mjs": {
+      "sha256": "ad48dd504e8ebc2c5cfa67a1274c9739345bf40fd6d7662d6132baf65b26cc92",
+      "bytes": 9343
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/depth-inputs.test.mjs": {
+      "sha256": "36ff58b6beaae82448a9f8ec976a4035f1bf0682f7d984d930857e1f7008068b",
+      "bytes": 2094
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/entry-effect-cost-core.mjs": {
+      "sha256": "d9c83f6e47b252b61081773cb34f5745978472e2b0c61fd152caa29f97a25ca6",
+      "bytes": 11713
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/entry-effect-cost.mjs": {
+      "sha256": "e35d7aa99b3c2bb9385cf1aadb8bcdad90279ad5fd94de3dcd43d96a9ae5c979",
+      "bytes": 10456
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/entry-effect-cost.test.mjs": {
+      "sha256": "f00a85be508eb5ae582f652ad7d4a019b634d5559d480d3504e598cc446678ca",
+      "bytes": 30977
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/entry-render-cost.mjs": {
+      "sha256": "25e0c62bab6b1adb3243c428978f9c44c6aad98c38e7bed633b512b39741ef5e",
+      "bytes": 18790
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/entry-render-cost.test.mjs": {
+      "sha256": "3ddb90c00d4094be432f1915baf6ce281ed2b34ed1c884f3ce8ba504c7df8a7c",
+      "bytes": 32217
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/entry-routine-cost.mjs": {
+      "sha256": "8af87d7e39843c29f10d8ff74643beb883941afe179fc037ec2e5ae6f415907c",
+      "bytes": 15868
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/entry-routine-cost.test.mjs": {
+      "sha256": "e596cda67e9b865bf73a692f4e4d1c4bde8026980f458dda751006c5c7d414f5",
+      "bytes": 32957
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/harness.mjs": {
+      "sha256": "e51a1c9a74943c67642eff5423efa7c77180c99fc520fe700a99b4ce4bc99178",
+      "bytes": 27355
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/helper.test.mjs": {
+      "sha256": "10ebbf8186902949ee5f89bc6c2fa6e40f438a5a62d543f966f70437ed86bf94",
+      "bytes": 46849
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/lifecycle-controls.mjs": {
+      "sha256": "98a3e7654ef82de854fa186d6cbbfe52c2991df70ec6eaebdddd4aa225b90740",
+      "bytes": 3937
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/lifecycle-controls.test.mjs": {
+      "sha256": "60768ff901ecee5ca6c674c7ba63020b6afe8ba9a41285e6bc0c627984bbce42",
+      "bytes": 9122
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/pipeline-input-window.mjs": {
+      "sha256": "5a5758e6724fd0a18e8a9e2bb1ce299c067186a3c762cd3d070eee27915c61ff",
+      "bytes": 39977
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/pipeline-input-window.test.mjs": {
+      "sha256": "2ee15119e23ad6d224b6747f6dcff50c4960aa7a34526ee11e74bd47ad4f279a",
+      "bytes": 56183
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/preparation-summary.test.mjs": {
+      "sha256": "adf28201781767225903bb4679703473635237b5cd64cee27f19ac99c2abb2d1",
+      "bytes": 35404
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/qa-overlay.mjs": {
+      "sha256": "39a7a97e1c6a57cb24e3e132229063d253e159c37b4b0fca034df658aa2faba4",
+      "bytes": 38662
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/receipt.mjs": {
+      "sha256": "78636549b6308c54da12c85d2091f7d67ad9ad3b9dd483a051a7e88c3adeade0",
+      "bytes": 10576
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/routine-cost-core.mjs": {
+      "sha256": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+      "bytes": 8617
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/routine-cost.mjs": {
+      "sha256": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+      "bytes": 7568
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/routine-cost.test.mjs": {
+      "sha256": "c038685ffe29b8ddb9f8cb67204bffd730d71d4e129fba9448cdd960f94a4e67",
+      "bytes": 20594
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/server-bootstrap.mjs": {
+      "sha256": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+      "bytes": 6299
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/shader-attribution.mjs": {
+      "sha256": "62af23e40accd197d70eb960b72371de160cff1e7d46077ce3e5aef57a92d0ac",
+      "bytes": 27130
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/shader-attribution.test.mjs": {
+      "sha256": "59e0fa30437d5b6103666ef599aa5cfc350084a5ebd28412f36236b20b337761",
+      "bytes": 27960
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/shader-lifetime.mjs": {
+      "sha256": "dcc19246cd0dbb19d265e3036da72025e19a4ecc6181227723978f9d81938979",
+      "bytes": 22849
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/shader-lifetime.test.mjs": {
+      "sha256": "e6c051fbf3f8e918940351de7c9ed0e030f9a3ff9786631b8e075a5793acdd5a",
+      "bytes": 25885
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/shader-window.test.mjs": {
+      "sha256": "f3290bc97c02f811ad9200a38328d7d29075c22201d679b9316dc5b535d35bf4",
+      "bytes": 3385
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/startup-latency.mjs": {
+      "sha256": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+      "bytes": 7718
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/startup-observer.mjs": {
+      "sha256": "de78187d3ff7cb720f0f6961013e6a8e7414a299a5b550cf748550957e5b01cf",
+      "bytes": 21616
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/transit-clock.mjs": {
+      "sha256": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+      "bytes": 7034
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/weather-fixture.mjs": {
+      "sha256": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+      "bytes": 7804
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/sources/weather-latency.test.mjs": {
+      "sha256": "606a7ee7982a7e8ece2ebbc5f8f74205c1eb590c4a3e779dfc4bde0a2a9d7b82",
+      "bytes": 28318
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/targeted-development-1.tap": {
+      "sha256": "b6374436d8f2bb03a20ad62bc6823c612ff4e1b6167eb26d8cb79b212b5b104c",
+      "bytes": 4017
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/targeted-development-2.tap": {
+      "sha256": "8a894cf11ca9dda41412f7f189161ef037600a81653e60e3364e22cefa89b7aa",
+      "bytes": 6142
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/targeted-development-3.tap": {
+      "sha256": "f806768eea4efc784ef62ba679de8eb9c65be2a1cdb8f6f6482674a4d97876c9",
+      "bytes": 7005
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/targeted-development-4.tap": {
+      "sha256": "4621ee29fcf52425d38612cc0a8ad3c57acfd6ecb6fbb1e8bdcb8846ff991824",
+      "bytes": 8431
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/targeted-final.tap": {
+      "sha256": "32885542821f2dcaa045654890ec36f9c6a4e608757ef12f2e0c626889d4a252",
+      "bytes": 9533
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/verification.json": {
+      "sha256": "db74fc43845c523d1b867df9190b3789c8df631adf1f4e0d9705dcf39c1be818",
+      "bytes": 61296
+    },
+    "docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/verify.mjs": {
+      "sha256": "2ae670be0b3239c124be29c2955d8e22421ebd04885e6dd74ebe3f7a973e3a0f",
+      "bytes": 5070
+    }
+  }
+}

@@ -1,0 +1,336 @@
+TAP version 13
+# BJS - [11:40:40]: Babylon.js v9.30.0 - Null engine
+# Subtest: default-off returns without even reading Game
+ok 1 - default-off returns without even reading Game
+  ---
+  duration_ms: 1.8728
+  type: 'test'
+  ...
+# Subtest: one ten-target hierarchy subtracts prepare/create children and counts clean null
+ok 2 - one ten-target hierarchy subtracts prepare/create children and counts clean null
+  ---
+  duration_ms: 2.9096
+  type: 'test'
+  ...
+# Subtest: Standard direct readiness-to-engine hierarchy counts createEffect and subtracts its selected time
+ok 3 - Standard direct readiness-to-engine hierarchy counts createEffect and subtracts its selected time
+  ---
+  duration_ms: 0.6904
+  type: 'test'
+  ...
+# Subtest: original return identity undefined
+ok 4 - original return identity undefined
+  ---
+  duration_ms: 0.5053
+  type: 'test'
+  ...
+# Subtest: original return identity null
+ok 5 - original return identity null
+  ---
+  duration_ms: 0.4217
+  type: 'test'
+  ...
+# Subtest: original return identity false
+ok 6 - original return identity false
+  ---
+  duration_ms: 0.4758
+  type: 'test'
+  ...
+# Subtest: original return identity 0
+ok 7 - original return identity 0
+  ---
+  duration_ms: 0.3852
+  type: 'test'
+  ...
+# Subtest: original return identity 
+ok 8 - original return identity 
+  ---
+  duration_ms: 0.3679
+  type: 'test'
+  ...
+# Subtest: original return identity [object Promise]
+ok 9 - original return identity [object Promise]
+  ---
+  duration_ms: 0.3124
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw undefined
+ok 10 - original falsy/error throw undefined
+  ---
+  duration_ms: 0.8115
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw null
+ok 11 - original falsy/error throw null
+  ---
+  duration_ms: 0.2022
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw false
+ok 12 - original falsy/error throw false
+  ---
+  duration_ms: 0.1804
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw 0
+ok 13 - original falsy/error throw 0
+  ---
+  duration_ms: 0.1773
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw 
+ok 14 - original falsy/error throw 
+  ---
+  duration_ms: 0.123
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw Error: original
+ok 15 - original falsy/error throw Error: original
+  ---
+  duration_ms: 0.106
+  type: 'test'
+  ...
+# Subtest: foreign material barrier and standalone engine calls do not borrow an own parent association
+ok 16 - foreign material barrier and standalone engine calls do not borrow an own parent association
+  ---
+  duration_ms: 0.3039
+  type: 'test'
+  ...
+# Subtest: transaction rejects drift before writes and rolls back a late defineProperty failure exactly
+ok 17 - transaction rejects drift before writes and rolls back a late defineProperty failure exactly
+  ---
+  duration_ms: 0.3145
+  type: 'test'
+  ...
+# Subtest: retained method references pass through after dispose and foreign replacement is never clobbered
+ok 18 - retained method references pass through after dispose and foreign replacement is never clobbered
+  ---
+  duration_ms: 0.2009
+  type: 'test'
+  ...
+# BJS - [11:40:40]: Babylon.js v9.30.0 - Null engine
+# Subtest: native PBR dirty/cache reuse and clean-null branches use actual inherited ThinEngine API
+ok 19 - native PBR dirty/cache reuse and clean-null branches use actual inherited ThinEngine API
+  ---
+  duration_ms: 285.7117
+  type: 'test'
+  ...
+# BJS - [11:40:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:40]: Babylon.js v9.30.0 - Null engine
+# Subtest: native StandardMaterial readiness captures its actual inherited ThinEngine createEffect call without a PBR ancestor
+ok 20 - native StandardMaterial readiness captures its actual inherited ThinEngine createEffect call without a PBR ancestor
+  ---
+  duration_ms: 57.6833
+  type: 'test'
+  ...
+# Subtest: native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback
+ok 21 - native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback
+  ---
+  duration_ms: 0.4824
+  type: 'test'
+  ...
+# Subtest: engine own/foreign origin refuses before prototype mutation; abort restores live hooks
+ok 22 - engine own/foreign origin refuses before prototype mutation; abort restores live hooks
+  ---
+  duration_ms: 4.7863
+  type: 'test'
+  ...
+# Subtest: actual WebGPU own prototype origin can be installed/retired without device work
+ok 23 - actual WebGPU own prototype origin can be installed/retired without device work
+  ---
+  duration_ms: 4.3972
+  type: 'test'
+  ...
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# Subtest: receipt is distinct/strict while original schema and default-off identity remain unchanged
+ok 24 - receipt is distinct/strict while original schema and default-off identity remain unchanged
+  ---
+  duration_ms: 290.2
+  type: 'test'
+  ...
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger
+not ok 25 - actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger
+  ---
+  duration_ms: 24.8147
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-effect-cost\\helper\\v20\\entry-effect-cost.test.mjs:172:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /renderer correlation/. Input:
+    
+    'Error: Effect unhealthy complete frame'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'Effect unhealthy complete frame'
+  stack: |-
+    validateEntryEffectProfile (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/entry-effect-cost-core.mjs:129:194)
+    validateReceipt (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/receipt.mjs:83:40)
+    file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/entry-effect-cost.test.mjs:183:122
+    getActual (node:assert:611:5)
+    strict.throws (node:assert:759:24)
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/entry-effect-cost.test.mjs:183:111)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/entry-effect-cost.test.mjs:183:111)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# Subtest: unchanged single deadline includes a long original eighth native frame
+ok 26 - unchanged single deadline includes a long original eighth native frame
+  ---
+  duration_ms: 22.9088
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced generation
+ok 27 - native capture retires replaced generation
+  ---
+  duration_ms: 11.191
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced engine
+ok 28 - native capture retires replaced engine
+  ---
+  duration_ms: 10.2777
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced actor
+ok 29 - native capture retires replaced actor
+  ---
+  duration_ms: 10.4975
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced device
+ok 30 - native capture retires replaced device
+  ---
+  duration_ms: 9.6832
+  type: 'test'
+  ...
+# Subtest: depth/call caps and diagnostic clock failure never repair or repeat original calls
+ok 31 - depth/call caps and diagnostic clock failure never repair or repeat original calls
+  ---
+  duration_ms: 14.5021
+  type: 'test'
+  ...
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# Subtest: same-scene recursive render remains original work and is explicitly incomplete
+ok 32 - same-scene recursive render remains original work and is explicitly incomplete
+  ---
+  duration_ms: 11.9244
+  type: 'test'
+  ...
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# Subtest: foreign same-engine Scene materials are passthrough, not attributed to the selected Scene
+ok 33 - foreign same-engine Scene materials are passthrough, not attributed to the selected Scene
+  ---
+  duration_ms: 22.5756
+  type: 'test'
+  ...
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# Subtest: native QA ten-routine button uses the actual waiter/factory/receipt and no old action
+ok 34 - native QA ten-routine button uses the actual waiter/factory/receipt and no old action
+  ---
+  duration_ms: 26.2298
+  type: 'test'
+  ...
+# Subtest: copied fixture compatibility edits reverse exactly to immutable V17 bytes
+not ok 35 - copied fixture compatibility edits reverse exactly to immutable V17 bytes
+  ---
+  duration_ms: 2.8762
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-effect-cost\\helper\\v20\\entry-effect-cost.test.mjs:242:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/entry-effect-cost.test.mjs:248:108)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: descriptor drift during capture retires without clobbering the foreign engine method
+ok 36 - descriptor drift during capture retires without clobbering the foreign engine method
+  ---
+  duration_ms: 9.7635
+  type: 'test'
+  ...
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:40:41]: Babylon.js v9.30.0 - Null engine
+# Subtest: disposed owner snapshots and retained instance wrappers do not query resources again
+ok 37 - disposed owner snapshots and retained instance wrappers do not query resources again
+  ---
+  duration_ms: 9.8277
+  type: 'test'
+  ...
+# Subtest: phase registration failure rolls back all ten native descriptors before publishing an owner
+ok 38 - phase registration failure rolls back all ten native descriptors before publishing an owner
+  ---
+  duration_ms: 2.3852
+  type: 'test'
+  ...
+# Subtest: partial RTT observer failure removes its first subscription and does not escape native notification
+ok 39 - partial RTT observer failure removes its first subscription and does not escape native notification
+  ---
+  duration_ms: 1.889
+  type: 'test'
+  ...
+# Subtest: native Scene throw preserves exact undefined and restores all descriptors
+ok 40 - native Scene throw preserves exact undefined and restores all descriptors
+  ---
+  duration_ms: 1.8881
+  type: 'test'
+  ...
+# Subtest: native Scene throw preserves exact 0 and restores all descriptors
+ok 41 - native Scene throw preserves exact 0 and restores all descriptors
+  ---
+  duration_ms: 1.7014
+  type: 'test'
+  ...
+# Subtest: invalid native frame IDs stay explicit partial without adding or repairing a render
+ok 42 - invalid native frame IDs stay explicit partial without adding or repairing a render
+  ---
+  duration_ms: 10.0326
+  type: 'test'
+  ...
+# Subtest: maximal scalar profile remains bounded and validation never invokes inherited toJSON
+ok 43 - maximal scalar profile remains bounded and validation never invokes inherited toJSON
+  ---
+  duration_ms: 16.7474
+  type: 'test'
+  ...
+1..43
+# tests 43
+# suites 0
+# pass 41
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2880.4059

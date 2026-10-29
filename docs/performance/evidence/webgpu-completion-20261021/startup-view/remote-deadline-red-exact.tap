@@ -1,0 +1,53 @@
+TAP version 13
+# BJS - [19:32:43]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:32:43]: Skeleton "known-peer continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [19:32:43]: Skeleton "self continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [19:32:43]: Babylon.js v9.30.0 - Null engine
+# Subtest: known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+not ok 1 - known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+  ---
+  duration_ms: 268.2846
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-webgpu-startup.test.ts:9:24807'
+  failureType: 'testCodeFailure'
+  error: |-
+    new accepted remote target needs an actual submitted view
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-webgpu-startup.test.ts:806:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: a synchronous observer stall cannot bypass the shared deadline through the unchanged vehicle branch
+not ok 2 - a synchronous observer stall cannot bypass the shared deadline through the unchanged vehicle branch
+  ---
+  duration_ms: 8.1422
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-webgpu-startup.test.ts:9:28851'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-webgpu-startup.test.ts:843:3)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4699.2354

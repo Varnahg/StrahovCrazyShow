@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "resources": [
+    "heavy-validation"
+  ],
+  "verification": [
+    "Před/po LFS inventory a streamované SHA-256 všech actual souborů, Git status a cílený LFS preflight; původní downloaded není důkaz checkoutu."
+  ],
+  "notes": [
+    "Výslovná autorizovaná práce na dokončení KEY22, taskový koordinátor webgpu-completion-01a15a3e-root, pracovní kopie .cache/player-feedback-20261020. Žádný cizí WIP/hraný snapshot nepřebírat.",
+    "Integrátor přijal skutečné 10/10 materializování již downloaded objektů, všech12 actualdélka/SHA=GitOID, sourceGitdiffprázdný. Audit a handoff dokončené, žádný vlastní dlouhý proces/GPU/port."
+  ],
+  "id": "webgpu-completion-assets-20261021",
+  "title": "KEY22: materializovat přesné committed LFS vstupy pro úplný snapshot",
+  "writePaths": [
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr",
+    "docs/agents/handoffs/webgpu-completion-assets-20261021.md"
+  ],
+  "acceptance": [
+    "Pouze Git LFS checkout již downloaded Git objektů do přesných pointer/missing cest; žádná regenerace ani jiné assetové změny.",
+    "Všech12 committed LFS souborů má skutečnou délku a SHA shodné s OID, pracovní Git diff zdrojů zůstává prázdný."
+  ]
+}

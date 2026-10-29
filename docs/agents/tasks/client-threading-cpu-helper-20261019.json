@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-cpu-helper-20261019",
+  "title": "Převzít existující bounded CPU sampler do aktuální izolované scény",
+  "status": "done",
+  "dependsOn": [
+    "client-threading-character-material-init-20261019"
+  ],
+  "writePaths": [
+    ".cache/client-threading-cpu-helper-20261019/",
+    "docs/agents/handoffs/client-threading-cpu-helper-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Read-only donor .cache/client-threading-validation-20261019/combined source1fbc05af. Převzít existující samostatný SelfProfilerV2 a jeho testy z medium-cpu-profile/source gzip; žádné historickéGame/runtime/deps ani mesh overlay nepřevzít.",
+    "Změnit pouze kopii Game v vlastnícache: explicitní local query profileCpu=1, jediné vlastnictví cpuStop přímo benchmarkstate, restart/start-error/completion-error/renderer-failure/dispose/recording-end cleanup. Capture closure před odebráním benchmark; stop až po metrikách a předcallbackem, preserve original error.",
+    "Cíleně refaktorovat a ověřit skutečnou Game AST completion/lifecycle cestu, včetně scene.getActiveIndices throw a nového profilu spuštěného vcallbacku. Žádný únik profileru a žádné stop novějšího owneru.",
+    "Sampler16ms/max2000, jeden raw DOM export, žádnýraw trace v bounded sessioneventu. Výsledek je lokální diagnostický candidate, nikoli mainruntime či FPSpřejímka."
+  ],
+  "verification": [
+    "Existing helper tests + přesné Game lifecycle fixture CPU testy. Bez fullsuite/build/GPU/serverů; root provede typovou kontrolu a vlastní minified hidden-map build.",
+    "Handoff přesné vlastnísource/test/delta/hash a výsledky; žádnýcommit ani změna hranýchsnapshotů/dependencies."
+  ],
+  "notes": [
+    "KEY-40 pokračuje skutečnou atribucí transit/NPC po dokončeném KEY-41. BMAD řídí root; podagent dalšíworkflow nespouští.",
+    "19.10 checkpoint přijat: helper25/25 + fullTypes/build a šest Edge profilů, evidence main db9108ddd3d069030abebd0fcccd6ecefbd0ff53. Profilovací task neznamená přijetí workeru ani splnění KEY40. Následné cílené unit36/36+fullTypes dokončeny; procesy ukončeny."
+  ]
+}

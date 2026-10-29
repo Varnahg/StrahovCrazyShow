@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-buffer-lifecycle-20261021",
+  "title": "KEY-22: přiřadit skutečný NCM destroyed vertex buffer k životnímu cyklu a reuse",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/",
+    "docs/performance/evidence/webgpu-completion-20261021/buffer-lifecycle/",
+    "docs/agents/handoffs/webgpu-completion-buffer-lifecycle-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací zaznamenat actual NCM source36c134e1/build63ca/helperc951/f7d45a1e render-fault8435/8436/8438, buffer37326,size2048,submitted89284–89286, poslednívalidstateae0aa3c2 a pinned source/primárnípodklady/varianty. Vlastník bufferu je zatím neznámý; signature regularinstances je hypotéza, capture je2Dcopy existujícího canvasu bezRTT.",
+    "Vybraný první diskriminátor je úzký owner/reallocation/release/destroy + skutečný původní drawContext/fastBundle identity trace. Zachovat přesné původní calls/args/receiver/return/throw/Promise; actualGame scene/device/mesh filter, foreign passthrough, defaultoff. Žádné nové GPU/readiness/render/await/fence volání ani resource/Buffer lifetime změna.",
+    "Spojit původní regular-instance current/previous matrix buffer identity před/po native update se skutečným DataBuffer.uniqueId, Mesh/SubMesh/pass a před/po drawContext/fastBundle identity. Původní release/refcount a deferred destroy musí rozlišit release od skutečného destroy. Generic/untracked buffer či owner zůstane explicitně unknown; velikost ani sampler sami owner neprokazují.",
+    "Než zvolí hooky, autor porovná plný encoder/bundle/storage graph, menší owner/reallocation tap, vypnutí reuse a odklad destroy. Vybraný menší první trace nemůže vydávat odvozené bundle resource za přímo pozorované GPU setVertexBuffer/setBindGroup; pokud owner nestačí, další discriminator musí přidělit root.",
+    "Weak resource identity, pouze bounded scalar metadata/recent windows a známé source názvy; žádné držení GPU/Effect/Mesh objektů v exportu, shader/defines/credentials, silent overwrite nebo neomezený log. Reportovat history overflow/untracked/coverage a rozsah target evidence; nepředstírat úplnou historii při bounded window.",
+    "Explicitní nový flag + canonical build/load/browser seal, viditelná diagnostic informace a vlastní immutable raw receipt. Fatal original error/dispose/abort/rejoin musí zachovat poslední dostupný trace i původní chybu; helper nesmí blokovat UI cleanup nebo změnit pořadí původních listeners. Varianty event taps předem doložit z pinned source.",
+    "Root před zápisem uchoval22helper3673 souborů v validation/helper-runtimes/v5 a spustil build40c566/preview18777. Tyto bytes ani starý build63ca nepřepisovat. Implementaci+cílenýrefaktor+meaningfulCPU regressions/hashproof předat společně, žádný child build/server/GPU/commit."
+  ],
+  "verification": [
+    "Actual pinned instance buffer lifecycle a engine draw/release/deferred destroy algoritmy s fake terminalGPU/IO; přesný owner/use/realloc/refcount/fastBundle relationship a explicitně unknown jinébuffery.",
+    "Original calls/returns/false/throw/Promise/receiver, foreign scenes/devices, defaultoff a caps/bytes, synchronous original error/fatal retirement, abort/dispose/rejoin a foreign-wrapper descriptor restore.",
+    "Stávající100 helperCPU + nové cílené regrese, identity negative fixtures, syntax/UIparse, source/pin/helper/log SHA před/po a zachování frozenv4/v5. Žádná performance nebo skutečnáGPU tvrzení z CPUtestu."
+  ],
+  "notes": [
+    "Upstream primární příbuzný příklad https://github.com/BabylonJS/Babylon.js/pull/18238/files dokládá NCM baked GPU handles a resetDrawCache při změně per-pass VBO, ale mění SelectionOutlineLayer, kterou naše aplikace nemusí používat; nejde o přímé přiřazení našeho bufferu nebo automatický patch.",
+    "Žádná opravadefaultu/cachereuse/destroy/instancing policy, nový pinpatch nebo timeout. Nejdřív skutečný buffer owner; obecný odklad destroy/fence by mohl maskovat stálý stale bundle.",
+    "Root zrovna provádí oddělený CM8routine GPU profil. Child před testy oznámí plán a případné krátké měřicí okno respektuje; souběžný fullsuite/build/GPU je zakázán. Žádný rekurzivníBMAD."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-standard-lod-define-proof-20261018",
+  "title": "KEY-31: ověřit stabilní Standard LOD define při skutečné WebGPU capability",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-standard-lod-define-proof-20261018/",
+    "docs/agents/handoffs/webgpu-standard-lod-define-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zdokumentovat celý pinned Standard/IBL/capability/key řetězec a rozumné varianty před změnou privátního kandidáta.",
+    "Reprodukovat skutečný FOG a textureLOD=true na aktuálních factory/Game materiálech bez readiness bypassu. Odlišit source CPU důkaz od GPU výsledku.",
+    "Případný nejmenší kandidát upraví pouze dvě fyzicky vlastní Standard JS/d.ts deklarace; všechny původní exposure/ownership/shadow/IBL opravy zůstanou identické.",
+    "Doložit celé defines, klíče, Effect/context reuse, lifecycle, GLSL/WGSL shader a binding parity vůči ustálenému původnímu stavu. Bez nové cache, shaderové změny, limity či etapy nezvyšovat.",
+    "Nezměnit main, native package/patch/lock, původní frozen experimenty nebo hrané buildy."
+  ],
+  "verification": [
+    "Lehký cílený CPU red/green nad fyzicky vlastními core/loaders, všechny ostatní závislosti read-only. Žádný install, build, celá sada ani GPU.",
+    "Přesný manifest preimages/changes/logs, vysvětlení neprokázaných částí, předání a uvolnění rezervace po ukončení procesů."
+  ],
+  "notes": [
+    "Actualsame-session startup79/80 vsdrive415/416 v authored-startup-trace-1 se liší pouze přítomností LODBASEDMICROSFURACE při přípravě. ShadercapabilityWebGPUtextureLODtrue; dosavadní NullEngine fixture mělafalse.",
+    "Koordinátor root zadává navazující úzký proof v rámci BMAD kroku03. Žádný rekurzivní workflow; GPU přejímku případného kandidáta provede root."
+  ]
+}

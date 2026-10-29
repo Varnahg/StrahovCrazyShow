@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-authored-light-candidate-20261018",
+  "title": "KEY-31: připravit skutečné authored přijímače v automobilových světelných etapách",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-authored-light-candidate-20261018/",
+    "docs/agents/handoffs/webgpu-authored-light-candidate-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze copied kandidát nad frozen grass-preparation-v2 4a968ff7. Žádné native/primary/dependency/hranýbuild změny. Zachovat celých41etap,30s/pass/90s, původní readiness a WebGL chování.",
+    "Povolené copied runtime: nový client/authored-light-preparation.ts a client/game.ts. Testy: nové tests/authored-light-preparation.test.ts a tests/game-authored-light-preparation.test.ts; existující game-light-preparation, game-low-vehicle-preparation a game-quality-preparation pouze potřebné dependency wiring se zachováním assertions. Další soubor předem koordinovat.",
+    "Scoped alwaysSelectAsActiveMesh lease jen na skutečných enabled/visible authored Mesh reprezentantech: mesh.metadata.sourcePack architecture-reality s material.metadata.exteriorOnlyGlass, a outdoor-artifacts. Žádné názvy jako identita; B6 transparent room glass/nesouvisející meshe a disabled objekty neaktivovat.",
+    "Deduplikace podle skutečné material identity a relevantního vertex/layout/shadow/instance vstupu; nepředpokládat, že stejný material automaticky znamená stejný program. Zvláštní nepodporované geometrie výslovně neprohlašovat za pokryté. Žádné clone, novébuffery/materialy, shadercache, PersistentMode, změny kamery/actor/physics/network/světel nebo běžná per-frame práce.",
+    "Aktivovat pouze v existujících dvou low WebGPU vehicle etapách, po skutečné world/LOD prezentaci a před ready/draw. Každé opakované apply/restart má platný výběr. Před player etapami a na restore/cancel/error/timeout/dispose obnovit pouze vlastní původní flag konkrétního stáleživého mesh; starý cleanup nesmí přepsat novější lease/náhradu nebo cizí změnu.",
+    "Výsledek musí být doložen ze STUDENÉHO původně opačného/neaktivního pohledu: helper aktivní jen vehicle0/1, potom všechny zbývající etapy/quality a skutečný deferredcleanup, car1/0/1/0 bez nových cílovýchprogramů. Ověřit low první i poslední průchod; samotný proof s41aktivními etapami tento kontrakt neprokazuje.",
+    "Pokud dvě etapy kvůli doložené historii Standard _keys/USESPHERICALFROMREFLECTIONMAP nebo jiné příčině nestačí, zachovat failure a vrátit přesný důkaz koordinátorovi. Automaticky nerozšiřovat na41etap, nepřidávat cache ani shader/serializer/patch změny. NPC8 a celkováperformance zůstávají otevřené."
+  ],
+  "verification": [
+    "Cílené CPU regrese skutečného výběru, rozdílných atributů/shadow stavů, původníchtrue flags, opakování/stale cleanup, missingenabled reprezentantů, LOD/replacement/disposal a chyb. Žádné změny běžných world flags po ready.",
+    "Actual architecture53929057/outdoor4002100657+Cinematic+Game fixture z přijatého proofu, ne generické materiály. Zachovat explicitní canvas/TextureIO/NullEngine limity. Ze studeného opposite view přesně obělowvehicle etapy a zbyléquality, wholedefines/Effect/context reuse, skutečné camera-passdraws a deferredcleanup. Původní WebGL a původní testy musí projít.",
+    "Lehké targeted CPU pouze; žádný fullTS/fullsuite/build/GPU/server/install/commit. Manifest exact copied preimages/results, všechny pokusy, refaktoring a handoff/release. Root provede fullTS/build a produkční GPU6→0 s původními budgety."
+  ],
+  "notes": [
+    "Proof320b3d54, finalfixturec8316c64/report998c0f49:3/3PASS. Covered41→0/0/0/0, opposite0/41→actualalignyawπ→0→3/3/0/0. Cap4, žádnýdispose. Standard mezi historiemi jediný USESPHERICALFROMREFLECTIONMAP value true vobou, _keyscoveredtrue/coldfalse; PBRwholedefinesexact. Nezávisléreview[] s výslovným požadavkem otestovat právě cold2stage hranici kandidáta.",
+    "Cílené použití původních meshů je menší než nový camera-view lease a nemá retenční náklady clone. Plošnýall-meshwarm a41stage rozšíření mají širší dosud neměřenou cenu. Žádnázměna sourcegeometrie či vzhledu.",
+    "AktivníBMADspec-key-31-long-frame-gaps pokračuje v kroku03; userpriorita plynuléhraní. Hrané4197 a nověpublikovaný immutable4198 s předchozí FAR opravou se nesmějí měnit.",
+    "V1 outcome rejected-cold-two-stage-contract, manifestcacdb353. VobouC5pořadích car1reuse0/car0new2Standard pouze+USESPHERICALFROMREFLECTIONMAP. PBRreuseexact, flagsrestored,0disposed/cap4. Kandidát nemá fullTS/GPU/legacy/lifecyclepřejímku a neníintegrovaný; čeká na nový izolovaný IBLdefineproof a nativeinitparitu."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-authored-fog-proof-20261018",
+  "title": "KEY-31: doplnit skutečnou mlhu do reprodukce tří zbývajících programů skla",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-authored-fog-proof-20261018/",
+    "docs/agents/handoffs/webgpu-authored-fog-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Převzít pouze kopii aktuálního skutečného factory/Game reproduktoru a read-only závislosti; frozen zdroje, vendor, main a hrané buildy neměnit.",
+    "Nastavit přesný konstruktorový FOGMODE_EXP a density0,0018, zopakovat původní 41etap a 1/0/1/0 replay. Porovnat úplné defines, Effect/context a skutečný deferred cleanup.",
+    "Odlišit prokázanou chybějící FOG větev fixture od neprokázané příčiny GPU rekompilace. Bez změny readiness, timeoutů, shaderu, cache či přidání diagnostické vrstvy."
+  ],
+  "verification": [
+    "Lehký cílený CPU test skutečných materiálů, source/dependency hash a původní assertions zachované; žádný build, GPU nebo celá sada.",
+    "Předání průzkumu, variant, výsledku i známých omezení koordinátorovi; po ukončení vlastního procesu uvolnit claim."
+  ],
+  "notes": [
+    "Root18.10 autorizuje přímé pokračování BMAD kroku03 bez rekurzivního workflow. ActualGPU authored-attribution-1 přiřadil3novéprogramy sklu:0 0L3,0 1L3,0 0L2. OutdoorPBR není mezi novými požadavky.",
+    "Read-only source audit render_diagnosis potvrzuje pouzeFOG jako rozdíl vůči passingCPU; actualGame jej nastavuje užpředpřípravou. Proof nemusí býtRED a nesmí být vydávánzaGPUdůkaz."
+  ]
+}

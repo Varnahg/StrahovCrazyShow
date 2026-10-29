@@ -1,0 +1,58 @@
+{
+  "atUTC": "2026-10-24T02:24:40.397Z",
+  "decision": "Accept finite source/CPU correction; actual GPU fix remains unaccepted until new immutable run.",
+  "authorOwnedFilesVerified": 41,
+  "authorSealSha256": "0d224fe7dbcfd3252802fe15e4828d1915275f2ca013b89e4556a35cbb6d3074",
+  "authorHandoffSha256": "710e89ceb0152c6e3aff68bd6eac39ddbbe230dca7bce4a3de3a664689cda7d4",
+  "source": {
+    "path": "client/authored-light-preparation.ts",
+    "sha256": "02e353f49b128a602b44c669c842a57fd4c574aef483109dc14c5617a85e6168"
+  },
+  "regression": {
+    "path": "tests/receiver-light-preparation.test.ts",
+    "sha256": "7b9dcb06057ae577f8baba316f67b7de8e2d55357b1ac7987a9dd81ce7476b19"
+  },
+  "sourceDriftFromAuthor": [
+    "client/authored-light-preparation.ts"
+  ],
+  "native39Drift": [],
+  "helper36Drift": [],
+  "peerReviews": [
+    {
+      "reviewer": "webgpu_renderer_audit",
+      "findings": [],
+      "scope": "Product/test diff, exact RED/GREEN/broader proof, current39, full target key car-union comparison; not new public seal or scoped types."
+    },
+    {
+      "reviewer": "webgpu_performance_audit",
+      "findings": [],
+      "scope": "Product/test diff, exact RED/GREEN/broader proof, current39, original41seal and full target key car-union; not new public seal or scoped types."
+    }
+  ],
+  "results": {
+    "red": {
+      "pass": 22,
+      "fail": 4,
+      "skipped": 0
+    },
+    "green": {
+      "pass": 26,
+      "fail": 0,
+      "skipped": 0
+    },
+    "broader": {
+      "pass": 69,
+      "fail": 0,
+      "skipped": 0
+    },
+    "explicitTypeRoots": 5,
+    "typeDiagnostics": 0,
+    "syntaxDiagnostics": 0
+  },
+  "lifecycle": "Only geometry attribute reads changed. No new cache/lease/timer/stage/light/actor/camera state; custom-instance and genuine geometry-divisor guards retained.",
+  "open": [
+    "Actual WebGPU startup time with restored receiver work under original 30/90 limits.",
+    "Actual first F and remaining shadow programs after avatar edit.",
+    "Final functional/image/performance matrix, default/main/KEY22."
+  ]
+}

@@ -1,0 +1,38 @@
+diff --git a/docs/agents/architecture.md b/docs/agents/architecture.md
+index 166dff4..5fb3fdd 100644
+--- a/docs/agents/architecture.md
++++ b/docs/agents/architecture.md
+@@ -104,3 +104,11 @@ Trvající nároky z [ověření](../verification.md) a [README](../../README.md
+ [scripts/performance-snapshot.mjs](../../scripts/performance-snapshot.mjs) kopíruje zdroje, assety **i testy**, klíčovou konfiguraci a stadium fixture `docs/reality-pack/landmarks/geometry-source.json` do `.cache/performance-snapshot/<jméno>`, porovnává SHA před/po kopii a zachovává velké zdrojové balíčky. Zbytek průběžně měněné dokumentace není runtime snapshot. Nová testová datová závislost mimo zahrnuté adresáře vyžaduje vědomou aktualizaci snapshotu.
+ 
+ Při tomto dokumentačním průzkumu byly čteny skutečné soubory, importy, generátory, lockfile a historická evidence; nebyly spouštěny servery, generátory assetů, full suite, build, integrace ani GPU měření. Platnost cest a místních odkazů tohoto dokumentu byla zkontrolována samostatně.
++
++## Automatické lokální záznamy — doplnění 13. 10. 2026
++
++Na výslovné zadání uživatele nyní lokální stránka spouští `client/session-diagnostics.ts` z `client/main.tsx` automaticky; `client/game.ts` a `client/ui.tsx` poskytují časování, kontext a technické události. `shared/session-diagnostics.ts` určuje omezený sanitizovaný formát, `server/session-diagnostics.ts` ukládá dávky do ignorované `.cache/game-diagnostics/`. Nastavení ani export není potřeba zapínat. Toto je samostatná cesta od desetisekundového benchmarku a nezastavuje adaptivní kvalitu.
++
++Při následném hlášení problému načti existující lokální záznamy sám: `node scripts/diagnostics-report.mjs --all --json`, následně vyber odpovídající relaci/čas a případně čti její JSONL. Nejnovější relace může být vlastní kontrolní browser; porovnej čas, režim, zdrojovou identitu a události, než ji přiřadíš uživateli. Nevyžaduj ruční start FPS testu ani export, pokud automatický záznam existuje. Provozní stdout/stderr původního dev serveru zůstávají v jeho vlastním handoffu.
++
++Log je omezený časovou/místní retencí a může obsahovat explicitní mezery. Zdroje pozorované při serverovém příjmu nejsou důkazem totožnosti dříve načteného dev klienta; produkční klient ukládá také svůj build snapshot ID. Pravidla interpretace, příkazy a limity jsou v [automatic-diagnostics.md](../performance/automatic-diagnostics.md), skutečné ověření v [předání integrace](handoffs/automatic-diagnostics-integration.md). Záznam běžného hraní není sám o sobě srovnávací GPU přejímka.
+diff --git a/docs/agents/tasks/publish-research-20261014.json b/docs/agents/tasks/publish-research-20261014.json
+index 3c004f6..acb160e 100644
+--- a/docs/agents/tasks/publish-research-20261014.json
++++ b/docs/agents/tasks/publish-research-20261014.json
+@@ -2,7 +2,7 @@
+   "schemaVersion": 1,
+   "id": "publish-research-20261014",
+   "title": "Samostatně commitovat předaný výzkum a postup práce14.10 bez runtime změn",
+-  "status": "ready",
++  "status": "done",
+   "dependsOn": [],
+   "writePaths": [
+     "docs/performance/research-20261014/b6-render.md",
+@@ -23,6 +23,7 @@
+   ],
+   "notes": [
+     "Root je výslovný příjemce všech tří předání; adopt-dirty je doložený převod, ne bypass.",
+-    "Globální admin vlastník držíAGENTS/taskcatalog, research-integration vlastníkdecision-register; stejnýroot sestaví jeden soudržný doc commit."
++    "Globální admin vlastník držíAGENTS/taskcatalog, research-integration vlastníkdecision-register; stejnýroot sestaví jeden soudržný doc commit.",
++    "Výzkum commitnutý do lokální main10fa69b057b90696f1eaadc0b520caceb0dfbf44; publikačnírezervaceuvolněná, žádnéhelpery."
+   ]
+ }

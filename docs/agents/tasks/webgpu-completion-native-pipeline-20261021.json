@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-native-pipeline-20261021",
+  "title": "KEY-22: ověřená async startup pipeline příprava v nativním NCM",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/webgpu-pipeline-preparation.ts",
+    "tests/webgpu-pipeline-preparation.test.ts",
+    "tests/webgpu-native-pipeline-preparation.test.ts",
+    "docs/performance/evidence/webgpu-completion-20261021/native-pipeline/",
+    "docs/agents/handoffs/webgpu-completion-native-pipeline-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdříve pinned9.30 primární zdroje, skutečný NCM timeout a varianty včetně ponechání CM, async NCM a odmítnutých nepravdivých readiness/timeout zkratek; příčina synchronní cesty není automaticky důkaz výkonového přínosu.",
+    "Startup-only async adapter podporuje skutečné NCM draw, null-pass clear, render bundles a fastBundle cache bez předání Promise/nepřipravené pipeline encoderu, bez změny descriptoru nebo geometrie/materiálů.",
+    "Výsledky z Promise vkládá pouze další skutečný pinned cache miss. Zachovat bounded64 pending i completed entries, device/effect identity, incomplete RTT retry a jeden aktivní vlastník; žádný globální cache reset nebo runtime mode flip.",
+    "Implementace a cílený refaktoring zachovají ověřený CM i WebGL inert kontrakt, všechny readiness podmínky a původní timeouty. Actual NCM výkon/startup a obraz přijímá až kořen v novém neměnném buildu."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy včetně skutečné pinned draw/clear/cache/bundle cesty s náhradou pouze terminálního GPU IO.",
+    "Ověřit miss/pending/completion/native insertion/fastBundle reuse, dirty rebind, regular a thin instances, null clear, RTT retry, attachments/samples, bounds, rejection/abort/dispose a mode drift.",
+    "Předat seznam přesných souborů, SHA, příkazy a meze důkazů; žádný full build/server/GPU v tomto tasku."
+  ],
+  "notes": [
+    "21.10 NCM source80395553/build14983724 receipt45291133: původní30s low timeout,315sync/0async; původní scope/fence completion se překrývá≈20,7s. Jde o completion wall latency, nikoli určení GPU execution nebo CPU compiler bottlenecku.",
+    "Současný adapter záměrně odmítá compatibilityMode=false; samotné odstranění guardu nestačí. NCM ClearQuad.clear(null) současná boundary obchází, draw fastBundle přežívá záměrně a musí zůstat správně dirty/insertion vlastnictví.",
+    "Současně root řeší oddělený CM final-gate shader churn; tento task nepřebírá Game, render-startup, helper ani jejich cache. Child nespouští další BMAD workflow, necommitne a po předání uvolní rezervaci."
+  ]
+}

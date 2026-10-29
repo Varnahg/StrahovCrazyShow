@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-rag-full-validation-20261029",
+  "title": "Docker full: izolované přijetí prvního startu, restartu a přenosného seedu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/docker-rag-full-validation-20261029/",
+    "docs/agents/handoffs/docker-rag-full-validation-20261029.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:4294"
+  ],
+  "acceptance": [
+    "Nad dokončeným stabilním bootstrap/packaging/seed checkpointem vytvořit immutable snapshot ve vlastní cache se source/test/input hashi. Jeden plný runtime image build sdílet mezi dvěma výslovně izolovanými testovacími Compose projekty; žádné root dependencies/dist ani změny vstupů během validace.",
+    "Ověřit zdokumentovaný jediný Compose příkaz od prázdného vlastního volume: automatické credentials/role/migrace/seed import, game health a skutečné runtime omezené DB připojení. DB host port nepublikovat; testovací HTTP pouze na rezervovaném4294.",
+    "Použít pouze jasně falešný API key soubor. Schválený seed je101 dokumentových vektorů (45legacy title-locator-text-v1 a56v3 title-heading-text-v2, oba OpenAI large3072) a jeden v3 bundle. Ověřit úplné cache pokrytí a doložit0 API pokusů/volání; samotný falešný klíč není důkaz. Žádné reálné OpenAI volání nebo obnovení starého placeného budgetu.",
+    "Ověřit ACL: game reader nesmí migrovat/zapisovat, ingester nemá owner oprávnění a owner secrets nejsou ve hře nebo public artefaktech. Citlivé runtime hodnoty se neobjeví v image/client/Git/logu; výpis Compose config pouze s bezpečnými testovacími hodnotami.",
+    "Restart téhož projektu/volume musí zachovat credentials, heads a cache bez nových API pokusů. Druhý vlastní prázdný projekt/volume ověří přenos veřejného seedu stejným již sestaveným image; projekty se stejným host portem provozovat postupně.",
+    "Ověřit konkrétní bezpečné selhání (například neplatný seed nebo chybějící secret) bez poškození posledních platných dat a bez nekonečného retry. Žádná změna původního strahov-rag-20261028 volume/DB, frozen služeb nebo cizího Docker projektu.",
+    "Před buildem znovu ověřit disk/RAM/port a identitu vlastních projektů. Žádný Docker prune/restart Desktop, GPU nebo herní prohlížeč. Vlastní pomocníky/kontejnery/network/test volumes uklidit jen podle přesných doložených project labels/identity; před release ověřit port4294 volný a nezměněný chráněný původní volume."
+  ],
+  "verification": [
+    "Provést skutečný build/start/health/ACL/restart/second-project seed import a safe-failure scénář, zaznamenat exit kódy, počty dokumentů/vektorů/profile identities/cache/attempt ledger před a po. Zdokumentovat přesný image/source hash a rozdíl mezi doloženou lokální přenositelností a neprovedeným fyzickým testem na druhém notebooku.",
+    "Fake/unit testy z komponent nejsou náhradou tohoto Docker přijetí; před plnou pipeline převzít stabilní komponentové výsledky a jejich cílený refaktoring. Zdrojové chyby předat vlastníkům jejich scopes, validační task mění pouze svou cache/handoff.",
+    "Explicitní nástroje bez host-root pnpm exec/run nebo instalace. Docker image používá vlastní zamčené dependencies podle přijatého Dockerfile. Žádné tajné hodnoty v diagnostice.",
+    "Jeden stručný handoff a společné review funkčního celku; zachovat původní neúspěšné pokusy a skutečné limity, nevydávat seed dosavadního korpusu za celý automatický crawler."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Konkrétní plán autorizovaného koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d pro uživatelem požadovaný jednoduchý Docker celek.",
+    "Seed handoff přečten: export45+56 přes whitelist/READ ONLY, původní legacy head/90cache a scratch head/56cache zachované, kontejner vrácen stopped, API0. Lokálně ověřen počet101, rozdělení45/56 input profilů a jeden v3 bundle; nejde o vlastní zopakování DB auditu.",
+    "Koordinátor hlásil C47GB/D13GB volných a jeden přibližně5GB runtime image sdílený projekty. Jde o plán kapacity, nikoli garanci aktuálního volného místa; preflight musí být čerstvý.",
+    "Při registraci nejsou heavy/workspace-build/4294 v jiném aktivním claimu. Ready není spuštění před vlastním claimem, hotovým checkpointem a skutečnou kontrolou procesů.",
+    "29.10.2026 přijato jako KEY70 v PR39/main9fbc76477bfd941bc3a71bc8dbc5ad645af4ebd2. Exact-head verify/secrets/project-acceptance success na94a0cc32, merge tree e3ed142a6b8633f8808adff164d26b7b2b5c9c32 shodný a D main ff-only/clean/0-0. Skutečné Docker fresh/restart/druhýprojekt/ACL/safe-failure a101vectors/0attempts doložené v handoffu. Done nepokrývá celý crawler, všechny katalogové zdroje, fyzický druhý notebook ani WebGPU timeout. Policy-blokovaný volitelný cleanup se neopakuje."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "playtest-diary-timeline-20261016",
+  "title": "Pohybový deník: kontrakt a časová osa",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/playtest-diary.ts",
+    "client/playtest-timeline.ts",
+    "tests/playtest-diary-contract.test.ts",
+    "tests/playtest-timeline.test.ts",
+    "docs/agents/handoffs/playtest-diary-timeline-20261016.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Run/game/frame/action contract, batches of real inputs with tick/epoch/source; 10Hz actor/render/camera records; bounded2s/512 ring and2s postincident; requested/applied/rejected distinction.",
+    "Implement, refactor and targeted CPU tests together; no Game/UI/server entrypoint edits."
+  ],
+  "verification": [
+    "Read current AGENTS/architecture/coordination/current-work; inspect actual claims; claim unique owner before writes.",
+    "Own targeted CPU regressions, research primary sources and compare options before implementation; handoff source/test hashes and process cleanup. No heavy/GPU work in this task."
+  ],
+  "notes": [
+    "Requested by coordinating chat01a141c7-d77f-72c2-8709-5cb930572b0b after explicit user authorization there; proposed coordinator diary-01a141c7-root. Created by current catalog owner; this definition is not an active claim.",
+    "Use isolated worktree based on final flashlight main (not stale9d98ffc after subsequent integration). Frozen4188 and its borrowed node_modules remain immutable.",
+    "Game/UI and broad historical WIP are not transferred merely by this task. Wait for documented source handoff and reservation release; no adoption based on age.",
+    "Disjoint module implementation may proceed once its own reservation succeeds; coordinate shared contract through diary coordinator."
+  ]
+}

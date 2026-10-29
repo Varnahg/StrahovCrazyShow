@@ -1,0 +1,214 @@
+{
+  "startedUTC": "2026-10-23T15:07:11.754Z",
+  "completedUTC": "2026-10-23T15:07:34.740Z",
+  "scope": "Targeted CPU/semantic TypeScript only. Actual Game AST/controllers and Babylon NullEngine; explicit read-only source8 native JS/declaration overlays in owned tooling. No fullsuite/build/install/GPU/performance/default/main acceptance.",
+  "before": {
+    "source": {
+      "client/game.ts": "eab405a77a255bbb1cf5e054bcca918cd289426073e6393acb80c897b951d613",
+      "client/light-preparation.ts": "86a53f8772d08303a034d5d00366e46f052da9cfb0a3c7109cf2a74b515385b9",
+      "client/render-quality-preparation.ts": "607ee5ea4aca58578df90d2e165f9940231f833016e1db9014ebbcdb05b06a35",
+      "tests/game-authored-light-preparation.test.ts": "a189da84c5fecc54d2605e99c69009053411ffb5d88bd6b27e51e31dace11afd",
+      "tests/game-light-preparation.test.ts": "bcc17f2efb159eae4a0120276253d5213391c4a0c4bccc95701b567c305e748c",
+      "tests/game-low-vehicle-preparation.test.ts": "dd6596db041280973ce7810d8b7b282a9ff8c8a14bb1ff24536bc042eb32c5d9",
+      "tests/game-quality-preparation.test.ts": "f741c9c5f3c623b9ffc093e5b40a271cd03e627029b92ac42143205587500d2c",
+      "tests/render-quality-preparation.test.ts": "e84465b1eb717fe151de34db342f752b1aa77b6236ab3c3476b4866ae0d02760",
+      "tests/startup-preparation-loop.test.ts": "f7d9bc33c19268d4d3467b4e898e36ffdd6321b9ea2a963c28d3afbc572a731e"
+    },
+    "tests": {
+      "tests/game-authored-light-preparation.test.ts": "a189da84c5fecc54d2605e99c69009053411ffb5d88bd6b27e51e31dace11afd",
+      "tests/game-light-preparation.test.ts": "bcc17f2efb159eae4a0120276253d5213391c4a0c4bccc95701b567c305e748c",
+      "tests/game-low-vehicle-preparation.test.ts": "dd6596db041280973ce7810d8b7b282a9ff8c8a14bb1ff24536bc042eb32c5d9",
+      "tests/game-quality-preparation.test.ts": "f741c9c5f3c623b9ffc093e5b40a271cd03e627029b92ac42143205587500d2c",
+      "tests/render-quality-preparation.test.ts": "e84465b1eb717fe151de34db342f752b1aa77b6236ab3c3476b4866ae0d02760",
+      "tests/startup-preparation-loop.test.ts": "f7d9bc33c19268d4d3467b4e898e36ffdd6321b9ea2a963c28d3afbc572a731e",
+      "tests/startup-preparation-view.test.ts": "fc7083c8121a1bd29855c77aae09f24eb1891909d7d6be4147fe8c0432f1bf20",
+      "tests/game-webgpu-startup.test.ts": "735febc50b72252e4e3acf33283501565eb294642632f386645e3b0c6da73160",
+      "tests/game-preparation-baseline.test.ts": "be37e65ec4e707a56b8a2bd4ee4782abceacf1dd6dbb9dd16c5ee7cd2119d6c1",
+      "tests/game-preparation-scheduler.test.ts": "acb66d8ff421da3fb21c6a33852d0d1ecf2ed9c6e46cdf6601120790aa62d504",
+      "tests/game-light-lifecycle.test.ts": "472a7b77df8eeb960ff8ab7432bbb8de20f446af3f449c91664456837dc02c33",
+      "tests/light-preparation.test.ts": "acd1725adb403c71bc12b8abf9eca23372dd44ba4da8f731ff1b6799a08148bf",
+      "tests/vehicle-lighting.test.ts": "853f89942bb96e872526208c87e23b8a325ae71dfcc79a9e2c40007806f1f0b0",
+      "tests/authored-light-preparation.test.ts": "6bcbdd8d996e9322cf38b56ec61fd89ffc1ac0d678382a488664a63b5e8a83ed"
+    },
+    "protected": {
+      "client/ui.tsx": "b01b114c2ef1f2076d80d7e81bf232449e1c3003fa9818bf70e40714cbb8b3f9",
+      "client/startup-preparation-view.ts": "49840dc43a276d9479a599114f76d0af6fa4da67bd6f4dfc778d35a92f6cdd95",
+      "client/render-startup.ts": "bd15587d199abce9f9c7833309d175041ca4ef389b8a1803499400b105db0661",
+      "client/startup-preparation-loop.ts": "ea9407a613ece5349320057a528f619cd57d9e08f869f6394a5547c83c09d77f",
+      "client/vehicle-lighting.ts": "7903f0be0f4b98affc599d7c9cb323581fa482b640b969d9ffc90eb433461891",
+      "client/authored-light-preparation.ts": "1b455b8a87995433fdf79e59965d11453fca514fbeb055166ac21283c03c6a18",
+      "client/art-lighting.ts": "16da0c493cb8b06fe5e8664753de52a5f43ae4a8ae8f78417cdd77385dafc80a",
+      "client/render-health.ts": "75f4dd319014ce747f4d5c3ef988f32284d35a4fc07fa95c8bf0e72ac62214b2",
+      "client/webgpu-validation.ts": "96b0d8b8104064baa94d64c410cfd9b5a28d98e6f769e153cfe77f85aee8ae2f",
+      "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+      "package.json": "52c317376b3fa3c0d9fe64614adc52adff6caab52a9d6b35f611ca026d7743ee",
+      "pnpm-lock.yaml": "8e6b4519cfc712b4a83a6fd893ddc37192836f582e6c4a2b95d187e03a277936",
+      "patches/@babylonjs__core@9.30.0.patch": "e82638ea49de7d93b13e1a5e5c57beb92e2d083ec5a7617f978e28a0dac8c43f",
+      "client/webgpu-shadow-readiness.ts": "9bf2f9ba307685920a18ca4e31a9db7f25c61f452ab9454d0c89b90d21236965",
+      "tsconfig.json": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c"
+    },
+    "freshNative": {
+      "Meshes/mesh.pure.js": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/PBR/pbrBaseMaterial.pure.js": "fc3a71a18055e31c9e222a81294ad352d5d8a2088d97a65b04b208402302fbf5",
+      "Lights/Shadows/shadowGenerator.js": "2c094f0c900a6cffd385a17fe8e0ceafe04b801d0e4bb460784ca22223bd62ac",
+      "Engines/webgpuEngine.pure.js": "b419f3d8b06ad05ba521ec3596eefaa8d8fb408365d2824c3ac4f7a694f4a7b7",
+      "Engines/WebGPU/webgpuQuerySet.js": "d4b574db1da2207178b87280e6df60a42ffcfff206a1d5e109d69a1571adbc73",
+      "Engines/WebGPU/webgpuTimestampQuery.js": "7886c1e5c770c7b8783f7319151e22b47464f7dd8294f7be674dd78600772a53",
+      "Engines/WebGPU/webgpuOcclusionQuery.js": "6daf97a575f58e00b75e2dd2492bc321bd6ca46cdb03827053bc1543d6a5920f",
+      "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+    },
+    "installedNative": {
+      "Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/PBR/pbrBaseMaterial.pure.js": "fc3a71a18055e31c9e222a81294ad352d5d8a2088d97a65b04b208402302fbf5",
+      "Lights/Shadows/shadowGenerator.js": "2c094f0c900a6cffd385a17fe8e0ceafe04b801d0e4bb460784ca22223bd62ac",
+      "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+      "Engines/WebGPU/webgpuQuerySet.js": "dfdffba837c0fd9bed0233bdc4dd3545a665ac84cbd2e98a9005abefe817c4be",
+      "Engines/WebGPU/webgpuTimestampQuery.js": "4756adfa1c0ac4a8777150f953071e3539aac5fa67db9034a6a5391cf87f82d6",
+      "Engines/WebGPU/webgpuOcclusionQuery.js": "30fc4e30e73dfdd5092d4e354efeced45225fcb4f0be264d8b8d537498e8bf30",
+      "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+    }
+  },
+  "after": {
+    "source": {
+      "client/game.ts": "eab405a77a255bbb1cf5e054bcca918cd289426073e6393acb80c897b951d613",
+      "client/light-preparation.ts": "86a53f8772d08303a034d5d00366e46f052da9cfb0a3c7109cf2a74b515385b9",
+      "client/render-quality-preparation.ts": "607ee5ea4aca58578df90d2e165f9940231f833016e1db9014ebbcdb05b06a35",
+      "tests/game-authored-light-preparation.test.ts": "a189da84c5fecc54d2605e99c69009053411ffb5d88bd6b27e51e31dace11afd",
+      "tests/game-light-preparation.test.ts": "bcc17f2efb159eae4a0120276253d5213391c4a0c4bccc95701b567c305e748c",
+      "tests/game-low-vehicle-preparation.test.ts": "dd6596db041280973ce7810d8b7b282a9ff8c8a14bb1ff24536bc042eb32c5d9",
+      "tests/game-quality-preparation.test.ts": "f741c9c5f3c623b9ffc093e5b40a271cd03e627029b92ac42143205587500d2c",
+      "tests/render-quality-preparation.test.ts": "e84465b1eb717fe151de34db342f752b1aa77b6236ab3c3476b4866ae0d02760",
+      "tests/startup-preparation-loop.test.ts": "f7d9bc33c19268d4d3467b4e898e36ffdd6321b9ea2a963c28d3afbc572a731e"
+    },
+    "tests": {
+      "tests/game-authored-light-preparation.test.ts": "a189da84c5fecc54d2605e99c69009053411ffb5d88bd6b27e51e31dace11afd",
+      "tests/game-light-preparation.test.ts": "bcc17f2efb159eae4a0120276253d5213391c4a0c4bccc95701b567c305e748c",
+      "tests/game-low-vehicle-preparation.test.ts": "dd6596db041280973ce7810d8b7b282a9ff8c8a14bb1ff24536bc042eb32c5d9",
+      "tests/game-quality-preparation.test.ts": "f741c9c5f3c623b9ffc093e5b40a271cd03e627029b92ac42143205587500d2c",
+      "tests/render-quality-preparation.test.ts": "e84465b1eb717fe151de34db342f752b1aa77b6236ab3c3476b4866ae0d02760",
+      "tests/startup-preparation-loop.test.ts": "f7d9bc33c19268d4d3467b4e898e36ffdd6321b9ea2a963c28d3afbc572a731e",
+      "tests/startup-preparation-view.test.ts": "fc7083c8121a1bd29855c77aae09f24eb1891909d7d6be4147fe8c0432f1bf20",
+      "tests/game-webgpu-startup.test.ts": "735febc50b72252e4e3acf33283501565eb294642632f386645e3b0c6da73160",
+      "tests/game-preparation-baseline.test.ts": "be37e65ec4e707a56b8a2bd4ee4782abceacf1dd6dbb9dd16c5ee7cd2119d6c1",
+      "tests/game-preparation-scheduler.test.ts": "acb66d8ff421da3fb21c6a33852d0d1ecf2ed9c6e46cdf6601120790aa62d504",
+      "tests/game-light-lifecycle.test.ts": "472a7b77df8eeb960ff8ab7432bbb8de20f446af3f449c91664456837dc02c33",
+      "tests/light-preparation.test.ts": "acd1725adb403c71bc12b8abf9eca23372dd44ba4da8f731ff1b6799a08148bf",
+      "tests/vehicle-lighting.test.ts": "853f89942bb96e872526208c87e23b8a325ae71dfcc79a9e2c40007806f1f0b0",
+      "tests/authored-light-preparation.test.ts": "6bcbdd8d996e9322cf38b56ec61fd89ffc1ac0d678382a488664a63b5e8a83ed"
+    },
+    "protected": {
+      "client/ui.tsx": "b01b114c2ef1f2076d80d7e81bf232449e1c3003fa9818bf70e40714cbb8b3f9",
+      "client/startup-preparation-view.ts": "49840dc43a276d9479a599114f76d0af6fa4da67bd6f4dfc778d35a92f6cdd95",
+      "client/render-startup.ts": "bd15587d199abce9f9c7833309d175041ca4ef389b8a1803499400b105db0661",
+      "client/startup-preparation-loop.ts": "ea9407a613ece5349320057a528f619cd57d9e08f869f6394a5547c83c09d77f",
+      "client/vehicle-lighting.ts": "7903f0be0f4b98affc599d7c9cb323581fa482b640b969d9ffc90eb433461891",
+      "client/authored-light-preparation.ts": "1b455b8a87995433fdf79e59965d11453fca514fbeb055166ac21283c03c6a18",
+      "client/art-lighting.ts": "16da0c493cb8b06fe5e8664753de52a5f43ae4a8ae8f78417cdd77385dafc80a",
+      "client/render-health.ts": "75f4dd319014ce747f4d5c3ef988f32284d35a4fc07fa95c8bf0e72ac62214b2",
+      "client/webgpu-validation.ts": "96b0d8b8104064baa94d64c410cfd9b5a28d98e6f769e153cfe77f85aee8ae2f",
+      "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+      "package.json": "52c317376b3fa3c0d9fe64614adc52adff6caab52a9d6b35f611ca026d7743ee",
+      "pnpm-lock.yaml": "8e6b4519cfc712b4a83a6fd893ddc37192836f582e6c4a2b95d187e03a277936",
+      "patches/@babylonjs__core@9.30.0.patch": "e82638ea49de7d93b13e1a5e5c57beb92e2d083ec5a7617f978e28a0dac8c43f",
+      "client/webgpu-shadow-readiness.ts": "9bf2f9ba307685920a18ca4e31a9db7f25c61f452ab9454d0c89b90d21236965",
+      "tsconfig.json": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c"
+    },
+    "freshNative": {
+      "Meshes/mesh.pure.js": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/PBR/pbrBaseMaterial.pure.js": "fc3a71a18055e31c9e222a81294ad352d5d8a2088d97a65b04b208402302fbf5",
+      "Lights/Shadows/shadowGenerator.js": "2c094f0c900a6cffd385a17fe8e0ceafe04b801d0e4bb460784ca22223bd62ac",
+      "Engines/webgpuEngine.pure.js": "b419f3d8b06ad05ba521ec3596eefaa8d8fb408365d2824c3ac4f7a694f4a7b7",
+      "Engines/WebGPU/webgpuQuerySet.js": "d4b574db1da2207178b87280e6df60a42ffcfff206a1d5e109d69a1571adbc73",
+      "Engines/WebGPU/webgpuTimestampQuery.js": "7886c1e5c770c7b8783f7319151e22b47464f7dd8294f7be674dd78600772a53",
+      "Engines/WebGPU/webgpuOcclusionQuery.js": "6daf97a575f58e00b75e2dd2492bc321bd6ca46cdb03827053bc1543d6a5920f",
+      "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+    },
+    "installedNative": {
+      "Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/PBR/pbrBaseMaterial.pure.js": "fc3a71a18055e31c9e222a81294ad352d5d8a2088d97a65b04b208402302fbf5",
+      "Lights/Shadows/shadowGenerator.js": "2c094f0c900a6cffd385a17fe8e0ceafe04b801d0e4bb460784ca22223bd62ac",
+      "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+      "Engines/WebGPU/webgpuQuerySet.js": "dfdffba837c0fd9bed0233bdc4dd3545a665ac84cbd2e98a9005abefe817c4be",
+      "Engines/WebGPU/webgpuTimestampQuery.js": "4756adfa1c0ac4a8777150f953071e3539aac5fa67db9034a6a5391cf87f82d6",
+      "Engines/WebGPU/webgpuOcclusionQuery.js": "30fc4e30e73dfdd5092d4e354efeced45225fcb4f0be264d8b8d537498e8bf30",
+      "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+    }
+  },
+  "stable": true,
+  "cpu": {
+    "tests": 272,
+    "pass": 272,
+    "fail": 0,
+    "skip": 0,
+    "sourceStable": true,
+    "startedUTC": "2026-10-23T15:06:46.539Z",
+    "completedUTC": "2026-10-23T15:07:03.139Z",
+    "logSha256": "5ee75b7c35a76c990cc099b7886cbf04942036e1fdca5b4f2a9e77e7a600bf2d"
+  },
+  "types": {
+    "exit": 0,
+    "summary": "{\"roots\":9,\"diagnostics\":0,\"source8Declarations\":2780,\"declarationDrift\":0,\"logSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}",
+    "roots": 9,
+    "diagnostics": 0,
+    "declarationFiles": 2780,
+    "declarationDrift": [],
+    "proofSha256": "9598d15fd2d258a3f25e6986ed84dea80856e2d5218a730b2bd7569feff50b41",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "syntax": [
+    {
+      "file": "add-regressions.mjs",
+      "exit": 0
+    },
+    {
+      "file": "complete-tail-tests.mjs",
+      "exit": 0
+    },
+    {
+      "file": "final-proof.mjs",
+      "exit": 0
+    },
+    {
+      "file": "port-stages.mjs",
+      "exit": 0
+    },
+    {
+      "file": "port-tail.mjs",
+      "exit": 0
+    },
+    {
+      "file": "prepare.mjs",
+      "exit": 0
+    },
+    {
+      "file": "typecheck.mjs",
+      "exit": 0
+    },
+    {
+      "file": "verify.mjs",
+      "exit": 0
+    }
+  ],
+  "cacheLoaderSyntax": 0,
+  "diff": 0,
+  "runtimeInverse": {
+    "client/game.ts": true,
+    "client/light-preparation.ts": true
+  },
+  "otherGameMembersByteExact": true,
+  "red": {
+    "original": "a38a53bc0305cae57f2c068eaf560e28c3115f03706eb01b8b088f6d950b22cc",
+    "stageOnlyLate": "03f00b75426eb16c4ce0aaf6530713401c30d558e02d36fefd2f0bc4bd026736",
+    "fixedPhysicalProfiles": "8cf8a819affa20acb40d4e130608c9fe866691ade4dafd3d3dd0a577b1b2e874",
+    "previous264": "1eb7992db8cf902f8e13c3aa8f9676e3811c240b116b7ed0d5035fd1fcf2a3a8"
+  },
+  "runtime": {
+    "client/game.ts": "eab405a77a255bbb1cf5e054bcca918cd289426073e6393acb80c897b951d613",
+    "client/light-preparation.ts": "86a53f8772d08303a034d5d00366e46f052da9cfb0a3c7109cf2a74b515385b9",
+    "client/render-quality-preparation.ts": "607ee5ea4aca58578df90d2e165f9940231f833016e1db9014ebbcdb05b06a35"
+  }
+}

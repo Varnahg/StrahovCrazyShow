@@ -1,0 +1,88 @@
+{
+  "atUTC": "2026-10-24T04:05:22.605Z",
+  "headSha": "a94f61bc8b456350999a0d449062b9163a74ebad",
+  "baseSha": "9341bcef674de81abd9ae99f1afbf211672165d4",
+  "sourceSnapshotId": "eb98d2cdbafa363d1e3be5f81a3cb94f00dea05a855389547f88fe44406f3bf4",
+  "sourceFiles": 8558,
+  "testFiles": 252,
+  "nativePins": 39,
+  "coreSingleton": true,
+  "mainPatch": "965f9774f8fd436bcd699d6f54c0a1b64a318f554bb261a85aa9189828f55c49",
+  "buildId": "51c86e12aaafe7dd42155109df3f08654a0dc027ab5015d223a2e0bd85141262",
+  "servedBundleFiles": 18,
+  "backend": "Native console banners WebGL2; unchanged main default; no query",
+  "viewport": {
+    "css": [
+      1528,
+      651
+    ],
+    "internal": [
+      1528,
+      651
+    ]
+  },
+  "targeted": {
+    "pass": 64,
+    "fail": 0,
+    "skip": 0
+  },
+  "localBuild": "PASS including tsc --noEmit; existing large chunks/dynamic import warnings",
+  "localIntegration": "PASS isolated port2568",
+  "remoteCI": {
+    "verify": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40059200173",
+    "secret": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40059200154",
+    "headSha": "a94f61bc8b456350999a0d449062b9163a74ebad",
+    "conclusion": "success"
+  },
+  "browser": "PASS native Edge MP ready -> normal leave -> MP rejoin ready -> normal leave -> Guest ready/offline -> normal leave -> own tab closed",
+  "controlledFailure": "CPU only: tests execute actual UI lifecycle effect/callback AST with controlled factory/start failure, synchronous/retained/rejected/throwing leave, stale Game/Room and newer pending join, Guest isolation. No browser failure injection claimed.",
+  "performance": "No performance claim. No system collector, FPS/p95/p99/GPU execution measurement; HUD single number is not accepted evidence.",
+  "diagnostics": {
+    "originalPath": ".cache/game-diagnostics/a00f14e7-5a81-4752-b8a8-73a0973dfd01.jsonl",
+    "bytes": 658482,
+    "sha256": "b460138892b44bb693a2fb3f31d27a642059e8955ab21c8466109b0049fed3c4",
+    "rows": 90,
+    "records": 728,
+    "kinds": {
+      "session-start": 1,
+      "browser-capabilities": 1,
+      "browser-state": 2,
+      "longtask": 230,
+      "long-animation-frame": 237,
+      "resource-timing": 29,
+      "resource-window": 43,
+      "source-identity": 1,
+      "network-connecting": 2,
+      "network-connected": 2,
+      "mode-change": 3,
+      "renderer-ready": 3,
+      "network-left": 6,
+      "presentation-rate": 3,
+      "lighting-preparation": 3,
+      "webgpu-preparation-profile": 3,
+      "game-ready": 3,
+      "network-correction": 2,
+      "frame-window": 97,
+      "frame-hitch": 18,
+      "network-round-trip": 34,
+      "game-dispose": 3,
+      "pagehide": 1,
+      "session-end": 1
+    },
+    "lastKind": "session-end",
+    "declaredSourceScope": "client/server/shared/scripts/tests source and project configuration; excludes binary assets, dependencies and local logs; non-atomic working-tree observation",
+    "extraSourceSeal": "Full before/after8558 source/test/asset seal independently supplements logger working-tree identity."
+  },
+  "cleanup": {
+    "tab": "2070823893 closed after normal UI leave",
+    "serverSession": 61271,
+    "serverPid": 48648,
+    "stop": "original session CtrlC exit1, ports2568/4214/2598 empty verified; no foreign processes stopped",
+    "viewportChanged": false
+  },
+  "limitations": [
+    "This independent UI unit does not accept the wider WebGPU migration or enable WebGPU default.",
+    "Normal browser flows use the unchanged main game and dependencies, not source14/15.",
+    "Controlled failure coverage is CPU actual-effect reproduction, distinct from browser smoke."
+  ]
+}

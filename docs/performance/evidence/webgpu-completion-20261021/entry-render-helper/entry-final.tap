@@ -1,0 +1,437 @@
+TAP version 13
+# BJS - [22:04:25]: Babylon.js v9.30.0 - Null engine
+# Subtest: defaultoff has no reads/hooks/timers
+ok 1 - defaultoff has no reads/hooks/timers
+  ---
+  duration_ms: 2.4886
+  type: 'test'
+  ...
+# Subtest: MP delay does not spend8frames: native false→true at outer prepare starts timestamps before original work
+ok 2 - MP delay does not spend8frames: native false→true at outer prepare starts timestamps before original work
+  ---
+  duration_ms: 4.7704
+  type: 'test'
+  ...
+# Subtest: all original receiver/args/returns including Promise identity and falsy returns are untouched
+ok 3 - all original receiver/args/returns including Promise identity and falsy returns are untouched
+  ---
+  duration_ms: 3.932
+  type: 'test'
+  ...
+# Subtest: same original throw index0 value undefined
+ok 4 - same original throw index0 value undefined
+  ---
+  duration_ms: 0.4465
+  type: 'test'
+  ...
+# Subtest: same original throw index1 value undefined
+ok 5 - same original throw index1 value undefined
+  ---
+  duration_ms: 0.3303
+  type: 'test'
+  ...
+# Subtest: same original throw index2 value undefined
+ok 6 - same original throw index2 value undefined
+  ---
+  duration_ms: 0.2624
+  type: 'test'
+  ...
+# Subtest: same original throw index0 value null
+ok 7 - same original throw index0 value null
+  ---
+  duration_ms: 0.2284
+  type: 'test'
+  ...
+# Subtest: same original throw index1 value null
+ok 8 - same original throw index1 value null
+  ---
+  duration_ms: 0.2297
+  type: 'test'
+  ...
+# Subtest: same original throw index2 value null
+ok 9 - same original throw index2 value null
+  ---
+  duration_ms: 0.2588
+  type: 'test'
+  ...
+# Subtest: same original throw index0 value false
+ok 10 - same original throw index0 value false
+  ---
+  duration_ms: 0.3128
+  type: 'test'
+  ...
+# Subtest: same original throw index1 value false
+ok 11 - same original throw index1 value false
+  ---
+  duration_ms: 0.2372
+  type: 'test'
+  ...
+# Subtest: same original throw index2 value false
+ok 12 - same original throw index2 value false
+  ---
+  duration_ms: 0.2586
+  type: 'test'
+  ...
+# Subtest: same original throw index0 value 0
+ok 13 - same original throw index0 value 0
+  ---
+  duration_ms: 0.2171
+  type: 'test'
+  ...
+# Subtest: same original throw index1 value 0
+ok 14 - same original throw index1 value 0
+  ---
+  duration_ms: 0.1915
+  type: 'test'
+  ...
+# Subtest: same original throw index2 value 0
+ok 15 - same original throw index2 value 0
+  ---
+  duration_ms: 0.2198
+  type: 'test'
+  ...
+# Subtest: same original throw index0 value 
+ok 16 - same original throw index0 value 
+  ---
+  duration_ms: 0.1964
+  type: 'test'
+  ...
+# Subtest: same original throw index1 value 
+ok 17 - same original throw index1 value 
+  ---
+  duration_ms: 0.2404
+  type: 'test'
+  ...
+# Subtest: same original throw index2 value 
+ok 18 - same original throw index2 value 
+  ---
+  duration_ms: 0.1923
+  type: 'test'
+  ...
+# Subtest: same original throw index0 value Error: primary
+ok 19 - same original throw index0 value Error: primary
+  ---
+  duration_ms: 0.1685
+  type: 'test'
+  ...
+# Subtest: same original throw index1 value Error: primary
+ok 20 - same original throw index1 value Error: primary
+  ---
+  duration_ms: 0.1726
+  type: 'test'
+  ...
+# Subtest: same original throw index2 value Error: primary
+ok 21 - same original throw index2 value Error: primary
+  ---
+  duration_ms: 0.2928
+  type: 'test'
+  ...
+# Subtest: nested scopes overlap Scene and never inflate outer prelude; no extra original calls
+ok 22 - nested scopes overlap Scene and never inflate outer prelude; no extra original calls
+  ---
+  duration_ms: 0.7665
+  type: 'test'
+  ...
+# Subtest: phase errors remain partial without repairing original calls: out-of-order
+ok 23 - phase errors remain partial without repairing original calls: out-of-order
+  ---
+  duration_ms: 0.3881
+  type: 'test'
+  ...
+# Subtest: phase errors remain partial without repairing original calls: missing-prepare
+ok 24 - phase errors remain partial without repairing original calls: missing-prepare
+  ---
+  duration_ms: 0.1849
+  type: 'test'
+  ...
+# Subtest: phase errors remain partial without repairing original calls: recursion
+ok 25 - phase errors remain partial without repairing original calls: recursion
+  ---
+  duration_ms: 0.2534
+  type: 'test'
+  ...
+# Subtest: phase errors remain partial without repairing original calls: scene-no-progress
+ok 26 - phase errors remain partial without repairing original calls: scene-no-progress
+  ---
+  duration_ms: 1.4065
+  type: 'test'
+  ...
+# Subtest: phase errors remain partial without repairing original calls: engine-progress
+ok 27 - phase errors remain partial without repairing original calls: engine-progress
+  ---
+  duration_ms: 0.4247
+  type: 'test'
+  ...
+# Subtest: phase errors remain partial without repairing original calls: vehicle-exit
+ok 28 - phase errors remain partial without repairing original calls: vehicle-exit
+  ---
+  duration_ms: 0.3392
+  type: 'test'
+  ...
+# Subtest: single original deadline includes standby and capture, also synchronous stall before timer callback
+ok 29 - single original deadline includes standby and capture, also synchronous stall before timer callback
+  ---
+  duration_ms: 0.5121
+  type: 'test'
+  ...
+# Subtest: invalid initial clock produces truthful unavailable timestamp and clean rollback
+ok 30 - invalid initial clock produces truthful unavailable timestamp and clean rollback
+  ---
+  duration_ms: 0.2006
+  type: 'test'
+  ...
+# Subtest: invalid initial clock produces truthful unavailable timestamp and clean rollback
+ok 31 - invalid initial clock produces truthful unavailable timestamp and clean rollback
+  ---
+  duration_ms: 0.1599
+  type: 'test'
+  ...
+# Subtest: invalid initial clock produces truthful unavailable timestamp and clean rollback
+ok 32 - invalid initial clock produces truthful unavailable timestamp and clean rollback
+  ---
+  duration_ms: 0.1696
+  type: 'test'
+  ...
+# Subtest: backwards clock never replaces original result and marks incomplete evidence
+ok 33 - backwards clock never replaces original result and marks incomplete evidence
+  ---
+  duration_ms: 0.2205
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: actor
+ok 34 - exact owner retirement: actor
+  ---
+  duration_ms: 0.2277
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: scene
+ok 35 - exact owner retirement: scene
+  ---
+  duration_ms: 0.1766
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: engine
+ok 36 - exact owner retirement: engine
+  ---
+  duration_ms: 0.2268
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: device
+ok 37 - exact owner retirement: device
+  ---
+  duration_ms: 0.1625
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: health
+ok 38 - exact owner retirement: health
+  ---
+  duration_ms: 0.1566
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: generation
+ok 39 - exact owner retirement: generation
+  ---
+  duration_ms: 0.1613
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: renderer
+ok 40 - exact owner retirement: renderer
+  ---
+  duration_ms: 0.1677
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: budget
+ok 41 - exact owner retirement: budget
+  ---
+  duration_ms: 0.2195
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: stable
+ok 42 - exact owner retirement: stable
+  ---
+  duration_ms: 0.1894
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: controller
+ok 43 - exact owner retirement: controller
+  ---
+  duration_ms: 0.1618
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: current
+ok 44 - exact owner retirement: current
+  ---
+  duration_ms: 0.1808
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: healthError
+ok 45 - exact owner retirement: healthError
+  ---
+  duration_ms: 0.2094
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: unready
+ok 46 - exact owner retirement: unready
+  ---
+  duration_ms: 0.2105
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: benchmark
+ok 47 - exact owner retirement: benchmark
+  ---
+  duration_ms: 0.1758
+  type: 'test'
+  ...
+# Subtest: abort/disposal is idempotent with no late owner effects: helper-abort
+ok 48 - abort/disposal is idempotent with no late owner effects: helper-abort
+  ---
+  duration_ms: 0.2549
+  type: 'test'
+  ...
+# Subtest: abort/disposal is idempotent with no late owner effects: startup-abort
+ok 49 - abort/disposal is idempotent with no late owner effects: startup-abort
+  ---
+  duration_ms: 0.1454
+  type: 'test'
+  ...
+# Subtest: abort/disposal is idempotent with no late owner effects: scene-dispose
+ok 50 - abort/disposal is idempotent with no late owner effects: scene-dispose
+  ---
+  duration_ms: 0.186
+  type: 'test'
+  ...
+# Subtest: abort/disposal is idempotent with no late owner effects: stop
+ok 51 - abort/disposal is idempotent with no late owner effects: stop
+  ---
+  duration_ms: 0.1458
+  type: 'test'
+  ...
+# Subtest: foreign replacement/flags are preserved; own descriptors restore and prior wrapper cannot affect fresh Game
+ok 52 - foreign replacement/flags are preserved; own descriptors restore and prior wrapper cannot affect fresh Game
+  ---
+  duration_ms: 1.6715
+  type: 'test'
+  ...
+# Subtest: preflight validates all descriptors before mutation, default class drift and duplicate arm refused
+ok 53 - preflight validates all descriptors before mutation, default class drift and duplicate arm refused
+  ---
+  duration_ms: 0.4277
+  type: 'test'
+  ...
+# Subtest: partial descriptor install failure rolls back previous writes; original calls still work
+ok 54 - partial descriptor install failure rolls back previous writes; original calls still work
+  ---
+  duration_ms: 0.2631
+  type: 'test'
+  ...
+# Subtest: partial observer registration failure removes already installed abort listeners and all descriptors
+ok 55 - partial observer registration failure removes already installed abort listeners and all descriptors
+  ---
+  duration_ms: 0.4424
+  type: 'test'
+  ...
+# Subtest: ready-valid pending/controller failures refuse arm and do not mutate a descriptor
+ok 56 - ready-valid pending/controller failures refuse arm and do not mutate a descriptor
+  ---
+  duration_ms: 0.4529
+  type: 'test'
+  ...
+# Subtest: synchronous scene replay during registration retires late observer before timer installation
+ok 57 - synchronous scene replay during registration retires late observer before timer installation
+  ---
+  duration_ms: 0.5128
+  type: 'test'
+  ...
+# Subtest: synchronous abort during listener registration removes that exact late listener and installs no timer
+ok 58 - synchronous abort during listener registration removes that exact late listener and installs no timer
+  ---
+  duration_ms: 0.5166
+  type: 'test'
+  ...
+# Subtest: synchronous timer callback cannot publish a late live timer or owner
+ok 59 - synchronous timer callback cannot publish a late live timer or owner
+  ---
+  duration_ms: 0.365
+  type: 'test'
+  ...
+# Subtest: hardened foreign descriptor flags survive owned cleanup and stale wrapper remains passthrough
+ok 60 - hardened foreign descriptor flags survive owned cleanup and stale wrapper remains passthrough
+  ---
+  duration_ms: 0.3304
+  type: 'test'
+  ...
+# Subtest: synchronous teardown plus original falsy throw preserves primary at scope0
+ok 61 - synchronous teardown plus original falsy throw preserves primary at scope0
+  ---
+  duration_ms: 0.5617
+  type: 'test'
+  ...
+# Subtest: synchronous teardown plus original falsy throw preserves primary at scope1
+ok 62 - synchronous teardown plus original falsy throw preserves primary at scope1
+  ---
+  duration_ms: 0.405
+  type: 'test'
+  ...
+# Subtest: synchronous teardown plus original falsy throw preserves primary at scope2
+ok 63 - synchronous teardown plus original falsy throw preserves primary at scope2
+  ---
+  duration_ms: 0.4606
+  type: 'test'
+  ...
+# Subtest: bounds stop accounting without dropping original nested calls
+ok 64 - bounds stop accounting without dropping original nested calls
+  ---
+  duration_ms: 0.9971
+  type: 'test'
+  ...
+# Subtest: actual pinned Scene and actual Gltf/Stable methods retain frame ID semantics and direct inner refresh scope
+ok 65 - actual pinned Scene and actual Gltf/Stable methods retain frame ID semantics and direct inner refresh scope
+  ---
+  duration_ms: 597.0919
+  type: 'test'
+  ...
+# Subtest: new receipt kind rejects malformed/profile/identity/completion drift and retains valid failure
+ok 66 - new receipt kind rejects malformed/profile/identity/completion drift and retains valid failure
+  ---
+  duration_ms: 2.1355
+  type: 'test'
+  ...
+# Subtest: actual Game prelude AST calls are unchanged and use only the three original methods
+ok 67 - actual Game prelude AST calls are unchanged and use only the three original methods
+  ---
+  duration_ms: 137.6371
+  type: 'test'
+  ...
+# Subtest: harness emits exact snapshot singleton class imports and a parseable virtual module without a new flag
+ok 68 - harness emits exact snapshot singleton class imports and a parseable virtual module without a new flag
+  ---
+  duration_ms: 12.3109
+  type: 'test'
+  ...
+# Subtest: actual QA entry button owns standby, original accepted transition, receipt and teardown; old8button never invoked
+ok 69 - actual QA entry button owns standby, original accepted transition, receipt and teardown; old8button never invoked
+  ---
+  duration_ms: 9.4448
+  type: 'test'
+  ...
+# Subtest: v10 routine modules/original button are byte-exact and UI transform remains exact once
+ok 70 - v10 routine modules/original button are byte-exact and UI transform remains exact once
+  ---
+  duration_ms: 57.1614
+  type: 'test'
+  ...
+# Subtest: unchanged old donor test relative path is bridged explicitly without editing its bytes
+ok 71 - unchanged old donor test relative path is bridged explicitly without editing its bytes
+  ---
+  duration_ms: 3.2028
+  type: 'test'
+  ...
+1..71
+# tests 71
+# suites 0
+# pass 71
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2289.5415

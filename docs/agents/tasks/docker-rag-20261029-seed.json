@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-rag-20261029-seed",
+  "title": "Docker: ověřený veřejný dokumentový seed a přenositelné embeddingy",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "server/data/rag/bootstrap-cache.json",
+    "server/data/rag/bootstrap-documents.json",
+    ".cache/docker-rag-seed-20261029/",
+    "docs/agents/handoffs/docker-rag-20261029-seed.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zabalit pouze konkrétně ověřené veřejné dokumenty a jejich již pořízené dokumentové embeddingy. Před zápisem doložit přesný zdrojový export, seznam/sourceVersion dokumentů, quality/provenance a model/provider/dimensions/input profile/hash vazby.",
+    "Nikdy nepřebírat celý cache/DB dump: žádné query embeddingy, uživatelské otázky/chat data, session tokeny, credentials, soukromá env či provozní ledger do veřejného seed artefaktu.",
+    "Seed musí projít existujícími dokumentovými/profilovými validátory a domluveným bootstrap import kontraktem. Zachovat rozměry a numerickou validitu vektorů i původní identity; nepřeznačit starý profil a nepředstírat všechny katalogové zdroje za importované.",
+    "Zaznamenat provenienci, přesný počet, hashe a kompatibilitu; velké artefakty distribuovat podle stávajících pravidel po domluvě packagingu, žádná změna .gitattributes/package či API v tomto scope."
+  ],
+  "verification": [
+    "Pouze offline kontrola konkrétního předaného exportu a výsledných veřejných JSON; všechny pracovní výstupy vlastní cache. Ověřit nepřítomnost cizích/private dat a source/profile/hash shodu.",
+    "Skutečný DB start/export, live API nebo přesun volume vyžaduje samostatné koordinované okno; tento task sám nesmí otevřít produkční/placenou DB ani číst klíče.",
+    "Restart/reuse přijetí provede root spolu s packaging/bootstrap během následné integrace; žádný nový embedding call při samotném balení."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Nová přímá lidská priorita ověřena v chatu01a17e9d-dd4a-7fe3-91ac-4f3bc548982d: vložit pouze secrets a jednoduše spustit celý Docker celek včetně embeddingů a vektorové DB.",
+    "Při registraci nebyl nalezen aktivní Docker ani překrývající se renderer owner; existující dotčené soubory byly Gitclean. Před zápisem vlastní claim, ready neruší případnou pozdější kolizi.",
+    "Odlehčený postup, jeden stručný plán funkčního celku, cílené testy a společné review před integrací. Přímý implementační podagent další BMAD workflow nespouští.",
+    "Žádné změny RAG/shared runtime API, žádný automatický reset/prune původní DB nebo placené cache, žádné secret hodnoty v Gitu či logu. Docker/build/DB/liveAPI validace potřebuje samostatný konkrétní plán a resource okno.",
+    "29.10.2026 odblokováno po konkrétním plánu čtecího auditu/exportu: legacy public document cache +56v3 vectors ze scratch rag_auto_0dadab175ad3_test a first-document-plan SHA efea7de81b31c563a0250584f6c6daced20289d25561e128ad13ea800d49ff18. Nejprve cache+validace, až poté oba veřejné JSON.",
+    "Konkrétní offline plán/profile a rozsah exportu byl předán a přečten. Root před veřejnou publikací potvrdí bootstrap importní formát a jednotlivé source/profile/hash vazby; explicitní whitelist nezahrnuje query/chat cache.",
+    "Disjunktní část C; bootstrap autor nesmí tyto datové výstupy paralelně měnit.",
+    "Skutečná DB část vyžaduje současně docker-rag-seed-validation-20261029 claim (heavy/5468). Bez API, obnovy starých placených budgetů nebo změny původní DB/volume.",
+    "29.10.2026 přijato jako KEY70 v PR39/main9fbc76477bfd941bc3a71bc8dbc5ad645af4ebd2. Exact-head verify/secrets/project-acceptance success na94a0cc32, merge tree e3ed142a6b8633f8808adff164d26b7b2b5c9c32 shodný a D main ff-only/clean/0-0. Skutečné Docker fresh/restart/druhýprojekt/ACL/safe-failure a101vectors/0attempts doložené v handoffu. Done nepokrývá celý crawler, všechny katalogové zdroje, fyzický druhý notebook ani WebGPU timeout. Policy-blokovaný volitelný cleanup se neopakuje."
+  ]
+}

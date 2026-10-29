@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "ui-main-sync-20261029",
+  "title": "Převzít přijatý UI PR38 do čisté D main kopie",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/ui-main-sync-20261029.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Pouze byte-identický ff-only přenos publikovaného PR38 do D:/CodexWorkspaces/StrahovCrazyShow-main-20261027; výchozí čistý main8d3e69ec, cíl43175fc4ae1b855686638821b164867fe614a598. Žádné autorské source změny.",
+    "Ověřit shodu celého tree d5f20e7ebb56f4a2ff935fb2fb5fecfb9b6b52d1 s accepted head77a2a66157df2192d320f363daef2c78f60d14c7, clean stav a ahead/behind0/0.",
+    "C kopie, dependencies a živé služby zůstávají beze změny. Žádný build/hra/GPU/API; vlastní krátký handoff a release po syncu."
+  ],
+  "verification": [
+    "Git identita a clean před/po, ff-only, žádný reset/stash/restore.",
+    "Povinné GitHub verify/secrets/project-acceptance success na přesném headu. Tento sync není nový vizuální či GPU test."
+  ],
+  "notes": [
+    "Claim a handoff v D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; katalog spravuje stávající admin. Přímé předání RAG/UI koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d.",
+    "Acceptance https://github.com/Varnahg/StrahovCrazyShow/pull/38#issuecomment-6496222826. Přijímá se layout/loader scope; WebGPU timeout, zdravý GPU preview a celý RAG katalog zůstávají otevřené.",
+    "29.10.2026 přijato v PR38/main43175fc4ae1b855686638821b164867fe614a598; celý tree d5f20e7ebb56f4a2ff935fb2fb5fecfb9b6b52d1 shodný s77a2a661, exact-head verify/secrets/project-acceptance success. D main ff-only synchronizovaný, čistý a0/0. Done se týká přijatého UI layout/loader rozsahu; healthy GPU preview, herní startup, WebGPU timeout a celý RAG katalog se tím neuzavírají."
+  ]
+}

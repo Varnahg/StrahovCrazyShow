@@ -1,0 +1,76 @@
+{
+  "redProofSha256": "cf0993ed1d4a5490621264369e25da27977f93a65aece51927636f6cf879bfe5",
+  "files": {
+    "patches/@babylonjs__core@9.30.0.patch": {
+      "sha256": "83170c3387f61c71ae7916d656dd206382a4f0a26cb76dacf612376ab800c991",
+      "bytes": 76435,
+      "origin": "exact before copy"
+    },
+    "pnpm-lock.yaml": {
+      "sha256": "efd50cdf31481576da9efe84d0be11fdae7f201ca911601ee09e4937c653e946",
+      "bytes": 63331,
+      "origin": "exact before copy"
+    },
+    "tests/webgpu-shadow-pass-ownership.test.ts": {
+      "sha256": "b009319e2e4515ac70b0899b31e83978c187d3dadd03cee8ff90867b2aa99e00",
+      "bytes": 6898,
+      "origin": "current byte-exact"
+    },
+    "tests/game-leaf-shadow-preparation.test.ts": {
+      "sha256": "e73c5549b9e989b425e6cf5e652840087e94770486d7946617cf25e2ba5eb47c",
+      "bytes": 18230,
+      "origin": "exact before copy"
+    },
+    "tests/webgpu-shadow-sharing.test.ts": {
+      "sha256": "97225818f8e471adae217cbac68d7253a774a6e52fba74509a1651832df87898",
+      "bytes": 403,
+      "origin": "current byte-exact"
+    },
+    "tests/fixtures/webgpu-shadow-sharing/loader.mjs": {
+      "sha256": "356e8fc4722de11284ae307ee9191f8e0ddb5b12118a11122f8de506e8cf0cba",
+      "bytes": 380,
+      "origin": "current byte-exact"
+    },
+    "tests/fixtures/webgpu-shadow-sharing/fixture.mjs": {
+      "sha256": "df73fceede865a7f8f8a96a106b43244dae50d701d431aed7b7ec2c7954c28ea",
+      "bytes": 3747,
+      "origin": "current byte-exact"
+    },
+    "tests/fixtures/webgpu-shadow-sharing/shadow-share.test.mjs": {
+      "sha256": "e696d89cece3d7f979808006718f4e1c53f98f60ed4f1eaaff6c894faac33205",
+      "bytes": 8949,
+      "origin": "current byte-exact"
+    },
+    "tests/fixtures/webgpu-shadow-sharing/provenance.json": {
+      "sha256": "d638f9ed9d5194ee614e6600cfbe71665b338d101c78b43cd560a103ad175999",
+      "bytes": 1430,
+      "origin": "exact before copy"
+    },
+    "tests/fixtures/webgpu-shadow-sharing/pass-ownership.test.mjs": {
+      "sha256": "05913eb1f8883677341a618efe9437f4fd3b6dd79a3895da69533a09d16a01e4",
+      "bytes": 11603,
+      "origin": "exact before copy"
+    },
+    "tests/webgpu-shadow-freshness.test.ts": {
+      "sha256": "ab8e15b10426d6a873dd601088fb59e763c4b2aebed4e5cf287248289de8068f",
+      "bytes": 19049,
+      "origin": "current byte-exact"
+    },
+    "tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs": {
+      "sha256": "6373ce4f3de16ff1dac6c4771b067c3badbd62a9a3d3d1dbb20f4f192a7adf87",
+      "bytes": 11507,
+      "origin": "inverse only five added tuple allocation assertions"
+    }
+  },
+  "changedSinceRed": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/game-leaf-shadow-preparation.test.ts",
+    "tests/fixtures/webgpu-shadow-sharing/provenance.json",
+    "tests/fixtures/webgpu-shadow-sharing/pass-ownership.test.mjs",
+    "tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs"
+  ],
+  "explanation": "Game leaf projection and pass-ownership assertion now read Effect from existing notification tuple. Nonstandalone adds five allocation-identity assertion lines in the second public-alias case. No original API assertion is removed or weakened.",
+  "actualShaderMaterialFirstTestByteExact": true,
+  "actualShaderMaterialFirstTestSha256": "ad17001c5726c93e7805c7fde7acdeec818ec851b7fd70b9a297a39a08ab6b59"
+}

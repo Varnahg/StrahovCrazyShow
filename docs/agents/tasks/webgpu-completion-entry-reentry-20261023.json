@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-entry-reentry-20261023",
+  "title": "KEY-22: odmítnout rekurzivní CPU scope a doplnit donor contract v QA v12",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-completion-20261021/entry-render/helper/v12/",
+    "docs/performance/evidence/webgpu-completion-20261021/entry-render-helper/reentry-correction/",
+    "docs/agents/handoffs/webgpu-completion-entry-reentry-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před code reprodukovat přesný readonly peer P2 counterexample a porovnat odmítnutí self-reentry s širší inclusive-recursion podporou. Minimal reject self-reentry vybrán, protože recursion má být incomplete a není vyžadována produkčním Game řetězcem.",
+    "V11a3017cc0/32, jeho původní52seal a root archival sources zůstanou byteexact. Nová depth5 v12copy, pouze entry-render-cost.mjs, jeho test a README se mohou lišit; ostatních29inputů beze změny.",
+    "Same-index nested reentry pod Scene skončí phase-error/incomplete, originál stále právě jednou Reflect.apply se stejným receiver/args/return/falsy throw. První legitimní nested prepare/stable pod Scene zůstane zachovaný. Žádný false complete odmítnutý vlastním validátorem.",
+    "Cílený RED→GREEN test pěti2ms rekurzí a falsy throw/cleanup, včetně původního validátoru failedattempt receipt. Původní87kontrol zachovat; chybějící meaningful donor version8descriptors/outerordering asserts doplnit do novéfixture s přesným původním source12/native donor SHA.",
+    "Historický wording v11 equivalence výslovně opravit novým follow-up záznamem, staré sealy/logy nepřepisovat. Nový source/proof/manifest/handoff s cíleným refaktoringem a guard/lifecycle regresí; bezinstall/fullsuite/build/GPU/server/commit/BMADrecursion."
+  ],
+  "verification": [
+    "Lehké Node/tsx cílené RED a GREEN, originalfailure/protectedSHA retained, exact3input delta vůči v11, legitimate nested coverage, all helper syntax/UI parse. Žádný GPU/performance claim.",
+    "Root nezávislý peer review finalSHA/proof a nový immutable source12/v12 build s budoucím clock; v11 nikdy nebyl GPU použit."
+  ],
+  "notes": [
+    "Root accepted narrow QA deliverable in5b769bbc after two independent finalreviewfindings[],101CPU/31syntax/UI0,49SHA/bytes and32reconstructedsources. Actual source12/v12build511b1e72 first-entry completed8chains/0hooks/healthy; firstchain127.1ms=glTF0.3+Stable4.4+Scene122.4. ParentKEY22/main/FPS and Scene attribution remain open; newtaskentry-routines owns nextdeepcapture. Originalv11sealsandfailedcounterexample retained.",
+    "Root explicit delegation original performance author, owner webgpu-completion-01a15a3e-entry-helper-v12. Worktree .cache/player-feedback-20261020. Read task/root-review.json a původní renderer/editor zprávy; nová čistá disjunktní claim bezadopt-dirty.",
+    "P2 entry lines102-107 accepts depth[2]&&index!=2 even depth[index]>0.5nestedprepare each2ms=>nested30 vsScene18; complete true then validatorrejects. Source/fixture counterexample only, no actualGPUrepro. Broader inclusive recursion validator rewrite je odmítnutá varianta.",
+    "V11 CPU71+14+2 je pravdivé; donor replacement fakticky jenhash+2orders, ne všechny legacyasserts. Source12/runtime/rootnative/oldhelper unchanged. Root copies32 archival inputs at entry-render-helper/sources readonly, never execute wrongdepthcopy.",
+    "Root owns validation/heavy/GPU/build/ports and source12. No processes now. Futureclock entry-source12-v11-clock.json A21:02:10UTC may be used only if future at root newv12build; name does not implyv11wasbuilt. Never modify existingconfig/build. No secrets/environment dumps."
+  ]
+}

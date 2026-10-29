@@ -1,0 +1,26 @@
+# Předání: fix-b6-transform-read-20261014
+
+- Vlastník: `fix-01a13624-b6-pivot-20261014`; příjemce: koordinátor `/root`.
+- Pracovní kopie: `C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow`, větev `codex/playtest-repairs-wave4`. Základ HEAD `91ee88f0aaa902c79fad589aeb84bc086a66c9ea` + koordinátorem převzatý wave3 snapshot; před změnou byl B6 čistý proti HEAD i wave3. Ostatní bootstrap WIP nebyl přebírán ani měněn.
+- Výsledek: implementována přijatá varianta A. Čtení světové matice B6 pivotu vynucuje synchronizaci pouze při skutečné změně; převod fill světla používá dva vlastní scratch objekty a toRef metody. Žádná dlouhodobá inverse cache ani obecný lighting helper.
+- Změněné soubory: `client/b6-reality.ts`, nový `tests/b6-render-lifecycle.test.ts`, vlastní `docs/performance/research-20261014/b6-render.md`, tento handoff. Research byl nejprve byte-exact zkopírován z main pod SHA `927956382935e1ef0cdc84194a94de547370f2b68ac916db9c33b445f61bbf8f`, potom doplněn o implementační přílohu.
+- Podklady: celý přijatý výzkum, rozhodnutí A od rootu, primární instalovaný Babylon9.30.0, nezměněný produkční log07c227f8…/snapshot0f20b5a7…; detailní mechanismus a alternativy v research dokumentu.
+- Refaktoring: sjednocení fill-world cíle do jednoho controller-owned Vector3 a inverse převodu do controller-owned Matrix; odstraněny per-update Matrix.Invert/TransformCoordinates alokace. Žádné nové callbacky, cache invalidační registry nebo změna resource ownership. Guard zachovává skutečnou same-render-ID editaci rootu.
+- Ověření před opravou: `node --import tsx --test tests/b6-render-lifecycle.test.ts`, exit1,1 FAIL/3 PASS. Skutečná statická chůze ve třech krocích způsobila405 root +402 child world-matrix aktualizací místo0/0; selhala právě tato regrese.
+- Ověření po opravě: tentýž příkaz exit0,4/4 PASS. Po finálním formátování nového testu `node --import tsx --test --test-concurrency=1 tests/b6-render-lifecycle.test.ts tests/b6-reality.test.ts tests/world-asset-identity.test.ts tests/vehicle-lighting.test.ts`, exit0,34/34 PASS. Žádné stávající testy se neupravovaly.
+- Typy: in-memory TypeScript program se skutečnou konfigurací `tsconfig.json`, roots `client/b6-reality.ts` + `tests/b6-render-lifecycle.test.ts`; `getPreEmitDiagnostics`0, exit0. Importovaná type closure3143 souborů; nejde o celý projektový build/typecheck.
+- Pokrytí: skutečné B6/VehicleLighting/getWorldAssetRoot moduly; static matrix cascade, same-render translate/yaw/nonuniform scale s nezávislým world-point oracle, fill world position/intensity/range, caster/light/material/vertex/index identities, LOD detach/re-entry všech kvalit v obou cores/chodbě/vstupu, reparent/repeated attach, dispose a cizí ownership. Stávající testy přidávají reálné props a fyzické cesty.
+- SHA-256: `client/b6-reality.ts` = `942cc969ebf9b4249086353c08090630720758fc3c63cbca648e72fb7b0bb422`; `tests/b6-render-lifecycle.test.ts` = `2947a16e145f4611e0cb92c445c898389b969512954814a1ab28f4b3b682a8c0`.
+- Procesy a zdroje: všechny vlastní test/typecheck procesy skončily exit0 kromě záměrného původního regression FAIL; všechny NullEngine scény/controllers/beams se uklidí. Žádný server/port, GPU, build, celá sada nebo commit. Manifest/lockfile a tři původní testy zůstaly beze změny.
+- Omezení: obecná lavina při skutečném přesunu rootu zůstává mimo variantu A; původní runtime ji měl také. CPU counts nejsou FPS důkaz. KEY-16 jako celek, červené problikávání a barvy tímto nejsou označeny za vyřešené.
+- Další krok: root review a praktická přejímka pod `validate-b6-transform-20261014`; neměnný kandidát, stejná trasa/světlo/quality/rozlišení, root kontroluje jiné 3D scény. Poté přesný samostatný commit a integrace main pouze tohoto celku. Případnou nedostupnost browser/GPU přejímky přiznat; nenahrazovat ji NullEngine výkonem.
+- Rezervace: po odeslání předání a poslední kontrole souborů bude uvolněna; autoritativní stav je v registru. Žádné další zápisy po předání ke zmrazení.
+- Integrátor: přebírá koordinátor `/root`; aktualizuje task/Linear a výsledky produkčního ověření, neukončuje KEY-16 pouze podle34 unit testů.
+
+## Převzetí rootem a kandidát k pozdější grafické přejímce
+
+Root převzal přesné čtyři předané cesty pod ownerem `repairs-01a13624-b6-integration`. Nezávislý read-only review nezjistil funkční regresi; ověřil native same-render/frozen/ancestor kontrakt a nezávislý S/R/T oracle v testu. Nepřímé parent-chain/freeze pokrytí a původní stacionární-player update guard zůstávají výslovné limity.
+
+Stabilní kandidát `cbc158068138e3454a6959a0d7a945465ea2974e6c246e86ed231abf92a4b5dc` se liší od wave3 přesně dvěma runtime/test vstupy. **878/878 testů, build a celá izolovaná integrace PASS**. Samostatný Git archive91ee88f + jen nový B6modul a test prošel4/4, takže fix není závislý na ostatním necommitnutém wave3WIP. Přesné výstupy jsou v `docs/performance/evidence/b6-transform-20261014/` a vlastním validačním cache.
+
+Uživatel výslovně odložil grafické ověření. Kandidát se uloží samostatnýmcommitem pouze se svým kódem/testy/handoffem/evidencí; ostatní bootstrapWIP ani researchdoc z jiné větve se nestageují. **Do main se runtimefix zatím nepřenáší aKEY-16 se neuzavírá.** Nová grafická přejímka má připravené baseline/candidate buildy, počasí, start/stopskripty a trasu; GPU/FPS přínos se netvrdí.

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T14:52:56.593Z",
+  "sourceSnapshotId": "bc38843693a9ccf591e500657d9e506d7d64e4a1788ccb4a6f9571eefa78a8bd",
+  "gitMain": "9341bcef674de81abd9ae99f1afbf211672165d4",
+  "url": "http://127.0.0.1:4211/?renderBackend=webgpu",
+  "files": {
+    "session.jsonl": {
+      "bytes": 205843,
+      "sha256": "bad306fb56ba22c13b4d6da1b1795f80d02b0e35243f2e758ed98992b12aacac"
+    },
+    "http-identity.json": {
+      "bytes": 2821,
+      "sha256": "920bceefbdebd59e71daad39398fc7ac27dcfe431d4e9ab6d80b29b7bd577a16"
+    },
+    "terminal.png": {
+      "bytes": 21894,
+      "sha256": "553468d220df6b743ebac0797808d51dee49a915678f925c5e6b23154aeede05"
+    },
+    "terminal-dom.txt": {
+      "bytes": 3388,
+      "sha256": "2e4b6d3af18df45ba7f80600080361e84d79b0617ffdae8c4bc9c03e65808495"
+    }
+  },
+  "actualServedFiles": 20,
+  "weather": {
+    "sha256": "7092ce0fb6147aab12112dc785dc6590de7d0c849b72cba11b32e335a46a9b41",
+    "value": {
+      "temperature": 18,
+      "wind": 0,
+      "windDirection": 0,
+      "rain": 0,
+      "cloud": 0,
+      "observedAt": 1792502700000,
+      "fetchedAt": 1792502700000,
+      "source": "Řízené testovací počasí · uložený záznam",
+      "cloudSource": "Řízený meteorologický model · benchmark",
+      "cloudWindSource": "Řízené modelové proudění · benchmark",
+      "stale": true,
+      "cloudStale": true,
+      "status": "fallback",
+      "sourceKind": "model"
+    }
+  },
+  "sessionId": "812a6400-4c03-4444-a263-3921ac3a4583",
+  "lighting": {
+    "elapsedMs": 49643.300000071526,
+    "stages": 41,
+    "qualities": [
+      {
+        "quality": "low",
+        "finalPass": false,
+        "status": "complete",
+        "failureStep": null,
+        "elapsedMs": 17041.700000047684,
+        "activeElapsedMs": 17041.700000047684,
+        "pausedMs": 0,
+        "stageCount": 15
+      },
+      {
+        "quality": "high",
+        "finalPass": false,
+        "status": "complete",
+        "failureStep": null,
+        "elapsedMs": 19386,
+        "activeElapsedMs": 19386,
+        "pausedMs": 0,
+        "stageCount": 13
+      },
+      {
+        "quality": "medium",
+        "finalPass": true,
+        "status": "complete",
+        "failureStep": null,
+        "elapsedMs": 13215.400000095367,
+        "activeElapsedMs": 13215.400000095367,
+        "pausedMs": 0,
+        "stageCount": 13
+      }
+    ]
+  },
+  "error": {
+    "seq": 482,
+    "atMs": 161096.5,
+    "kind": "startup-error",
+    "data": {
+      "message": "RenderStartupTimeoutError: Renderer startup exceeded its visible-time deadline",
+      "stack": "RenderStartupTimeoutError: Renderer startup exceeded its visible-time deadline\n    at h (http://127.0.0.1:4211/assets/game-U2uLk4M3.js:506:31864)\n    at http://127.0.0.1:4211/assets/game-U2uLk4M3.js:506:32272"
+    }
+  },
+  "rendererReady": {
+    "seq": 31,
+    "atMs": 66505.9,
+    "kind": "renderer-ready",
+    "data": {
+      "durationMs": 73.29999995231628,
+      "renderer": "pascal",
+      "vendor": "nvidia",
+      "version": "unknown version",
+      "backend": "webgpu"
+    }
+  },
+  "acceptedStartup": false,
+  "acceptedPerformance": false,
+  "conclusion": "The unchanged original main client in its dedicated active/focused window completes41lighting stages then fails the same original submitted-frame deadline. The new task-loop/attribution helper/cloud fixture is not required for reproduction.",
+  "limitations": [
+    "This control has original clear18C/cloud0/wind0 weather, whereas candidate fixture is cloudy. No causal startup duration/FPS comparison.",
+    "Server-generated diagnostics source.kind=working-tree and gitHead reflect the unlabelled server recorder/root checkout, not proof of client identity. The actual20served files match the original baseline preflight manifest and sourceSnapshotId is from that byte verification.",
+    "No new diagnostic lifetime wrappers in this original production build; readiness failure mechanism is assigned by separate candidate traces.",
+    "The failed baseline Room was explicitly left after recording; no baseline game remained during later GPU runs."
+  ]
+}

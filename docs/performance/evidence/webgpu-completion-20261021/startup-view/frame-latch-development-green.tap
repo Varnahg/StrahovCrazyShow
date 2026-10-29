@@ -1,0 +1,77 @@
+TAP version 13
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:47]: Skeleton "known-peer continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [19:48:48]: Skeleton "self continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# Subtest: actual Game start cannot become playable until the submitted-frame gate succeeds
+ok 1 - actual Game start cannot become playable until the submitted-frame gate succeeds
+  ---
+  duration_ms: 18.6673
+  type: 'test'
+  ...
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+ok 2 - actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+  ---
+  duration_ms: 46.0263
+  type: 'test'
+  ...
+# {"status":"ready","failure":null,"simulatedVisibleMs":100,"draws":2,"submits":2,"acceptedPackets":2,"scope":"controlled CPU scheduling, not GPU/performance data"}
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+ok 3 - actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+  ---
+  duration_ms: 9.5918
+  type: 'test'
+  ...
+# {"status":"ready","failure":null,"simulatedVisibleMs":100,"draws":2,"submits":2,"acceptedPackets":2,"scope":"controlled CPU scheduling, not GPU/performance data"}
+# Subtest: remote submitted-frame gate retries real scene-visibility change during a fence
+ok 4 - remote submitted-frame gate retries real scene-visibility change during a fence
+  ---
+  duration_ms: 7.317
+  type: 'test'
+  ...
+# Subtest: remote submitted-frame gate retries real membership change during a fence
+ok 5 - remote submitted-frame gate retries real membership change during a fence
+  ---
+  duration_ms: 7.4306
+  type: 'test'
+  ...
+# Subtest: remote submitted-frame gate retries real profile change during a fence
+ok 6 - remote submitted-frame gate retries real profile change during a fence
+  ---
+  duration_ms: 5.6118
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original queue-error during an asynchronous fence
+ok 7 - remote frame latch preserves original queue-error during an asynchronous fence
+  ---
+  duration_ms: 7.1319
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original abort during an asynchronous fence
+ok 8 - remote frame latch preserves original abort during an asynchronous fence
+  ---
+  duration_ms: 5.3166
+  type: 'test'
+  ...
+# Subtest: known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+ok 9 - known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+  ---
+  duration_ms: 270.8574
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6244.9699

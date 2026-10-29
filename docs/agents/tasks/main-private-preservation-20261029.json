@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "main-private-preservation-20261029",
+  "title": "Uchovat unikátní ignorované podklady před odstraněním worktrees",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/main-private-preservation-20261029/",
+    "docs/agents/handoffs/main-private-preservation-20261029.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Připravit auditovatelnou obsahově deduplikovanou archivaci ignorovaných podkladů, config a zdrojových modelů.",
+    "Nikdy nečíst tajemství do výstupů, nenásledovat junctions a nedělat změny runtime volumes.",
+    "Žádné odstranění původních dat před root ověřením manifestu."
+  ],
+  "verification": [
+    "Manifest počtů, velikostí, SHA-256 a obnovitelnosti; vyloučené regenerovatelné dependencies/buildy zaznamenané."
+  ],
+  "notes": [
+    "Cwd D main; kořenový owner následně provede úklid. Vstupní worktrees jsou read-only.",
+    "Všechny původní claimy převzal hlavní koordinátor na přímé zadání uživatele; jejich původní stav archivován v git common dir.",
+    "Žádná rekurze BMAD, jiná větev ani worktree."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "acceptance": [
+    "Pouze testovací vrstva; žádná změna produkčního klienta, serveru, fyziky nebo veřejného API.",
+    "Výzkum, varianty, cílený refaktoring a relevantní skutečné ověření; zachovat cizí WIP a deníkové rezervace."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/recorded-walkthrough-recording.test.ts"
+  ],
+  "notes": [
+    "Uživatel 20. 10. 2026 požaduje replikovat oba vlastní průchody mapou pouze v testech; sampled renderer replay není deterministický input/physics replay.",
+    "Výchozí přijatý main ab39b7185d0c9fb5e393c654818f43de82e07886; izolovaná managed worktree recorded-playtest-replay.",
+    "Linear KEY-49: https://linear.app/gigeconomy/issue/KEY-49; vlastní změny a předání této relace, žádný cizí WIP."
+  ],
+  "id": "recorded-walkthrough-data-20261020",
+  "title": "Testové scénáře z obou doložených uživatelských průchodů",
+  "writePaths": [
+    "tests/replay/recording.mjs",
+    "tests/replay/fixtures/",
+    "tests/recorded-walkthrough-recording.test.ts",
+    "docs/agents/handoffs/recorded-walkthrough-data-20261020.md"
+  ]
+}

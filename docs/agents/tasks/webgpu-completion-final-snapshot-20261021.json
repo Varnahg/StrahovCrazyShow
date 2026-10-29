@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-final-snapshot-20261021",
+  "title": "KEY-22: neměnný source8 se všemi aktualizovanými startup fixture",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261021-candidate-8/",
+    "docs/agents/handoffs/webgpu-completion-final-snapshot-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Root vytvoří ze stabilního reviewed commit checkpointu včetně opravené fixture, celé testy a assets; staré snapshots neměnit.",
+    "Runtime/patch/lock source8 proti source7 zůstane byteexact kromě explicitně dokázaných testfixture souborů. Pokud hashově shodné, source8 může použít pouze nově ověřený read-only junction na vlastní fresh source7 dependencies; rootoldshared tree se nepoužije. Identita/realpath i původní fresh install proof se evidují.",
+    "Před vytvořením vlastního junction bezpečně ověřit a ne-rekurzivně odstranit jen nově vytvořený snapshottool junction; nikdy target. Další rozšíření namespace předem koordinovat."
+  ],
+  "verification": [
+    "Snapshot hash před/po včetnětestů, full source7→8 diff, patch/lock+38 installedpin proof, root targeted/fullTS/build/integration/CI a actualGPU dle acceptance."
+  ],
+  "notes": [
+    "Pouze root explicitní KEY22 navazující zadání. Heavy/GPU/build/ports mají existující rootclaims. Ready neopravňuje cizí práci."
+  ]
+}

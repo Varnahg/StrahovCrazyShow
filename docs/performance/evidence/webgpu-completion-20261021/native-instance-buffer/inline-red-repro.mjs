@@ -1,0 +1,25 @@
+import {NullEngine} from '@babylonjs/core/Engines/nullEngine.js';
+import {Scene} from '@babylonjs/core/scene.js';
+import {Mesh} from '@babylonjs/core/Meshes/mesh.js';
+import {VertexData} from '@babylonjs/core/Meshes/mesh.vertexData.js';
+import {Material} from '@babylonjs/core/Materials/material.js';
+import {WebGPUEngine} from '@babylonjs/core/Engines/webgpuEngine.js';
+import {WebGPUBufferManager} from '@babylonjs/core/Engines/WebGPU/webgpuBufferManager.js';
+import {WebGPUCacheRenderPipelineTree} from '@babylonjs/core/Engines/WebGPU/webgpuCacheRenderPipelineTree.js';
+import {WebGPUCacheBindGroups} from '@babylonjs/core/Engines/WebGPU/webgpuCacheBindGroups.js';
+import {WebGPUBundleList} from '@babylonjs/core/Engines/WebGPU/webgpuBundleList.js';
+import '@babylonjs/core/Meshes/instancedMesh.js';
+let recorded=0;const bundles=[];
+const device={limits:{maxVertexAttributes:16,maxVertexBufferArrayStride:2048},createBuffer:d=>({...d,destroy(){this.destroyed=true;}}),queue:{writeBuffer(){}},createBindGroupLayout:()=>({}),createPipelineLayout:()=>({}),createRenderPipeline:()=>({}),createBindGroup:()=>({}),createRenderBundleEncoder(){const resources=[];return{setPipeline(){},setIndexBuffer(b){resources.push(b);},setVertexBuffer(i,b){resources.push(b);},setBindGroup(){},drawIndexed(){},draw(){},drawIndexedIndirect(b){resources.push(b);},drawIndirect(b){resources.push(b);},finish(){const bundle={id:++recorded,resources};bundles.push(bundle);return bundle;}};}};
+const e=new NullEngine();e._isWebGPU=true;e.uniqueId=1;Object.defineProperty(e,'isWebGPU',{value:true});Object.defineProperty(e,'compatibilityMode',{value:false});e._caps.instancedArrays=true;e._caps.vertexArrayObject=false;e.currentRenderPassId=7;e._device=device;e._bufferManager=new WebGPUBufferManager(e,device);
+for(const key of ['createVertexBuffer','createDynamicVertexBuffer','createIndexBuffer','updateDynamicVertexBuffer','_releaseBuffer','bindBuffers','bindUniformBufferBase','createDrawContext','createMaterialContext','enableEffect','_draw','drawArraysType','drawElementsType'])e[key]=WebGPUEngine.prototype[key];
+e._cacheRenderPipeline=new WebGPUCacheRenderPipelineTree(device);e._cacheBindGroups=new WebGPUCacheBindGroups(device,{},e);e._bundleList=new WebGPUBundleList(device);e._snapshotRendering={play:false,record:false};e._counters={numEnableEffects:0,numEnableDrawWrapper:0,numBundleReuseNonCompatMode:0,numBundleCreationNonCompatMode:0};e._getCurrentRenderPass=()=>({});e.applyStates=()=>{};e._applyRenderPassChanges=()=>{};e._reportDrawCall=()=>{};e._ubDontInvertY=e._bufferManager.createBuffer(8,72);Object.defineProperty(e,'currentSampleCount',{value:1});
+const s=new Scene(e),m=new Mesh('world source',s),v=new VertexData();v.positions=[0,0,0,1,0,0,0,1,0];v.indices=[0,1,2];v.applyToMesh(m);const mat=new Material('native base material',s);m.material=mat;
+const names=['position','world0','world1','world2','world3','previousWorld0','previousWorld1','previousWorld2','previousWorld3'];
+const pc={shaderProcessingContext:{bufferNames:[],samplerNames:[],textureNames:[],bindGroupLayoutEntries:[],bindGroupEntries:[],bindGroupLayoutEntryInfo:[],attributeNamesFromEffect:names,attributeLocationsFromEffect:names.map((_,i)=>i)},bindGroupLayouts:{},stages:{vertexStage:{module:{},entryPoint:'main'},fragmentStage:{module:{},entryPoint:'main'}}};
+const effect={uniqueId:987001,_pipelineContext:pc,getEngine:()=>e,getPipelineContext:()=>pc,getAttributesNames:()=>names,_attributes:names.map((_,i)=>i),dispose(){},_checkNonFloatVertexBuffers(){}};mat._getDrawWrapper().setEffect(effect);s.needsPreviousWorldMatrices=true;
+const instances=Array.from({length:40},(_,i)=>m.createInstance('world i'+i));
+function draw(count){s.incrementRenderId();for(const inst of instances.slice(0,count))m._registerInstanceForRenderId(inst,s.getRenderId());m.render(m.subMeshes[0],false);return m._getInstanceDataStorage();}
+const first=draw(1),old=first.instancesBuffer.getBuffer(),oldPrevious=first.instancesPreviousBuffer.getBuffer(),bundle=e._currentDrawContext.fastBundle;const oldRaw=old.underlyingResource,oldPrevRaw=oldPrevious.underlyingResource;
+const second=draw(40),current=second.instancesBuffer.getBuffer(),currentPrevious=second.instancesPreviousBuffer.getBuffer();e._bufferManager.destroyDeferredBuffers();
+console.log(JSON.stringify({nativeEntry:'Mesh.render',baseMaterialNative:true,nativePipelineCache:true,nativeBindGroupCache:true,recorded,reused:e._counters.numBundleReuseNonCompatMode,oldBytes:old.capacity,currentBytes:current.capacity,oldRefsAfterGrowth:old.references,previousOldBytes:oldPrevious.capacity,previousCurrentBytes:currentPrevious.capacity,bundleStayed:e._currentDrawContext.fastBundle===bundle,firstBundleHeldOld:bundle.resources.includes(oldRaw),firstBundleHeldPrevious:bundle.resources.includes(oldPrevRaw),oldDestroyed:oldRaw.destroyed===true,previousDestroyed:oldPrevRaw.destroyed===true,secondBundleHeldNew:e._currentDrawContext.fastBundle.resources.includes(current.underlyingResource),contextDirty:e._currentDrawContext._isDirty,materialDirty:e._currentMaterialContext.isDirty}));

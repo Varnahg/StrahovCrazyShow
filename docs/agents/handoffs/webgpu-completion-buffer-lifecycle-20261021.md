@@ -1,0 +1,41 @@
+# Předání: webgpu-completion-buffer-lifecycle-20261021
+
+- Vlastník: `webgpu-completion-01a15a3e-buffer-lifecycle`; příjemce: root koordinátor KEY-22.
+- Pracovní kopie: `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020`, větev `codex/webgpu-completion-20261021`; výchozí commit claimu `a437e2b1893ed7545d6e54a376d91aeaa4a9e8d0`.
+- Výsledek: lokální QA-only kandidát úzkého buffer owner/reallocation/release/destroy a skutečných DrawContext/fastBundle identit. Samostatný `--buffer-lifecycle` je defaultoff a součást canonical build/load/browser seal. Žádný produktový fix, staging, commit, build, server ani GPU měření.
+- Cizí WIP: nic nepřevzato. Rootův immutable helper3673/frozenv5 a build40c566 běžely dál beze změny; verifikace porovnala všechny frozenv4/v5 soubory s jejich manifesty před i po testech. Společné runtime zdroje nebyly měněné.
+- Podklady a volba před implementací: [výzkum a varianty](../../performance/evidence/webgpu-completion-20261021/buffer-lifecycle/README.md). Actual source36c134e1/build63ca/helperc951/f7d45a1e fault8435/8436/8438 a buffer37326/2048 nejsou owner důkaz. Pinned9.30 native matrix/current/previous/refcount/deferred destroy/NCM fastBundle chain; již zahrnutý SelectionOutlineLayer PR18238 se v aplikaci nepoužívá. F8 je2Dcopy existujícího canvasu. Plný encoder graph, vypnutí reuse a odklad destroy byly porovnány a odmítnuty pro tento první diskriminátor.
+
+Změněné measurement soubory v `docs/performance/evidence/webgpu-completion-20261021/measurement/`:
+
+- Nové `buffer-lifecycle-core.mjs`, `buffer-lifecycle.mjs`, `buffer-lifecycle.test.mjs`.
+- `common.mjs`, `harness.mjs`, `qa-overlay.mjs`, `receipt.mjs`, `README.md` pro explicitní flag/defaultoff, virtual importy, rozšířenou přesnou dependency identity, viditelný diagnostic režim a samostatný immutable raw `kind:buffer-lifecycle`.
+- `helper.test.mjs` přidává skutečné overlay/transport fatal-before-original-cleanup a startup rejection fixture; `weather-latency.test.mjs`, `shader-attribution.test.mjs`, `routine-cost.test.mjs` zachovávají původní assertions a doplňují nový explicitní canonical false field.
+
+Vlastní evidence v `docs/performance/evidence/webgpu-completion-20261021/buffer-lifecycle/`:
+
+- `README.md`, verbatim `baseline100-verification.json` a `baseline3673-identity.json`.
+- CPU-only reprodukovatelný `verify.mjs`, finální `cpu119.tap`, `verification.json`; `owned-files.json` je finální taskový manifest bez self-hashe. Původní117/117 před review jsou zachované v `before-friendly-target117-verification.json`, `before-friendly-target117.tap` a původním `cpu117.tap`.
+- Tento vlastní handoff je jediný změněný soubor mimo oba přidělené evidence prefixy.
+
+Refaktoring a lifecycle: jedna datová čtečka a sdílený per-instance installer/restore slouží všem taps; weak ID/resource/hook bookkeeping a scalar tabulky bez silné historie GPU/Buffer/Mesh objektů. Beze změny bufferu/contextu neemitujeme nový matrix event; nové Mesh instance přicházejí původní scene-add notification, nikoli per-frame scene scan. Původní receiver/args/return/throw/Promise a počet GPU/readiness/render/fence calls zůstávají. Fatal trace vzniká před původním Game handlerem, který dál dostane původní text/chybu; abort/dispose/rejoin obnoví pouze vlastněný descriptor a pozdní/cizí hook nemění sealed receipt.
+
+Ověření:
+
+- `node docs/performance/evidence/webgpu-completion-20261021/buffer-lifecycle/verify.mjs` → exit0, **119/119 PASS**, původních100 zachováno a19 nových,24 syntax PASS, UIparse0; actual test command a čas jsou ve verification.json.
+- Actual pinned Mesh/SubMesh `_renderWithInstances/_updateInstancedBuffers`, Buffer/refcount/manager/deferred destroy a WebGPUEngine NCM `_draw` s fake terminal GPU IO. Odlišné current/previous role od generic2048,4096 reallocation, původní fastBundle replay, release versus destroy, receiver/Promise/false/falsy throw, hardened/drift/foreign/device/generation/abort/rejoin, descriptor restore, target gaps a caps. NullEngine je pouze CPU host; WebGPU uniqueId/NCM policy jsou explicitní terminal-fixture vstupy.
+- Maximal scalar fixture: **1 991 415B** (96char technická jména a9digit scalars, dirty flags pouze -1/0/1), přes64KiB headroom pod nezměněným2MiB transport cap. Resource2048/owner1024/event4096; owner cap byl během developmentu snížen z2048, protože první maximal fixture2MiB překročila. Původní shader/routine/production/transport cap se nezvýšil. Nejde o matematický slib neomezené session nebo libovolně velkých čísel; transport stále kontroluje skutečné bytes a při failure ponechá immutable download/retry.
+- 39 selected runtime/pin SHA before==after,25 helper SHA before==after; frozenv4/v5 hashově beze změny a obě baseline kopie verbatim. Helper **`a5b3dc0000956b9abcd77dab55e06ae8c31f7f6c12ffb1ba5840f19562f933f9`**; TAP SHA **`fe2cfa83a19df5c44b21a4cfbec18ee40355dab849e5e9825b3edb774b94abf6`**. Aktuální proof je buffer-lifecycle/verification.json; starší measurement/verification.json zůstává původní83/83 history, nikoli tento aktuální výsledek.
+- Vlastní scope `git diff --check` exit0. CPU výstup není skutečné GPU ani FPS evidence. Vývojové fixture odhalily nevhodný public `buffer` setter místo skutečného own `_buffer`, prázdný Mesh bez subMeshes a chybějící NullEngine WebGPU policy; finální actual pinned fixtures tyto náhrady již netvrdí.
+
+Nezávislé review před actual GPU doložilo P2 původních117/117: Game onFault předává handleru přátelský UI text a původní raw-label fixture tento převod míjela. Původní PASS je uchovaný, ale helper420f se nepoužije pro actual target attribution. Oprava pasivně přečte nejvýše5 již zapsaných own RenderHealth.firstErrors stejné generation; `targetSource` rozliší handler argument, health record a unavailable. Skutečný Game onFault arrow je pro novou fixture vybraný AST z aktuálního source a běží se skutečným RenderHealth/watchWebGpuValidation event chain. Ověřuje původní before listener→diagnostics→trace→friendly handler→after listener pořadí. Žádný snapshot/API/new listener nebo změna původního argumentu. Druhá regrese odmítá accessor/foreign generation. Vlastní kontrola současně doplnila export již vypočtených dirty flags v columns14/15, stejný event cap a znovu ověřený byte budget.
+
+Omezení: pozorovaná native regular matrix role je přímý owner důkaz; generic/thin/geometry nebo nepozorovaný buffer zůstává unknown. Stejná fastBundle identita po náhradě je diskriminátor, **encoded setVertexBuffer/setBindGroup resource membership nebylo pozorováno**. History není whole-session/lossless: evictions/untracked/unknown/hardened/restore conflicts jsou explicitní a target může být not-retained. Owner-record loss se nezamlčí ani po reassociation. Na skutečný37326 zatím není nové přiřazení. Žádný fix cache/reuse/destroy ani celá migrace není tímto předáním přijata.
+
+Praktický další krok rootu po finálním clean review a release: nový immutable build se stejným source a počasím, volba `--buffer-lifecycle` bez shader/latency/routine/clock/profileEnvironment, skutečný NCM průchod. Při opakování chyby root spojí numeric target s native current/previous vlastnictvím, reallocation/release/destroy a pozorovanými context/bundle ID. Nepozorovaný owner zůstane unknown; teprve další přidělený discriminator může rozšířit encoded graph. Původní buildy/receipts se nepřepisují.
+
+Procesy/zdroje: pouze ukončené lehké Node CPU testy/syntax/parser/hash příkazy; žádný vlastní dlouhožijící proces, port, build ani GPU resource. Rootova krátká8frame měřicí okna byla respektována před testy.
+
+Nezávislé review: `/root/webgpu_renderer_audit` výslovně potvrdil **clean helper a5b3dc0000956b9abcd77dab55e06ae8c31f7f6c12ffb1ba5840f19562f933f9**, uzavření friendly-handler P2 a žádný další konkrétní nález. Nezávisle porovnal všech25 helper SHA,39 selected SHA, TAP SHA/119PASS/24syntax/UI0/diff0 a frozenv4/v5. Přesný záznam je `buffer-lifecycle/review.md`.
+
+Rezervace: předání je kompletní a bez běžících vlastních procesů; po finálním owned-files manifestu bez dalšího zápisu následuje `release --task webgpu-completion-buffer-lifecycle-20261021 --owner webgpu-completion-01a15a3e-buffer-lifecycle`. Skutečné uvolnění dokládá CLI výstup koordinátorovi. Root teprve integruje/publikuje a mění task/Linear/verification stav; release není GPU přijetí ani Done.

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-measurement-20261021",
+  "title": "KEY-22: explicitní QA ovládání a důkazy skutečné migrace bez změn zmrazených zdrojů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/",
+    "docs/agents/handoffs/webgpu-completion-measurement-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Znovupoužít přijatý Vite build-only transform a přesnou identitu zdrojů/testů/assetů, helperů, transformů i bundle; původní snapshot zůstává neměnný.",
+    "Explicitní QA panel před skutečným Game.start zachová i neúspěšný startup, ukazuje jen whitelisted technické kopie a nemění readiness, timeout, scheduler ani renderer.",
+    "Plain měření skutečné plné hry s HUD, různými MP avatary, raw frame series a doloženými rozměry/backendem/health; diagnostické instrumentace jsou oddělené.",
+    "Volitelný explicitní QA transit clock mapuje jednou Simulation.tick argument na serveru i browseru a Game.trafficInstant render; nemění autoritativní packet/input/replay clocks, fixedtimestep, Date nebo síťové deadline. Předem dané E0/A a jednorázové plánované benchmarkUTC jsou ve stejné hashed konfiguraci.",
+    "Clock je defaultoff; samostatný server-bootstrap spouští pouze root na rezervovaném API2597, existujícíbaseline2596 se nepřenastaví. Helperdoloží skutečnéhook counts, late/failed pokusy a nezávislé fyzikální/renderové mapy, nepovažujeendpointcounts za srovnatelnouceloutrasu.",
+    "CLI nepoužívá automatizaci browseru, porty či procesy bez samostatné validační rezervace. Testy helperu ověří přesné transformy, odmítnutí driftu a zachování neúspěšných důkazů.",
+    "Volitelná explicitní immutable weather fixture přebírá existující performance-preview mechanismus: úplné numerické Weather hodnoty beze změny zátěže, viditelné QA/fallback označení místo živého zdroje, source/emitted SHA a provenance ve stejné build/run identitě. Default bez fixture zachová původní API proxy.",
+    "Volitelný pouze diagnostický startup observer odděleně změří completion latency původních popErrorScope a queue.onSubmittedWorkDone. Nevolá je navíc, nečeká navíc, vrací původní Promise/throw a nemění health/readiness/timeout. Bounded scalar evidence, overflow a ownership/lifecycle jsou explicitní; defaultoff plain FPS cestu neinstrumentuje.",
+    "Navazující diagnostika CM finálního gate označí bounded technickou identitu původních shader-validation jobs, modulů, stage a pasivně čtených současných Effect/pipeline-context vazeb. Pozoruje pouze původní Promise bez dalšího getCompilationInfo/GPU API/await, zachová receiver/throw/return a ownership cleanup. Inventory už existujícího compilationProfile je v terminal exportu; plain zůstává defaultoff. Žádné runtime zdroje hry nebo shader texty či GPU objekty do exportu."
+  ],
+  "verification": [
+    "Lehké cílené node testy helperů uvnitř vlastního prefixu; žádný build/server/GPU běh v tomto tasku.",
+    "Předat kompletní soubory, konkrétní příkazy a důkazy; kořenový koordinátor vlastní build, porty a skutečnou GPU přejímku."
+  ],
+  "notes": [
+    "Dva nezměněné main preflighty mají 1Hz RAF a řízený light timeout; jejich výsledky nejsou výkonová přejímka. Pro první rozlišení stačí existující session recorder a profileEnvironment.",
+    "Nenahrazovat produkční renderer/simulaci, nezpřístupňovat Game/device do window, nepollovat mutující pipeline.isReady navíc a neodstraňovat světla, stíny nebo materiály pro lepší FPS.",
+    "Žádné zápisy do předchozího transit-calendar helperu ani jeho původní cache; nové výstupy spouští koordinátor pouze ve svém validačním scope.",
+    "Dodatečné konkrétní zadání: focused NCM actual30s low timeout na6/15 stages, raw receipt0b36c7cb v rootověqa-plain-run-1. Rozdíl sync285/async0 je doložený, dominance scope/fence latency dosud ne. Nejdřív tento observer; produktový NCM fix bude samostatně rezervovaný až po měření.",
+    "Před dalším zápisem root uchová přesný přijatý helper07b3e1cd v ownedvalidationcache. Stávající běžící plainbuildf511d0ab má neměnné bundle a původní helper identity; nový helper potřebuje nový build/run. Child nespouští žádný port/server/GPU ani nepřebírárootovy cache.",
+    "21.10 další reprodukce CM f1f716a8 bez peera opět selhala až submitted-frame po complete41 světelných etapách. Předchozí ba860fc6 má finalgate delta434 shader pairs, žádné nové async pipelines; konkrétní moduly zatím neoznačené. Root uchoval helper63d576ff/51tests v qa-helper-v2; diagnostický build14983724 zůstává neměnný. Nejprve prozkoumat přesné pinned instance properties a varianty observeru, potom implementace/refaktor/CPU tests a handoff."
+  ]
+}

@@ -1,0 +1,94 @@
+- main:
+  - generic "3D hra Strahov"
+  - generic: s•trahov
+  - paragraph: Připravuji celý kopec…
+  - paragraph: "3D scénu se nepodařilo spustit: RenderStartupTimeoutError: Renderer startup exceeded its visible-time deadline"
+  - button "Nahlásit problém"
+  - button "Opustit demo"
+  - button "Opustit demo": s•
+  - status: 1 na kopci · společný svět
+  - generic: DEMO
+  - generic "Řízené testovací počasí · uložený záznam · Řízený meteorologický model · benchmark":
+    - generic: ☁ 18,0 °C
+    - generic: model · starší data
+  - text: 16:00
+  - generic: Praha
+  - button "Tvoje postava": W
+  - navigation "Herní nabídka":
+    - button "Akce":
+      - generic: Akce
+    - button "Mapa":
+      - generic: Mapa
+    - button "Deník":
+      - generic: Deník
+    - button "Lidé":
+      - generic: Lidé
+    - button "Chat":
+      - generic: Chat
+    - button "Aktivity":
+      - generic: Aktivity
+    - button "Nastavení":
+      - generic: Nastavení
+    - button "Zpětná vazba":
+      - generic: Zpětná vazba
+    - paragraph: "Tab: nabídka · Enter: otevřít · Esc: zavřít. Kliknutím do hry pokračuješ."
+  - region "Interaktivní minimapa":
+    - generic: Strahov
+    - button "Otáčet mapu podle směru postavy" [disabled]:
+      - generic: ↑
+      - text: S
+    - group "Mapa kolejního areálu Strahov podle OpenStreetMap":
+      - generic: "11"
+      - generic: "12"
+      - generic: "4"
+      - generic: "2"
+      - generic: "9"
+      - generic: "1"
+      - generic: "8"
+      - generic: "5"
+      - generic: "10"
+      - generic: "7"
+      - generic: "3"
+      - generic: "6"
+      - 'button "2 míst: Blok 6, Klubovna B6"':
+        - generic: "2"
+      - button "Kancelář SH / SÚZ"
+      - button "Fotokomora"
+      - button "Hudebna B10"
+      - button "Včely · okolí B11"
+      - button "Silicon Gym / boulder"
+      - 'button "2 míst: SHerna B4, Studentská prádelna"':
+        - generic: "2"
+      - button "Hudebna B4"
+      - button "Společné místnosti B6"
+      - 'button "2 míst: Klubovna SH, Sedmička / Klub 007"':
+        - generic: "2"
+      - button "Fotbálek SH"
+      - button "Hudebna B9"
+      - button "MacGyver / 3D tisk"
+      - 'button "2 míst: Buzerák / SHOW, Mezi bloky"':
+        - generic: "2"
+      - button "Zahrádky SH"
+      - button "Grilovací centrum"
+      - button "Školicí centrum SH"
+      - button "R-ko / Recharging Bar"
+      - button "Stadion Strahov · 191 A"
+      - button "Stadion Strahov · 191 B"
+      - generic: 10 m
+    - group "Ovládání mapy":
+      - button "Přiblížit mapu": +
+      - button "Oddálit mapu": −
+      - button "Sledovat moji postavu" [disabled] [pressed]: ⌖
+      - button "Zobrazit celý areál": ⛶
+    - paragraph: Kolečko přibližuje, tažení posouvá. Kliknutím označíš cíl; Enter označí střed mapy.
+  - generic "Mapa © OpenStreetMap · ODbL. Prostorová předloha © IPR Praha · CC BY · 2023": © OSM / IPR
+  - generic "Levé kliknutí vybere cíl. Tažení levým nebo pravým tlačítkem otáčí kameru, kolečko přibližuje. Esc zavře nabídku nebo uvolní myš.":
+    - button "Ovládání":
+      - text: "?"
+      - generic: Ovládání
+    - button "Rychlá gesta (G)":
+      - text: G
+      - generic: Rychlá gesta (G)
+    - generic: — FPS
+  - button "Svítilna (F)" [disabled]:
+    - generic: F

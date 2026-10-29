@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-log-delivery",
+  "title": "KEY-1: bezeztrátově odvádět podrobné automatické logy při zdravém lokálním transportu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/session-diagnostics.ts", "shared/session-diagnostics.ts", "server/session-diagnostics.ts", "tests/session-diagnostics.test.ts", "tests/session-diagnostics-server.test.ts", "docs/agents/handoffs/repair-log-delivery.md"],
+  "resources": [],
+  "acceptance": [
+    "Odstranit doloženou ztrátu při zdravém transportu: wave2 log9.69MB má777reported drops,32seq gaps a chybějící konec; fronta1MiB a jediný128KiBbatch po5s nestíhá bursty.",
+    "Automatický bounded drain/backpressure a tail lifecycle, přesné příčiny ztráty a pravdivý stav ukládání. Zachovat pořadí, idempotentní retry, privacy sanitizer a původní diagnostické detaily.",
+    "Test zdravého reálnému záznamu odpovídajícího tlaku musí prokázat všechny seq/kritické události bez dropů. Offline/HTTP failure/cancel/dispose zůstává bounded a diagnostikované, bez fetch storm nebo nových neřízených timerů.",
+    "Pro trvalou lokální outbox či změnu wire formátu nejprve domluvit API s root; neřešit ztráty jen nekonečným zvětšením paměti nebo vypnutím událostí. Implementaci a cílený refaktoring předat společně s ověřením."
+  ],
+  "verification": ["Zdroj: .cache/playtest-repairs-validation/wave2-session.jsonl + wave2-report.json. Nečíst celý report do terminálu; promítat pouze potřebná pole.", "Cílené CPU testy a TS, žádný GPU/fullsuite/serverport bezroot. Root ověří novou celou cestu v browseru."],
+  "notes": ["Výslovný převod všech pěti dirty zdrojů/testů doložen v repair-game-integration handoffu; nový příjemce smí adopt-dirty.", "Root vlastní Game/UI a bude sampler posílat přes dosavadní event API; nezměnit ho bez handshake. Zachovat historické JSONL." ]
+}

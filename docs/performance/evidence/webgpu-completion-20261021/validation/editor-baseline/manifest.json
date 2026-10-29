@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "sourceSnapshotId": "bc38843693a9ccf591e500657d9e506d7d64e4a1788ccb4a6f9571eefa78a8bd",
+  "url": "http://127.0.0.1:4211/?renderBackend=webgpu",
+  "browser": "Edge155 on Windows",
+  "purpose": "Základní obrazový/lifecycle smoke současného nativního editoru; nikoli FPS nebo úplná migrační přejímka.",
+  "requestedViewport": {
+    "width": 2040,
+    "height": 986
+  },
+  "actualPreviewCanvas": {
+    "cssWidth": 346,
+    "cssHeight": 244,
+    "internalWidth": 346,
+    "internalHeight": 244,
+    "previewState": "ready"
+  },
+  "observed": [
+    "Šest presetů po dokončení native preview readiness",
+    "Otočení Alex doprava a přiblížení tváře",
+    "Změna rozměru náhledu po viewport resize",
+    "Warn/error konzole na konci kontroly prázdná"
+  ],
+  "limitations": [
+    "První příliš rychlé přepnutí více presetů zachytilo i loading nebo předchozí rig; tyto soubory zůstaly v ignorované cache a nejsou použity jako přejímka.",
+    "Veřejné uživatelské karty nebyly měněny. Native foreground otázka zůstává otevřená.",
+    "Tato kontrola je na původní baseline; nový default/startup kandidát musí mít vlastní praktické ověření."
+  ],
+  "images": [
+    {
+      "file": "editor-alex-ready-2040.jpg",
+      "bytes": 136553,
+      "sha256": "b5b471a35d56106950b869e8feb5fd33aad81af2ce08135d9ff9e1a4f915b568"
+    },
+    {
+      "file": "editor-robin-2040.jpg",
+      "bytes": 136330,
+      "sha256": "f2671fa396ee99501f8a964f614ee8bcaf96e61dbaa5bcd4572c6536576befeb"
+    },
+    {
+      "file": "editor-eli-ready-2040.jpg",
+      "bytes": 136322,
+      "sha256": "2540a05f561773d2638f11921686f205acf345e74716be2c0c61cfd66098aa60"
+    },
+    {
+      "file": "editor-sam-ready-2040.jpg",
+      "bytes": 136653,
+      "sha256": "9652c15757ac3cbecc8878babdbf97f4ae6509d2dad4ac85c7309ce6c73c9793"
+    },
+    {
+      "file": "editor-mia-ready-2040.jpg",
+      "bytes": 136287,
+      "sha256": "7f1ff202f3bfafa0f82733a3178c5abaf064b312f7c93ec4f4ce98d22819c712"
+    },
+    {
+      "file": "editor-niki-ready-2040.jpg",
+      "bytes": 136224,
+      "sha256": "b41a6455a8b8a5d1a00d5e95a6c46b584df951f74bc72d45de2b7142089895ae"
+    },
+    {
+      "file": "editor-alex-face-2040.jpg",
+      "bytes": 127128,
+      "sha256": "7a90ada9a0fd55a694d05c50e0e4bcc608cd88d56243207934a61c67af1687ae"
+    }
+  ]
+}

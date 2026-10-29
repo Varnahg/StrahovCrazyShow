@@ -1,0 +1,1125 @@
+TAP version 13
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# Subtest: a previously selected RAF and manual endFrame issue no GPU work after terminal health
+ok 1 - a previously selected RAF and manual endFrame issue no GPU work after terminal health
+  ---
+  duration_ms: 10.8905
+  type: 'test'
+  ...
+# Subtest: a synchronous terminal report during the callback prevents the following endFrame submit
+ok 2 - a synchronous terminal report during the callback prevents the following endFrame submit
+  ---
+  duration_ms: 1.9446
+  type: 'test'
+  ...
+# Subtest: actual pinned frame begin throw invalidates health without repairing or scheduling the frame
+ok 3 - actual pinned frame begin throw invalidates health without repairing or scheduling the frame
+  ---
+  duration_ms: 3.6338
+  type: 'test'
+  ...
+# Subtest: actual pinned frame callback throw invalidates health without repairing or scheduling the frame
+ok 4 - actual pinned frame callback throw invalidates health without repairing or scheduling the frame
+  ---
+  duration_ms: 0.9699
+  type: 'test'
+  ...
+# Subtest: actual pinned frame end throw invalidates health without repairing or scheduling the frame
+ok 5 - actual pinned frame end throw invalidates health without repairing or scheduling the frame
+  ---
+  duration_ms: 1.2846
+  type: 'test'
+  ...
+# Subtest: actual pinned frame submit throw invalidates health without repairing or scheduling the frame
+ok 6 - actual pinned frame submit throw invalidates health without repairing or scheduling the frame
+  ---
+  duration_ms: 1.4159
+  type: 'test'
+  ...
+# Subtest: nested reports are deduplicated and a throwing reporter cannot replace the original frame exception
+ok 7 - nested reports are deduplicated and a throwing reporter cannot replace the original frame exception
+  ---
+  duration_ms: 2.5239
+  type: 'test'
+  ...
+# Subtest: successful and borrowed frame calls preserve receiver arguments return and do not allocate health snapshots
+ok 8 - successful and borrowed frame calls preserve receiver arguments return and do not allocate health snapshots
+  ---
+  duration_ms: 1.2882
+  type: 'test'
+  ...
+# Subtest: frame returns never inspect then or attach promise settlement handlers
+ok 9 - frame returns never inspect then or attach promise settlement handlers
+  ---
+  duration_ms: 1.5144
+  type: 'test'
+  ...
+# Subtest: healthy endFrame preserves receiver arguments returns throws and thenables; disposed wrappers stay transparent
+ok 10 - healthy endFrame preserves receiver arguments returns throws and thenables; disposed wrappers stay transparent
+  ---
+  duration_ms: 1.5261
+  type: 'test'
+  ...
+# Subtest: restoration emits a terminal device fault in its new generation even without preceding loss
+ok 11 - restoration emits a terminal device fault in its new generation even without preceding loss
+  ---
+  duration_ms: 1.2469
+  type: 'test'
+  ...
+# Subtest: disposed or generation-retired frames do not report into a new renderer
+ok 12 - disposed or generation-retired frames do not report into a new renderer
+  ---
+  duration_ms: 1.2618
+  type: 'test'
+  ...
+# Subtest: frame ownership is per engine and restores inherited/own descriptors without replacing later owners
+ok 13 - frame ownership is per engine and restores inherited/own descriptors without replacing later owners
+  ---
+  duration_ms: 1.2266
+  type: 'test'
+  ...
+# Subtest: missing immutable or accessor frame hooks fail closed without evaluating getters
+ok 14 - missing immutable or accessor frame hooks fail closed without evaluating getters
+  ---
+  duration_ms: 3.5349
+  type: 'test'
+  ...
+# Subtest: own frame descriptors and the sole owner survive attach/dispose without duplicate callbacks
+ok 15 - own frame descriptors and the sole owner survive attach/dispose without duplicate callbacks
+  ---
+  duration_ms: 1.4285
+  type: 'test'
+  ...
+# Subtest: always-on health catch composes with the actual optional frame profiler in either attachment order
+ok 16 - always-on health catch composes with the actual optional frame profiler in either attachment order
+  ---
+  duration_ms: 11.2534
+  type: 'test'
+  ...
+# Subtest: inline terminal reports veto endFrame through the actual profiler in either order and preserve later owners
+ok 17 - inline terminal reports veto endFrame through the actual profiler in either order and preserve later owners
+  ---
+  duration_ms: 2.6659
+  type: 'test'
+  ...
+# Subtest: mixed operation kinds retain a total ready barrier and default shader work is preparation
+ok 18 - mixed operation kinds retain a total ready barrier and default shader work is preparation
+  ---
+  duration_ms: 1.1164
+  type: 'test'
+  ...
+# Subtest: preparation rejection keeps its identity and only settles its own pending kind
+ok 19 - preparation rejection keeps its identity and only settles its own pending kind
+  ---
+  duration_ms: 0.9441
+  type: 'test'
+  ...
+# Subtest: shader-validation rejection keeps its identity and only settles its own pending kind
+ok 20 - shader-validation rejection keeps its identity and only settles its own pending kind
+  ---
+  duration_ms: 0.4128
+  type: 'test'
+  ...
+# Subtest: dispose clears both kinds and late settlements cannot alter the retired counters
+ok 21 - dispose clears both kinds and late settlements cannot alter the retired counters
+  ---
+  duration_ms: 0.6701
+  type: 'test'
+  ...
+# Subtest: loss clears both kinds and late settlements cannot alter the retired counters
+ok 22 - loss clears both kinds and late settlements cannot alter the retired counters
+  ---
+  duration_ms: 1.0152
+  type: 'test'
+  ...
+# Subtest: restore clears both kinds and late settlements cannot alter the retired counters
+ok 23 - restore clears both kinds and late settlements cannot alter the retired counters
+  ---
+  duration_ms: 1.0725
+  type: 'test'
+  ...
+# Subtest: two real engine owners attribute effect errors and resource failures independently
+ok 24 - two real engine owners attribute effect errors and resource failures independently
+  ---
+  duration_ms: 1.0636
+  type: 'test'
+  ...
+# Subtest: owned asynchronous pipeline rejection is counted without a device event and keeps its rejection
+ok 25 - owned asynchronous pipeline rejection is counted without a device event and keeps its rejection
+  ---
+  duration_ms: 1.0864
+  type: 'test'
+  ...
+# Subtest: loss and restoration invalidate the renderer and old asynchronous work cannot enter the new generation
+ok 26 - loss and restoration invalidate the renderer and old asynchronous work cannot enter the new generation
+  ---
+  duration_ms: 0.8045
+  type: 'test'
+  ...
+# Subtest: all errors are counted while retained messages and snapshots stay bounded and isolated
+ok 27 - all errors are counted while retained messages and snapshots stay bounded and isolated
+  ---
+  duration_ms: 0.962
+  type: 'test'
+  ...
+# Subtest: disposal detaches only its observers and late owned work preserves result semantics
+ok 28 - disposal detaches only its observers and late owned work preserves result semantics
+  ---
+  duration_ms: 0.4898
+  type: 'test'
+  ...
+# Subtest: guard rejects an owned fault promptly and preserves that error identity
+ok 29 - guard rejects an owned fault promptly and preserves that error identity
+  ---
+  duration_ms: 0.5822
+  type: 'test'
+  ...
+# Subtest: guard preserves normal success/rejection and releases every settled waiter
+ok 30 - guard preserves normal success/rejection and releases every settled waiter
+  ---
+  duration_ms: 0.7876
+  type: 'test'
+  ...
+# Subtest: guard around track keeps the original rejection despite the health notification
+ok 31 - guard around track keeps the original rejection despite the health notification
+  ---
+  duration_ms: 0.5391
+  type: 'test'
+  ...
+# Subtest: native device loss works without Babylon auto-restore and is not double-counted
+ok 32 - native device loss works without Babylon auto-restore and is not double-counted
+  ---
+  duration_ms: 0.7556
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# Subtest: explicit ready-generation revalidation still submits and waits for scope/fence/pending readiness without another state transition
+ok 33 - explicit ready-generation revalidation still submits and waits for scope/fence/pending readiness without another state transition
+  ---
+  duration_ms: 16.092
+  type: 'test'
+  ...
+# Subtest: ready revalidation refuses foreign generation and a generation changed while the original fence is pending
+ok 34 - ready revalidation refuses foreign generation and a generation changed while the original fence is pending
+  ---
+  duration_ms: 3.2419
+  type: 'test'
+  ...
+# Subtest: ready revalidation preserves original validation error and the caller's remaining deadline
+ok 35 - ready revalidation preserves original validation error and the caller's remaining deadline
+  ---
+  duration_ms: 3.5174
+  type: 'test'
+  ...
+# Subtest: final submission waits for diagnostic-only shader work created by that same frame
+ok 36 - final submission waits for diagnostic-only shader work created by that same frame
+  ---
+  duration_ms: 6.842
+  type: 'test'
+  ...
+# Subtest: late fulfilled compilation errors reject final acceptance after a successful submission
+ok 37 - late fulfilled compilation errors reject final acceptance after a successful submission
+  ---
+  duration_ms: 1.5828
+  type: 'test'
+  ...
+# Subtest: diagnostic-only pending work cannot extend the final visible deadline
+ok 38 - diagnostic-only pending work cannot extend the final visible deadline
+  ---
+  duration_ms: 2.1691
+  type: 'test'
+  ...
+# Subtest: startup needs an actual ready submitted frame, then removes all idle work
+ok 39 - startup needs an actual ready submitted frame, then removes all idle work
+  ---
+  duration_ms: 5.6359
+  type: 'test'
+  ...
+# Subtest: readiness must hold before and after the frame and tracked compilation must finish
+ok 40 - readiness must hold before and after the frame and tracked compilation must finish
+  ---
+  duration_ms: 1.6816
+  type: 'test'
+  ...
+# Subtest: initially hidden time does not consume the startup budget or submit frames
+ok 41 - initially hidden time does not consume the startup budget or submit frames
+  ---
+  duration_ms: 2.1079
+  type: 'test'
+  ...
+# Subtest: hiding during a pending submission pauses the timer and requires a visible ready frame
+ok 42 - hiding during a pending submission pauses the timer and requires a visible ready frame
+  ---
+  duration_ms: 1.4213
+  type: 'test'
+  ...
+# Subtest: a pending submission cannot hide the visible deadline and late success cannot mark ready
+ok 43 - a pending submission cannot hide the visible deadline and late success cannot mark ready
+  ---
+  duration_ms: 1.3564
+  type: 'test'
+  ...
+# Subtest: a synchronous render stall loses to the deadline before the overdue timer task runs
+ok 44 - a synchronous render stall loses to the deadline before the overdue timer task runs
+  ---
+  duration_ms: 1.0953
+  type: 'test'
+  ...
+# Subtest: native device loss promptly cancels a pending submission without Babylon restoration
+ok 45 - native device loss promptly cancels a pending submission without Babylon restoration
+  ---
+  duration_ms: 1.0672
+  type: 'test'
+  ...
+# Subtest: renderer disposal promptly rejects a pending queue and late completion stays disposed
+ok 46 - renderer disposal promptly rejects a pending queue and late completion stays disposed
+  ---
+  duration_ms: 0.8982
+  type: 'test'
+  ...
+# Subtest: abort before startup schedules no frame and is not a render fault
+ok 47 - abort before startup schedules no frame and is not a render fault
+  ---
+  duration_ms: 0.6243
+  type: 'test'
+  ...
+# Subtest: abort during render closes only the scope and never flushes or submits
+ok 48 - abort during render closes only the scope and never flushes or submits
+  ---
+  duration_ms: 0.7533
+  type: 'test'
+  ...
+# Subtest: abort during a never-settling submission releases every health waiter
+ok 49 - abort during a never-settling submission releases every health waiter
+  ---
+  duration_ms: 0.953
+  type: 'test'
+  ...
+# Subtest: a readiness check that faults the owner cannot render the invalid scene
+ok 50 - a readiness check that faults the owner cannot render the invalid scene
+  ---
+  duration_ms: 0.7831
+  type: 'test'
+  ...
+# Subtest: a fault between a guard settlement and its continuation cannot render
+ok 51 - a fault between a guard settlement and its continuation cannot render
+  ---
+  duration_ms: 0.6723
+  type: 'test'
+  ...
+# Subtest: queue rejection keeps its original error and cannot produce ready
+ok 52 - queue rejection keeps its original error and cannot produce ready
+  ---
+  duration_ms: 0.8453
+  type: 'test'
+  ...
+# Subtest: GPU scope validation fails the owner once even when queue submission succeeds
+ok 53 - GPU scope validation fails the owner once even when queue submission succeeds
+  ---
+  duration_ms: 0.8603
+  type: 'test'
+  ...
+# Subtest: render exceptions skip pinned end/flush/submit and consume the closed scope's late rejection
+ok 54 - render exceptions skip pinned end/flush/submit and consume the closed scope's late rejection
+  ---
+  duration_ms: 1.7487
+  type: 'test'
+  ...
+# Subtest: manual startup retains falsy source throws before scope or reporter failures
+ok 55 - manual startup retains falsy source throws before scope or reporter failures
+  ---
+  duration_ms: 4.1439
+  type: 'test'
+  ...
+# Subtest: manual startup disposal inside render cannot flush the disposed owner
+ok 56 - manual startup disposal inside render cannot flush the disposed owner
+  ---
+  duration_ms: 0.7482
+  type: 'test'
+  ...
+# Subtest: synchronous startup source error wins over an already fulfilled scope validation error
+ok 57 - synchronous startup source error wins over an already fulfilled scope validation error
+  ---
+  duration_ms: 2.9389
+  type: 'test'
+  ...
+# Subtest: native startup does not silently fall back when submission validation is absent
+ok 58 - native startup does not silently fall back when submission validation is absent
+  ---
+  duration_ms: 0.8458
+  type: 'test'
+  ...
+# Subtest: WebGL still needs an actual frame and never reads a native device
+ok 59 - WebGL still needs an actual frame and never reads a native device
+  ---
+  duration_ms: 0.8448
+  type: 'test'
+  ...
+# Subtest: owned resource failure promptly cancels even a never-settling queue
+ok 60 - owned resource failure promptly cancels even a never-settling queue
+  ---
+  duration_ms: 1.0955
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:00:05]: Babylon.js v9.30.0 - Null engine
+# Subtest: bounded CPU-only ticks use task turns without any engine frame or presentation dependency
+ok 61 - bounded CPU-only ticks use task turns without any engine frame or presentation dependency
+  ---
+  duration_ms: 18.5042
+  type: 'test'
+  ...
+# Subtest: lazy native draw submits through actual pinned endFrame and stop inside callback permits its healthy completion
+ok 62 - lazy native draw submits through actual pinned endFrame and stop inside callback permits its healthy completion
+  ---
+  duration_ms: 2.0875
+  type: 'test'
+  ...
+# Subtest: the actual finite light catalog preserves all stages, bounded checks and ready draws without presentation callbacks
+ok 63 - the actual finite light catalog preserves all stages, bounded checks and ready draws without presentation callbacks
+  ---
+  duration_ms: 28.505
+  type: 'test'
+  ...
+# Subtest: the next quality pass and final idle barrier cannot bypass the last tick's pending fence
+ok 64 - the next quality pass and final idle barrier cannot bypass the last tick's pending fence
+  ---
+  duration_ms: 3.2826
+  type: 'test'
+  ...
+# Subtest: actual light failed result vetoes the recorded frame after its synchronous cleanup
+ok 65 - actual light failed result vetoes the recorded frame after its synchronous cleanup
+  ---
+  duration_ms: 5.0468
+  type: 'test'
+  ...
+# Subtest: actual light timeout result vetoes the recorded frame after its synchronous cleanup
+ok 66 - actual light timeout result vetoes the recorded frame after its synchronous cleanup
+  ---
+  duration_ms: 1.4775
+  type: 'test'
+  ...
+# Subtest: actual light restore result vetoes the recorded frame after its synchronous cleanup
+ok 67 - actual light restore result vetoes the recorded frame after its synchronous cleanup
+  ---
+  duration_ms: 1.098
+  type: 'test'
+  ...
+# Subtest: actual light cleanup result vetoes the recorded frame after its synchronous cleanup
+ok 68 - actual light cleanup result vetoes the recorded frame after its synchronous cleanup
+  ---
+  duration_ms: 1.8074
+  type: 'test'
+  ...
+# Subtest: actual light disposed result vetoes the recorded frame after its synchronous cleanup
+ok 69 - actual light disposed result vetoes the recorded frame after its synchronous cleanup
+  ---
+  duration_ms: 3.0199
+  type: 'test'
+  ...
+# Subtest: actual swallowed falsy draw throw (0) keeps its health guard rejection identity
+ok 70 - actual swallowed falsy draw throw (0) keeps its health guard rejection identity
+  ---
+  duration_ms: 4.3246
+  type: 'test'
+  ...
+# Subtest: actual swallowed falsy draw throw (undefined) keeps its health guard rejection identity
+ok 71 - actual swallowed falsy draw throw (undefined) keeps its health guard rejection identity
+  ---
+  duration_ms: 1.7819
+  type: 'test'
+  ...
+# Subtest: actual swallowed falsy draw throw (false) keeps its health guard rejection identity
+ok 72 - actual swallowed falsy draw throw (false) keeps its health guard rejection identity
+  ---
+  duration_ms: 1.6692
+  type: 'test'
+  ...
+# Subtest: a direct source throw reaches RenderHealth and no later frame is scheduled
+ok 73 - a direct source throw reaches RenderHealth and no later frame is scheduled
+  ---
+  duration_ms: 1.5504
+  type: 'test'
+  ...
+# Subtest: a direct begin throw reaches RenderHealth and no later frame is scheduled
+ok 74 - a direct begin throw reaches RenderHealth and no later frame is scheduled
+  ---
+  duration_ms: 1.0993
+  type: 'test'
+  ...
+# Subtest: a direct draw throw reaches RenderHealth and no later frame is scheduled
+ok 75 - a direct draw throw reaches RenderHealth and no later frame is scheduled
+  ---
+  duration_ms: 1.4218
+  type: 'test'
+  ...
+# Subtest: a direct end throw reaches RenderHealth and no later frame is scheduled
+ok 76 - a direct end throw reaches RenderHealth and no later frame is scheduled
+  ---
+  duration_ms: 1.4063
+  type: 'test'
+  ...
+# Subtest: a draw error swallowed by an incorrectly true callback still cannot submit
+ok 77 - a draw error swallowed by an incorrectly true callback still cannot submit
+  ---
+  duration_ms: 1.6794
+  type: 'test'
+  ...
+# Subtest: first draw throw (0) wins over a later callback cleanup throw
+ok 78 - first draw throw (0) wins over a later callback cleanup throw
+  ---
+  duration_ms: 1.5087
+  type: 'test'
+  ...
+# Subtest: first draw throw (undefined) wins over a later callback cleanup throw
+ok 79 - first draw throw (undefined) wins over a later callback cleanup throw
+  ---
+  duration_ms: 1.1577
+  type: 'test'
+  ...
+# Subtest: first draw throw (false) wins over a later callback cleanup throw
+ok 80 - first draw throw (false) wins over a later callback cleanup throw
+  ---
+  duration_ms: 0.981
+  type: 'test'
+  ...
+# Subtest: synchronous health fault inside render vetoes endFrame and retires the scheduler
+ok 81 - synchronous health fault inside render vetoes endFrame and retires the scheduler
+  ---
+  duration_ms: 2.2284
+  type: 'test'
+  ...
+# Subtest: validation and asynchronous queue rejection invalidate the owner without an uncaptured device event
+ok 82 - validation and asynchronous queue rejection invalidate the owner without an uncaptured device event
+  ---
+  duration_ms: 2.5963
+  type: 'test'
+  ...
+# Subtest: hidden owners cancel queued callbacks, retain requested work and resume one task without an extra frame
+ok 83 - hidden owners cancel queued callbacks, retain requested work and resume one task without an extra frame
+  ---
+  duration_ms: 2.2876
+  type: 'test'
+  ...
+# Subtest: hiding during a valid draw completes that owned frame, pauses subsequent work and retains its fence
+ok 84 - hiding during a valid draw completes that owned frame, pauses subsequent work and retains its fence
+  ---
+  duration_ms: 1.5749
+  type: 'test'
+  ...
+# Subtest: abort promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+ok 85 - abort promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+  ---
+  duration_ms: 2.1494
+  type: 'test'
+  ...
+# Subtest: dispose promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+ok 86 - dispose promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+  ---
+  duration_ms: 1.1706
+  type: 'test'
+  ...
+# Subtest: device-loss promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+ok 87 - device-loss promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+  ---
+  duration_ms: 2.3462
+  type: 'test'
+  ...
+# Subtest: generation promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+ok 88 - generation promptly rejects waitForIdle while a fence is pending; late work cannot revive the owner
+  ---
+  duration_ms: 1.6464
+  type: 'test'
+  ...
+# Subtest: abort inside a draw closes its scope without endFrame; later dequeued tasks remain inert
+ok 89 - abort inside a draw closes its scope without endFrame; later dequeued tasks remain inert
+  ---
+  duration_ms: 1.694
+  type: 'test'
+  ...
+# Subtest: WebGL reference retains full manual begin/end without fake WebGPU scope or timing
+ok 90 - WebGL reference retains full manual begin/end without fake WebGPU scope or timing
+  ---
+  duration_ms: 1.8342
+  type: 'test'
+  ...
+# Subtest: idle barrier rejects an active or reentrant caller instead of observing a previous pass
+ok 91 - idle barrier rejects an active or reentrant caller instead of observing a previous pass
+  ---
+  duration_ms: 2.3296
+  type: 'test'
+  ...
+# Subtest: a cancellation cleanup throw still closes the host, releases listeners and records the fault once
+ok 92 - a cancellation cleanup throw still closes the host, releases listeners and records the fault once
+  ---
+  duration_ms: 1.1747
+  type: 'test'
+  ...
+# Subtest: the actual MessageChannel host runs finite work and its final disposal closes its browser listener
+ok 93 - the actual MessageChannel host runs finite work and its final disposal closes its browser listener
+  ---
+  duration_ms: 97.8859
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# Subtest: readValues: native success, copy semantics, pool reuse, valid zero
+ok 94 - readValues: native success, copy semantics, pool reuse, valid zero
+  ---
+  duration_ms: 18.9326
+  type: 'test'
+  ...
+# Subtest: readValues: dispose pending completion is null and never re-pools
+ok 95 - readValues: dispose pending completion is null and never re-pools
+  ---
+  duration_ms: 1.4155
+  type: 'test'
+  ...
+# Subtest: readValues: engine-dispose pending completion is null and never re-pools
+ok 96 - readValues: engine-dispose pending completion is null and never re-pools
+  ---
+  duration_ms: 1.0367
+  type: 'test'
+  ...
+# Subtest: readValues: engine-id pending completion is null and never re-pools
+ok 97 - readValues: engine-id pending completion is null and never re-pools
+  ---
+  duration_ms: 0.9102
+  type: 'test'
+  ...
+# Subtest: readValues: engine-device pending completion is null and never re-pools
+ok 98 - readValues: engine-device pending completion is null and never re-pools
+  ---
+  duration_ms: 1.0068
+  type: 'test'
+  ...
+# Subtest: readValues: device-loss pending completion is null and never re-pools
+ok 99 - readValues: device-loss pending completion is null and never re-pools
+  ---
+  duration_ms: 1.0754
+  type: 'test'
+  ...
+# Subtest: readValues: active rejection preserves falsy identity through cleanup throw
+ok 100 - readValues: active rejection preserves falsy identity through cleanup throw
+  ---
+  duration_ms: 3.5938
+  type: 'test'
+  ...
+# Subtest: readValue: native success, copy semantics, pool reuse, valid zero
+ok 101 - readValue: native success, copy semantics, pool reuse, valid zero
+  ---
+  duration_ms: 0.8952
+  type: 'test'
+  ...
+# Subtest: readValue: dispose pending completion is null and never re-pools
+ok 102 - readValue: dispose pending completion is null and never re-pools
+  ---
+  duration_ms: 0.6621
+  type: 'test'
+  ...
+# Subtest: readValue: engine-dispose pending completion is null and never re-pools
+ok 103 - readValue: engine-dispose pending completion is null and never re-pools
+  ---
+  duration_ms: 0.9617
+  type: 'test'
+  ...
+# Subtest: readValue: engine-id pending completion is null and never re-pools
+ok 104 - readValue: engine-id pending completion is null and never re-pools
+  ---
+  duration_ms: 0.6117
+  type: 'test'
+  ...
+# Subtest: readValue: engine-device pending completion is null and never re-pools
+ok 105 - readValue: engine-device pending completion is null and never re-pools
+  ---
+  duration_ms: 0.5177
+  type: 'test'
+  ...
+# Subtest: readValue: device-loss pending completion is null and never re-pools
+ok 106 - readValue: device-loss pending completion is null and never re-pools
+  ---
+  duration_ms: 0.6733
+  type: 'test'
+  ...
+# Subtest: readValue: active rejection preserves falsy identity through cleanup throw
+ok 107 - readValue: active rejection preserves falsy identity through cleanup throw
+  ---
+  duration_ms: 1.3008
+  type: 'test'
+  ...
+# Subtest: readTwoValuesAndSubtract: native success, copy semantics, pool reuse, valid zero
+ok 108 - readTwoValuesAndSubtract: native success, copy semantics, pool reuse, valid zero
+  ---
+  duration_ms: 0.8322
+  type: 'test'
+  ...
+# Subtest: readTwoValuesAndSubtract: dispose pending completion is null and never re-pools
+ok 109 - readTwoValuesAndSubtract: dispose pending completion is null and never re-pools
+  ---
+  duration_ms: 0.4013
+  type: 'test'
+  ...
+# Subtest: readTwoValuesAndSubtract: engine-dispose pending completion is null and never re-pools
+ok 110 - readTwoValuesAndSubtract: engine-dispose pending completion is null and never re-pools
+  ---
+  duration_ms: 0.3296
+  type: 'test'
+  ...
+# Subtest: readTwoValuesAndSubtract: engine-id pending completion is null and never re-pools
+ok 111 - readTwoValuesAndSubtract: engine-id pending completion is null and never re-pools
+  ---
+  duration_ms: 0.3814
+  type: 'test'
+  ...
+# Subtest: readTwoValuesAndSubtract: engine-device pending completion is null and never re-pools
+ok 112 - readTwoValuesAndSubtract: engine-device pending completion is null and never re-pools
+  ---
+  duration_ms: 0.3726
+  type: 'test'
+  ...
+# Subtest: readTwoValuesAndSubtract: device-loss pending completion is null and never re-pools
+ok 113 - readTwoValuesAndSubtract: device-loss pending completion is null and never re-pools
+  ---
+  duration_ms: 0.5122
+  type: 'test'
+  ...
+# Subtest: readTwoValuesAndSubtract: active rejection preserves falsy identity through cleanup throw
+ok 114 - readTwoValuesAndSubtract: active rejection preserves falsy identity through cleanup throw
+  ---
+  duration_ms: 3.1036
+  type: 'test'
+  ...
+# Subtest: native synchronous encoder error retains identity and releases borrowed ownership
+ok 115 - native synchronous encoder error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 1.4385
+  type: 'test'
+  ...
+# Subtest: native synchronous resolve error retains identity and releases borrowed ownership
+ok 116 - native synchronous resolve error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 1.4579
+  type: 'test'
+  ...
+# Subtest: native synchronous copy error retains identity and releases borrowed ownership
+ok 117 - native synchronous copy error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 0.871
+  type: 'test'
+  ...
+# Subtest: native synchronous finish error retains identity and releases borrowed ownership
+ok 118 - native synchronous finish error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 0.7124
+  type: 'test'
+  ...
+# Subtest: native synchronous submit error retains identity and releases borrowed ownership
+ok 119 - native synchronous submit error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 0.7367
+  type: 'test'
+  ...
+# Subtest: native synchronous map error retains identity and releases borrowed ownership
+ok 120 - native synchronous map error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 0.5954
+  type: 'test'
+  ...
+# Subtest: native synchronous range error retains identity and releases borrowed ownership
+ok 121 - native synchronous range error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 0.7264
+  type: 'test'
+  ...
+# Subtest: native synchronous unmap error retains identity and releases borrowed ownership
+ok 122 - native synchronous unmap error retains identity and releases borrowed ownership
+  ---
+  duration_ms: 0.5635
+  type: 'test'
+  ...
+# Subtest: single-buffer backpressure and multiple in-flight maps preserve original counts
+ok 123 - single-buffer backpressure and multiple in-flight maps preserve original counts
+  ---
+  duration_ms: 1.1023
+  type: 'test'
+  ...
+# Subtest: dispose attempts all pending/pool/query releases once even with falsy cleanup failure
+ok 124 - dispose attempts all pending/pool/query releases once even with falsy cleanup failure
+  ---
+  duration_ms: 1.8291
+  type: 'test'
+  ...
+# Subtest: partial constructor allocation failure releases earlier native resources
+ok 125 - partial constructor allocation failure releases earlier native resources
+  ---
+  duration_ms: 1.0842
+  type: 'test'
+  ...
+# Subtest: one loss reaction per device and no QuerySet/engine in shared state
+ok 126 - one loss reaction per device and no QuerySet/engine in shared state
+  ---
+  duration_ms: 0.7326
+  type: 'test'
+  ...
+# Subtest: timestamp frame/pass null has no sample and real zero remains a sample
+ok 127 - timestamp frame/pass null has no sample and real zero remains a sample
+  ---
+  duration_ms: 8.478
+  type: 'test'
+  ...
+# Subtest: timestamp disable/re-enable cannot reset or write a newer frame cycle
+ok 128 - timestamp disable/re-enable cannot reset or write a newer frame cycle
+  ---
+  duration_ms: 1.2296
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# Subtest: active frame/pass errors use the native engine event and create no unhandled child
+ok 129 - active frame/pass errors use the native engine event and create no unhandled child
+  ---
+  duration_ms: 50.8577
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# Subtest: native pass consumer handles loss-first race without fake sample
+ok 130 - native pass consumer handles loss-first race without fake sample
+  ---
+  duration_ms: 2.7724
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: WebGPU query read failed (timestamp-pass): Error: map
+# Subtest: native pass consumer handles map-first race without fake sample
+ok 131 - native pass consumer handles map-first race without fake sample
+  ---
+  duration_ms: 1.3241
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# Subtest: native event observer throw cannot reject the internal consumer chain
+ok 132 - native event observer throw cannot reject the internal consumer chain
+  ---
+  duration_ms: 1.8902
+  type: 'test'
+  ...
+# Subtest: occlusion replacement ignores old data/rejection and cleans current ownership
+ok 133 - occlusion replacement ignores old data/rejection and cleans current ownership
+  ---
+  duration_ms: 2.4504
+  type: 'test'
+  ...
+# BJS - [22:00:04]: Babylon.js v9.30.0 - WebGPU1 engine
+# BJS - [22:00:04]: WebGPU is not supported by your browser.
+# Subtest: occlusion active rejection reports exact error, disposal and old rejection are consumed
+not ok 134 - occlusion active rejection reports exact error, disposal and old rejection are consumed
+  ---
+  duration_ms: 4.8376
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-query-lifecycle\\query-lifecycle.test.mjs:111:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'map')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-query-lifecycle/query-lifecycle.test.mjs:115:72)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: engine disposal attempts existing steps in order, both query owners, clear and exact falsy failure
+ok 135 - engine disposal attempts existing steps in order, both query owners, clear and exact falsy failure
+  ---
+  duration_ms: 3.6723
+  type: 'test'
+  ...
+# Subtest: query error watcher leaves WebGL property and lifecycle untouched
+ok 136 - query error watcher leaves WebGL property and lifecycle untouched
+  ---
+  duration_ms: 3.2529
+  type: 'test'
+  ...
+# Subtest: query error producer is required for WebGPU including registration and malformed observer
+ok 137 - query error producer is required for WebGPU including registration and malformed observer
+  ---
+  duration_ms: 1.19
+  type: 'test'
+  ...
+# Subtest: query error watcher forwards exact falsy error and source, detaches and rejects drift once
+ok 138 - query error watcher forwards exact falsy error and source, detaches and rejects drift once
+  ---
+  duration_ms: 2.9405
+  type: 'test'
+  ...
+# Subtest: query watcher attempts lifecycle cleanup after producer removal throws
+ok 139 - query watcher attempts lifecycle cleanup after producer removal throws
+  ---
+  duration_ms: 0.5761
+  type: 'test'
+  ...
+# Subtest: WebGL installs no listeners or lifecycle observers and never reads a device
+ok 140 - WebGL installs no listeners or lifecycle observers and never reads a device
+  ---
+  duration_ms: 0.6724
+  type: 'test'
+  ...
+# Subtest: every uncaptured error is forwarded with bounded text and normal event delivery preserved
+ok 141 - every uncaptured error is forwarded with bounded text and normal event delivery preserved
+  ---
+  duration_ms: 2.4343
+  type: 'test'
+  ...
+# Subtest: context restoration replaces the device listener without duplicate callbacks or old-device errors
+ok 142 - context restoration replaces the device listener without duplicate callbacks or old-device errors
+  ---
+  duration_ms: 0.6737
+  type: 'test'
+  ...
+# Subtest: engine disposal removes the listener and observers without skipping later disposal observers
+ok 143 - engine disposal removes the listener and observers without skipping later disposal observers
+  ---
+  duration_ms: 1.1011
+  type: 'test'
+  ...
+# Subtest: manual cleanup and a replayed disposal notification cannot leave a live listener
+ok 144 - manual cleanup and a replayed disposal notification cannot leave a live listener
+  ---
+  duration_ms: 0.7489
+  type: 'test'
+  ...
+# Subtest: missing initialized device is visible and a restored device becomes monitored
+ok 145 - missing initialized device is visible and a restored device becomes monitored
+  ---
+  duration_ms: 0.6807
+  type: 'test'
+  ...
+# Subtest: explicit loss monitoring follows only the current live device and detaches on cleanup
+ok 146 - explicit loss monitoring follows only the current live device and detaches on cleanup
+  ---
+  duration_ms: 1.1849
+  type: 'test'
+  ...
+# Subtest: requesting explicit device-loss monitoring exposes a missing lost Promise
+ok 147 - requesting explicit device-loss monitoring exposes a missing lost Promise
+  ---
+  duration_ms: 0.5716
+  type: 'test'
+  ...
+1..147
+# tests 147
+# suites 0
+# pass 146
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2947.4638

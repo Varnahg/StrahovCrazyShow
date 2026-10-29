@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-grass-worker-prototype-20261019",
+  "title": "Ověřit persistent worker pro deterministické grass tiles bez změny renderu",
+  "status": "ready",
+  "dependsOn": [
+    "client-threading-character-material-init-20261019"
+  ],
+  "writePaths": [
+    "client/photo-grass-placement.ts",
+    "client/photographic-grass.ts",
+    "client/photo-grass-worker.ts",
+    "client/photo-grass-worker-protocol.ts",
+    "client/photo-grass-tile-executor.ts",
+    "tests/photo-grass-worker.test.ts",
+    "tests/photo-grass.test.ts",
+    "docs/agents/handoffs/client-threading-grass-worker-prototype-20261019.md",
+    "_bmad-output/implementation-artifacts/client-threading-grass-worker-20261019/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Experimental explicitly local opt-in worker implementation only; existing default main-thread path stays unchanged until real production A/B proves benefit. No claim of accepted optimization from worker creation alone.",
+    "Use exact existing prepareTile classifier/terrain/matrix generator; preserve FIFO1536 main cache, release transferred worker cache entries before detach; no duplicate long-term matrix cache, SAB or world data rewrite.",
+    "One persistent worker/controller, bounded <=2 inflight and <=2 completions/update; handler queues only, update owns cache/revision. Camera changes do not reject deterministic completed tiles; explicit cancellation/resource epoch/disposal reject stale or duplicate messages. Yield worker slices for cancellation.",
+    "Bounded robust fallback to original main generator on unavailable/failed worker without concurrent producers or root/fade/cache loss. ready remains resource readiness. No worker side Babylon Scene/device/DOM ownership.",
+    "Existing deterministic matrices/hash, near-frustum coverage, teleport/quality/fades/cache/lifecycle parity plus actual transfer ownership and delayed/duplicate/cancelled/disposed-result tests; real-browser bundling and cold convergence/performance delegated root after independentreview.",
+    "Implement and refactor coherent narrow unit, preserve root foreign WIP, no staging/commit withoutroot acceptance. Measure bootstrap duplication of shared/world TREES in later browser check. No work outside exactpaths."
+  ],
+  "verification": [
+    "Read AGENTS/project BMADpolicy; delegated implementation no recursiveworkflow. Claim beforewrites.",
+    "During root4206measurement do not run tests/builds or CPU microbenchmarks; prepare code and inspect only. Root later authorizes targeted CPU tests after GPUcapture ends.",
+    "No heavyvalidation/GPU/server bychild. Root owns isolated build/fullchecks/production A/B and integration."
+  ],
+  "notes": [
+    "User authorizedmultithreadingresearch+implementation19Oct; researchdone but benefitunproven. Current profile excludes grass becausepathoutsidegrass; root collectingknownlawn next. This is smallest reversible experiment, mayberejected if overheadorcostdoesnotjustify.",
+    "Root BMAD current build route supports followup implementation from worker-decision-input.md; childimplements directassignment, no recursiveBMAD. Rootcoordinator maintainsLinear andgoal."
+  ]
+}

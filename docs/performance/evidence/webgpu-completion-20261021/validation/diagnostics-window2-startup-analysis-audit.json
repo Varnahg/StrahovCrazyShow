@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "/root/diagnostics_verification_review",
+  "mode": "read-only independent arithmetic; no test/build/GPU",
+  "findings": [],
+  "analysisSha256": "8455d709d76b1ae2ff5571f9bcc95e3c3cebacb402e55b05f8f602afc79578c7",
+  "unionBothChannelsMs": [10425.199999332428,8209.799999952316,5839.599999427795,1027.6999994516373],
+  "queueOnlyUnionMsRounded": [10422.1,8206.7,5837.0,1026.3],
+  "caveats": [
+    "Combined union is not queue-only latency, GPU execution or shader ownership.",
+    "Latency union and synchronous CPU wall intervals are not disjoint; do not add them as a budget partition.",
+    "Variants windows exclude quality apply and restore; full preparationSummary retains those costs.",
+    "Different active instrumentation excludes matched A/B inference."
+  ],
+  "replay": "node docs/performance/evidence/webgpu-completion-20261021/validation/analyze-window2-startup.mjs --verify"
+}

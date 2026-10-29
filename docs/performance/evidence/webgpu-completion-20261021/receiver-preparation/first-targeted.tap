@@ -1,0 +1,222 @@
+TAP version 13
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# Subtest: selection uses real source/material metadata and leaves resources and unrelated flags intact
+ok 1 - selection uses real source/material metadata and leaves resources and unrelated flags intact
+  ---
+  duration_ms: 35.1181
+  type: 'test'
+  ...
+# Subtest: camera-masked and degenerate candidates cannot hide a drawable representative
+ok 2 - camera-masked and degenerate candidates cannot hide a drawable representative
+  ---
+  duration_ms: 6.1497
+  type: 'test'
+  ...
+# Subtest: disabled, invisible and parent-disabled objects are never activated
+ok 3 - disabled, invisible and parent-disabled objects are never activated
+  ---
+  duration_ms: 5.9829
+  type: 'test'
+  ...
+# Subtest: deduplication keeps material identities, vertex attributes and shadow inputs distinct
+ok 4 - deduplication keeps material identities, vertex attributes and shadow inputs distinct
+  ---
+  duration_ms: 4.8871
+  type: 'test'
+  ...
+# Subtest: same material/layout with distinct actual light membership is not collapsed
+ok 5 - same material/layout with distinct actual light membership is not collapsed
+  ---
+  duration_ms: 5.4751
+  type: 'test'
+  ...
+# Subtest: real regular/thin instances and instanced vertex attributes are explicitly unsupported
+ok 6 - real regular/thin instances and instanced vertex attributes are explicitly unsupported
+  ---
+  duration_ms: 4.3252
+  type: 'test'
+  ...
+# Subtest: skinned, morph and baked-animation meshes remain explicitly outside the scope
+ok 7 - skinned, morph and baked-animation meshes remain explicitly outside the scope
+  ---
+  duration_ms: 2.7631
+  type: 'test'
+  ...
+# Subtest: the active camera render-pass material controls eligibility
+ok 8 - the active camera render-pass material controls eligibility
+  ---
+  duration_ms: 2.2878
+  type: 'test'
+  ...
+# Subtest: missing geometry and MultiMaterial are not advertised as covered
+ok 9 - missing geometry and MultiMaterial are not advertised as covered
+  ---
+  duration_ms: 3.0996
+  type: 'test'
+  ...
+# Subtest: prior true flags and external false writes survive release and repeated disposal
+ok 10 - prior true flags and external false writes survive release and repeated disposal
+  ---
+  duration_ms: 5.1226
+  type: 'test'
+  ...
+# Subtest: a stale release cannot disable a newer activation of the same helper
+ok 11 - a stale release cannot disable a newer activation of the same helper
+  ---
+  duration_ms: 2.3283
+  type: 'test'
+  ...
+# Subtest: LOD and same-count replacement are selected anew without touching disposed predecessors
+ok 12 - LOD and same-count replacement are selected anew without touching disposed predecessors
+  ---
+  duration_ms: 3.0193
+  type: 'test'
+  ...
+# Subtest: partial selection failure rolls back earlier flags and preserves the original exception
+ok 13 - partial selection failure rolls back earlier flags and preserves the original exception
+  ---
+  duration_ms: 3.1896
+  type: 'test'
+  ...
+# Subtest: cleanup continues after one flag setter fails and retains its exact exception
+ok 14 - cleanup continues after one flag setter fails and retains its exact exception
+  ---
+  duration_ms: 2.237
+  type: 'test'
+  ...
+# Subtest: scene disposal during a lease is safe and releases the helper lifecycle
+ok 15 - scene disposal during a lease is safe and releases the helper lifecycle
+  ---
+  duration_ms: 1.4671
+  type: 'test'
+  ...
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [02:25:08]: Babylon.js v9.30.0 - Null engine
+# Subtest: declared B6 receiver borrows the real absent disabled instance and restores exact Scene membership
+ok 16 - declared B6 receiver borrows the real absent disabled instance and restores exact Scene membership
+  ---
+  duration_ms: 29.5347
+  type: 'test'
+  ...
+# Subtest: actual native Scene/PBR instance batch prepares useInstances without changing the hidden source
+not ok 17 - actual native Scene/PBR instance batch prepares useInstances without changing the hidden source
+  ---
+  duration_ms: 1821.4051
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\receiver-light-preparation.test.ts:1:3324'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading '0')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    Mesh.source._processRendering (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\receiver-light-preparation.test.ts:63:57)
+    Mesh.render (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2884:22)
+    SubMesh.render (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\subMesh.pure.ts:436:29)
+    RenderingGroup._RenderSorted (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Rendering\renderingGroup.ts:294:21)
+    RenderingGroup._renderOpaqueSorted (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Rendering\renderingGroup.ts:222:24)
+    RenderingGroup.render (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Rendering\renderingGroup.ts:157:18)
+    RenderingManager.render (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Rendering\renderingManager.ts:258:28)
+    Scene._renderForCamera (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\scene.pure.ts:5240:32)
+    Scene._processSubCameras (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\scene.pure.ts:5271:18)
+    Scene._renderFrame (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\scene.pure.ts:5760:22)
+  ...
+# Subtest: road-face instances and enabled stadium glass use producer declarations while unrelated and disabled tiers stay untouched
+ok 18 - road-face instances and enabled stadium glass use producer declarations while unrelated and disabled tiers stay untouched
+  ---
+  duration_ms: 7.2997
+  type: 'test'
+  ...
+# Subtest: independent source geometries/materials/light memberships are conservatively retained with no proxy allocation
+ok 19 - independent source geometries/materials/light memberships are conservatively retained with no proxy allocation
+  ---
+  duration_ms: 4.272
+  type: 'test'
+  ...
+# Subtest: missing instances, source LOD, opposite determinant and deformation paths remain explicitly unsupported
+ok 20 - missing instances, source LOD, opposite determinant and deformation paths remain explicitly unsupported
+  ---
+  duration_ms: 4.7246
+  type: 'test'
+  ...
+# Subtest: unknown attachment, parent-disabled, camera-masked and degenerate instances never masquerade as covered
+ok 21 - unknown attachment, parent-disabled, camera-masked and degenerate instances never masquerade as covered
+  ---
+  duration_ms: 2.413
+  type: 'test'
+  ...
+# Subtest: normal B6 takeover survives metadata replacement and true-to-false takeover is not undone
+ok 22 - normal B6 takeover survives metadata replacement and true-to-false takeover is not undone
+  ---
+  duration_ms: 3.2076
+  type: 'test'
+  ...
+# Subtest: foreign enable and registration writes are preserved independently of owned frustum flag
+ok 23 - foreign enable and registration writes are preserved independently of owned frustum flag
+  ---
+  duration_ms: 1.9455
+  type: 'test'
+  ...
+# Subtest: nested generations, disposed concrete parents and acquisition exceptions release only their own mutations
+ok 24 - nested generations, disposed concrete parents and acquisition exceptions release only their own mutations
+  ---
+  duration_ms: 4.2658
+  type: 'test'
+  ...
+# Subtest: reentrant begin during a real enable notification cannot let the old acquisition disable the newer lease
+not ok 25 - reentrant begin during a real enable notification cannot let the old acquisition disable the newer lease
+  ---
+  duration_ms: 3.9172
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\receiver-light-preparation.test.ts:1:9210'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\receiver-light-preparation.test.ts:142:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 23
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3260.6352

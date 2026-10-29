@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "main-consolidation-20261029",
+  "title": "Sjednotit všechnu práci do main a odstranit vedlejší větve a pracovní kopie",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/main-consolidation-20261029/",
+    "docs/verification-evidence/main-consolidation-20261029/",
+    "docs/agents/handoffs/main-consolidation-20261029.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Jediná místní i vzdálená pracovní větev main a jediný kanonický checkout C:/Users/rezac/Documents/GitHub/StrahovCrazyShow.",
+    "Všechny jedinečné commity a rozpracované soubory jsou před úklidem doložitelně zachované v historii main; aktuální funkce se nesmějí vrátit na starší varianty.",
+    "Neveřejné konfigurace a runtime data zachována mimo Git; odstraněné kopie mají inventář, otisky a ověřené pokrytí.",
+    "Relevantní cílené testy, pnpm test, pnpm build a integrace nad výsledným main; přesné výsledky a omezení v předání."
+  ],
+  "verification": [
+    "Porovnání všech refs, stavu a neignorovaných i důležitých ignorovaných souborů všech worktrees.",
+    "git branch --all; git worktree list; git status --short; kontrola dosažitelnosti všech snapshotů z main.",
+    "pnpm test; pnpm build; pnpm test:integration po dokončení portovaných změn."
+  ],
+  "notes": [
+    "Přímé zadání uživatele 29.10.2026 v chatu 01a189cd-352b-7ca1-a2c6-2b4f61b4f9aa nahrazuje předchozí rozdělení práce mezi větve a explicitně předává veškerý WIP ke konsolidaci.",
+    "Původní claims a provozní předání jsou v git common dir agent-coordination/consolidation-20261029. Projektové chaty byly idle/notLoaded; Docker8080 se zachovává včetně datových volumes.",
+    "Admin scope samostatně dev-coordination-maintenance. Čtecí podagenti neprovádějí zápisy. Runtime integrační paths budou přiděleny po obsahovém auditu.",
+    "Jde o integraci existující práce, nikoli nové funkce z pozastaveného chatového zadání. Bez nové větve/worktree."
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "/root/webgpu_editor_audit",
+  "findings": [],
+  "scope": "Read-only finite actual data review, no test/build/GPU/write",
+  "files": [
+    {
+      "file": "mia-first-f-window.json",
+      "bytes": 16941,
+      "sha256": "66d8991de75de705703857a7aaed3f18fd240af0af10e5f0edfebf1815ef78c7"
+    },
+    {
+      "file": "robin-first-f-window.json",
+      "bytes": 16943,
+      "sha256": "d731aad7973a073ce8f880d63b1a1ce76ccd99ea8ab3bfc186429f693f00d21c"
+    },
+    {
+      "file": "robin-repeat-f-window.json",
+      "bytes": 16961,
+      "sha256": "20ebb307e017a626cdcdfa78210999d203a97097c2f737306b33ea6b302de65e"
+    },
+    {
+      "file": "mia-before-first-f.json",
+      "bytes": 12742,
+      "sha256": "afc5ef39646e66b19eb5c5339dd4cbd14c141fbb02336297720a505522cd26f0"
+    },
+    {
+      "file": "robin-confirmed-before-first-f.json",
+      "bytes": 12728,
+      "sha256": "9b2be7156ebf1aba8fabf3506fb77ed7309ae05c5464235904f70464fb1c61d2"
+    },
+    {
+      "file": "b6-final.json",
+      "bytes": 12729,
+      "sha256": "0cb0e64b9ad6cc480b76a36d3ed6596fb6581b974b8f39f942929898fcee3df7"
+    }
+  ],
+  "limits": [
+    "No FPS/pixel/causal A-B claim",
+    "Actual view matrix and actorY jitter, despite equal orbit/projection"
+  ],
+  "initialStartupReview": {
+    "attemptId": "32199391-3951-498d-a66c-5f77d0494a1d",
+    "bytes": 448071,
+    "sha256": "34e0e35df9ad155598ed16fec81f35a01d4adbbe9dfd3a407e3a2cc89929285f",
+    "rows": 76,
+    "projectionBytes": 43964,
+    "findings": []
+  }
+}

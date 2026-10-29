@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-startup-cause",
+  "title": "KEY-8: doložit příčinu studeného startu v produkci a přesnou opravu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["docs/performance/repair-startup-cause.md", "docs/agents/handoffs/repair-startup-cause.md"],
+  "resources": [],
+  "acceptance": ["Rozlišit dev modul53MB od skutečného produkčního bundlu/assetů; určit blokující import/physics/world/assets/ready cestu podle kódu a dostupných logů.", "Navrhnout konkrétní disjunktní implementační rozsah pouze na doložené příčině; odlišit přímé měření, inference a chybějící profil."],
+  "verification": ["Read-only primární kód a baseline/wave1 produkční zdroje, žádné asset generování, GPU, build nebo zátěžové měření.", "Předat relevantní důkazy, úzký návrh, testy a rizika změny lifecycle."],
+  "notes": ["Původní audit docs/performance/playtest-diagnostics-20261013.md; baseline session .cache/playtest-repairs-validation/baseline-session.jsonl. Nové startup-phase události jsou ve wave1 recorderu, který ještě čeká browser ověření."]
+}

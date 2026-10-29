@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-default-20261021",
+  "title": "KEY-22/34: společná produkční politika WebGPU default hry i editoru",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/render-engine.ts",
+    "tests/render-engine.test.ts",
+    "docs/agents/handoffs/webgpu-completion-default-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Řídit se spec-key-22-webgpu-completion.md: bez query a explicitní webgpu používají společnou native WebGPU CM factory na všech hostname.",
+    "Explicitní WebGL2 reference a WebGPU NCM experiment jen na přesném loopbacku. Zachovat odmítnutí prázdné/neznámé/duplicitní volby, žádný silentfallback.",
+    "Cílený refaktoring selektoru a relevantní skutečně spuštěné policy/init/cancellation/lifecycle regrese. Native WGSL, abort a disposal kontrakt se nezhorší.",
+    "Jen lokální kandidát; root smí publikovat default teprve po úplné skutečné GPU a integrační přejímce. Samotný CPU test není KEY22 Done."
+  ],
+  "verification": [
+    "pnpm --config.verify-deps-before-run=false exec tsx --test tests/render-engine.test.ts tests/avatar-preview-webgpu.test.ts tests/render-startup.test.ts",
+    "Žádný child build/server/GPU/fullsuite; tyto zdroje drží rootvalidation task."
+  ],
+  "notes": [
+    "Výzkum: jediná factory již vlastní oba vstupy; current main9341bcef stále volí WebGL2 a zakazuje WebGPU mimo loopback. NCM adapter startup preparation je inert, sdílené kostry potřebují měření, proto defaultkandidát CM.",
+    "Nové mainpreflighty mají1HzrawRAF a30sřízenýtimeout takéveWebGL2; příčina browserprezentace dosud není doložená runtimevada. Neměnit timeout/scheduler ani přebírat původní cizí Game/UI WIP."
+  ]
+}

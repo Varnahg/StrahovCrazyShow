@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-main-sync-20261029",
+  "title": "Převzít přijatý PR37 do čisté D main kopie",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-main-sync-20261029/",
+    "docs/agents/handoffs/rag-main-sync-20261029.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Pouze byte-identický ff-only Git přenos přijatého PR37 merge8d3e69eccbce326ea198351507b5ea3a52e7cf82 do čisté D:/CodexWorkspaces/StrahovCrazyShow-main-20261027 po release RAG integračního claimu; žádné autorské změny převzatých source/test/evidence souborů.",
+    "Předem ověřit čistotu, main3644d773 a vzdálený merge. Po syncu doložit tree23aa5a8c2d8a55aaa638634cb9f283c9d7f22f1c shodný s accepted head632c61c1825d589799d7afb5174855aedb193786, clean stav a ahead/behind0/0.",
+    "Nedotýkat se C pracovních kopií, dependencies, cache modelů, frozen serverů ani původního WIP. Žádný build, hra, DB, API nebo GPU.",
+    "Vlastní krátký handoff zapsat v D admin worktree; UI/catalog status mění admin pod svou existující rezervací. Po syncu a handoffu heavy uvolnit."
+  ],
+  "verification": [
+    "Git remote/head/tree a ff-only, clean před/po; žádný reset/stash/restore/checkout přes WIP.",
+    "Povinné checks byly ověřené na přesném accepted headu; nepřejmenovat původní CI failure na PASS ani tento Git krok vydávat za nový funkční test."
+  ],
+  "notes": [
+    "Cwd pro claim a evidence D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Samotný převzatý checkout je výslovně D main výše.",
+    "Autorizované předání od původního RAG koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d; acceptance https://github.com/Varnahg/StrahovCrazyShow/pull/37#issuecomment-6495366994. Tento task neotevírá nový write scope do autorské C RAG worktree.",
+    "29.10.2026 přijato po merge PR37 na8d3e69eccbce326ea198351507b5ea3a52e7cf82 a ověření celého accepted tree23aa5a8c2d8a55aaa638634cb9f283c9d7f22f1c. D main synchronizovaný ff-only, čistý a0/0; žádná nová hra/build/DB/instalace."
+  ]
+}

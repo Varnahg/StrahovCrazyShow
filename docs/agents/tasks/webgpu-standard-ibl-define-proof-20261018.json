@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-standard-ibl-define-proof-20261018",
+  "title": "KEY-31: ověřit stabilní registraci Standard IBL shaderového příznaku",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-standard-ibl-define-proof-20261018/", "docs/agents/handoffs/webgpu-standard-ibl-define-proof-20261018.md"],
+  "resources": [],
+  "acceptance": [
+    "Pouze izolovaný proof nad frozen authored2stage candidate cacdb353 a base grass4a968ff7, bez nativních/shared dependency/primary/hraných změn. V1negative evidence zůstane přesně zachovaná.",
+    "Jediná zkoušená oprava pinned core: deklarace USESPHERICALFROMREFLECTIONMAP=false v StandardMaterialDefines před constructor.rebuild; odpovídající vlastní typová deklarace je přípustná. Žádný IBLhelperguard/rebuild, jinéflagy, cache/refCount/PersistentMode, dalšíwarmstage nebo změna helperruntime.",
+    "Fyzická izolovaná dependency kopie pod vlastní cache, správné resolver vazby a stejné moduly pro skutečné factory. Nic nepatchovat přes junction do shared node_modules. Manifest pinovaných původních a výsledných souborů a důkaz neměnnosti zdrojovýchdependencies.",
+    "Stejný actual C5/preload +41stages low-first/low-last +cap4 +deferredcleanup jako genuineRED. Po jednédeklaraci požadovat car1/0/1/0 bez novýchcílovýchprogramů, wholedefines aEffect/context reuse. Přímý null→cube→null IBL cyklus má false→true→false a stabilněregistrovanýklíč.",
+    "V tomtéž bounded experimentu ověř skutečné pinned Standard GLSL/WGSL processor výstupy/referenční graf a uniform/binding layout: opravený první car0 oproti již ustálenému referenčnímu car0. Oddělit diagnosticképrefixy/unusedconst, netvrdit pixelovouparitu jen zpočtu testů. Pokud processor parity vyžaduje nepřiznanouimitaci, doložit přesnýlimit místo předstírání.",
+    "PBR chování a deklarace zůstanou beze změny. Přímý cube→skybox/2D reset je známájiná hranice helperu, tímto proofem se neopravuje ani netvrdí univerzálníIBL correctness. Žádnáimplementace jinéopravy.",
+    "Combined C5 mediumpreload a native startup nejsou automaticky totožné. Použít jasněoznačenou historii a nemaskovat jiný skutečnýnative problém. Root provádí zvláštní čtecíaudit native/combined parity předadopcí."
+  ],
+  "verification": [
+    "Lehké targeted CPU, původní RED2/2novéStandard zachovat, nový GREEN sActualfactories/Cinematic/Game a lifecycle. No readiness/cachemock, explicitnísyntetickécanvas/TextureIO/NullEngine GLSL limity.",
+    "Připnuté source/processorinputs, všechnylogy/reporty/manifest a přímý scope diff jednédeklarace. Žádné fullTS/fullsuite/build/GPU/server/pnpm install ani commit. Native patch/lock/cleaninstall aGPUimage jsou až případný root krok po přijetí.",
+    "Předání s přesnými skutečnými výsledky a omezeními; ukončit vlastníprocesy, heartbeat do15min a release. Bez rekurzivního BMAD."
+  ],
+  "notes": [
+    "Primární pinnedřetězec: StandardMaterialDefines nemáfield předrebuild; Standard preparesLights před IBL; helper IBLpozději přidátrue; toStringčte pouze_keys; novýLIGHTslot spustírebuild a náhodněregistrujeužexistující IBLfield. Cold2stage candidate proto car1reuse0/car0new2 voboupořadích kvalit, bezdisposal a capregrese.",
+    "Read-only includeaudit StandardVS/FS:0reference flag v GLSL37/37 a WGSL36/36 souborech, žádné missing; StandardSHuniformlist/UBO/bind mají supportSH=false. PBRfield deklaruje a používá. To je sourceopora, nehotovýGPU/obrazovýdůkaz.",
+    "Volba deklarace zachovává současný výpočet hodoty a ustálenépozdějšíklíče. Sharedhelperguard mění kontrakt províce typů, rebuild poIBL přidávápráci/registrujejinéfields, opakováníwarmstagesmaskujeinicializaci. Proto nejsou zvolenými variantami.",
+    "Aktivní BMADspec-key-31-long-frame-gaps krok03. Prvníhelpercandidate je rejected, nikdynebylintegrovaný. Hrané4198/FAR a4197/staršíverze zachovat; root původnímain runtimecb236094 zůstává."
+  ]
+}

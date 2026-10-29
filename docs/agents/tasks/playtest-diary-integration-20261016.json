@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "playtest-diary-integration-20261016",
+  "title": "Integrovat pohybový a obrazový deník po předání Game",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/playtest-diary.ts",
+    "client/playtest-controls.tsx",
+    "tests/playtest-game.test.ts",
+    "tests/playtest-ui.test.ts",
+    "docs/agents/handoffs/playtest-diary-integration-20261016.md",
+    "docs/performance/evidence/playtest-diary-20261016/",
+    ".cache/playtest-diary-validation/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Wait for explicit release/handoff of Game/UI and final flashlight main commit; preserve all flashlight fixes. Integrate only handed-over richer diagnostics WIP, no unrelated startup/culling/editor changes.",
+    "No collection-caused >50ms stall; measured p95 delta≤2ms in whole production game/HUD/real sessions. Reserve heavy-validation/GPU/build/ports through a separate validation task before running those checks."
+  ],
+  "verification": [
+    "Read current AGENTS/architecture/coordination/current-work; inspect actual claims; claim unique owner before writes.",
+    "Own targeted CPU regressions, research primary sources and compare options before implementation; handoff source/test hashes and process cleanup. No heavy/GPU work in this task."
+  ],
+  "notes": [
+    "Requested by coordinating chat01a141c7-d77f-72c2-8709-5cb930572b0b after explicit user authorization there; proposed coordinator diary-01a141c7-root. Created by current catalog owner; this definition is not an active claim.",
+    "Use isolated worktree based on final flashlight main (not stale9d98ffc after subsequent integration). Frozen4188 and its borrowed node_modules remain immutable.",
+    "Game/UI and broad historical WIP are not transferred merely by this task. Wait for documented source handoff and reservation release; no adoption based on age.",
+    "Blocked until explicit flashlight Game handoff plus UI ownership determination. No implicit heavy/GPU approval from ready modules.",
+    "Explicit root handoff of owned historical Game/UI diagnostic WIP after originalrepair-game-integration ownership record was verified16Oct. Transfer only diagnostics/lighting-change/ui-state/startup-phase/incident telemetry semantics. Do not copy broadstartup/culling/editor changes; retain final flashlightpublishedGame as base. ExactUIandGamesource hashes inadminhandoff.",
+    "Ready means claim may be attempted only after actualprofileGame reservation release; successfulclaim remainsmandatory. Coordinator diary-01a141c7-root may then maintain only its new diarytask metadata after adminslotrelease, not adopt oldunrelatedWIPdocs.",
+    "2026-10-19: Explicit narrow reservation handoff for user-approved Docker plan in chat01a155e8-2ab0-7143-b5f3-0644ce9a04dd. Removed only server/index.ts after verifying no staged or unstaged change in diary worktree; source SHA256 c6878dad98fdea9c525e021ed5bf1c864465aa558b66804d5fc34a666053ccfe equals diary HEAD9d98ffc. Docker must use its current main source, not copy the old diary version. Diary implementation remains paused; remaining WIP scope stays reserved after release/reclaim. Any later diary endpoint integration needs fresh coordination with the server owner.",
+    "2026-10-20: After explicit human approval for KEY-48 coordination, documentation-only handoff commit9ebf7bcce23de1e0b759a54010d79b56ced6e716 was created BEFORE release. Recipient refactor-01a15658-audit receives permission to claim client/game.ts,client/ui.tsx,client/session-diagnostics.ts,scripts/performance-snapshot.mjs; all four have zero diary WIP and match diary baseline9d98ffc. Only these four paths were removed through release/edit/reclaim. Remaining7paths plus media/report/timeline source WIP stay paused and protected. Separate main Game/UI dirty changes are not transferred or approved. See versioned playtest-diary-integration handoff and refactor-handoff-20261020.json for exact SHA, provenance, partial tests and limits. Recipient must claim its own scope on its current baseline; future diary integration needs new coordination."
+  ]
+}

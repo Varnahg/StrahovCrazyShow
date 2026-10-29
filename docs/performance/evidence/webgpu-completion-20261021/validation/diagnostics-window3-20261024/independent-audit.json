@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "/root/diagnostics_verification_review",
+  "mode": "Read-only arithmetic, byte verification and recorder correlation; no test/build/GPU",
+  "publicationSha256": "9da659aa01c5ec1d1e250b8b3ea75f5b8559d143380fd48bd2b80be66365190f",
+  "findings": [],
+  "payloadsVerified": 29,
+  "payloadBytes": 2502492,
+  "gzipOriginalsByteexact": 2,
+  "oldOriginalsExcluded": 10,
+  "credentialPatternsFound": 0,
+  "originalCompleteness": [
+    {"prefix":"33e8c119", "missingSeq":[370], "recordSizeDropped":1, "gameDispose":true, "sessionEnd":false, "lastSeq":618},
+    {"prefix":"ddb17a09", "missingSeq":[400], "recordSizeDropped":1, "sessionEnd":true, "lastSeq":465, "bestEffortTail":true}
+  ],
+  "carCorrelation": {
+    "kind":"Temporal, not native frame-ID correlation; timeOrigin rounded by0.1ms",
+    "acceptedTriggerAtMs":149185.9,
+    "previousFrameStartAtMs":149171.2,
+    "recorderEventSeq":496,
+    "previousFrameCpuMs":198.9,
+    "previousFrameRenderMs":184.2,
+    "deliveryIntervalMs":205.2,
+    "laterCurrentCpuMs":61.3,
+    "laterCurrentRenderMs":58.1
+  },
+  "scope":"Full diagnostic receipt completion is distinct from original recorder losslessness, GPU time, FPS A/B and whole migration acceptance."
+}

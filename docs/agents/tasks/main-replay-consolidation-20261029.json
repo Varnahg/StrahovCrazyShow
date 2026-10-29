@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "main-replay-consolidation-20261029",
+  "title": "Převzít izolované replay nástroje z původní větve do main",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/replay/",
+    "tests/recorded-walkthrough-recording.test.ts",
+    "tests/recorded-walkthrough-replay.test.ts",
+    "docs/performance/evidence/recorded-walkthrough-20261020/",
+    "_bmad-output/implementation-artifacts/recorded-walkthrough-20261020/",
+    "docs/agents/handoffs/recorded-walkthrough-data-20261020.md",
+    "docs/agents/handoffs/recorded-walkthrough-replay-20261020.md",
+    "docs/agents/handoffs/main-replay-consolidation-20261029.md",
+    ".cache/main-replay-consolidation-20261029/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Převzít skutečné unikátní replay nástroje a fixtures z eb7624b6, aktualizovat pouze nezbytné vazby na současný main.",
+    "Testovací server izolovaný od provider/feedback tajemství; produkční Game/UI se nemění.",
+    "Cílené testy, refaktoring a přesné předání; GPU přejímku nevydávat za provedenou."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/recorded-walkthrough-recording.test.ts tests/recorded-walkthrough-replay.test.ts",
+    "CLI --help, bezpečné testy izolace a test-build transform."
+  ],
+  "notes": [
+    "Přímá delegace root konsolidace; žádný další BMAD workflow, nová větev ani worktree.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-main-20261027, zdroj eb7624b6; historické evidence zůstanou označené historicky. Root vlastní katalog/commit a heavy ověření."
+  ]
+}

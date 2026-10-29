@@ -1,0 +1,81 @@
+TAP version 13
+# BJS - [19:25:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:25:15]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 1 - actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 1107.5435
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:9289'
+  failureType: 'testCodeFailure'
+  error: |-
+    first main visibility/beam activation must not create additional native Effects
+    
+    38 !== 37
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 37
+  actual: 38
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:179:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":37,"after":38,"delta":1,"events":[{"stage":"restore","quality":"medium","pass":7,"id":37,"depth":true,"hash":"25fc8cc9abe82d276853a45c806435b1e58fc46cbf44d09a7b74f79c7adfa530","sm":"\#define SM_LIGHTTYPE_SPOTLIGHT\\n\#define SM_FLOAT 0\\n\#define SM_ESM 0\\n\#define SM_DEPTHTEXTURE 1\\n\#define SM_NORMALBIAS 1\\n\#define SM_DIRECTIONINLIGHTDATA 0\\n\#define SM_USEDISTANCE 0\\n\#define SM_SOFTTRANSPARENTSHADOW 0","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]}],"beforeSnapshot":{"bases":[{"pass":7,"id":35,"depth":true,"hash":"1216561cbb294f1fbd571be910ebffc0916cb034900f86c03a277f09f4dfe346","sm":"","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]}],"entries":[]},"afterSnapshot":{"bases":[{"pass":7,"id":35,"depth":true,"hash":"1216561cbb294f1fbd571be910ebffc0916cb034900f86c03a277f09f4dfe346","sm":"","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]},{"pass":1,"id":7,"depth":false,"hash":"2e141793682a31c63608ac9dcbf3fd4d859e7549f3f81c5a5562880902b43d97","sm":"","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]}],"entries":[{"pass":7,"car":true,"player":false,"base":35,"effect":37}]},"preBase":[35,7],"postMain":7,"vehicleDraws":0,"afterFrames":[{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false}]}
+# BJS - [19:25:15]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 2 - actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 478.2779
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:9289'
+  failureType: 'testCodeFailure'
+  error: |-
+    first main visibility/beam activation must not create additional native Effects
+    
+    32 !== 31
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 31
+  actual: 32
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:179:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":31,"after":32,"delta":1,"events":[{"stage":"restore","quality":"high","pass":13,"id":69,"depth":true,"hash":"25fc8cc9abe82d276853a45c806435b1e58fc46cbf44d09a7b74f79c7adfa530","sm":"\#define SM_LIGHTTYPE_SPOTLIGHT\\n\#define SM_FLOAT 0\\n\#define SM_ESM 0\\n\#define SM_DEPTHTEXTURE 1\\n\#define SM_NORMALBIAS 1\\n\#define SM_DIRECTIONINLIGHTDATA 0\\n\#define SM_USEDISTANCE 0\\n\#define SM_SOFTTRANSPARENTSHADOW 0","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]}],"beforeSnapshot":{"bases":[{"pass":13,"id":67,"depth":true,"hash":"1216561cbb294f1fbd571be910ebffc0916cb034900f86c03a277f09f4dfe346","sm":"","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]}],"entries":[]},"afterSnapshot":{"bases":[{"pass":13,"id":67,"depth":true,"hash":"1216561cbb294f1fbd571be910ebffc0916cb034900f86c03a277f09f4dfe346","sm":"","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]},{"pass":9,"id":45,"depth":false,"hash":"2e141793682a31c63608ac9dcbf3fd4d859e7549f3f81c5a5562880902b43d97","sm":"","lights":["\#define DIRLIGHT2","\#define HEMILIGHT3","\#define POINTLIGHT1","\#define SHADOWLOWQUALITY0","\#define SHADOWPCF0","\#define SPOTLIGHT0"]}],"entries":[{"pass":13,"car":true,"player":false,"base":67,"effect":69}]},"preBase":[67,13],"postMain":45,"vehicleDraws":0,"afterFrames":[{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false}]}
+# Subtest: async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+not ok 3 - async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+  ---
+  duration_ms: 248.4543
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:11309'
+  failureType: 'testCodeFailure'
+  error: |-
+    fully configured asynchronous leaf must also be prepared before first visibility
+    
+    24 !== 22
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 22
+  actual: 24
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:196:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 0
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5986.4194

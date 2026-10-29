@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-routine-cost-20261021",
+  "title": "KEY-22: úzce změřit skutečné active a material readiness/bind rutiny",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/",
+    "docs/performance/evidence/webgpu-completion-20261021/routine-cost/",
+    "docs/agents/handoffs/webgpu-completion-routine-cost-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejprve zapsat actual source5 piloty, pinned pořadí a oficiální podklady, možnosti a vybraný rozsah. Piloty nejsou causal FPS A/B ani důkaz konkrétní3ms opravy.",
+    "Defaultoff explicitní QA profil původních max8 rutin ve skutečné Game scéně: scene.getActiveMeshCandidates, Scene._activeMesh, TransformNode.computeWorldMatrix, Mesh.getLOD, PBRBaseMaterial/StandardMaterial.isReadyForSubMesh a bindForSubMesh. Žádný produkční runtime nebo měnění scény.",
+    "Re-use max8/stack32 donor jádra s přesným vlastnictvím/descriptor restore. Receiver filter pouze actual scene, původní call přesně jednou se stejným return/throw/receiver. Nejvýše8 skutečných diagnostických render framů, phase active/main/RTT/other; inclusive a selfSelected nejsou součet wholeframe.",
+    "Žádná nová render/readiness/GPU volání, shader source/defines/credential export nebo navýšení inventáře; žádné nové mesh observers na každém mesh, žádný broad prototype zásah do cizí scény. Nevybrané receivery jdou rovnou do původní funkce.",
+    "Nový flag/identita musí být canonical build/load/served bundle seal a visible diagnostic/raw receipt; staré preserved helperc951/build63ca se nepřepisují. Abort/dispose/rejoin/false/throw/foreign wrapper cleanup a bounds explicitně ověřit.",
+    "Implementace+cílený refaktoring+relevantní CPU ověření a přesné SHA předat společně. Root drží build/server/GPU; child je nespouští a necommitne. Následuje nezávislé review a fresh immutable build."
+  ],
+  "verification": [
+    "Původní donor rawSHA a nový explicitní cílový seznam, pinned native own-descriptor/receiver přes skutečné příslušné třídy/scene, phase/frame hooks order a residual meze.",
+    "Defaultoff bez wrappers, max8frames/routines/stack/bytes, original return/throw/receiver, nested/selfSelected scope, readinessfalse/early returns, unsupported/drift a cleanup/rejoin/foreign ownership.",
+    "Stávající helper/clock/weather/shader83 cílené CPU regrese a nové scoped regrese, identity negative fixtures, syntax/UI parse a source/dependency/log SHA stabilita. Žádný fullsuite/build/server/GPU."
+  ],
+  "notes": [
+    "Source36c134e1/build63ca/helperc951. CM34cfa48.6FPS,p9526.4,p9933.3; NCM9da053.5/24/29.1; NCM3near73aae48.8/28.2/37.6.0newcompile/pipeline. Ambient/UTC se liší, nejde o causalA/B.",
+    "NCM3 CPUrender17.325ms,active5.887/main8.762/RTT1.762 inclusive. NCM1 421bundlereuse/0creation a neměnné pipeline cache. Native fastbundle přeskočí pipeline lookup; compiler/cache oprava není doložená.",
+    "Donor f3-routine-profile qa-routine-profile rawSHAee3c3280… zachovává původní metody a cap8/stack32. MeshDraw observer donor před/bind zahrnuje readiness, ale nerozliší ji a potřebuje3observers na každý mesh. Vybrán menší routine průřez. getActiveMeshCandidates už lossless cache má; octree koliduje s providerem a široké freeze mění lifecycle/LOD.",
+    "Root před prvním zápisem zachová helperc951 ve vlastním immutable validation/helper-runtimes/v4. Native DevTools sampling nemá dostupný ovladatelný surface/export, rawCDP/browserdrivers nepoužívat. Žádný BMAD rekurzivní workflow."
+  ]
+}

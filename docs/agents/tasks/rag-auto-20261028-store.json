@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-store",
+  "title": "RAG: verzované v3 úložiště a oddělené current/archive vyhledávání",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/rag-vector-store.ts",
+    "server/rag-ingest.ts",
+    "server/rag-schema.sql",
+    "server/rag-migrations/",
+    "scripts/rag-import.ts",
+    "tests/rag-vector-store.test.ts",
+    "tests/rag-ingest.test.ts",
+    "tests/rag-vector-db.test.ts",
+    ".cache/rag-auto-store-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-store.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat potvrzený kompatibilní storage API podle docs/rag-ingestion/20261028/store-v3-contract.md a dohodnuté foundation EvidenceKnowledgeChunk projekce. Před dokončením doložit poslední guard pro novou legacy metadata verzi; nový claim je nutný před zápisem.",
+    "Přidat skutečně verzované additivní migrace pro úplné dokumenty/bloky/provenance a oddělený current/archive retrieval. Zachovat staré head/cache/v2 chování a role; replay legacy bootstrapu nesmí přepsat novější triggery.",
+    "Více archivních verzí logického dokumentu musí mít composite sourceVersion členství. Current nikdy automaticky nečte archiv; právní asOf čas musí zůstat oddělený od administrativní freshness.",
+    "Znovu použít stávající OpenAI profile/cache/attempt infrastrukturu. Nový title-heading-text-v2 profil explicitní, žádné přeznačení či přepis v1 cache.",
+    "Publikovat atomicky celé konzistentní revize s rollback/resume/uncertain ledger ochranami; žádná částečná dokumentová verze. CLI rozšířit pro výslovný v3 administrativní import/status a rozpočty.",
+    "Žádné crawler/worker/veřejné API/provider/UI wiring změny, OpenAI volání/key reads, instalace nebo porty. Skutečné DB/migrace/fullsuite až samostatně root s integračním claimem nad hotovým checkpointem a konkrétním plánem, nikdy nyní na placeném volume."
+  ],
+  "verification": [
+    "Po dohodě rozhraní implementace, cílený refaktoring, fake SQL/unit regrese a strict TypeScript; přímé Node vstupy bez pnpm exec/run synchronizace dependencies.",
+    "Ověřit legacy parity, verze migrací a zákaz downgrade bootstrapu, composite identity, current/archive/asOf/freshness, atomic rollback/resume, cache/profile identity a nejisté pokusy.",
+    "Připravit oddělený skutečný DB test pro následné integrační okno, ale nespouštět jej pod tímto bezresource taskem. Fake SQL test není přijetí reálné migrace."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/automated-document-rag, KEY-67. Přímý konkrétní požadavek koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d navazuje na uživatelem schválený oddělený vektorový archiv.",
+    "28.10.2026 storage API potvrzené koordinátorem po čtecím návrhu a domluvě foundation: public-documents/public-archive vedle legacypublic, captureSearch/searchSnapshot/assertSnapshot v jedinémstore, společné embeddingSpace před placením, archivehead/asOf a freshnessnow odděleně. Blokace chybějícího rozhraní odstraněná; poslední konkrétní legacy-version guard se doloží před přijetím implementace.",
+    "Foundation, acquisition, extractor a PDF adapter mají vlastní disjunktní scopes. Jejich kontrakty nevymýšlet podruhé ani bez dohody nepřepisovat.",
+    "Existující strahov-rag-20261028 paid volume a metadata/stavy pokusů jsou chráněné. Tento task není oprávnění k Docker reset/prune nebo k destruktivní migraci.",
+    "Přechod blocked→ready nemění žádný writePath/resource ani zákaz skutečné DB/migrace/paidvolume v childscope. Legacy suppression se neobnovuje samo při expiry/retirementu, rollback musí být explicitní; návrat staré logické verze změnou metadat nesmí pravidlo obejít."
+  ]
+}

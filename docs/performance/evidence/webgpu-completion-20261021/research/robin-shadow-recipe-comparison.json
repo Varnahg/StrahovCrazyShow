@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "atUTC": "2026-10-24T02:19:17.777Z",
+  "reviewer": "root independent raw comparison after webgpu_editor_audit source research",
+  "originalWindows": [
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/validation/receiver-source13-v16/robin-first-f-inputs.json",
+      "sha256": "0105bb21c5a607cbb752c3adb2b38f3ea14a004a104b9de9a7f30c4994f6b877",
+      "before": {
+        "quality": "low",
+        "requestedRendering": {
+          "mode": "auto",
+          "quality": "low",
+          "hardwareScaling": 2,
+          "targetFps": 60,
+          "revision": 23
+        },
+        "backbuffer": {
+          "width": 1020,
+          "height": 493,
+          "scaling": 2
+        }
+      },
+      "after": {
+        "quality": "low",
+        "requestedRendering": {
+          "mode": "auto",
+          "quality": "low",
+          "hardwareScaling": 2,
+          "targetFps": 60,
+          "revision": 23
+        },
+        "backbuffer": {
+          "width": 1020,
+          "height": 493,
+          "scaling": 2
+        }
+      }
+    },
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/validation/pipeline-owner-source12-v16/actual/robin-first-f-inputs-recovered-receipt.json",
+      "sha256": "e6d2a0d0cc8999784940bf1e7cf2ce5022b906e52f1af52534a7492d5e2980f0",
+      "before": {
+        "quality": "medium",
+        "requestedRendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "hardwareScaling": 1,
+          "targetFps": 60,
+          "revision": 2
+        },
+        "backbuffer": {
+          "width": 2040,
+          "height": 986,
+          "scaling": 1
+        }
+      },
+      "after": {
+        "quality": "medium",
+        "requestedRendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "hardwareScaling": 1,
+          "targetFps": 60,
+          "revision": 2
+        },
+        "backbuffer": {
+          "width": 2040,
+          "height": 986,
+          "scaling": 1
+        }
+      }
+    }
+  ],
+  "exactMatches": {
+    "vertex": true,
+    "fragment": true,
+    "defines": true,
+    "contextName": true
+  },
+  "inputs": {
+    "vertex": "25ce3f820e8d9c25cb778c2ca896e54075731b2664751788dde5274611716a26",
+    "fragment": "0cb955f2857193e2e489bc267d02b5994b12b6cc36f56308549ded0f5f47e6b5",
+    "defines": "921107e0bf05b3d4782c8e2ef787d17629234b644ff2c65558918af2303ff4a7",
+    "contextName": "07bcada038524d08dd161ee8620e8bd3a087797643346b9758c259810a76b137"
+  },
+  "miaRecord4": {
+    "path": "docs/performance/evidence/webgpu-completion-20261021/validation/receiver-source13-v16/mia-first-f-inputs.json",
+    "sha256": "a8023c55797cbd48d0b59f05390419ddd5c1468372838c4f673caf197af86bab",
+    "matchesRobin": {
+      "vertex": false,
+      "fragment": false,
+      "defines": false,
+      "contextName": false
+    }
+  },
+  "conclusion": "Different observed own-shadow pass IDs do not establish a different shader recipe. Actual Effect creation/release/reprocess history remains unknown.",
+  "limitations": [
+    "Post-ready bounded observations only; no startup-to-edit cache history.",
+    "One pipeline preparation call is not one new Effect.",
+    "No source changes, GPU rerun, performance or complete draw-pipeline proof."
+  ]
+}
