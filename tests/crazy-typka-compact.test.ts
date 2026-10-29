@@ -33,6 +33,8 @@ function state(patch: Partial<CrazyTypkaState> = {}): CrazyTypkaState {
     notice: null,
     recovery: "none",
     setDraft() {},
+    setKnowledgeScope() {},
+    knowledgeScope: { kind: "current" },
     async send() {},
     async retry() {},
     async reset() {},
@@ -177,7 +179,7 @@ test("compact header is clearly AI, uses the portrait and retains complete priva
       details[1],
       locale === "cs" ? /v krátké relaci/ : /in a short session/,
     );
-    const label = html.match(/<label for="([^"]+)">([^<]+)<\/label>/);
+    const label = html.match(/<label for="([^"]+-message)">([^<]+)<\/label>/);
     assert.ok(label);
     assert.match(html, new RegExp(`<textarea id="${label[1]}"`));
     assert.equal(label[2], locale === "cs" ? "Zpráva" : "Message");

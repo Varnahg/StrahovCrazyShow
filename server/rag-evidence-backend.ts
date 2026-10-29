@@ -1,8 +1,17 @@
 import {
   CRAZY_TYPKA_LIMITS,
+  CURRENT_KNOWLEDGE_SCOPE,
+  crazyTypkaScopeKey,
+  isCrazyTypkaKnowledgeScope,
+  type CrazyTypkaKnowledgeScope,
   type CrazyTypkaErrorCode,
 } from "../shared/crazy-typka";
-import type { KnowledgeChunk } from "./crazy-typka-retrieval";
+import type { EvidenceKnowledgeChunk } from "./rag-knowledge-types";
+import { isKnowledgeCurrent } from "./crazy-typka-retrieval";
+import {
+  CRAZY_TYPKA_EVIDENCE_BYTES,
+  crazyTypkaEvidencePayload,
+} from "./crazy-typka-provider";
 import {
   createEmbeddingProfile,
   createOpenAIEmbedder,
@@ -12,8 +21,9 @@ import {
 } from "./rag-embeddings";
 import {
   createVectorKnowledgeStore,
-  type RagSnapshot,
-  type VectorKnowledgeStore,
+  type RagSearchSnapshot,
+  type RagSourceDependency,
+  type RagVectorStore,
 } from "./rag-vector-store";
 
 export class RagEvidenceError extends Error {
@@ -41,9 +51,10 @@ export type PreparedEvidenceQuery = Readonly<{
   filterText: string;
 }>;
 export type EvidenceSnapshot = Readonly<{
-  snapshot: RagSnapshot;
-  chunks: readonly KnowledgeChunk[];
-  sourceVersionIds: readonly string[];
+  snapshot: RagSearchSnapshot | null;
+  scope: CrazyTypkaKnowledgeScope;
+  chunks: readonly EvidenceKnowledgeChunk[];
+  dependencies: readonly RagSourceDependency[];
   embeddingUsage: Readonly<{ promptTokens: number; totalTokens: number }>;
 }>;
 export type AsyncEvidenceBackend = {
@@ -55,6 +66,7 @@ export type AsyncEvidenceBackend = {
       signal: AbortSignal;
       now: number;
       user: string;
+      scope?: CrazyTypkaKnowledgeScope;
       onEmbeddingAttempt: (inputBytes: number) => void;
       onEmbeddingUsage?: (usage: {
         promptTokens: number;
@@ -117,14 +129,42 @@ export function prepareEvidenceQuery(
   });
 }
 
-function sameProfile(actual: EmbeddingProfile, expected: EmbeddingProfile) {
+function sameSpace(
+  actual: RagSearchSnapshot["embeddingSpace"],
+  expected: EmbeddingProfile,
+) {
   return (
-    actual.id === expected.id &&
     actual.provider === expected.provider &&
     actual.model === expected.model &&
-    actual.dimensions === expected.dimensions &&
-    actual.inputVersion === expected.inputVersion
+    actual.dimensions === expected.dimensions
   );
+}
+/** Final synchronous clock guard, after the asynchronous snapshot validation. */
+export function isEvidenceCurrent(
+  evidence: EvidenceSnapshot,
+  instant: number,
+): boolean {
+  return evidence.chunks.every(({ document }) => {
+    if (!isKnowledgeCurrent(document.checkedAt, document.reviewAfter, instant))
+      return false;
+    if (evidence.scope.kind === "current")
+      return (
+        document.status === "current" &&
+        (document.effectiveFrom === null ||
+          instant >= Date.parse(document.effectiveFrom)) &&
+        (document.effectiveUntil === null ||
+          instant < Date.parse(document.effectiveUntil))
+      );
+    if (document.status !== "archived") return false;
+    if (evidence.scope.asOf === undefined) return true;
+    const at = Date.parse(evidence.scope.asOf);
+    return (
+      document.effectiveFrom !== null &&
+      document.effectiveUntil !== null &&
+      at >= Date.parse(document.effectiveFrom) &&
+      at < Date.parse(document.effectiveUntil)
+    );
+  });
 }
 function waitFor<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
   if (!signal) return promise;
@@ -150,7 +190,10 @@ function waitFor<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
 }
 
 export function createRagEvidenceBackend(options: {
-  store: VectorKnowledgeStore;
+  store: Pick<
+    RagVectorStore,
+    "captureSearch" | "searchSnapshot" | "assertSnapshot" | "close"
+  >;
   embedder: Embedder;
   maxDistance?: number;
   timeoutMs?: number;
@@ -222,10 +265,14 @@ export function createRagEvidenceBackend(options: {
     void work.finally(() => pending.delete(work)).catch(() => {});
     return work;
   }
-  async function capture(signal: AbortSignal) {
-    const snapshot = await store.captureActive(signal);
+  async function capture(scope: CrazyTypkaKnowledgeScope, signal: AbortSignal) {
+    const snapshot = await store.captureSearch(scope, signal);
     if (closed || signal.aborted) throw new RagEvidenceError("cancelled");
-    if (!snapshot || !sameProfile(snapshot.profile, embedder.profile))
+    if (
+      snapshot &&
+      (!sameSpace(snapshot.embeddingSpace, embedder.profile) ||
+        crazyTypkaScopeKey(snapshot.scope) !== crazyTypkaScopeKey(scope))
+    )
       throw new RagEvidenceError("provider-unavailable");
     return snapshot;
   }
@@ -236,8 +283,7 @@ export function createRagEvidenceBackend(options: {
       if (readiness && now() < readiness.until) return readiness.ready;
       if (!checking) {
         checking = operation(async (ownSignal) => {
-          await capture(ownSignal);
-          return true;
+          return !!(await capture(CURRENT_KNOWLEDGE_SCOPE, ownSignal));
         })
           .catch(() => false)
           .then((value) => {
@@ -251,8 +297,23 @@ export function createRagEvidenceBackend(options: {
       return waitFor(checking, signal);
     },
     search(query, input) {
+      const requested = input.scope ?? CURRENT_KNOWLEDGE_SCOPE;
+      if (!isCrazyTypkaKnowledgeScope(requested))
+        return Promise.reject(new RagEvidenceError("invalid-request"));
+      const scope = Object.freeze({ ...requested });
       return operation(async (signal) => {
-        const snapshot = await capture(signal); // No paid call for a missing or mismatched DB revision.
+        const snapshot = await capture(scope, signal);
+        if (!snapshot) {
+          if (scope.kind === "current")
+            throw new RagEvidenceError("provider-unavailable");
+          return Object.freeze({
+            snapshot: null,
+            scope,
+            chunks: Object.freeze([]),
+            dependencies: Object.freeze([]),
+            embeddingUsage: Object.freeze({ promptTokens: 0, totalTokens: 0 }),
+          });
+        }
         const embedded = await embedder.embed([query.text], {
           signal,
           user: input.user,
@@ -260,14 +321,14 @@ export function createRagEvidenceBackend(options: {
         });
         if (closed || signal.aborted) throw new RagEvidenceError("cancelled");
         input.onEmbeddingUsage?.(embedded.usage);
-        const hits = await store.search(
+        const hits = await store.searchSnapshot(
           snapshot,
           embedded.vectors[0],
           { limit: CRAZY_TYPKA_LIMITS.sources, now: input.now },
           signal,
         );
         if (closed || signal.aborted) throw new RagEvidenceError("cancelled");
-        const selected = hits
+        const eligible = hits
           .filter((hit) => {
             if (
               !Number.isFinite(hit.distance) ||
@@ -278,17 +339,33 @@ export function createRagEvidenceBackend(options: {
             return maxDistance === undefined || hit.distance <= maxDistance;
           })
           .slice(0, CRAZY_TYPKA_LIMITS.sources);
+        const selected: typeof eligible = [];
+        for (const hit of eligible) {
+          const candidate = [...selected, hit].map((item) => item.chunk);
+          if (
+            Buffer.byteLength(
+              JSON.stringify(crazyTypkaEvidencePayload(candidate)),
+              "utf8",
+            ) <= CRAZY_TYPKA_EVIDENCE_BYTES
+          )
+            selected.push(hit);
+        }
         if (
           new Set(selected.map((hit) => hit.chunk.id)).size !== selected.length
         )
           throw new RagEvidenceError("invalid-response");
-        const sourceVersionIds = [
-          ...new Set(selected.map((hit) => hit.sourceVersionId)),
+        const dependencies = [
+          ...new Map(
+            selected.map((hit) => [
+              `${hit.dependency.head}:${hit.dependency.sourceVersionId}`,
+              Object.freeze({ ...hit.dependency }),
+            ]),
+          ).values(),
         ];
         if (
-          !(await store.assertCurrent(
+          !(await store.assertSnapshot(
             snapshot,
-            sourceVersionIds,
+            dependencies,
             input.now,
             signal,
           ))
@@ -296,24 +373,36 @@ export function createRagEvidenceBackend(options: {
           throw new RagEvidenceError("response-expired");
         return Object.freeze({
           snapshot,
+          scope,
           chunks: Object.freeze(selected.map((hit) => hit.chunk)),
-          sourceVersionIds: Object.freeze(sourceVersionIds),
+          dependencies: Object.freeze(dependencies),
           embeddingUsage: Object.freeze(embedded.usage),
         });
       }, input.signal);
     },
     validate(evidence, instant, signal) {
-      return operation(
-        async (ownSignal) =>
-          sameProfile(evidence.snapshot.profile, embedder.profile) &&
-          (await store.assertCurrent(
+      return operation(async (ownSignal) => {
+        if (!isCrazyTypkaKnowledgeScope(evidence.scope)) return false;
+        if (!evidence.snapshot)
+          return (
+            evidence.scope.kind === "archive" &&
+            !evidence.chunks.length &&
+            !evidence.dependencies.length &&
+            (await capture(evidence.scope, ownSignal)) === null
+          );
+        return (
+          sameSpace(evidence.snapshot.embeddingSpace, embedder.profile) &&
+          crazyTypkaScopeKey(evidence.snapshot.scope) ===
+            crazyTypkaScopeKey(evidence.scope) &&
+          isEvidenceCurrent(evidence, instant) &&
+          (await store.assertSnapshot(
             evidence.snapshot,
-            evidence.sourceVersionIds,
+            evidence.dependencies,
             instant,
             ownSignal,
-          )),
-        signal,
-      );
+          ))
+        );
+      }, signal);
     },
     close() {
       if (!closing) {

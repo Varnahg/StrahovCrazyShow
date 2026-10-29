@@ -5,35 +5,58 @@ import {
   createConfiguredEvidenceBackend,
   prepareEvidenceQuery,
   RagEvidenceError,
+  isEvidenceCurrent,
 } from "../server/rag-evidence-backend";
 import {
   createEmbeddingProfile,
   type Embedder,
 } from "../server/rag-embeddings";
 import type {
-  RagSnapshot,
-  VectorHit,
-  VectorKnowledgeStore,
+  RagSearchSnapshot,
+  RagSearchHit,
+  RagVectorStore,
 } from "../server/rag-vector-store";
 import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
+import {
+  CRAZY_TYPKA_EVIDENCE_BYTES,
+  crazyTypkaEvidencePayload,
+} from "../server/crazy-typka-provider";
 
 const profile = createEmbeddingProfile();
-const snapshot: RagSnapshot = { revisionId: "a".repeat(64), profile };
+const snapshot: RagSearchSnapshot = {
+  id: "a".repeat(64),
+  scope: { kind: "current" },
+  heads: {
+    legacy: { name: "public", revisionId: "a".repeat(64), profile },
+    documents: null,
+    archive: null,
+  },
+  embeddingSpace: {
+    provider: profile.provider,
+    model: profile.model,
+    dimensions: profile.dimensions,
+  },
+};
 const vector = Array.from({ length: profile.dimensions }, (_, i) =>
   i ? 0 : 1,
 );
 const chunk = getKnowledgeRegistry().chunks.find(
   (chunk) => chunk.id === "suz-report-maintenance",
 )!;
-const hit: VectorHit = {
+const hit: RagSearchHit = {
   chunk,
-  sourceVersionId: "b".repeat(64),
+  dependency: { head: "public", sourceVersionId: "b".repeat(64) },
   distance: 0.15,
 };
 const instant = Date.parse("2026-10-28T12:00:00Z");
 function fixture(
   overrides: {
-    store?: Partial<VectorKnowledgeStore>;
+    store?: Partial<
+      Pick<
+        RagVectorStore,
+        "captureSearch" | "searchSnapshot" | "assertSnapshot" | "close"
+      >
+    >;
     embedder?: Partial<Embedder>;
     maxDistance?: number;
     timeoutMs?: number;
@@ -45,18 +68,21 @@ function fixture(
     queryVector: unknown,
     closed = 0;
   const inputs: string[][] = [];
-  const store: VectorKnowledgeStore = {
-    async captureActive() {
+  const store: Pick<
+    RagVectorStore,
+    "captureSearch" | "searchSnapshot" | "assertSnapshot" | "close"
+  > = {
+    async captureSearch() {
       events.push("capture");
       return snapshot;
     },
-    async search(_snapshot, value, where) {
+    async searchSnapshot(_snapshot, value, where) {
       events.push("sql-search");
       queryVector = value;
       filters = where;
       return [hit];
     },
-    async assertCurrent() {
+    async assertSnapshot() {
       events.push("validate");
       return true;
     },
@@ -167,7 +193,9 @@ test("search uses the query vector and actual store hits without a lexical candi
       result.chunks.map((chunk) => chunk.id),
       ["suz-report-maintenance"],
     );
-    assert.deepEqual(result.sourceVersionIds, ["b".repeat(64)]);
+    assert.deepEqual(result.dependencies, [
+      { head: "public", sourceVersionId: "b".repeat(64) },
+    ]);
     assert.equal(result.embeddingUsage.totalTokens, 5);
     await f.backend.validate(result, instant, new AbortController().signal);
     assert.equal(f.inputs.length, 1, "validation cannot embed again");
@@ -179,12 +207,18 @@ test("search uses the query vector and actual store hits without a lexical candi
 test("missing or mismatched active profile cannot spend an embedding call", async () => {
   for (const active of [
     null,
-    { ...snapshot, profile: { ...profile, dimensions: 768 } },
-    { ...snapshot, profile: { ...profile, id: "c".repeat(64) } },
+    {
+      ...snapshot,
+      embeddingSpace: { ...snapshot.embeddingSpace, dimensions: 768 },
+    },
+    {
+      ...snapshot,
+      embeddingSpace: { ...snapshot.embeddingSpace, model: "other-model" },
+    },
   ]) {
     const f = fixture({
       store: {
-        async captureActive() {
+        async captureSearch() {
           return active;
         },
       },
@@ -210,7 +244,7 @@ test("default relevance cutoff accepts its boundary and rejects unrelated neares
   for (const distance of [0.6, 0.6001, 0.85]) {
     const f = fixture({
       store: {
-        async search() {
+        async searchSnapshot() {
           return [{ ...hit, distance }];
         },
       },
@@ -232,7 +266,7 @@ test("low similarity is an empty successful search; DB failure and stale revisio
   }
   const broken = fixture({
     store: {
-      async search() {
+      async searchSnapshot() {
         throw new Error("postgres://private-secret connection failure");
       },
     },
@@ -247,7 +281,7 @@ test("low similarity is an empty successful search; DB failure and stale revisio
   }
   const stale = fixture({
     store: {
-      async assertCurrent() {
+      async assertSnapshot() {
         return false;
       },
     },
@@ -268,7 +302,7 @@ test("readiness requests coalesce without query embedding and expire their short
   const f = fixture({
     now: () => time,
     store: {
-      async captureActive() {
+      async captureSearch() {
         captures++;
         return snapshot;
       },
@@ -294,10 +328,10 @@ test("readiness requests coalesce without query embedding and expire their short
 });
 
 test("abort, deadline and shutdown retire pending backend work and never pay after a late capture", async () => {
-  let finish!: (value: RagSnapshot) => void;
+  let finish!: (value: RagSearchSnapshot) => void;
   const f = fixture({
     store: {
-      captureActive: () =>
+      captureSearch: () =>
         new Promise((resolve) => {
           finish = resolve;
         }),
@@ -321,7 +355,7 @@ test("abort, deadline and shutdown retire pending backend work and never pay aft
   assert.equal(f.closed(), 1);
   const timeout = fixture({
     timeoutMs: 5,
-    store: { captureActive: () => new Promise(() => {}) },
+    store: { captureSearch: () => new Promise(() => {}) },
   });
   const keepAlive = setTimeout(() => {}, 1000);
   try {
@@ -332,5 +366,129 @@ test("abort, deadline and shutdown retire pending backend work and never pay aft
   } finally {
     clearTimeout(keepAlive);
     await timeout.backend.close();
+  }
+});
+
+test("combined view shares one embedding across compatible v1 and v2 document profiles", async () => {
+  const documents = createEmbeddingProfile({
+    inputVersion: "title-heading-text-v2",
+  });
+  const f = fixture({
+    store: {
+      async captureSearch() {
+        return {
+          ...snapshot,
+          heads: {
+            ...snapshot.heads,
+            documents: {
+              name: "public-documents",
+              revisionId: "d".repeat(64),
+              profile: documents,
+            },
+          },
+        };
+      },
+    },
+  });
+  try {
+    assert.equal(await f.backend.ready(), true);
+    assert.equal((await f.search()).chunks.length, 1);
+    assert.equal(f.inputs.length, 1);
+    assert.notEqual(profile.id, documents.id);
+  } finally {
+    await f.backend.close();
+  }
+});
+
+test("absent archive spends no embedding and its later creation invalidates the empty snapshot", async () => {
+  let archive: RagSearchSnapshot | null = null;
+  const scope = { kind: "archive" as const, asOf: "2020-06-01T00:00:00.000Z" };
+  const f = fixture({
+    store: {
+      async captureSearch(requested) {
+        return requested.kind === "archive" ? archive : snapshot;
+      },
+    },
+  });
+  try {
+    assert.equal(await f.backend.ready(), true);
+    const evidence = await f.backend.search(
+      prepareEvidenceQuery("Starší podmínky"),
+      {
+        scope,
+        signal: new AbortController().signal,
+        now: instant,
+        user: "fake",
+        onEmbeddingAttempt() {
+          assert.fail("no archive must not embed");
+        },
+      },
+    );
+    assert.equal(evidence.snapshot, null);
+    assert.deepEqual(evidence.scope, scope);
+    assert.deepEqual(evidence.chunks, []);
+    assert.equal(f.inputs.length, 0);
+    assert.equal(
+      await f.backend.validate(evidence, instant, new AbortController().signal),
+      true,
+    );
+    archive = {
+      ...snapshot,
+      scope,
+      heads: {
+        legacy: null,
+        documents: null,
+        archive: {
+          name: "public-archive",
+          revisionId: "e".repeat(64),
+          profile,
+        },
+      },
+    };
+    assert.equal(
+      await f.backend.validate(evidence, instant, new AbortController().signal),
+      false,
+    );
+  } finally {
+    await f.backend.close();
+  }
+});
+
+test("evidence admission counts UTF-8 metadata and keeps whole chunks under one total cap", async () => {
+  const large = {
+    ...chunk,
+    id: "large",
+    text: "🪴".repeat(800),
+    sourceLocator: "ě".repeat(500),
+    versionNote: "ž".repeat(1500),
+    document: {
+      ...chunk.document,
+      title: "Č".repeat(200),
+      authorityLevel: "š".repeat(300),
+    },
+  };
+  const candidates = Array.from({ length: 4 }, (_, index) => ({
+    ...hit,
+    chunk: { ...large, id: `large-${index}` },
+  }));
+  const f = fixture({
+    store: {
+      async searchSnapshot() {
+        return candidates;
+      },
+    },
+  });
+  try {
+    const evidence = await f.search();
+    assert.ok(evidence.chunks.length > 0 && evidence.chunks.length < 4);
+    assert.ok(
+      Buffer.byteLength(
+        JSON.stringify(crazyTypkaEvidencePayload(evidence.chunks)),
+      ) <= CRAZY_TYPKA_EVIDENCE_BYTES,
+    );
+    assert.ok(evidence.chunks.every((item) => item.text === large.text));
+    assert.equal(isEvidenceCurrent(evidence, instant), true);
+  } finally {
+    await f.backend.close();
   }
 });
