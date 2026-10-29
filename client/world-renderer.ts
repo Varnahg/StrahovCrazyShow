@@ -24,7 +24,7 @@ import {
   blockNumber,
 } from "../shared/world";
 import type { Building } from "../shared/types";
-import { buildStreets } from "./streets-renderer";
+import { streetBuildSteps } from "./streets-renderer";
 import { buildRoadDetails } from "./road-details";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import {
@@ -51,6 +51,13 @@ import {
 } from "./world-asset-identity";
 import { osmAssetIdentity } from "../shared/world-asset-identity";
 import { createB6BoxFaceParts, createB6StairMeshes } from "./b6-reality";
+import {
+  createWorldBuildStagesJob,
+  runWorldBuildStagesSync,
+  type WorldBuildJob,
+  type WorldBuildStageOptions,
+  type WorldBuildStep,
+} from "./world-build-stages";
 
 export interface WorldBuildContext {
   scene: Scene;
@@ -665,68 +672,170 @@ function stadium(context: WorldBuildContext) {
   }
 }
 
-export function buildWorld(
+export type WorldBuildResult = {
+  architecture: ReturnType<typeof buildArchitectureReality> | undefined;
+  b6Fallback: TransformNode;
+  b6Root: TransformNode;
+  landmarks: ReturnType<typeof buildLandmarkReality> | undefined;
+  campusExterior: ReturnType<typeof createCampusExterior> | undefined;
+  outdoorArtifacts: ReturnType<typeof createOutdoorArtifacts> | undefined;
+};
+
+type WorldBuildOptions = { photogrammetry?: boolean };
+type OwnedController = { dispose(): void };
+
+/** Scene objects belong to the host Scene; only returned controllers transfer. */
+function disposeBuildControllers(controllers: OwnedController[]) {
+  const owned = controllers.splice(0).reverse();
+  const errors: unknown[] = [];
+  for (const controller of owned) {
+    try {
+      controller.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+  if (errors.length)
+    throw new AggregateError(errors, "World controller cleanup failed");
+}
+
+/** One deterministic operation stream for synchronous and scheduled callers. */
+function* worldBuildSteps(
   context: WorldBuildContext,
-  options: { photogrammetry?: boolean } = {},
-) {
-  const exteriorPlan = options.photogrammetry
-    ? undefined
-    : buildCampusExteriorPlan();
+  options: WorldBuildOptions,
+  owned: OwnedController[],
+): Generator<WorldBuildStep, WorldBuildResult> {
+  let exteriorPlan: ReturnType<typeof buildCampusExteriorPlan> | undefined;
+  let architecture: WorldBuildResult["architecture"];
+  let landmarks: WorldBuildResult["landmarks"];
+  let campusExterior: WorldBuildResult["campusExterior"];
+  let outdoorArtifacts: WorldBuildResult["outdoorArtifacts"];
+  if (!options.photogrammetry)
+    yield {
+      phase: "campus-plan",
+      operation: "buildCampusExteriorPlan",
+      run: () => {
+        exteriorPlan = buildCampusExteriorPlan();
+      },
+    };
   if (options.photogrammetry) {
-    buildPhotogrammetryEntranceRepair(context.scene);
-    buildPhotogrammetryGroundRepairs(context.scene);
+    yield {
+      phase: "photogrammetry-repairs",
+      operation: "entrance",
+      run: () => {
+        buildPhotogrammetryEntranceRepair(context.scene);
+      },
+    };
+    yield {
+      phase: "photogrammetry-repairs",
+      operation: "ground",
+      run: () => {
+        buildPhotogrammetryGroundRepairs(context.scene);
+      },
+    };
   }
   if (!options.photogrammetry) {
-    buildTerrain({
-      scene: context.scene,
-      rects: GROUND_RECTS,
-      bounds: TERRAIN_COVERAGE,
-    });
-    buildLandcover(
-      context.scene,
-      new Set(exteriorPlan!.courts.map((court) => court.osmId)),
-    );
-    buildStreets(context);
-    buildRoadDetails(context.scene);
-    buildRealityGround({ scene: context.scene });
+    yield {
+      phase: "terrain",
+      operation: "buildTerrain",
+      run: () => {
+        buildTerrain({
+          scene: context.scene,
+          rects: GROUND_RECTS,
+          bounds: TERRAIN_COVERAGE,
+        });
+      },
+    };
+    yield {
+      phase: "landcover",
+      operation: "buildLandcover",
+      run: () => {
+        buildLandcover(
+          context.scene,
+          new Set(exteriorPlan!.courts.map((court) => court.osmId)),
+        );
+      },
+    };
+    yield* streetBuildSteps(context);
+    yield {
+      phase: "road-details",
+      operation: "buildRoadDetails",
+      run: () => {
+        buildRoadDetails(context.scene);
+      },
+    };
+    yield {
+      phase: "reality-ground",
+      operation: "buildRealityGround",
+      run: () => {
+        buildRealityGround({ scene: context.scene });
+      },
+    };
   }
   const base = (b: Building) =>
     blockNumber(b.name) === 6
       ? B6_LAYOUT.foundationOffset
       : buildingBaseHeight(b.points);
-  const architecture = options.photogrammetry
-    ? undefined
-    : buildArchitectureReality({
-        scene: context.scene,
-        baseElevation: (_x, _z, b) => base(b),
-        buildings: BUILDINGS.filter(
-          (b) => !LANDMARK_BUILDING_REPLACEMENTS.has(b.id),
-        ),
-      });
-  const foundation = context.mat("#797c75");
-  foundation.metadata = { surfaceKind: "concrete", uvMetresPerRepeat: 4 };
+  if (!options.photogrammetry)
+    yield {
+      phase: "architecture",
+      operation: "buildArchitectureReality",
+      run: () => {
+        architecture = buildArchitectureReality({
+          scene: context.scene,
+          baseElevation: (_x, _z, b) => base(b),
+          buildings: BUILDINGS.filter(
+            (b) => !LANDMARK_BUILDING_REPLACEMENTS.has(b.id),
+          ),
+        });
+        owned.push(architecture);
+      },
+    };
+  let foundation!: StandardMaterial;
+  yield {
+    phase: "foundations",
+    operation: "material",
+    run: () => {
+      foundation = context.mat("#797c75");
+      foundation.metadata = { surfaceKind: "concrete", uvMetresPerRepeat: 4 };
+    },
+  };
   for (const b of options.photogrammetry ? [] : BUILDINGS) {
-    const mesh = new Mesh("building foundation " + b.id, context.scene);
-    applyTerrainData(mesh, buildingFoundationData(b.points, base(b)));
-    mesh.material = foundation;
-    mesh.isPickable = false;
-    mesh.freezeWorldMatrix();
-    mesh.metadata = { shadowCaster: true };
-    attachWorldAssetNode(
-      mesh,
-      getWorldAssetRoot(
-        context.scene,
-        osmAssetIdentity("building", "way", b.id),
-        { x: b.points[0][0], y: base(b), z: b.points[0][1] },
-      ),
-    );
+    yield {
+      phase: "foundations",
+      operation: String(b.id),
+      run: () => {
+        const mesh = new Mesh("building foundation " + b.id, context.scene);
+        applyTerrainData(mesh, buildingFoundationData(b.points, base(b)));
+        mesh.material = foundation;
+        mesh.isPickable = false;
+        mesh.freezeWorldMatrix();
+        mesh.metadata = { shadowCaster: true };
+        attachWorldAssetNode(
+          mesh,
+          getWorldAssetRoot(
+            context.scene,
+            osmAssetIdentity("building", "way", b.id),
+            { x: b.points[0][0], y: base(b), z: b.points[0][1] },
+          ),
+        );
+      },
+    };
   }
-  const b6Fallback = new TransformNode("B6 structural fallback", context.scene);
-  const b6Root = getWorldAssetRoot(
-    context.scene,
-    osmAssetIdentity("building", "way", "53929071"),
-    { x: 8, y: B6_LAYOUT.foundationOffset, z: -55 },
-  );
+  let b6Fallback!: TransformNode;
+  let b6Root!: TransformNode;
+  yield {
+    phase: "b6-structure",
+    operation: "roots",
+    run: () => {
+      b6Fallback = new TransformNode("B6 structural fallback", context.scene);
+      b6Root = getWorldAssetRoot(
+        context.scene,
+        osmAssetIdentity("building", "way", "53929071"),
+        { x: 8, y: B6_LAYOUT.foundationOffset, z: -55 },
+      );
+    },
+  };
   const fallbackGroups = new Map<
     string,
     {
@@ -736,105 +845,187 @@ export function buildWorld(
       indices: number[];
     }
   >();
-  for (const b of B6_BOXES) {
+  for (const [index, b] of B6_BOXES.entries()) {
     if ((b.kind as string) === "glass") continue;
-    const color =
-      b.kind === "floor"
-        ? "#b3aea0"
-        : b.kind === "base"
-          ? COLORS.base
-          : COLORS.plaster;
-    const group = fallbackGroups.get(color) ?? {
-      positions: [],
-      normals: [],
-      uvs: [],
-      indices: [],
+    yield {
+      phase: "b6-structure",
+      operation: `box:${index}`,
+      run: () => {
+        const color =
+          b.kind === "floor"
+            ? "#b3aea0"
+            : b.kind === "base"
+              ? COLORS.base
+              : COLORS.plaster;
+        const group = fallbackGroups.get(color) ?? {
+          positions: [],
+          normals: [],
+          uvs: [],
+          indices: [],
+        };
+        // The preload fallback shares the exact same omitted exterior faces as
+        // the final controller and editable GLB, instead of recreating full boxes.
+        for (const { data } of createB6BoxFaceParts(b)) {
+          const offset = group.positions.length / 3;
+          group.positions.push(...data.positions);
+          group.normals.push(...data.normals);
+          group.uvs.push(...data.uvs);
+          for (const index of data.indices) group.indices.push(offset + index);
+        }
+        fallbackGroups.set(color, group);
+      },
     };
-    // The preload fallback shares the exact same omitted exterior faces as
-    // the final controller and editable GLB, instead of recreating full boxes.
-    for (const { data } of createB6BoxFaceParts(b)) {
-      const offset = group.positions.length / 3;
-      group.positions.push(...data.positions);
-      group.normals.push(...data.normals);
-      group.uvs.push(...data.uvs);
-      for (const index of data.indices) group.indices.push(offset + index);
-    }
-    fallbackGroups.set(color, group);
   }
   for (const [color, group] of fallbackGroups) {
-    const mesh = new Mesh(
-      "B6 canonical structural fallback " + color,
-      context.scene,
-    );
-    const data = new VertexData();
-    Object.assign(data, group);
-    data.applyToMesh(mesh);
-    mesh.material = context.mat(color);
-    mesh.isPickable = false;
-    mesh.metadata = {
-      b6Fallback: true,
-      canonicalFaceFactory: true,
-      shadowCaster: true,
+    yield {
+      phase: "b6-structure",
+      operation: `mesh:${color}`,
+      run: () => {
+        const mesh = new Mesh(
+          "B6 canonical structural fallback " + color,
+          context.scene,
+        );
+        const data = new VertexData();
+        Object.assign(data, group);
+        data.applyToMesh(mesh);
+        mesh.material = context.mat(color);
+        mesh.isPickable = false;
+        mesh.metadata = {
+          b6Fallback: true,
+          canonicalFaceFactory: true,
+          shadowCaster: true,
+        };
+        mesh.parent = b6Fallback;
+      },
     };
-    mesh.parent = b6Fallback;
   }
-  for (const mesh of createB6StairMeshes(
-    context.scene,
-    B6_LAYOUT.foundationOffset,
-  ))
-    mesh.parent = b6Fallback;
-  attachWorldAssetNode(b6Fallback, b6Root);
-  context.label("B6", 8, 19.1 + B6_LAYOUT.foundationOffset, -55, 5);
-  context.label(
-    "VSTUP B6",
-    B6_LAYOUT.entry.x,
-    3 + B6_LAYOUT.foundationOffset,
-    B6_LAYOUT.entry.z,
-    3,
-  );
-  const landmarks = options.photogrammetry
-    ? undefined
-    : buildLandmarkReality({
-        scene: context.scene,
-        buildings: BUILDINGS,
-        baseElevation: base,
-      });
-  const campusExterior = exteriorPlan
-    ? createCampusExterior(context.scene, exteriorPlan)
-    : undefined;
-  const outdoorArtifacts = options.photogrammetry
-    ? undefined
-    : createOutdoorArtifacts(context.scene, buildOutdoorWorldPlan());
+  yield {
+    phase: "b6-stairs",
+    operation: "createB6StairMeshes",
+    run: () => {
+      for (const mesh of createB6StairMeshes(
+        context.scene,
+        B6_LAYOUT.foundationOffset,
+      ))
+        mesh.parent = b6Fallback;
+    },
+  };
+  yield {
+    phase: "b6-labels",
+    operation: "attach-and-label",
+    run: () => {
+      attachWorldAssetNode(b6Fallback, b6Root);
+      context.label("B6", 8, 19.1 + B6_LAYOUT.foundationOffset, -55, 5);
+      context.label(
+        "VSTUP B6",
+        B6_LAYOUT.entry.x,
+        3 + B6_LAYOUT.foundationOffset,
+        B6_LAYOUT.entry.z,
+        3,
+      );
+    },
+  };
+  if (!options.photogrammetry)
+    yield {
+      phase: "landmarks",
+      operation: "buildLandmarkReality",
+      run: () => {
+        landmarks = buildLandmarkReality({
+          scene: context.scene,
+          buildings: BUILDINGS,
+          baseElevation: base,
+        });
+        owned.push(landmarks);
+      },
+    };
+  if (exteriorPlan)
+    yield {
+      phase: "campus-exterior",
+      operation: "createCampusExterior",
+      run: () => {
+        campusExterior = createCampusExterior(context.scene, exteriorPlan!);
+        owned.push(campusExterior);
+      },
+    };
+  if (!options.photogrammetry)
+    yield {
+      phase: "outdoor-artifacts",
+      operation: "plan-and-createOutdoorArtifacts",
+      run: () => {
+        outdoorArtifacts = createOutdoorArtifacts(
+          context.scene,
+          buildOutdoorWorldPlan(),
+        );
+        owned.push(outdoorArtifacts);
+      },
+    };
   for (const p of PLACES)
     if (p.worldLabel !== false && p.id !== "club6" && p.id !== "b6")
-      context.label(p.name, p.x, groundHeight(p.x, p.z) + 3.4, p.z, 5.5);
+      yield {
+        phase: "place-labels",
+        operation: p.id,
+        run: () => {
+          context.label(p.name, p.x, groundHeight(p.x, p.z) + 3.4, p.z, 5.5);
+        },
+      };
   for (const [i, p] of HUNT_POINTS.entries()) {
-    const m = MeshBuilder.CreatePolyhedron(
-      "hunt" + i,
-      { type: 1, size: 0.4 },
-      context.scene,
-    );
-    m.position.set(p.x, groundHeight(p.x, p.z) + 1.2, p.z);
-    m.metadata = { groundY: groundHeight(p.x, p.z) };
-    m.material = context.mat("#c5d989");
-    m.isPickable = false;
-    context.huntMeshes.push(m);
+    yield {
+      phase: "hunt",
+      operation: String(i),
+      run: () => {
+        const m = MeshBuilder.CreatePolyhedron(
+          "hunt" + i,
+          { type: 1, size: 0.4 },
+          context.scene,
+        );
+        m.position.set(p.x, groundHeight(p.x, p.z) + 1.2, p.z);
+        m.metadata = { groundY: groundHeight(p.x, p.z) };
+        m.material = context.mat("#c5d989");
+        m.isPickable = false;
+        context.huntMeshes.push(m);
+      },
+    };
   }
-  for (const meshes of context.staticMeshes.values()) {
-    const merged = Mesh.MergeMeshes(meshes, true, true, undefined, false, true);
-    if (merged) {
-      merged.metadata = { solid: true, artStatic: true };
-      merged.isPickable = false;
-      merged.freezeWorldMatrix();
-    }
+  for (const [material, meshes] of context.staticMeshes) {
+    yield {
+      phase: "static-merge",
+      operation: material.name,
+      run: () => {
+        const merged = Mesh.MergeMeshes(
+          meshes,
+          true,
+          true,
+          undefined,
+          false,
+          true,
+        );
+        if (merged) {
+          merged.metadata = { solid: true, artStatic: true };
+          merged.isPickable = false;
+          merged.freezeWorldMatrix();
+        }
+      },
+    };
   }
-  context.staticMeshes.clear();
+  yield {
+    phase: "static-merge",
+    operation: "release-groups",
+    run: () => {
+      context.staticMeshes.clear();
+    },
+  };
   for (const material of context.scene.materials) {
     if (
       material instanceof StandardMaterial &&
       material.name !== "art:lamp-pool"
     )
-      material.specularColor.set(0.025, 0.025, 0.025);
+      yield {
+        phase: "material-finish",
+        operation: material.name,
+        run: () => {
+          material.specularColor.set(0.025, 0.025, 0.025);
+        },
+      };
   }
   return {
     architecture,
@@ -843,5 +1034,89 @@ export function buildWorld(
     landmarks,
     campusExterior,
     outdoorArtifacts,
+  };
+}
+
+export function buildWorld(
+  context: WorldBuildContext,
+  options: WorldBuildOptions = {},
+): WorldBuildResult {
+  const owned: OwnedController[] = [];
+  try {
+    const result = runWorldBuildStagesSync(
+      worldBuildSteps(context, options, owned),
+    );
+    owned.length = 0;
+    return result;
+  } catch (error) {
+    try {
+      disposeBuildControllers(owned);
+    } catch (cleanupError) {
+      throw new AggregateError(
+        [error, cleanupError],
+        "World build and cleanup failed",
+        { cause: error },
+      );
+    }
+    throw error;
+  }
+}
+
+/** The host retains Scene ownership and disposes partial scene objects on failure. */
+export function createWorldBuildJob(
+  context: WorldBuildContext,
+  options: WorldBuildOptions & Omit<WorldBuildStageOptions, "isDisposed"> = {},
+): WorldBuildJob<WorldBuildResult> {
+  const owned: OwnedController[] = [];
+  const job = createWorldBuildStagesJob(
+    worldBuildSteps(context, options, owned),
+    {
+      ...options,
+      isDisposed: () => context.scene.isDisposed,
+    },
+  );
+  let cancelled = false;
+  let running: Promise<WorldBuildResult> | undefined;
+  const detach = () => context.scene.onDisposeObservable.remove(observer);
+  const cancel = () => {
+    cancelled = true;
+    job.cancel();
+    if (!running) detach();
+  };
+  const observer = context.scene.onDisposeObservable.addOnce(cancel);
+  return {
+    run() {
+      return (running ??= job
+        .run()
+        .then((result) => {
+          if (
+            cancelled ||
+            options.signal?.aborted ||
+            context.scene.isDisposed
+          ) {
+            const error = new Error(
+              "World build was aborted before ownership transfer",
+            );
+            error.name = "AbortError";
+            throw error;
+          }
+          owned.length = 0;
+          return result;
+        })
+        .catch((error: unknown) => {
+          try {
+            disposeBuildControllers(owned);
+          } catch (cleanupError) {
+            throw new AggregateError(
+              [error, cleanupError],
+              "World build and cleanup failed",
+              { cause: error },
+            );
+          }
+          throw error;
+        })
+        .finally(detach));
+    },
+    cancel,
   };
 }

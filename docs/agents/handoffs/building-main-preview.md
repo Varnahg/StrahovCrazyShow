@@ -1,3 +1,15 @@
+# Odstavení vlastní relace — 19. 10. 2026, KEY-44
+
+Na delegovaný pokyn koordinátora `01a155b2-1927-7681-9a9e-090b6c7bd974` byla tato relace pouze bezpečně odstavena. Žádná další implementace ani integrace nepokračuje.
+
+- Aktivní registr potvrdil vlastníka `building-main-preview / buildings-01a12b28-live`; před zápisem byl obnoven jeho heartbeat.
+- Oba procesy uložené v ignorovaném `.cache/main-testing-handoff.json` již při kontrole neexistovaly. Na portech **4179 ani 2570 nebyl žádný listener**. Nebyl ukončen žádný proces; žádný jiný PID nebyl převzat podle portu nebo stáří claimu. Přesné provozní identity a čas kontroly zůstávají pouze v ignorovaném JSON.
+- Aktuální běžící klient na této URL nebyl dostupný; níže uvedená identita B3 je historická evidence z 12. 10., nikoli tvrzení o nynější hrané verzi.
+- Snapshoty B1/B2/B3 ve worktree `visual-quality-jump`, předchozí B1 distribuce a adresář lokálních benchmarků stále existují. Obsah nebyl přepisován ani odstraňován; neproběhl nový hashový audit jejich obsahu. Všechen ostatní WIP byl ponechán bez zásahu.
+- Změněn pouze tento již rezervovaný handoff a ignorovaný provozní JSON. Bez stagingu/commitu, úprav katalogu, AGENTS či verification; bez testů, buildu a GPU. Po tomto předání se uvolňuje pouze vlastní procesní claim; nejde o nové přijetí implementace ani změnu stavu tasku.
+
+## Historický handoff z 12. 10. 2026
+
 # Persistent building-model preview
 
 Owner: `buildings-01a12b28-live`. Implementation checkpoint `7f65653`, final B3 source `e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a6`, protocol10. Runtime cwd: `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`.

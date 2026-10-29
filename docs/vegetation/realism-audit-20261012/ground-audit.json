@@ -1,0 +1,651 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-12T11:26:04.797Z",
+  "scope": "Read-only source/asset inspection. Static counts and hypothetical texture memory, not a GPU benchmark or visual acceptance.",
+  "command": "node docs/vegetation/realism-audit-20261012/ground-audit.mjs",
+  "checks": {
+    "allSourceManifestHashesMatch": true,
+    "encodedPixelDimensionsParsed": true,
+    "geometryCountsMatch": true,
+    "testsRun": false,
+    "buildRun": false,
+    "integrationRun": false
+  },
+  "limitations": [
+    "Image dimensions are actual JPEG SOF/PNG IHDR dimensions, not inferred from filenames. A separate read-only System.Drawing.Image.FromFile inspection returned the same surface dimensions.",
+    "RGBA8 with a full mip chain is an explicit theoretical allocation assumption, not measured VRAM; actual browser formats, residency, sharing, and driver overhead are not observed.",
+    "Draw limits in configuration are legacy maxima; current renderer creates three LOD batches. Counts exclude other scene draws and passes.",
+    "No tests were run or fabricated for this documentation-only research. Existing historical verification is separately dated and is not a new result.",
+    "No FPS, GPU timings, p95, or p99 were measured. Existing U1 screenshot/review evidence is historical and the grass runtime hashes were compared separately."
+  ],
+  "inputManifestSha256": "b6f2a5f470785b3e5894b89f18e96739148cbf2afe23954cafd32b307e455f0f",
+  "inputs": [
+    {
+      "path": "client/cinematic-art.ts",
+      "bytes": 9712,
+      "sha256": "0801bb81c54bdeff221ce5a1e735927e7a98fcf4d5deb1e8e5274e59297a7328"
+    },
+    {
+      "path": "client/photo-grass-batch.ts",
+      "bytes": 6247,
+      "sha256": "5c7d13bd394925eeab4922b8ac79939f920475779de68fb6c10621aa43d6949e"
+    },
+    {
+      "path": "client/photo-grass-budget.ts",
+      "bytes": 3066,
+      "sha256": "119026716ffe311b9b0d2980aa255d739cd55a04ddf6b81b0f8c139d0ca0854e"
+    },
+    {
+      "path": "client/photo-grass-placement.ts",
+      "bytes": 3441,
+      "sha256": "9f91ea57ae32f85aeaa58964d8ecd178e0ac071714c4afad56c2e9baf19ea0d0"
+    },
+    {
+      "path": "client/photo-grass-resources.ts",
+      "bytes": 7690,
+      "sha256": "14ebd248bc3a2bde786c9b52b80d82dfed604b387c6b87a3706f533cd3d5ac0f"
+    },
+    {
+      "path": "client/photo-grass-source-material.ts",
+      "bytes": 2639,
+      "sha256": "694bfe9c309e9565f549d59c4ae6d68bd7de70afd2ab2ab7af20e0a9b5840ef4"
+    },
+    {
+      "path": "client/photo-grass-transition.ts",
+      "bytes": 759,
+      "sha256": "6f019c148b39a4697891a33112888edf317f7292a316b896bbde2efc27621e47"
+    },
+    {
+      "path": "client/photo-grass-wind.ts",
+      "bytes": 4609,
+      "sha256": "9a4efbf60a1688bf8f29a2d3a5bebdcf183ba1be3d40d34ed7b0477832b38c57"
+    },
+    {
+      "path": "client/photographic-grass.ts",
+      "bytes": 18639,
+      "sha256": "bad76a906959d87c1f32a05b764466ffb158c14da6976824821e21e408dd5f6a"
+    },
+    {
+      "path": "client/streets-renderer.ts",
+      "bytes": 25409,
+      "sha256": "ab2661bf9a15c876674be46afd0d40ce8d70f078ddd8051d5e6a110887ba315c"
+    },
+    {
+      "path": "client/surface-pack.ts",
+      "bytes": 11151,
+      "sha256": "50d77ce3ea9af58281fb196ae3386c99a6e84909d3b6ce5a80307223c1bac90c"
+    },
+    {
+      "path": "client/terrain-renderer.ts",
+      "bytes": 11219,
+      "sha256": "c10acc586efbc5230d245e3107ad0717642a0ef911f5de96745901dad8ba7c67"
+    },
+    {
+      "path": "client/vegetation.ts",
+      "bytes": 29844,
+      "sha256": "56548718a707845a10559fec9c7f1415f05a5b81c1cf627994cdf02765b9fd2f"
+    },
+    {
+      "path": "public/models/vegetation/grass/geometry.json",
+      "bytes": 80793,
+      "sha256": "6834b188faa69a3ae3366e97a5de8c99dc6b7132d75d2eb15fbfabcb5545fa12"
+    },
+    {
+      "path": "public/models/vegetation/grass/material.json",
+      "bytes": 1230,
+      "sha256": "67fca9c3b035401bdd059c4bacb0caf392770e13e9940d04ed77398d5bda3d28"
+    },
+    {
+      "path": "shared/data/assets/surfaces-manifest.json",
+      "bytes": 10986,
+      "sha256": "c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474"
+    },
+    {
+      "path": "shared/data/landcover.json",
+      "bytes": 133300,
+      "sha256": "92425a36cfdf4bac15415c31e947bbd0e09576f5a650f9589284ee55e5402e3b"
+    },
+    {
+      "path": "shared/data/reality-ground.json",
+      "bytes": 48903,
+      "sha256": "9a144e2556c960677ce1d486477f0730ced54455662c1075ffc081fc90a6d878"
+    },
+    {
+      "path": "shared/vegetation.ts",
+      "bytes": 13238,
+      "sha256": "da310b4c7441e98816f9fe6900145c530f7dcb6c3846fb1ff55511568a510075"
+    }
+  ],
+  "surfaceProvenance": {
+    "provider": "ambientCG",
+    "license": "CC0-1.0",
+    "usage": "Generic material family, not a photogrammetric scan of Strahov. Geometry and colours follow the campus reference atlas."
+  },
+  "surfaces": [
+    {
+      "kind": "asphalt",
+      "id": "Asphalt033",
+      "source": "https://ambientcg.com/a/Asphalt033",
+      "importedAt": "2026-10-10T19:20:24.963798+00:00",
+      "metresPerRepeat": [
+        2.5,
+        2.5
+      ],
+      "scaleProvenance": "ambientCG official approximate asset dimensions (API centimetres / 100)",
+      "technique": "Generic CC0 material family; not a Strahov scan",
+      "channels": [
+        {
+          "channel": "color",
+          "path": "public/textures/surfaces/Asphalt033_1K-JPG_Color.jpg",
+          "bytes": 1229353,
+          "sha256": "126edfd31019dcc0e108ce6966eb0c23f772f130a3abcc3be6daedc590cbb7f8",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "normalgl",
+          "path": "public/textures/surfaces/Asphalt033_1K-JPG_NormalGL.jpg",
+          "bytes": 2213358,
+          "sha256": "34bf3e95a41a3856c291d2cb039dc75e5a72cc9499343248c6c7e9c1a91a9336",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "roughness",
+          "path": "public/textures/surfaces/Asphalt033_1K-JPG_Roughness.jpg",
+          "bytes": 715145,
+          "sha256": "ab1dee12de196e7f1462fd01ebb629e0ae68af9de08c26d38abd2d11dfe2022a",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        }
+      ],
+      "fileBytes": 4157856,
+      "theoreticalRgba8FullMipBytes": 16777212
+    },
+    {
+      "kind": "concrete",
+      "id": "Concrete034",
+      "source": "https://ambientcg.com/a/Concrete034",
+      "importedAt": "2026-10-10T19:20:25.056107+00:00",
+      "metresPerRepeat": [
+        1.1,
+        0.55
+      ],
+      "scaleProvenance": "ambientCG official approximate asset dimensions (API centimetres / 100)",
+      "technique": "Generic CC0 material family; not a Strahov scan",
+      "channels": [
+        {
+          "channel": "color",
+          "path": "public/textures/surfaces/Concrete034_1K-JPG_Color.jpg",
+          "bytes": 269501,
+          "sha256": "8ceb9186d990b31fce785e06fdc6974c160f1d27c43f6160266f164deba713aa",
+          "width": 1024,
+          "height": 512,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 2796204,
+          "matchesManifest": true
+        },
+        {
+          "channel": "normalgl",
+          "path": "public/textures/surfaces/Concrete034_1K-JPG_NormalGL.jpg",
+          "bytes": 821681,
+          "sha256": "e509eb9dfa978e780fbebfd2acacc2ce158b5b7ced722ddc0759039dd51e18ca",
+          "width": 1024,
+          "height": 512,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 2796204,
+          "matchesManifest": true
+        },
+        {
+          "channel": "roughness",
+          "path": "public/textures/surfaces/Concrete034_1K-JPG_Roughness.jpg",
+          "bytes": 217708,
+          "sha256": "a4a9e39857a19afd23a778e5abf44fcdf6bd7f93918f1cf6878b41933e553511",
+          "width": 1024,
+          "height": 512,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 2796204,
+          "matchesManifest": true
+        }
+      ],
+      "fileBytes": 1308890,
+      "theoreticalRgba8FullMipBytes": 8388612
+    },
+    {
+      "kind": "plaster",
+      "id": "Plaster001",
+      "source": "https://ambientcg.com/a/Plaster001",
+      "importedAt": "2026-10-10T19:20:25.213524+00:00",
+      "metresPerRepeat": [
+        1,
+        1
+      ],
+      "scaleProvenance": "Artistic approximate repeat scale: provider dimensions are unavailable; not a measured Strahov surface",
+      "technique": "Generic CC0 material family; not a Strahov scan",
+      "channels": [
+        {
+          "channel": "color",
+          "path": "public/textures/surfaces/Plaster001_1K-JPG_Color.jpg",
+          "bytes": 828790,
+          "sha256": "d3fe43282859ab7293ad41f2fa3c29f02df077e5bc326cf90a65cc588a4ac5a4",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "normalgl",
+          "path": "public/textures/surfaces/Plaster001_1K-JPG_NormalGL.jpg",
+          "bytes": 2091491,
+          "sha256": "ea293c335a0b9243f0a825573b81304b8f99e60b2c067e493d0792adf96dfc72",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "roughness",
+          "path": "public/textures/surfaces/Plaster001_1K-JPG_Roughness.jpg",
+          "bytes": 367391,
+          "sha256": "6028dbe3cb2ea250eacf3fb87d2c4e5ae8c2a7ff10ecad7883c27d721f2f8e88",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        }
+      ],
+      "fileBytes": 3287672,
+      "theoreticalRgba8FullMipBytes": 16777212
+    },
+    {
+      "kind": "grass",
+      "id": "Grass001",
+      "source": "https://ambientcg.com/a/Grass001",
+      "importedAt": "2026-10-10T19:20:25.445332+00:00",
+      "metresPerRepeat": [
+        1.4,
+        1.4
+      ],
+      "scaleProvenance": "ambientCG official approximate asset dimensions (API centimetres / 100)",
+      "technique": "Procedural grass material (provider), not a Strahov photograph or scan",
+      "channels": [
+        {
+          "channel": "color",
+          "path": "public/textures/surfaces/Grass001_1K-JPG_Color.jpg",
+          "bytes": 1764300,
+          "sha256": "b9b6d61bc3b6137b868a3447eef18737896acd26d58fe2f4b83ce8c0e9d3f8ad",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "normalgl",
+          "path": "public/textures/surfaces/Grass001_1K-JPG_NormalGL.jpg",
+          "bytes": 2338245,
+          "sha256": "eef0b56db5f00a6fcb3d0e0f8463e4e141e88aa85b26527a04d617b75a4ab5d2",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "roughness",
+          "path": "public/textures/surfaces/Grass001_1K-JPG_Roughness.jpg",
+          "bytes": 823623,
+          "sha256": "8810effd44756341170d551501b7d0c645dc2395dbce46a8c7f1e61045258a06",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        }
+      ],
+      "fileBytes": 4926168,
+      "theoreticalRgba8FullMipBytes": 16777212
+    },
+    {
+      "kind": "paving",
+      "id": "PavingStones112",
+      "source": "https://ambientcg.com/a/PavingStones112",
+      "importedAt": "2026-10-10T19:20:27.932069+00:00",
+      "metresPerRepeat": [
+        2.4,
+        2.4
+      ],
+      "scaleProvenance": "Artistic approximate repeat scale: provider dimensions are unavailable; not a measured Strahov surface",
+      "technique": "Generic CC0 material family; not a Strahov scan",
+      "channels": [
+        {
+          "channel": "color",
+          "path": "public/textures/surfaces/PavingStones112_1K-JPG_Color.jpg",
+          "bytes": 1611909,
+          "sha256": "e246deec461385baa047874cbe20b810d75e2d68e93684801af23cc9d0ec7bb8",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "normalgl",
+          "path": "public/textures/surfaces/PavingStones112_1K-JPG_NormalGL.jpg",
+          "bytes": 2128359,
+          "sha256": "a2095fab61d196a649245de547240c16c027f8afbd9e514a5646baf309516c51",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "roughness",
+          "path": "public/textures/surfaces/PavingStones112_1K-JPG_Roughness.jpg",
+          "bytes": 572596,
+          "sha256": "74b1647d9dfdb91d02f109df56a27d2f958b32e309339dea573a8e89d2648d0e",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        }
+      ],
+      "fileBytes": 4312864,
+      "theoreticalRgba8FullMipBytes": 16777212
+    },
+    {
+      "kind": "sett",
+      "id": "PavingStones036",
+      "source": "https://ambientcg.com/a/PavingStones036",
+      "importedAt": "2026-10-10T19:20:30.713405+00:00",
+      "metresPerRepeat": [
+        2,
+        2
+      ],
+      "scaleProvenance": "Artistic approximate repeat scale: provider dimensions are unavailable; not a measured Strahov surface",
+      "technique": "Generic CC0 material family; not a Strahov scan",
+      "channels": [
+        {
+          "channel": "color",
+          "path": "public/textures/surfaces/PavingStones036_1K-JPG_Color.jpg",
+          "bytes": 1796007,
+          "sha256": "065dad4ad95ee74992a6d3cbeb0efb107d3b18a0a3425487bf41452dce12c533",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "normalgl",
+          "path": "public/textures/surfaces/PavingStones036_1K-JPG_NormalGL.jpg",
+          "bytes": 2139484,
+          "sha256": "7e86034b299d5628bb072c74ed30364dbab5da21f55e17c675ccbef15b209543",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "roughness",
+          "path": "public/textures/surfaces/PavingStones036_1K-JPG_Roughness.jpg",
+          "bytes": 688711,
+          "sha256": "d97ddc1b344edf9e799d5a63b497c5bafabf3afe189bca565bbd155c79f269a1",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        }
+      ],
+      "fileBytes": 4624202,
+      "theoreticalRgba8FullMipBytes": 16777212
+    },
+    {
+      "kind": "gravel",
+      "id": "Gravel012",
+      "source": "https://ambientcg.com/a/Gravel012",
+      "importedAt": "2026-10-10T19:20:33.357388+00:00",
+      "metresPerRepeat": [
+        2,
+        2
+      ],
+      "scaleProvenance": "Artistic approximate repeat scale: provider dimensions are unavailable; not a measured Strahov surface",
+      "technique": "Generic CC0 material family; not a Strahov scan",
+      "channels": [
+        {
+          "channel": "color",
+          "path": "public/textures/surfaces/Gravel012_1K-JPG_Color.jpg",
+          "bytes": 1611153,
+          "sha256": "b480d08c312cf2147779e62d6316b24b405b563a5b0df9b408fbd7d23bb8c8e1",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "normalgl",
+          "path": "public/textures/surfaces/Gravel012_1K-JPG_NormalGL.jpg",
+          "bytes": 2494446,
+          "sha256": "48866679d582c93220f49aee8f9ac76ab16a8743fbfc9710498a4b632ef41140",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        },
+        {
+          "channel": "roughness",
+          "path": "public/textures/surfaces/Gravel012_1K-JPG_Roughness.jpg",
+          "bytes": 683940,
+          "sha256": "82f3e4d3161c40bbb9278cd7a3b899323137b1af80cdb39634cef97daf348fc3",
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "theoreticalRgba8FullMipBytes": 5592404,
+          "matchesManifest": true
+        }
+      ],
+      "fileBytes": 4789539,
+      "theoreticalRgba8FullMipBytes": 16777212
+    }
+  ],
+  "grass": {
+    "source": "https://polyhaven.com/a/grass_medium_01",
+    "sourceLicense": "CC0-1.0",
+    "sourceDescription": "Generic photographic source by Rico Cilliers and Rob Tuytel. Runtime is an authored short lawn derivative, not a local Strahov survey or unchanged source plant model.",
+    "sourceGeometrySha256": "67cd457ebd61ded79c15ff5b4e90c6ccd1508aa81eccb279f569261a3cfd1442",
+    "runtimeGeometryId": "4a866df9128043dcf0f61ff70a89d16db3b92e4a74964fd1a0da1112f82da7bc",
+    "textures": [
+      {
+        "channel": "albedo",
+        "path": "public/textures/vegetation/grass/lawn-leaf-v2-albedo.png",
+        "bytes": 204436,
+        "sha256": "d95be0b9f51b8f505b6b506fec0b98ddc34cf8bcffe3aa5f6cd68e2dbf1b4347",
+        "width": 1024,
+        "height": 512,
+        "format": "PNG",
+        "theoreticalRgba8FullMipBytes": 2796204,
+        "matchesManifest": true
+      },
+      {
+        "channel": "alpha",
+        "path": "public/textures/vegetation/grass/lawn-leaf-v2-alpha.png",
+        "bytes": 23126,
+        "sha256": "8564d10048138dbb0a5c3f861b840ad4085386f182a4ad0fc1c2dbd91048b260",
+        "width": 1024,
+        "height": 512,
+        "format": "PNG",
+        "theoreticalRgba8FullMipBytes": 2796204,
+        "matchesManifest": true
+      },
+      {
+        "channel": "normal",
+        "path": "public/textures/vegetation/grass/lawn-leaf-v2-normal.png",
+        "bytes": 248863,
+        "sha256": "ebc7627c6d97c1feea9fd676e6dec963e9e19ac7708629b84b827ff2e31b1209",
+        "width": 1024,
+        "height": 512,
+        "format": "PNG",
+        "theoreticalRgba8FullMipBytes": 2796204,
+        "matchesManifest": true
+      },
+      {
+        "channel": "normalBent",
+        "path": "public/textures/vegetation/grass/lawn-leaf-v2-normal-bent.png",
+        "bytes": 255985,
+        "sha256": "5ccdeb360b1544d32a33ec38cece2a2eb95737cf427fdc74eb124aae468cdd40",
+        "width": 1024,
+        "height": 512,
+        "format": "PNG",
+        "theoreticalRgba8FullMipBytes": 2796204,
+        "matchesManifest": true
+      },
+      {
+        "channel": "arm",
+        "path": "public/textures/vegetation/grass/lawn-leaf-v2-arm.png",
+        "bytes": 164375,
+        "sha256": "ba251bb9902d281e89ffc117e01e8989ac6e32abff986bae7bf36f0e9bf57353",
+        "width": 1024,
+        "height": 512,
+        "format": "PNG",
+        "theoreticalRgba8FullMipBytes": 2796204,
+        "matchesManifest": true
+      }
+    ],
+    "fileBytes": 896785,
+    "theoreticalRgba8FullMipBytes": 13981020,
+    "levels": [
+      {
+        "level": "near",
+        "vertices": 336,
+        "triangles": 168,
+        "leaves": 42,
+        "materialChannel": "bent",
+        "boundsMetresXYZ": [
+          [
+            -0.05445787583862402,
+            0.060840390657434656
+          ],
+          [
+            -0.007759340988709776,
+            0.058619694332893386
+          ],
+          [
+            -0.059000983489854816,
+            0.056165818085510966
+          ]
+        ]
+      },
+      {
+        "level": "medium",
+        "vertices": 168,
+        "triangles": 84,
+        "leaves": 42,
+        "materialChannel": "flat",
+        "boundsMetresXYZ": [
+          [
+            -0.05378911340494362,
+            0.06043395446093723
+          ],
+          [
+            -0.007472272628896645,
+            0.05884766136771223
+          ],
+          [
+            -0.05871419365320304,
+            0.05543781679628684
+          ]
+        ]
+      },
+      {
+        "level": "far",
+        "vertices": 44,
+        "triangles": 22,
+        "leaves": 11,
+        "materialChannel": "flat",
+        "boundsMetresXYZ": [
+          [
+            -0.0475625095960456,
+            0.06043395446093723
+          ],
+          [
+            -0.006438576359680726,
+            0.04723918091885245
+          ],
+          [
+            -0.05188806669392266,
+            0.05032817087846643
+          ]
+        ]
+      }
+    ],
+    "qualities": [
+      {
+        "quality": "low",
+        "triangleCap": 60000,
+        "declaredDrawLimit": 8,
+        "rangeMetres": 6,
+        "fadeStartMetres": 3.5,
+        "actualBatchUpperBound": 3,
+        "hypotheticalHomogeneousRootCapacity": {
+          "near": 357,
+          "medium": 714,
+          "far": 2727
+        }
+      },
+      {
+        "quality": "medium",
+        "triangleCap": 140000,
+        "declaredDrawLimit": 12,
+        "rangeMetres": 9,
+        "fadeStartMetres": 6,
+        "actualBatchUpperBound": 3,
+        "hypotheticalHomogeneousRootCapacity": {
+          "near": 833,
+          "medium": 1666,
+          "far": 6363
+        }
+      },
+      {
+        "quality": "high",
+        "triangleCap": 280000,
+        "declaredDrawLimit": 16,
+        "rangeMetres": 12,
+        "fadeStartMetres": 8,
+        "actualBatchUpperBound": 3,
+        "hypotheticalHomogeneousRootCapacity": {
+          "near": 1666,
+          "medium": 3333,
+          "far": 12727
+        }
+      }
+    ],
+    "translucency": 0.4000000059604645,
+    "sourceNormalStrength": 1,
+    "placement": {
+      "source": "client/photo-grass-placement.ts:24",
+      "candidatesPerSquareMetre": 169,
+      "maximumRetainedRootsPerSquareMetre": 160,
+      "deterministicJitteredGridSide": 13,
+      "footprintCheckHalfExtentMetres": 0.08,
+      "cacheTiles": 256
+    }
+  }
+}

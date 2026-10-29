@@ -6,15 +6,21 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import type { AvatarConfig } from "../shared/types";
-import { AvatarPrimitivePool, createAvatarRig } from "./avatar-renderer";
+import {
+  AvatarPreviewModel,
+  avatarPreviewMeshesReady,
+} from "./avatar-renderer";
+import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { createGameEngine, selectRenderBackend } from "./render-engine";
 import { RenderHealth, type RenderHealthSnapshot } from "./render-health";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import { OnDemandRender } from "./on-demand-render";
+import { sessionDiagnostics } from "./session-diagnostics";
 
 export type AvatarPreviewState = "loading" | "ready" | "unsupported" | "failed";
 export type AvatarPreviewController = {
   update(config: AvatarConfig): void;
+  setActive(active: boolean): void;
   rotate(radians: number): void;
   focus(detail: "body" | "face"): void;
   resetView(): void;
@@ -77,8 +83,9 @@ function createSurface(
   config: AvatarConfig,
   textureError: () => void,
 ): AvatarPreviewSurface {
+  const surfaceStarted = performance.now();
   const scene = new Scene(engine);
-  let pool: AvatarPrimitivePool | undefined;
+  let model: AvatarPreviewModel | undefined;
   const textures = new SceneTextureDiagnostics(scene, textureError);
   try {
     scene.useRightHandedSystem = true;
@@ -110,16 +117,30 @@ function createSurface(
     scene.imageProcessingConfiguration.toneMappingEnabled = true;
     scene.imageProcessingConfiguration.toneMappingType = 1;
     scene.imageProcessingConfiguration.exposure = 1.1;
-    pool = new AvatarPrimitivePool(scene);
-    const ownedPool = pool;
-    let rig = createAvatarRig(scene, config, ownedPool, "preview");
+    const sceneReadyAt = performance.now();
+    model = new AvatarPreviewModel(scene, config);
+    const modelReadyAt = performance.now();
+    const ownedModel = model;
+    sessionDiagnostics.event("avatar-preview", {
+      phase: "create",
+      sceneCpuMs: sceneReadyAt - surfaceStarted,
+      rigCpuMs: modelReadyAt - sceneReadyAt,
+      totalCpuMs: modelReadyAt - surfaceStarted,
+      scope:
+        "synchronous surface creation only; asynchronous engine initialization excluded",
+      meshes: scene.meshes.length,
+      materials: scene.materials.length,
+      textures: scene.textures.length,
+    });
+    let visibleMeshes = ownedModel.rig.root.getChildMeshes();
     let detail: "body" | "face" = "body";
     let disposed = false;
     const pose = () => {
       camera.radius = detail === "face" ? 0.9 : 3.65;
       camera.target.set(
         0,
-        (detail === "face" ? 1.565 : 0.75 / 1.03) * rig.root.scaling.y,
+        (detail === "face" ? 1.565 : 0.75 / 1.03) *
+          ownedModel.rig.root.scaling.y,
         0.015,
       );
       camera.beta = detail === "face" ? 1.46 : 1.41;
@@ -127,9 +148,17 @@ function createSurface(
     pose();
     return {
       update(next) {
-        rig.root.dispose(false, false);
-        rig = createAvatarRig(scene, next, ownedPool, "preview");
-        ownedPool.pruneUnused();
+        const startedAt = performance.now();
+        if (!ownedModel.update(next)) return;
+        sessionDiagnostics.event("avatar-preview", {
+          phase: "update",
+          rigCpuMs: performance.now() - startedAt,
+          builds: ownedModel.stats.builds,
+          meshes: scene.meshes.length,
+          materials: scene.materials.length,
+          textures: scene.textures.length,
+        });
+        visibleMeshes = ownedModel.rig.root.getChildMeshes();
         pose();
       },
       rotate(radians) {
@@ -145,12 +174,19 @@ function createSurface(
       resize(width, height) {
         engine.setSize(width, height);
       },
-      ready: () => scene.isReady() && engine.areAllEffectsReady(),
+      ready: () => avatarPreviewMeshesReady(visibleMeshes),
       render: () => scene.render(),
       shaderModules() {
         const modules = new Set<PreviewShaderModule>();
-        for (const mesh of scene.meshes)
-          for (const subMesh of mesh.subMeshes ?? []) {
+        for (const mesh of visibleMeshes) {
+          if (!mesh.isEnabled() || !mesh.isVisible || mesh.visibility <= 0)
+            continue;
+          // InstancedMesh.isReady(true) compiles the source's instance variant;
+          // its cloned submeshes need not own that effect themselves.
+          const rendered = mesh.isAnInstance
+            ? (mesh as InstancedMesh).sourceMesh
+            : mesh;
+          for (const subMesh of rendered.subMeshes ?? []) {
             // Public effect/context access; pinned WebGPU context exposes stages.
             const context = subMesh.effect?.getPipelineContext() as {
               stages?: {
@@ -164,20 +200,24 @@ function createSurface(
             ])
               if (stage?.module) modules.add(stage.module);
           }
+        }
         return [...modules];
       },
       dispose() {
         if (disposed) return;
         disposed = true;
+        sessionDiagnostics.event("avatar-preview", {
+          phase: "dispose",
+          builds: ownedModel.stats.builds,
+        });
         textures.dispose();
-        rig.root.dispose(false, false);
-        ownedPool.dispose();
+        ownedModel.dispose();
         scene.dispose();
       },
     };
   } catch (error) {
     textures.dispose();
-    pool?.dispose();
+    model?.dispose();
     scene.dispose();
     throw error;
   }
@@ -253,11 +293,18 @@ export async function createAvatarPreview(
     options.onState?.("unsupported", error);
     throw error;
   }
+  const engineStarted = runtime.now();
   const engine = await runtime.createEngine(canvas, signal);
   if (signal?.aborted || canvas.isConnected === false) {
     engine.dispose();
     throw abortError();
   }
+  sessionDiagnostics.event("avatar-preview", {
+    phase: "engine-ready",
+    engineStartupWallMs: runtime.now() - engineStarted,
+    scope:
+      "asynchronous engine initialization wall time; not CPU or GPU execution",
+  });
   let health: RenderHealth | undefined;
   let surface: AvatarPreviewSurface | undefined;
   let scheduler: OnDemandRender | undefined;
@@ -265,7 +312,12 @@ export async function createAvatarPreview(
   let failure: Error | undefined;
   let starting = true;
   let state: AvatarPreviewState = "loading";
-  let requested = initial;
+  let active = true;
+  const visible = () => active && runtime.visible();
+  let frames = 0;
+  let activationStarted: number | undefined;
+  let preparationStarted = runtime.now();
+  let requested = { ...initial };
   let signature = "";
   const cleanups: (() => void)[] = [];
   const moduleChecks = new WeakMap<PreviewShaderModule, Promise<void>>();
@@ -349,7 +401,7 @@ export async function createAvatarPreview(
     if (
       disposed ||
       state !== "loading" ||
-      !runtime.visible() ||
+      !visible() ||
       budgetTimer !== undefined
     )
       return;
@@ -361,7 +413,7 @@ export async function createAvatarPreview(
           !disposed &&
           epoch === budgetEpoch &&
           state === "loading" &&
-          runtime.visible()
+          visible()
         )
           reportDeadline();
       },
@@ -371,6 +423,7 @@ export async function createAvatarPreview(
   const loading = () => {
     if (state === "ready") {
       state = "loading";
+      preparationStarted = runtime.now();
       budgetRemaining = 30_000;
       options.onState?.("loading");
     }
@@ -414,11 +467,24 @@ export async function createAvatarPreview(
     const controller: AvatarPreviewController = {
       update(config) {
         if (disposed || failure) return;
-        requested = config;
+        requested = { ...config };
         if (JSON.stringify(config) !== signature) {
           loading();
           scheduler?.request();
         }
+      },
+      setActive(value) {
+        if (disposed || failure || active === value) return;
+        active = value;
+        if (active) activationStarted = runtime.now();
+        sessionDiagnostics.event("avatar-preview", {
+          phase: "active",
+          active,
+          rendererId: health!.rendererId,
+        });
+        if (visible()) resumeBudget();
+        else pauseBudget();
+        scheduler?.visibilityChanged();
       },
       rotate(radians) {
         if (!disposed && !failure) {
@@ -457,7 +523,7 @@ export async function createAvatarPreview(
     scheduler = new OnDemandRender({
       requestFrame: runtime.requestFrame,
       cancelFrame: runtime.cancelFrame,
-      visible: runtime.visible,
+      visible,
       onError: reportRenderFailure,
       async frame() {
         if (disposed || failure) return false;
@@ -467,6 +533,8 @@ export async function createAvatarPreview(
         let begun = false;
         let hasRenderFailure = false;
         let renderFailure: unknown;
+        let readinessCpuMs = 0;
+        let renderCpuMs = 0;
         const capture = (error: unknown) => {
           if (!hasRenderFailure) {
             hasRenderFailure = true;
@@ -492,12 +560,17 @@ export async function createAvatarPreview(
             height = nextHeight;
           }
           if (!canRenderFrame()) throw abortError();
+          const readinessStarted = runtime.now();
           beforeReady = ownedSurface.ready();
+          readinessCpuMs = runtime.now() - readinessStarted;
           if (!canRenderFrame()) throw abortError();
           engine.beginFrame();
           begun = true;
           if (!canRenderFrame()) throw abortError();
+          const renderStarted = runtime.now();
           ownedSurface.render();
+          renderCpuMs = runtime.now() - renderStarted;
+          frames++;
           if (!canRenderFrame()) throw abortError();
         } catch (error) {
           capture(error);
@@ -560,7 +633,27 @@ export async function createAvatarPreview(
         // before the overdue timer task. Do not accept after the visible budget.
         if (!withinBudget()) return false;
         if (
-          !runtime.visible() ||
+          frames === 1 ||
+          activationStarted !== undefined ||
+          renderCpuMs + readinessCpuMs >= 50
+        )
+          sessionDiagnostics.event("avatar-preview", {
+            phase: activationStarted === undefined ? "frame" : "resume-frame",
+            rendererId: health!.rendererId,
+            frames,
+            renderCpuMs,
+            readinessCpuMs,
+            preparationAgeMs: runtime.now() - preparationStarted,
+            activationAgeMs:
+              activationStarted === undefined
+                ? null
+                : runtime.now() - activationStarted,
+            scope:
+              "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately",
+          });
+        activationStarted = undefined;
+        if (
+          !visible() ||
           signature !== JSON.stringify(currentConfig()) ||
           !beforeReady ||
           !ownedSurface.ready() ||
@@ -575,6 +668,13 @@ export async function createAvatarPreview(
         pauseBudget();
         if (state !== "ready") {
           state = "ready";
+          sessionDiagnostics.event("avatar-preview", {
+            phase: "ready-frame",
+            rendererId: health!.rendererId,
+            frames,
+            preparationAgeMs: runtime.now() - preparationStarted,
+            scope: "validated submitted preview frame; no FPS claim",
+          });
           options.onState?.("ready");
         }
         if (starting) {
@@ -590,7 +690,7 @@ export async function createAvatarPreview(
     cleanups.push(runtime.observeResize(canvas, () => scheduler?.request()));
     cleanups.push(
       runtime.observeVisibility(() => {
-        if (!runtime.visible()) pauseBudget();
+        if (!visible()) pauseBudget();
         else resumeBudget();
         scheduler?.visibilityChanged();
       }),

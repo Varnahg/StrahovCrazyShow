@@ -20,6 +20,7 @@ type AvatarEditorProps = {
   profile: Profile;
   onChange: (profile: Profile) => void;
   compact?: boolean;
+  active?: boolean;
 };
 
 function Silhouette({
@@ -135,6 +136,7 @@ export function AvatarEditor({
   profile,
   onChange,
   compact = false,
+  active = true,
 }: AvatarEditorProps) {
   useLocale();
   const [section, setSection] = useState<"appearance" | "clothes">(
@@ -147,6 +149,7 @@ export function AvatarEditor({
   const canvas = useRef<HTMLCanvasElement>(null);
   const preview = useRef<AvatarPreviewController | null>(null);
   const previewGeneration = useRef(0);
+  const previewAbort = useRef<AbortController | null>(null);
   const currentAvatar = useRef(profile.avatar);
   const pointer = useRef<{ id: number; x: number } | null>(null);
   const faceId = useId();
@@ -156,9 +159,25 @@ export function AvatarEditor({
   currentAvatar.current = config;
 
   useEffect(() => {
+    if (!active) {
+      if (
+        pointer.current &&
+        canvas.current?.hasPointerCapture(pointer.current.id)
+      )
+        canvas.current.releasePointerCapture(pointer.current.id);
+      pointer.current = null;
+      preview.current?.setActive(false);
+      return;
+    }
+    if (preview.current) {
+      preview.current.update(currentAvatar.current);
+      preview.current.setActive(true);
+      return;
+    }
     const target = canvas.current;
     if (!target) return;
     const abort = new AbortController();
+    previewAbort.current = abort;
     const generation = ++previewGeneration.current;
     let owned: AvatarPreviewController | undefined;
     const current = () =>
@@ -208,15 +227,31 @@ export function AvatarEditor({
         setPreviewError(message(error));
       });
     return () => {
-      abort.abort();
-      owned?.dispose();
-      if (preview.current === owned) preview.current = null;
+      // A completed owner survives closing; cancellation still owns any
+      // unresolved first creation, including its late engine/controller.
+      if (owned) owned.setActive(false);
+      else abort.abort();
+    };
+  }, [active]);
+
+  useEffect(() => {
+    return () => {
+      previewGeneration.current++;
+      previewAbort.current?.abort();
+      preview.current?.dispose();
+      preview.current = null;
+      if (
+        pointer.current &&
+        canvas.current?.hasPointerCapture(pointer.current.id)
+      )
+        canvas.current.releasePointerCapture(pointer.current.id);
+      pointer.current = null;
     };
   }, []);
 
   useEffect(() => {
-    preview.current?.update(config);
-  }, [config]);
+    if (active) preview.current?.update(config);
+  }, [config, active]);
 
   const update = <K extends keyof AvatarConfig>(
     key: K,

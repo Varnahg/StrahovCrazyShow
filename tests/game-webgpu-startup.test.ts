@@ -26,12 +26,17 @@ const methods = gameClass.members.filter(
     node.name &&
     [
       "start",
+      "startContent",
+      "startupPhase",
+      "dispose",
       "handleRendererFailure",
       "isMeshReadyForCamera",
       "assertStartupActive",
       "disposeStartupAsset",
       "disposeStartupAssets",
       "trackStartupAsset",
+      "trackStartupResource",
+      "disposeStartupWorld",
       "applyAdaptiveQuality",
       "setQuality",
       "setTargetFps",
@@ -51,14 +56,17 @@ const compiled = ts.transpileModule(
       before: [
         (context) => (input) => {
           const visit: ts.Visitor = (node) =>
-            ts.isCallExpression(node) &&
-            node.expression.kind === ts.SyntaxKind.ImportKeyword
-              ? ts.factory.createCallExpression(
-                  ts.factory.createIdentifier("loadModule"),
-                  undefined,
-                  node.arguments,
-                )
-              : ts.visitEachChild(node, visit, context);
+            ts.isMetaProperty(node) &&
+            node.keywordToken === ts.SyntaxKind.ImportKeyword
+              ? ts.factory.createIdentifier("testImportMeta")
+              : ts.isCallExpression(node) &&
+                  node.expression.kind === ts.SyntaxKind.ImportKeyword
+                ? ts.factory.createCallExpression(
+                    ts.factory.createIdentifier("loadModule"),
+                    undefined,
+                    node.arguments,
+                  )
+                : ts.visitEachChild(node, visit, context);
           return ts.visitNode(input, visit) as ts.SourceFile;
         },
       ],
@@ -66,7 +74,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
+  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady, testImportMeta, RENDER_INCIDENT_SCOPE, MESH_DRAW_PROFILE_SCOPE, createWorldBuildJob, window, document } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -95,7 +103,7 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 async function settle() {
-  for (let i = 0; i < 24; i++) await Promise.resolve();
+  await new Promise<void>((resolve) => setImmediate(resolve));
 }
 
 /** Runs the actual production start body. Replaces module/asset/GPU IO only;
@@ -143,7 +151,7 @@ function fixture(
     setQuality() {},
     updateLighting() {},
   };
-  const interiorAsset = disposable(),
+  const interiorAsset = { ...disposable(), attachToBuilding() {} },
     vegetationAsset = disposable();
   if (!options.holdPhysics) physics.resolve();
   if (!options.holdAssets) {
@@ -155,6 +163,15 @@ function fixture(
   const StartupGame = make({
     arePreparationEffectsReady,
     exports: {},
+    testImportMeta: { env: { DEV: false, MODE: "test" } },
+    RENDER_INCIDENT_SCOPE: {},
+    MESH_DRAW_PROFILE_SCOPE: {},
+    createWorldBuildJob: () => ({
+      run: async () => ({ b6Root: {}, b6Fallback: { dispose() {} } }),
+      cancel() {},
+    }),
+    window: { removeEventListener() {} },
+    document: { removeEventListener() {}, pointerLockElement: null },
     measurePresentationRate: async () => ({
       reliable: true,
       observedBrowserHz: 60,
@@ -167,12 +184,17 @@ function fixture(
       add() {
         return { position: { x: 0, y: 1, z: 0 } };
       }
+      dispose() {}
     },
     loadModule: async (name: string) => {
       const modules: Record<string, unknown> = {
         "./assets": { loadCar: () => car.promise },
         "./vegetation": { loadVegetation: () => vegetation.promise },
-        "./transit-renderer": { TransitRenderer: class {} },
+        "./transit-renderer": {
+          TransitRenderer: class {
+            dispose() {}
+          },
+        },
         "./b6-reality": { loadB6Reality: () => interior.promise },
       };
       return modules[name];
@@ -180,9 +202,14 @@ function fixture(
     B6_LAYOUT: { foundationOffset: 0 },
     SurfacePack: class {
       update() {}
+      dispose() {}
     },
-    CinematicAtmosphere: class {},
-    VehicleLighting: class {},
+    CinematicAtmosphere: class {
+      dispose() {}
+    },
+    VehicleLighting: class {
+      dispose() {}
+    },
     // GPU/cache IO is covered by the helper's pinned-engine tests. This fixture
     // executes actual Game ownership and both readiness integration points.
     WebGpuPipelinePreparation: class {
@@ -229,19 +256,33 @@ function fixture(
   game = Object.assign(new StartupGame(), {
     engine,
     startupAbort: new AbortController(),
-    startupAssets: new Set(),
+    startupAssets: new Map(),
     rendererFailed: false,
     disposed: false,
     ready: false,
-    canvas: { dataset: {} },
+    canvas: { dataset: {}, removeEventListener() {} },
     adaptive: { setPresentationHz: () => ({}) },
     applyAdaptiveQuality() {},
-    gltfLightBudget: { prepareFrame() {} },
-    stableLights: { update() {} },
+    gltfLightBudget: { prepareFrame() {}, dispose() {} },
+    stableLights: { update() {}, dispose() {} },
     scene: {
-      render() {}, getActiveMeshes: () => ({ length: 0, data: [] }),
+      render() {},
+      getActiveMeshes: () => ({ length: 0, data: [] }),
       objectRenderers: [{ resetRefreshCounter() { targetRetries++; } }],
+      dispose() {},
     },
+    createWorldPresentation() {},
+    updatePreloadVisuals() {},
+    previousPosition: { copyFromFloats() {} },
+    updateCameraFollow() {},
+    avatars: new Map(),
+    resetDiagnosticContext() {},
+    enabledMeshCandidates: { dispose() {} },
+    labels: { dispose() {} },
+    contactShadows: { dispose() {} },
+    instrumentation: { dispose() {} },
+    engineInstrumentation: { dispose() {} },
+    avatarPool: { dispose() {} },
     car: { dispose() {} },
     parkedCar: { dispose() {} },
     camera: {},

@@ -16,7 +16,10 @@ import {
 } from "../client/session-diagnostics";
 import { NetworkTimeline } from "../client/network-timeline";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
-import { createEnvironmentProfile, type EnvironmentProfileSnapshot } from "../client/environment-profile";
+import {
+  createEnvironmentProfile,
+  type EnvironmentProfileSnapshot,
+} from "../client/environment-profile";
 import { writeQuaternion, writeVector3 } from "../client/transform-updates";
 import {
   snapshotTransportDiagnostics,
@@ -51,6 +54,7 @@ const members = declaration.members.filter(
       "updateWorldPresentation",
       "updateRenderEnvironment",
       "environmentProfileMetadata",
+      "environmentPhaseEnds",
       "diagnosticContext",
       "diagnosticNetworkContext",
       "resetDiagnosticContext",
@@ -157,11 +161,12 @@ function fixture(hostname = "localhost") {
     ready: true,
     disposed: false,
     startupAbort: new AbortController(),
-    startupAssets: new Set(),
+    startupAssets: new Map(),
     renderHealth: { dispose() {} },
     network: false,
     localId: "private-local-id",
     localPlayer: {},
+    profile: { avatar: {} },
     actor: { position: { x: 0, y: 1, z: 2 }, speed: 0, yaw: 0, vehicle: false },
     engine: {
       getDeltaTime: () => 16,
@@ -206,7 +211,11 @@ function fixture(hostname = "localhost") {
     },
     contactShadows: { set() {}, dispose() {} },
     updateCameraFollow() {},
-    camera: { position: Vector3.Zero(), minZ: 0.1 },
+    camera: {
+      position: Vector3.Zero(),
+      globalPosition: Vector3.Zero(),
+      minZ: 0.1,
+    },
     localAvatarPresentation: {
       update: () => ({ visible: true, resetAnimation: false }),
     },
@@ -216,6 +225,9 @@ function fixture(hostname = "localhost") {
       dispose() {},
     },
     scene: {
+      getActiveMeshes: () => ({ length: 0, data: [] }),
+      getActiveMeshCandidates: () => ({ length: 0, data: [] }),
+      getActiveIndices: () => 0,
       render: () => {
         renders++;
         clock += 4;
@@ -231,7 +243,7 @@ function fixture(hostname = "localhost") {
       removeEventListener() {},
     },
     enabledMeshCandidates: { dispose() {} },
-    instrumentation: { dispose() {} },
+    instrumentation: { dispose() {}, drawCallsCounter: { current: 0 } },
     avatarPool: { dispose() {} },
     lastStats: Infinity,
     lastGpuCounterCount: 0,
@@ -280,33 +292,67 @@ test("actual environment update attributes synchronous work and reports metadata
   const reports: EnvironmentProfileSnapshot[] = [];
   Object.assign(f.game.scene, {
     imageProcessingConfiguration: { exposure: 0.75 },
-    meshes: [{}, {}], materials: [{}],
+    meshes: [{}, {}],
+    materials: [{}],
   });
   const skyUpdate = f.game.skyWeather.update;
-  f.game.skyWeather.update = () => { clock += 2; return skyUpdate(); };
-  f.game.surfacePack = { update: () => { clock += 3; } };
-  f.game.cinematic = { update: () => {
-    clock += 40;
-    f.game.scene.imageProcessingConfiguration.exposure = 0.8;
-  } };
+  f.game.skyWeather.update = () => {
+    clock += 2;
+    return skyUpdate();
+  };
+  f.game.surfacePack = {
+    update: () => {
+      clock += 3;
+    },
+  };
+  f.game.cinematic = {
+    update: () => {
+      clock += 40;
+      f.game.scene.imageProcessingConfiguration.exposure = 0.8;
+    },
+  };
   f.game.environmentProfile = createEnvironmentProfile(
     { hostname: "localhost", search: "?profileEnvironment=1" },
-    { now: () => clock, onSlowFrame: (report) => { reports.push(report); clock += 100; } },
+    {
+      now: () => clock,
+      onSlowFrame: (report) => {
+        reports.push(report);
+        clock += 100;
+      },
+    },
   );
-  f.game.updateRenderEnvironment({ x: 0, y: 1, z: 2 }, undefined, false, 0.016, 12, 1234);
+  f.game.updateRenderEnvironment(
+    { x: 0, y: 1, z: 2 },
+    undefined,
+    false,
+    0.016,
+    12,
+    1234,
+  );
   assert.equal(reports.length, 1);
   assert.equal(reports[0].totalMs, 45);
   assert.equal(reports[0].phasesMs.skyWeather, 2);
   assert.equal(reports[0].phasesMs.surfaces, 3);
   assert.equal(reports[0].phasesMs.cinematic, 40);
-  assert.equal(Object.values(reports[0].phasesMs).reduce((sum, value) => sum + value, 0), 45);
-  assert.deepEqual({ ...reports[0].metadata }, {
-    quality: "medium", lightingInstant: 1234, daylight: 1,
-    previousExposure: 0.75, exposure: 0.8, meshCount: 2, materialCount: 1,
-  });
+  assert.equal(
+    Object.values(reports[0].phasesMs).reduce((sum, value) => sum + value, 0),
+    45,
+  );
+  assert.deepEqual(
+    { ...reports[0].metadata },
+    {
+      quality: "medium",
+      lightingInstant: 1234,
+      daylight: 1,
+      previousExposure: 0.75,
+      exposure: 0.8,
+      meshCount: 2,
+      materialCount: 1,
+    },
+  );
 });
 
-test("actual production Game.frame automatically records intervals, six phases and only fresh GPU samples", async (t) => {
+test("actual production Game.frame records six parent phases, nested environment work and only fresh GPU samples", async (t) => {
   const f = fixture();
   t.after(() => f.recorder.dispose());
   f.recorder.start();
@@ -339,14 +385,47 @@ test("actual production Game.frame automatically records intervals, six phases a
       "environment",
       "render",
       "labels",
+      "sky",
+      "artLighting",
+      "vegetation",
+      "transit",
+      "particles",
+      "surfaces",
+      "cinematic",
+      "lightOrdering",
     ].sort(),
   );
   assert.equal(
-    Object.values(windows[0].data.phaseTotals as Record<string, number>).reduce(
-      (a, b) => a + b,
+    [
+      "simulation",
+      "world",
+      "avatarsAndCamera",
+      "environment",
+      "render",
+      "labels",
+    ].reduce(
+      (sum, key) =>
+        sum + (windows[0].data.phaseTotals as Record<string, number>)[key],
       0,
     ),
     (windows[0].data.cpuMs as number[]).reduce((a, b) => a + b, 0),
+  );
+  const phases = windows[0].data.phaseTotals as Record<string, number>;
+  assert.equal(
+    [
+      "sky",
+      "artLighting",
+      "vegetation",
+      "transit",
+      "particles",
+      "surfaces",
+      "cinematic",
+    ].reduce((sum, key) => sum + phases[key], 0),
+    phases.environment,
+  );
+  assert.ok(
+    phases.lightOrdering <= phases.render,
+    "light-ordering child is not added twice to whole-frame work",
   );
   assert.equal(
     f.contexts(),

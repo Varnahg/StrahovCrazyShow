@@ -9,6 +9,7 @@ import {
   snapshotTimelineDiagnostics,
   type AcceptedAuthorityDiagnostics,
 } from "./game-diagnostics";
+import { MeshDrawProfile, MESH_DRAW_PROFILE_SCOPE } from "./mesh-draw-profile";
 import { NetworkTimeline, type TimelinePresentation } from "./network-timeline";
 import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
@@ -20,11 +21,16 @@ import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
 import {
+  RenderIncidentProfile,
+  RENDER_INCIDENT_SCOPE,
+  type RenderIncidentSnapshot,
+} from "./render-incident-profile";
+import {
   AvatarPrimitivePool,
   createAvatarRig,
   type AvatarRig,
 } from "./avatar-renderer";
-import { buildWorld } from "./world-renderer";
+import { buildWorld, createWorldBuildJob } from "./world-renderer";
 import { captureModelReview } from "./model-review";
 import { captureRenderCostInventory } from "./render-cost";
 import { snapshotBenchmarkDiagnostics } from "./benchmark-snapshot";
@@ -317,6 +323,7 @@ export class Game {
   lastGpuCounterAt = -Infinity;
   presentationRate: PresentationRateMeasurement | null = null;
   worldControllers?: ReturnType<typeof buildWorld>;
+  private worldBuildJob?: ReturnType<typeof createWorldBuildJob>;
   cinematic?: CinematicAtmosphere;
   surfacePack?: SurfacePack;
   b6Reality?: B6RealityController;
@@ -326,6 +333,9 @@ export class Game {
   actor!: Actor;
   localId = "guest";
   onInput?: (input: TimelineInput) => void;
+  onInputFrame?: () => void;
+  onBeforeInputFrame?: () => void;
+  onNetworkDiagnostics?: () => unknown;
   onPredictionReset?: (priority?: boolean) => void;
   onAction?: (action: string, data?: unknown) => void | boolean;
   onStats?: (stats: GameStats) => void;
@@ -364,7 +374,7 @@ export class Game {
     minAvatars: number;
     work: Record<string, number>;
     engineWork: Record<string, number>;
-    profile: BenchmarkRenderProfile;
+    profile?: BenchmarkRenderProfile;
     weatherAtStart: Weather | null;
     healthAtStart: RenderHealthSnapshot;
     compilationAtStart: ReturnType<WebGpuCompilationProfile["snapshot"]>;
@@ -386,28 +396,21 @@ export class Game {
   quality = "medium";
   keys = new Set<string>();
   avatars = new Map<string, Avatar>();
+  private avatarSetupReady = false;
+  private pendingPlayers: Player[] | null = null;
   yaw = Math.PI;
   pitch = 0.28;
   distance = 8;
   seq = 0;
-  onInputFrame?: () => void;
-  onBeforeInputFrame?: () => void;
-  onNetworkDiagnostics?: () => unknown;
   networkTimeline = new NetworkTimeline();
   private networkPresentation?: TimelinePresentation & {
     timeline: NetworkTimeline;
   };
   private lastTimelineRecoveryAt = -Infinity;
-  private lastAuthorityNetwork: AcceptedAuthorityDiagnostics | null = null;
-  private lastAuthorityAtMs: number | null = null;
-  private readonly diagnosticNetwork = {
-    motionPackets: 0,
-    authorityPackets: 0,
-    corrections: 0,
-    resyncs: 0,
-    lastCorrectionMetres: null as number | null,
-    lastMotionAtMs: 0,
-  };
+  private meshDrawProfile?: MeshDrawProfile;
+  private gltfLightBudget?: GltfLightBudget;
+  private nextMeshDrawSampleAt = 0;
+  private pendingMeshDrawReason: string | null = "first-frame";
   accumulator = 0;
   lastStats = 0;
   profile: Profile;
@@ -419,8 +422,8 @@ export class Game {
   lamps: StandardMaterial;
   rain?: LinesMesh;
   rainLines: Vector3[][] = [];
-  car: TransformNode;
-  parkedCar: TransformNode;
+  car!: TransformNode;
+  parkedCar!: TransformNode;
   found = new Set<string>();
   localEmoteUntil = 0;
   setEmote(id: string, emote: string) {
@@ -442,9 +445,10 @@ export class Game {
   readonly renderHealth: RenderHealth;
   private readonly startupAbort = new AbortController();
   private rendererFailed = false;
-  private readonly startupAssets = new Set<{ dispose(): void }>();
+  private readonly startupAssets = new Map<object, () => void>();
   private readonly compilationProfile: WebGpuCompilationProfile;
   private readonly environmentProfile: ReturnType<typeof createEnvironmentProfile>;
+  private readonly environmentPhaseEnds = { sky: 0, lighting: 0, vegetation: 0, transit: 0, particles: 0, surfaces: 0 };
   private readonly frameLifecycleProfile?: WebGpuFrameLifecycleProfile;
   private profiledLightingInstant = 0;
   private profiledDaylight = 0;
@@ -460,9 +464,10 @@ export class Game {
   });
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
-  private readonly stableLights: StableLightState;
+  private stableLights?: StableLightState;
+  private renderIncidentProfile?: RenderIncidentProfile;
+  private lastRenderIncident?: RenderIncidentSnapshot;
   private cancelLightPreparation?: () => void;
-  private readonly gltfLightBudget: GltfLightBudget;
   private enabledMeshCandidates: EnabledMeshCandidates;
   get assetLoadErrorCount() {
     return (
@@ -478,10 +483,20 @@ export class Game {
   prediction = new PredictionHistory();
   snapshots = new SnapshotBuffer();
   lastAuthorityTick = -1;
+  private lastAuthorityNetwork: AcceptedAuthorityDiagnostics | null = null;
+  private lastAuthorityAtMs: number | null = null;
+  private readonly diagnosticNetwork = {
+    motionPackets: 0,
+    authorityPackets: 0,
+    corrections: 0,
+    resyncs: 0,
+    lastCorrectionMetres: null as number | null,
+    lastMotionAtMs: 0,
+  };
   visualOffset = Vector3.Zero();
   previousPosition = new Vector3(SPAWN.x, SPAWN.y, SPAWN.z);
   jumpWasDown = false;
-  skyWeather: SkyWeatherController;
+  skyWeather!: SkyWeatherController;
   environment?: { update(player: { x: number; y: number; z: number }): void };
   carSnapshots: { time: number; state: VehicleState }[] = [];
   respawnPending = false;
@@ -573,6 +588,7 @@ export class Game {
             purpose: health.purpose,
             count: health.errorCount,
           });
+        if (fault.channel === "effect") sessionDiagnostics.event("render-error", { count: health.errorCount });
       } finally {
         if (health.phase === "invalid" || health.phase === "restart-required")
           this.handleRendererFailure(fault.channel === "device"
@@ -612,8 +628,12 @@ export class Game {
     }
     this.applyAdaptiveQuality(this.adaptive.state);
     this.gpu = readGpuDiagnostics(this.engine);
+    this.engine.onContextLostObservable.add(() => {
+      sessionDiagnostics.event("webgl-context-lost", {});
+    });
     this.engine.onContextRestoredObservable.add(() => {
       this.gpu = readGpuDiagnostics(this.engine);
+      sessionDiagnostics.event("webgl-context-restored", { gpu: this.gpu });
       this.lastGpuCounterCount = 0;
       this.lastMainPassCounterCount = 0;
       this.lastGpuCounterAt = -Infinity;
@@ -631,16 +651,28 @@ export class Game {
       }
     }
     this.scene = new Scene(this.engine);
-    // Capture material budgets before any world/asset loader can inflate them.
     this.gltfLightBudget = new GltfLightBudget(this.scene);
     this.stableLights = new StableLightState(this.scene);
+    if (sessionDiagnostics.isRecording) {
+      this.renderIncidentProfile = new RenderIncidentProfile(this.scene);
+      this.meshDrawProfile = new MeshDrawProfile(this.scene);
+    }
     this.enabledMeshCandidates = new EnabledMeshCandidates(
       this.scene,
       this.scene.getActiveMeshCandidates,
+      {
+        // Opt-in production A/B until real-scene CPU and visual acceptance.
+        earlyStaticFrustum:
+          new URLSearchParams(location.search).get("staticFrustum") === "1",
+        isStaticMesh: (mesh) =>
+          mesh.metadata?.artStatic === true ||
+          mesh.metadata?.sourcePack === "architecture-reality",
+      },
     );
     this.textureDiagnostics = new SceneTextureDiagnostics(
       this.scene,
       (count) => {
+        sessionDiagnostics.event("asset-error", { count, scope: "textures" });
         this.renderHealth.report("texture", `Nepodařilo se načíst texturu scény (${count}).`);
         this.canvas.dataset.assetLoadErrorCount = String(
           this.assetLoadErrorCount,
@@ -693,34 +725,6 @@ export class Game {
     this.sun.intensity = 1.2;
     this.lamps = this.mat("#f7d590");
     this.lamps.emissiveColor = Color3.FromHexString("#f7d590").scale(0.4);
-    this.buildWorld();
-    this.car = this.makeCar();
-    this.car.setEnabled(false);
-    this.parkedCar = this.makeCar();
-    this.parkedCar.position.set(
-      CAR_SPAWN.x,
-      groundHeight(CAR_SPAWN.x, CAR_SPAWN.z),
-      CAR_SPAWN.z,
-    );
-    this.skyWeather = new SkyWeatherController(this.scene);
-    for (let i = 0; i < 160; i++) {
-      const x = ((i * 13.17) % 36) - 18,
-        z = ((i * 7.31) % 36) - 18,
-        y = (i * 3.73) % 18;
-      this.rainLines.push([
-        new Vector3(x, y, z),
-        new Vector3(x + 0.12, y - 0.7, z),
-      ]);
-    }
-    this.rain = MeshBuilder.CreateLineSystem(
-      "rain",
-      { lines: this.rainLines, updatable: true },
-      this.scene,
-    );
-    this.rain.color = new Color3(0.65, 0.77, 0.85);
-    this.rain.alpha = 0.45;
-    this.rain.isPickable = false;
-    this.rain.setEnabled(false);
     this.localPlayer = {
       ...profile,
       ...SPAWN,
@@ -748,6 +752,35 @@ export class Game {
     canvas.addEventListener("wheel", this.wheel, { passive: false });
     window.addEventListener("resize", this.resize);
   }
+  private createWorldPresentation() {
+    this.car = this.makeCar();
+    this.car.setEnabled(false);
+    this.parkedCar = this.makeCar();
+    this.parkedCar.position.set(
+      CAR_SPAWN.x,
+      groundHeight(CAR_SPAWN.x, CAR_SPAWN.z),
+      CAR_SPAWN.z,
+    );
+    this.skyWeather = new SkyWeatherController(this.scene);
+    for (let i = 0; i < 160; i++) {
+      const x = ((i * 13.17) % 36) - 18,
+        z = ((i * 7.31) % 36) - 18,
+        y = (i * 3.73) % 18;
+      this.rainLines.push([
+        new Vector3(x, y, z),
+        new Vector3(x + 0.12, y - 0.7, z),
+      ]);
+    }
+    this.rain = MeshBuilder.CreateLineSystem(
+      "rain",
+      { lines: this.rainLines, updatable: true },
+      this.scene,
+    );
+    this.rain.color = new Color3(0.65, 0.77, 0.85);
+    this.rain.alpha = 0.45;
+    this.rain.isPickable = false;
+    this.rain.setEnabled(false);
+  }
   private handleRendererFailure(message: string) {
     if (this.disposed || this.rendererFailed) return;
     this.rendererFailed = true;
@@ -765,10 +798,11 @@ export class Game {
     const benchmark = this.benchmark;
     this.benchmark = undefined;
     attempt("abort", () => this.startupAbort.abort());
+    attempt("world-build", () => this.worldBuildJob?.cancel());
     attempt("startup-assets", () => this.disposeStartupAssets());
     attempt("light-preparation", () => this.cancelLightPreparation?.());
     attempt("render-loop", () => this.engine.stopRenderLoop());
-    attempt("benchmark", () => benchmark?.profile.dispose());
+    attempt("benchmark", () => benchmark?.profile?.dispose());
     attempt("held-input", () => this.blur());
     attempt("ui", () => this.onRendererFailure?.(message));
     attempt("notice", () => this.notice(message));
@@ -783,27 +817,38 @@ export class Game {
       throw error;
     }
   }
-  private disposeStartupAsset(asset: { dispose(): void }) {
-    try { asset.dispose(); }
+  private disposeStartupAsset(cleanup: () => void) {
+    try { cleanup(); }
     catch (error) {
       sessionDiagnostics.event("late-startup-cleanup-error", {
         rendererId: this.renderHealth.rendererId, message: String(error),
       });
+      sessionDiagnostics.event("startup-cleanup-error", { errors: [String(error)] });
     }
   }
   private disposeStartupAssets() {
-    const abandoned = [...this.startupAssets];
+    const abandoned = [...this.startupAssets.values()];
     this.startupAssets.clear();
-    for (const asset of abandoned) this.disposeStartupAsset(asset);
+    for (const cleanup of abandoned) this.disposeStartupAsset(cleanup);
   }
   private trackStartupAsset<T extends { dispose(): void }>(operation: Promise<T>): Promise<T> {
+    return this.trackStartupResource(operation, (asset) => asset.dispose());
+  }
+  /** Retain ownership across guard settlement and the caller's continuation.
+   * Only the adopting caller removes its entry, after the final active check. */
+  private trackStartupResource<T extends object>(operation: Promise<T>, dispose: (value: T) => void): Promise<T> {
     return operation.then((asset) => {
+      const cleanup = () => dispose(asset);
       try {
         this.assertStartupActive();
-        this.startupAssets.add(asset);
-      } catch { this.disposeStartupAsset(asset); }
+        this.startupAssets.set(asset, cleanup);
+      } catch { this.disposeStartupAsset(cleanup); }
       return asset;
     });
+  }
+  private disposeStartupWorld(world: ReturnType<typeof buildWorld>) {
+    for (const controller of [world.architecture, world.landmarks, world.campusExterior, world.outdoorArtifacts])
+      if (controller) this.disposeStartupAsset(() => controller.dispose());
   }
   private isMeshReadyForCamera(mesh: { isReady(check: boolean): boolean }) {
     const previousPass = this.engine.currentRenderPassId;
@@ -812,6 +857,25 @@ export class Game {
     finally { this.engine.currentRenderPassId = previousPass; }
   }
   async start() {
+    try {
+      await this.startContent();
+      this.assertStartupActive();
+    } catch (error) {
+      this.dispose();
+      throw error;
+    }
+  }
+  private async startContent() {
+    sessionDiagnostics.event("game-start", {
+      mode: this.network ? "multiplayer" : "guest",
+      clientBuildSnapshotId: import.meta.env.VITE_SOURCE_SNAPSHOT_ID || null,
+      clientBuildMode: import.meta.env.MODE,
+      development: import.meta.env.DEV,
+      renderTimingScope: RENDER_INCIDENT_SCOPE,
+      meshDrawTimingScope: MESH_DRAW_PROFILE_SCOPE,
+      gpu: this.gpu,
+      rendering: this.adaptive.state,
+    });
     this.assertStartupActive();
     this.canvas.dataset.bootStage = "presentation";
     this.presentationRate = await this.renderHealth.guard(measurePresentationRate());
@@ -828,26 +892,75 @@ export class Game {
           : null,
       ),
     );
+    this.canvas.dataset.bootStage = "world";
+    this.worldBuildJob = createWorldBuildJob(this, {
+      signal: this.startupAbort.signal,
+      onPhase: (timing) =>
+        sessionDiagnostics.event("startup-world-phase", timing),
+    });
+    const world = await this.renderHealth.guard(this.trackStartupResource(
+      this.worldBuildJob.run(), (result) => this.disposeStartupWorld(result),
+    ));
+    this.assertStartupActive();
+    this.worldControllers = world;
+    this.startupAssets.delete(world);
+    this.worldBuildJob = undefined;
+    await this.renderHealth.guard(this.startupPhase("world-presentation", () =>
+      this.createWorldPresentation(),
+    ));
+    this.assertStartupActive();
     this.canvas.dataset.bootStage = "physics-library";
-    await this.renderHealth.guard(initPhysics());
+    await this.renderHealth.guard(this.startupPhase("physics-library", () => initPhysics()));
     this.assertStartupActive();
     // Survey/photogrammetry is an offline spatial reference. Gameplay uses
     // separately authored assets on the same DMR terrain as its colliders.
     this.canvas.dataset.worldMode = "authored-separate-assets";
     this.canvas.dataset.scanStage = "reference-only";
     this.canvas.dataset.bootStage = "static-collisions";
-    this.sim = new Simulation();
+    const simulation = await this.renderHealth.guard(this.trackStartupAsset(this.startupPhase(
+      "static-collisions",
+      () => new Simulation(),
+    )));
+    this.assertStartupActive();
+    this.sim = simulation;
+    this.startupAssets.delete(simulation);
     this.canvas.dataset.physicsStage = "ready";
     this.canvas.dataset.bootStage = "avatar-and-props";
     this.compilationProfile.setStage("assets");
     this.actor = this.sim.add("local");
+    await this.renderHealth.guard(this.startupPhase("final-visual-setup", () => {
+      this.surfacePack = new SurfacePack(this.scene);
+      this.cinematic = new CinematicAtmosphere(
+        this.scene,
+        this.camera,
+        this.sun,
+      );
+      this.vehicleLighting = new VehicleLighting(this.scene);
+      this.avatarSetupReady = true;
+      this.updatePlayers(this.pendingPlayers ?? [this.localPlayer]);
+      this.pendingPlayers = null;
+      this.previousPosition.copyFromFloats(
+        this.actor.position.x,
+        this.actor.position.y,
+        this.actor.position.z,
+      );
+      this.updateCameraFollow(
+        this.previousPosition,
+        this.avatars.get(this.localId)?.eyeHeight ?? 1.63,
+        1,
+      );
+      this.updatePreloadVisuals();
+    }));
+    this.assertStartupActive();
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
+    let preparingLighting = false;
     let pipelinePreparation: WebGpuPipelinePreparation | undefined;
     const renderPreloadScene = () => {
-      if (!this.disposed) {
-        this.gltfLightBudget.prepareFrame();
-        this.stableLights.update();
+      if (!this.disposed && !this.rendererFailed) {
+        if (!preparingLighting) this.updatePreloadVisuals();
+        this.gltfLightBudget?.prepareFrame();
+        this.stableLights?.update();
         this.scene.render();
       }
     };
@@ -872,9 +985,9 @@ export class Game {
         this.sim.surfaceHeight(x, z),
       );
       const [interior, vegetation, car] = await this.renderHealth.guard(Promise.allSettled([
-        this.trackStartupAsset(loadB6Reality(this.scene, {
-          foundationY: B6_LAYOUT.foundationOffset,
-        }).then(
+        this.trackStartupAsset(this.startupPhase("b6-assets", () =>
+          loadB6Reality(this.scene, { foundationY: B6_LAYOUT.foundationOffset }),
+        ).then(
           (value) => {
             if (!this.disposed && !this.rendererFailed) this.canvas.dataset.b6Stage = "ready";
             return value;
@@ -884,8 +997,8 @@ export class Game {
             throw error;
           },
         )),
-        this.trackStartupAsset(loadVegetation(this.scene)),
-        this.trackStartupAsset(loadCar(this.scene).then(
+        this.trackStartupAsset(this.startupPhase("vegetation-assets", () => loadVegetation(this.scene))),
+        this.trackStartupAsset(this.startupPhase("car-assets", () => loadCar(this.scene)).then(
           (value) => {
             if (!this.disposed && !this.rendererFailed) this.canvas.dataset.carStage = "ready";
             return value;
@@ -939,11 +1052,7 @@ export class Game {
       console.warn("Používám geometrickou zálohu auta.", error);
     }
     this.assertStartupActive();
-    this.surfacePack = new SurfacePack(this.scene);
-    this.surfacePack.update(1, this.quality, this.weather?.rain ?? 0);
-    this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
-    this.vehicleLighting = new VehicleLighting(this.scene);
-    this.updatePlayers([this.localPlayer]);
+    this.updatePreloadVisuals();
     this.engine.stopRenderLoop(preloadRender);
     // Only hidden startup draws may wait for a pipeline without drawing it.
     // Keep the scope through restore and the final submitted-frame gate.
@@ -964,8 +1073,14 @@ export class Game {
           stage: "preparation-start", rendererId: this.renderHealth.rendererId,
           timing: this.frameLifecycleProfile.snapshot(),
         });
-      const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation));
-      this.assertStartupActive();
+      preparingLighting = true;
+      let preparation;
+      try {
+        preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation));
+        this.assertStartupActive();
+      } finally {
+        preparingLighting = false;
+      }
       sessionDiagnostics.event("lighting-preparation", preparation);
       sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
       if (this.frameLifecycleProfile)
@@ -1003,6 +1118,65 @@ export class Game {
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
     this.engine.runRenderLoop(() => this.frame());
+  }
+  private async startupPhase<T>(
+    phase: string,
+    work: () => T | Promise<T>,
+  ): Promise<T> {
+    const start = performance.now();
+    let outcome = "failed";
+    try {
+      const result = await work();
+      outcome = "complete";
+      return result;
+    } finally {
+      sessionDiagnostics.event("startup-phase", {
+        phase,
+        outcome,
+        durationMs: performance.now() - start,
+        scope: "game-start wall time",
+      });
+    }
+  }
+  /** Preload uses the final materials, camera and actual sky/light settings.
+   * New streamed resources join the same controllers instead of invalidating
+   * an entirely different preview configuration at the end of loading. */
+  private updatePreloadVisuals() {
+    const player = this.actor.position;
+    const instant = this.timeOverride ?? Date.now();
+    const { sun, moon } = this.skyWeather.update({
+      instant,
+      weather: this.weather,
+      player,
+      dt: 0,
+      quality: this.quality,
+    });
+    const lighting = applyArtLighting(this, {
+      sun,
+      moon,
+      atmosphere: this.skyWeather.atmosphere,
+      headlightRequested: false,
+      extraPracticalLightSlots: Number(
+        this.b6Reality?.interiorLightEnabled ?? false,
+      ),
+      weather: this.weather,
+      player,
+      dt: 0,
+      instant,
+    });
+    this.updateCarLighting?.(lighting.night);
+    this.surfacePack?.update(0, this.quality, this.weather?.rain ?? 0);
+    this.cinematic?.update({
+      dt: 0,
+      player,
+      quality: this.quality,
+      cloud: this.weather?.cloud ?? 0.4,
+      rain: this.weather?.rain ?? 0,
+      keySource: lighting.keySource,
+      daylight: sun.daylight,
+      avatars: this.avatars.values(),
+      localId: this.localId,
+    });
   }
   mat(hex: string) {
     if (this.materials.has(hex)) return this.materials.get(hex)!;
@@ -1139,6 +1313,10 @@ export class Game {
   }
   updatePlayers(players: Player[]) {
     if (this.disposed || this.rendererFailed) return;
+    if (this.avatarSetupReady === false) {
+      this.pendingPlayers = players;
+      return;
+    }
     const ids = new Set(players.map((p) => p.id));
     for (const [id, a] of this.avatars)
       if (!ids.has(id)) {
@@ -1166,6 +1344,8 @@ export class Game {
   }
   setProfile(profile: Profile) {
     if (this.disposed || this.rendererFailed) return;
+    // Appearance affects renderer cost; identity and social profile do not.
+    sessionDiagnostics.event("avatar-change", { appearance: profile.avatar });
     this.profile = profile;
     this.localPlayer = { ...this.localPlayer, ...profile };
     const a = this.avatars.get(this.localId);
@@ -1297,6 +1477,7 @@ export class Game {
         ? packet.state.position
         : { ...this.actor.position },
       modeChanged = this.actor.vehicle !== packet.state.vehicle;
+    if (modeChanged) this.pendingMeshDrawReason = "vehicle-mode-change";
     // Recovery can arrive with an invalid old physics pose. Keep presentation's
     // hard reset independent of optional diagnostics; authority against itself
     // is not a measured zero displacement.
@@ -1452,6 +1633,11 @@ export class Game {
       return this.flashlightOn;
     this.flashlight ??= new PlayerFlashlight(this.scene);
     this.flashlightOn = !this.flashlightOn;
+    this.pendingMeshDrawReason = "action:flashlight";
+    sessionDiagnostics.event("action", {
+      action: "flashlight",
+      enabled: this.flashlightOn,
+    });
     this.canvas.dataset.flashlight = String(this.flashlightOn);
     return this.flashlightOn;
   }
@@ -1460,13 +1646,16 @@ export class Game {
   }
   setWeather(weather: Weather) {
     this.weather = weather;
+    sessionDiagnostics.event("weather-change", { weather });
   }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
     if (this.disposed || this.rendererFailed) return;
     if (this.preparingRenderQuality) return;
     if (next.revision === this.appliedQualityRevision) return;
+    this.pendingMeshDrawReason = "quality-change";
     this.appliedQualityRevision = next.revision;
     this.applyRenderQuality(next.quality, next.hardwareScaling);
+    sessionDiagnostics.event("quality-change", { rendering: next });
   }
   private preparingRenderQuality = false;
   /** Render-only overrides never write the user's adaptive controller state. */
@@ -1482,8 +1671,10 @@ export class Game {
   }
   setQuality(mode: string) {
     if (this.disposed || this.rendererFailed) return;
-    if (isRenderQualityMode(mode))
+    if (isRenderQualityMode(mode)) {
+      this.pendingMeshDrawReason = "quality-change";
       this.applyAdaptiveQuality(this.adaptive.setMode(mode));
+    }
   }
   setTargetFps(fps: number) {
     if (this.disposed || this.rendererFailed) return;
@@ -1494,8 +1685,9 @@ export class Game {
     if (!this.ready || this.disposed || this.rendererFailed) return false;
     // Faulted renderers retain automatic diagnostic records, but cannot start
     // another performance sample until a fresh Game has completed preparation.
-    this.benchmark?.profile.dispose();
+    this.benchmark?.profile?.dispose();
     sessionDiagnostics.event("benchmark-start", {
+      durationSeconds: 10,
       rendererId: this.renderHealth.rendererId,
       avatars: this.avatars.size,
       position: { x: this.actor.position.x, y: this.actor.position.y, z: this.actor.position.z },
@@ -1517,7 +1709,9 @@ export class Game {
       minAvatars: this.avatars.size,
       work: {},
       engineWork: {},
-      profile: new BenchmarkRenderProfile(this.scene),
+      profile: this.renderIncidentProfile
+        ? undefined
+        : new BenchmarkRenderProfile(this.scene),
       weatherAtStart: this.weather ? structuredClone(this.weather) : null,
       healthAtStart: this.renderHealth.snapshot(),
       compilationAtStart: this.compilationProfile.snapshot(),
@@ -1526,6 +1720,7 @@ export class Game {
   }
   interact() {
     if (!this.ready) return;
+    this.pendingMeshDrawReason = "action:interact";
     const p = this.actor.position;
     sessionDiagnostics.event("action", {
       action: "interact",
@@ -1612,6 +1807,7 @@ export class Game {
     parked: boolean;
     state?: VehicleState;
   }) {
+    if (!this.parkedCar) return;
     this.parkedCar.position.set(data.x, data.state?.position.y ?? 0, data.z);
     this.parkedCar.rotation.y = data.yaw;
     if (this.sim && data.state && !this.actor.vehicle)
@@ -1700,6 +1896,11 @@ export class Game {
           else if (document.pointerLockElement === this.canvas)
             document.exitPointerLock();
         }
+        sessionDiagnostics.event("camera-change", {
+          firstPerson: this.firstPerson,
+          distance: this.distance,
+          vehicle: this.actor.vehicle,
+        });
       }
       if (e.code === "KeyR") this.requestRespawn();
       if (e.code === "KeyF") this.toggleFlashlight();
@@ -2015,6 +2216,131 @@ export class Game {
     );
   }
 
+  /** Diagnostic lifetime is a connection, independently of prediction identity. */
+  resetDiagnosticContext(): void {
+    this.lastAuthorityNetwork = null;
+    this.lastAuthorityAtMs = null;
+    Object.assign(this.diagnosticNetwork, {
+      motionPackets: 0,
+      authorityPackets: 0,
+      corrections: 0,
+      resyncs: 0,
+      lastCorrectionMetres: null,
+      lastMotionAtMs: 0,
+    });
+    sessionDiagnostics.resetFrameContext();
+  }
+
+  private diagnosticNetworkContext() {
+    if (!this.network || this.disposed) return null;
+    const now = performance.now();
+    return {
+      motionPackets: this.diagnosticNetwork.motionPackets,
+      authorityPackets: this.diagnosticNetwork.authorityPackets,
+      corrections: this.diagnosticNetwork.corrections,
+      resyncs: this.diagnosticNetwork.resyncs,
+      lastCorrectionMetres: this.diagnosticNetwork.lastCorrectionMetres,
+      lastMotionAgeMs: this.diagnosticNetwork.lastMotionAtMs
+        ? Math.max(0, now - this.diagnosticNetwork.lastMotionAtMs) : null,
+      authorityAgeMs: this.lastAuthorityAtMs === null
+        ? null : Math.max(0, now - this.lastAuthorityAtMs),
+      authorityTick: this.lastAuthorityTick,
+      pendingInputs: this.prediction.inputs.length,
+      visualCorrectionMetres: this.visualOffset.length(),
+      timeline: snapshotTimelineDiagnostics(this.networkTimeline.snapshot()),
+      transport: snapshotTransportDiagnostics(this.onNetworkDiagnostics),
+      server: this.lastAuthorityNetwork,
+    };
+  }
+
+  /** Evaluated by the recorder only at bounded context sampling points. */
+  private diagnosticContext = () => {
+    if (this.disposed) return { mode: "disposed", network: null };
+    const pos = this.actor.position;
+    const camera = this.camera.globalPosition;
+    const lod = { near: 0, medium: 0, far: 0 };
+    for (const avatar of this.avatars.values()) lod[avatar.lod.level]++;
+    const active = this.scene.getActiveMeshes();
+    const materialClasses: Record<string, number> = {};
+    let submeshes = 0,
+      frozen = 0,
+      instances = 0;
+    for (let i = 0; i < active.length; i++) {
+      const mesh = active.data[i];
+      submeshes += mesh.subMeshes?.length ?? 0;
+      if (mesh.isWorldMatrixFrozen) frozen++;
+      if (mesh.getClassName() === "InstancedMesh") instances++;
+      const kind = mesh.material?.getClassName() ?? "none";
+      materialClasses[kind] = (materialClasses[kind] ?? 0) + 1;
+    }
+    return {
+      mode: this.network ? "multiplayer" : "guest",
+      connection:
+        this.canvas.dataset.networkStage ??
+        (this.network ? "connecting" : "offline"),
+      position: { x: pos.x, y: pos.y, z: pos.z },
+      zone: zoneAt(pos),
+      speed: this.actor.speed,
+      vehicle: this.actor.vehicle,
+      flashlight: this.flashlightOn,
+      appearance: this.profile.avatar,
+      camera: {
+        x: camera.x,
+        y: camera.y,
+        z: camera.z,
+        yaw: this.yaw,
+        pitch: this.pitch,
+        distance: this.distance,
+        fov: this.camera.fov,
+        firstPerson: this.firstPerson,
+      },
+      rendering: this.adaptive.state,
+      viewport: {
+        width: this.canvas.clientWidth,
+        height: this.canvas.clientHeight,
+      },
+      renderResolution: {
+        width: this.engine.getRenderWidth(),
+        height: this.engine.getRenderHeight(),
+      },
+      devicePixelRatio: window.devicePixelRatio,
+      gpu: this.gpu,
+      lightOrdering: this.stableLights?.stats ?? null,
+      renderWork: this.lastRenderIncident?.cumulative ?? null,
+      gpuSampleAgeMs: Number.isFinite(this.lastGpuCounterAt)
+        ? performance.now() - this.lastGpuCounterAt
+        : null,
+      avatars: this.avatars.size,
+      avatarLod: lod,
+      drawCalls: this.instrumentation.drawCallsCounter.current,
+      activeMeshInventory: {
+        candidates: this.scene.getActiveMeshCandidates().length,
+        meshes: active.length,
+        potentialSubmeshes: submeshes,
+        frozenWorldMatrices: frozen,
+        regularInstances: instances,
+        materialClasses,
+        scope:
+          "sampled active-mesh list; potential submeshes are not actual draw calls",
+      },
+      triangles: Math.round(this.scene.getActiveIndices() / 3),
+      vegetation: this.vegetation?.stats ?? null,
+      ambient: this.transit?.counts ?? null,
+      weather: this.weather ?? null,
+      lightingInstant: this.timeOverride ?? Date.now(),
+      lightingPreview: this.timeOverride !== null,
+      uiModal: this.uiModal,
+      benchmarkActive: !!this.benchmark,
+      renderErrors: this.renderErrorCount,
+      meshCandidates: this.enabledMeshCandidates.stats,
+      lightBudgets: this.gltfLightBudget?.stats ?? null,
+      assetErrors: this.assetLoadErrorCount,
+      network: this.diagnosticNetworkContext(),
+    };
+  };
+
+  /** Called once per rendered frame; network time comes only from accepted
+   * authority, so a render stall cannot replay commands into elapsed ticks. */
   advanceSimulation(dt: number, now: number) {
     if (this.respawnPending) {
       this.accumulator = 0;
@@ -2154,69 +2480,6 @@ export class Game {
     );
   }
 
-  /** Diagnostic lifetime is a connection, independently of prediction identity. */
-  resetDiagnosticContext(): void {
-    this.lastAuthorityNetwork = null;
-    this.lastAuthorityAtMs = null;
-    Object.assign(this.diagnosticNetwork, {
-      motionPackets: 0,
-      authorityPackets: 0,
-      corrections: 0,
-      resyncs: 0,
-      lastCorrectionMetres: null,
-      lastMotionAtMs: 0,
-    });
-    sessionDiagnostics.resetFrameContext();
-  }
-
-  private diagnosticNetworkContext() {
-    if (!this.network || this.disposed) return null;
-    const now = performance.now();
-    return {
-      motionPackets: this.diagnosticNetwork.motionPackets,
-      authorityPackets: this.diagnosticNetwork.authorityPackets,
-      corrections: this.diagnosticNetwork.corrections,
-      resyncs: this.diagnosticNetwork.resyncs,
-      lastCorrectionMetres: this.diagnosticNetwork.lastCorrectionMetres,
-      lastMotionAgeMs: this.diagnosticNetwork.lastMotionAtMs
-        ? Math.max(0, now - this.diagnosticNetwork.lastMotionAtMs) : null,
-      authorityAgeMs: this.lastAuthorityAtMs === null
-        ? null : Math.max(0, now - this.lastAuthorityAtMs),
-      authorityTick: this.lastAuthorityTick,
-      pendingInputs: this.prediction.inputs.length,
-      visualCorrectionMetres: this.visualOffset.length(),
-      timeline: snapshotTimelineDiagnostics(this.networkTimeline.snapshot()),
-      transport: snapshotTransportDiagnostics(this.onNetworkDiagnostics),
-      server: this.lastAuthorityNetwork,
-    };
-  }
-
-  /** Fixed-size, sampled context; no scene, player or material inventories. */
-  private diagnosticContext = () => {
-    if (this.disposed) return { mode: "disposed", network: null };
-    const position = this.actor.position;
-    const stage = this.canvas.dataset.networkStage;
-    const rendering = this.adaptive.state;
-    return {
-      mode: this.network ? "multiplayer" : "guest",
-      connection: !this.network ? "offline" : stage === "connected"
-        ? "connected" : stage?.startsWith("disconnected") ? "disconnected" : "connecting",
-      position: { x: position.x, y: position.y, z: position.z },
-      zone: zoneAt(position),
-      speed: this.actor.speed,
-      vehicle: this.actor.vehicle,
-      rendering: {
-        mode: rendering.mode,
-        quality: rendering.quality,
-        targetFps: rendering.targetFps,
-        hardwareScaling: rendering.hardwareScaling,
-      },
-      viewport: { width: this.canvas.clientWidth, height: this.canvas.clientHeight },
-      renderResolution: { width: this.engine.getRenderWidth(), height: this.engine.getRenderHeight() },
-      network: this.diagnosticNetworkContext(),
-    };
-  };
-
   /** Shared render-only world state; never advances physics or network clocks. */
   private updateWorldPresentation(pos: Vec3) {
     this.worldControllers?.architecture?.update(
@@ -2248,6 +2511,7 @@ export class Game {
     time: number,
     instant = this.timeOverride ?? Date.now(),
     flashlightOn = this.flashlightOn,
+    phaseEnds?: { sky: number; lighting: number; vegetation: number; transit: number; particles: number; surfaces: number },
   ) {
     if (this.environmentProfile)
       this.profiledPreviousExposure = this.scene.imageProcessingConfiguration.exposure;
@@ -2260,6 +2524,7 @@ export class Game {
       quality: this.quality,
     });
     this.environmentProfile?.mark("skyWeather");
+    if (phaseEnds) phaseEnds.sky = performance.now();
     const lighting = applyArtLighting(this, {
       sun,
       moon,
@@ -2291,6 +2556,7 @@ export class Game {
       this.quality,
     );
     this.environmentProfile?.mark("flashlight");
+    if (phaseEnds) phaseEnds.lighting = performance.now();
     this.vegetation?.update({
       dt,
       time,
@@ -2300,6 +2566,7 @@ export class Game {
       quality: this.quality,
     });
     this.environmentProfile?.mark("vegetation");
+    if (phaseEnds) phaseEnds.vegetation = performance.now();
     this.transit?.update({
       now: this.trafficInstant(),
       player: pos,
@@ -2307,6 +2574,7 @@ export class Game {
       dt,
     });
     this.environmentProfile?.mark("transit");
+    if (phaseEnds) phaseEnds.transit = performance.now();
     const raining =
       ((this.weather?.rain ?? 0) > 0.05 ||
         (this.weather?.snowfall ?? 0) > 0.005) &&
@@ -2328,8 +2596,10 @@ export class Game {
       });
     }
     this.environmentProfile?.mark("precipitation");
+    if (phaseEnds) phaseEnds.particles = performance.now();
     this.surfacePack?.update(dt, this.quality, this.weather?.rain ?? 0);
     this.environmentProfile?.mark("surfaces");
+    if (phaseEnds) phaseEnds.surfaces = performance.now();
     this.cinematic?.update({
       dt,
       player: pos,
@@ -2863,14 +3133,33 @@ export class Game {
         (m.metadata?.groundY ?? 0) + 1.3 + Math.sin(time * 2 + i) * 0.12;
     });
     const avatarsEnded = performance.now();
-    this.updateRenderEnvironment(pos, self, localView.cameraLight, dt, time);
+    this.updateRenderEnvironment(pos, self, localView.cameraLight, dt, time,
+      undefined, undefined, this.environmentPhaseEnds);
+    const { sky: skyEnded, lighting: lightingEnded, vegetation: vegetationEnded,
+      transit: transitEnded, particles: particlesEnded, surfaces: surfacesEnded } = this.environmentPhaseEnds;
     const environmentEnded = performance.now();
-    this.benchmark?.profile.beginFrame();
-    // All beam, street, interior and celestial shadow states are final here.
-    this.gltfLightBudget.prepareFrame();
-    this.stableLights.update();
-    this.scene.render();
-    const engineWork = this.benchmark?.profile.endFrame();
+    this.gltfLightBudget?.prepareFrame();
+    this.stableLights?.update();
+    const lightOrderingEnded = performance.now();
+    this.renderIncidentProfile?.beginFrame();
+    this.benchmark?.profile?.beginFrame();
+    const drawSampleReason =
+      this.pendingMeshDrawReason ??
+      (frameStarted >= this.nextMeshDrawSampleAt ? "periodic" : null);
+    this.meshDrawProfile?.beginFrame(drawSampleReason);
+    if (drawSampleReason) {
+      this.pendingMeshDrawReason = null;
+      this.nextMeshDrawSampleAt = frameStarted + 5000;
+    }
+    try {
+      this.scene.render();
+    } finally {
+      const drawSample = this.meshDrawProfile?.endFrame();
+      if (drawSample) sessionDiagnostics.event("mesh-draw-sample", drawSample);
+    }
+    this.lastRenderIncident = this.renderIncidentProfile?.endFrame();
+    const engineWork =
+      this.lastRenderIncident?.cpuMs ?? this.benchmark?.profile?.endFrame();
     const renderEnded = performance.now();
     for (const [id, a] of this.avatars) {
       if (id === this.localId) continue;
@@ -2893,8 +3182,6 @@ export class Game {
       if (this.frames.length > 600) this.frames.shift();
     }
     if (this.benchmark || sessionDiagnostics.isRecording) {
-      // Callback work through labels; excludes recorder and later HUD/benchmark
-      // bookkeeping. Keep one endpoint so the six phases sum to this CPU scope.
       const frameCpuEnded = performance.now();
       const breakdown = {
         simulation: simulationEnded - frameStarted,
@@ -2903,18 +3190,33 @@ export class Game {
         environment: environmentEnded - avatarsEnded,
         render: renderEnded - environmentEnded,
         labels: frameCpuEnded - renderEnded,
+        // These are children of environment, not additional whole-frame work.
+        sky: skyEnded - avatarsEnded,
+        artLighting: lightingEnded - skyEnded,
+        vegetation: vegetationEnded - lightingEnded,
+        transit: transitEnded - vegetationEnded,
+        particles: particlesEnded - transitEnded,
+        surfaces: surfacesEnded - particlesEnded,
+        cinematic: environmentEnded - surfacesEnded,
+        lightOrdering: lightOrderingEnded - environmentEnded,
       };
-      if (sessionDiagnostics.isRecording)
-        sessionDiagnostics.recordFrame({
+      if (sessionDiagnostics.isRecording) sessionDiagnostics.recordFrame(
+        {
           frameMs: rawFrameMs,
           frameStartedAtMs: frameStarted,
           cpuMs: frameCpuEnded - frameStarted,
+          // Timer-query results arrive asynchronously; never count a cached
+          // value repeatedly as new GPU measurements.
           gpuMs: freshGpuSample ? (this.lastGpuFrameMs ?? null) : null,
           phases: breakdown,
-        }, this.diagnosticContext);
+          renderWork: this.lastRenderIncident,
+        },
+        this.diagnosticContext,
+      );
       if (this.benchmark)
         for (const [key, milliseconds] of Object.entries(breakdown))
-          this.benchmark.work[key] = (this.benchmark.work[key] ?? 0) + milliseconds;
+          this.benchmark.work[key] =
+            (this.benchmark.work[key] ?? 0) + milliseconds;
     }
     if (this.benchmark) {
       const b = this.benchmark;
@@ -2928,7 +3230,8 @@ export class Game {
           sum = b.frames.reduce((a, b) => a + b, 0);
         // Release before the callback: it may immediately start another run.
         this.benchmark = undefined;
-        b.profile.dispose();
+        b.profile?.dispose();
+        sessionDiagnostics.event("benchmark-end", { frames: b.frames.length });
         const durationSeconds = Number(
           ((performance.now() - b.start) / 1000).toFixed(2),
         );
@@ -3097,8 +3400,17 @@ export class Game {
     this.renderHealth.dispose();
     this.disposeStartupAssets();
     this.cancelLightPreparation?.();
-    sessionDiagnostics.event("game-dispose", {});
+    sessionDiagnostics.event("game-dispose", {
+      renderErrors: this.renderErrorCount,
+      assetErrors: this.assetLoadErrorCount,
+    });
     this.resetDiagnosticContext();
+    this.worldBuildJob?.cancel();
+    this.engine.stopRenderLoop();
+    this.stableLights?.dispose();
+    this.renderIncidentProfile?.dispose();
+    this.meshDrawProfile?.dispose();
+    this.gltfLightBudget?.dispose();
     window.removeEventListener("keydown", this.keyDown);
     window.removeEventListener("keyup", this.keyUp);
     window.removeEventListener("blur", this.blur);
@@ -3115,15 +3427,12 @@ export class Game {
     this.canvas.removeEventListener("wheel", this.wheel);
     window.removeEventListener("resize", this.resize);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
-    this.engine.stopRenderLoop();
-    this.stableLights.dispose();
-    this.gltfLightBudget.dispose();
     this.enabledMeshCandidates.dispose();
     this.mapNavigator?.dispose();
     this.sim?.dispose();
     this.labels.dispose();
     this.contactShadows.dispose();
-    this.benchmark?.profile.dispose();
+    this.benchmark?.profile?.dispose();
     this.benchmark = undefined;
     this.instrumentation.dispose();
     this.engineInstrumentation.dispose();
@@ -3134,7 +3443,7 @@ export class Game {
     this.worldControllers?.landmarks?.dispose();
     this.worldControllers?.campusExterior?.dispose();
     this.worldControllers?.outdoorArtifacts?.dispose();
-    this.skyWeather.dispose();
+    this.skyWeather?.dispose();
     this.vegetation?.dispose();
     this.disposeCarAssets?.();
     this.vehicleLighting?.dispose();

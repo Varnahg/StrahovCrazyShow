@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-render-cost-cause",
+  "title": "KEY-5: příčina 8.55ms active meshes a16.15ms main draw v produkci",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["docs/performance/repair-render-cost-cause.md", "docs/agents/handoffs/repair-render-cost-cause.md"],
+  "resources": [],
+  "acceptance": ["Z dat skutečné původní produkční scény a primárního kódu určit dominantní traversal/draw/material/submesh práci a konkrétní úzkou opravu; nedělat neobjednaný broadrewrite.", "Preserve vstup/kolize/LOD/nativeinstances/transparency/order. Žádné odstraněnísvěta prolepšíFPS."],
+  "verification": ["Read-only code/inventory analysis a levné cílené testy; žádnýloadprofil/GPU/fulltests bezroot.", "Koordinátor přidělí konkrétní runtime/testwritePaths po přesném návrhu."],
+  "notes": ["Evidence .cache/playtest-repairs-validation/baseline-medium-2040.json a baseline-session.jsonl, snapshotf2705e4a…; medium,1avatar,fullHUD,NVIDIA1060,2040×986CSS/internal,nightpreview14Oct00:00local.", "Render33.5FPS/p9548.2/p9963.7, CPUrender25.03ms,activeMeshes8.55,mainDraw16.15,renderTargets0. Nezaměňovat s shadercoldissues."]
+}

@@ -60,7 +60,14 @@ const make = new Script(
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function fixture(options: { constructionError?: boolean; startError?: boolean; loseAfterStart?: boolean } = {}) {
+function fixture(
+  options: {
+    constructionError?: boolean;
+    startError?: boolean;
+    loseAfterStart?: boolean;
+    constructionDiagnosticError?: boolean;
+  } = {},
+) {
   let resolveEngine!: (engine: any) => void;
   let rejectEngine!: (reason: Error) => void;
   const promise = new Promise((resolve, reject) => {
@@ -83,6 +90,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
   const canvas = { current: {} };
   const initialCanvas = canvas.current;
   class Game {
+    scene = { meshes: [], materials: [] };
     onRendererFailure?: (message: string) => void;
     ready = false;
     renderHealth = { snapshot: () => ({ valid: this.ready, firstErrors: [] }) };
@@ -98,10 +106,11 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     async start() {
       if (options.startError) throw new Error("start failed");
       this.ready = true;
-      if (options.loseAfterStart) queueMicrotask(() => {
-        this.ready = false;
-        this.onRendererFailure?.("Device lost after start settlement");
-      });
+      if (options.loseAfterStart)
+        queueMicrotask(() => {
+          this.ready = false;
+          this.onRendererFailure?.("Device lost after start settlement");
+        });
     }
     dispose() {
       gameDisposals++;
@@ -118,7 +127,17 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     modeRef: { current: "menu" },
     lightingPreviewRef: { current: { instant: null } },
     idRef: { current: "fixture" },
-    sessionDiagnostics: { event: (name: string) => events.push(name) },
+    sessionDiagnostics: {
+      event: (name: string, data?: { phase?: string }) => {
+        events.push(name);
+        if (
+          options.constructionDiagnosticError &&
+          name === "startup-phase" &&
+          data?.phase === "game-construction"
+        )
+          throw new Error("construction diagnostic failure");
+      },
+    },
     loadModule: async (name: string) =>
       name === "./game" ? { Game } : { createGameEngine: () => promise },
     setStats: noop,
@@ -231,7 +250,9 @@ test("start failure releases the engine through its Game owner exactly once", as
 
 test("a live renderer failure clears UI ready and a retired callback cannot alter a replacement", async () => {
   const f = fixture();
-  await tick(); f.resolveEngine(f.engine); await tick();
+  await tick();
+  f.resolveEngine(f.engine);
+  await tick();
   const callback = f.state.current!.onRendererFailure!;
   callback("Device lost; restart required");
   assert.equal(f.stats().ready, false);
@@ -246,10 +267,26 @@ test("a live renderer failure clears UI ready and a retired callback cannot alte
 
 test("loss between Game start settlement and UI continuation cannot announce game-ready", async () => {
   const f = fixture({ loseAfterStart: true });
-  await tick(); f.resolveEngine(f.engine); await tick();
+  await tick();
+  f.resolveEngine(f.engine);
+  await tick();
   assert.equal(f.stats().ready, false);
   assert.equal(f.events.includes("game-ready"), false);
   assert.equal(f.stats().gameDisposals, 1);
+  f.cleanup();
+  assert.equal(f.engine.disposed, 1);
+});
+
+test("construction diagnostics cannot orphan the newly transferred Game engine", async () => {
+  const f = fixture({ constructionDiagnosticError: true });
+  await tick();
+  f.resolveEngine(f.engine);
+  await tick();
+  assert.equal(f.stats().gameCount, 1);
+  assert.equal(f.stats().gameDisposals, 1);
+  assert.equal(f.engine.disposed, 1);
+  assert.equal(f.state.current, null);
+  assert.equal(f.events.includes("game-ready"), false);
   f.cleanup();
   assert.equal(f.engine.disposed, 1);
 });

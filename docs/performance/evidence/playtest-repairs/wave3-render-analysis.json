@@ -1,0 +1,190 @@
+{
+  "snapshotId": "0f20b5a7c7ba9ce5ab9aa16bba3b0a6886823152a322be2724fd2cdad41d6248",
+  "sessionId": "371d306e-a801-41f0-917b-9ea7d832325d",
+  "inputs": [
+    {
+      "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\playtest-repairs-validation\\wave3-session\\371d306e-a801-41f0-917b-9ea7d832325d.jsonl",
+      "bytes": 16755244,
+      "sha256": "ce8bf5d62a310f278ff9c802ff91f8753d3dd1b7c23b18ffbba47c655a0ff86d"
+    },
+    {
+      "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\playtest-repairs-validation\\wave3-session\\371d306e-a801-41f0-917b-9ea7d832325d.part-0001.jsonl",
+      "bytes": 1421265,
+      "sha256": "da43692fad0b2b22a89786538d03395fe007ee67f3aa8e72b274dc485432573c"
+    }
+  ],
+  "selection": "periodic mesh samples at100–300s, after night switch94.3s and before first flashlight310.9s; manual medium; no avatar changes yet; one stationary multiplayer avatar, GTX1060/2040x986",
+  "scope": "CPU wall time sampled inside main draw, not GPU. Completed observer chains exclude readiness early returns and framework work. Source top8 omissions are explicit; unclassified is a real attribution gap. Periodic sampling is not a complete frame-time distribution and does not establish causal FPS benefit.",
+  "steady": {
+    "samples": 40,
+    "meanMainDrawCpuMs": 20.5225,
+    "meanCompletedCpuMs": 15.805,
+    "meanCompletedPreparationMs": 4.1875,
+    "meanCompletedBindDrawMs": 11.6175,
+    "meanUnattributedMainDrawMs": 4.7175,
+    "attempts": 15640,
+    "abandoned": 0,
+    "ambiguousSkipped": 0,
+    "sourceOmittedCpuMs": 0,
+    "sources": [
+      {
+        "source": "unclassified",
+        "recordedSamples": 40,
+        "meanCompletedCpuMs": 8.3075,
+        "meanPreparationMs": 1.9425,
+        "meanBindDrawMs": 6.365,
+        "meanCalls": 183
+      },
+      {
+        "source": "architecture-reality",
+        "recordedSamples": 40,
+        "meanCompletedCpuMs": 3.9175,
+        "meanPreparationMs": 1.2775,
+        "meanBindDrawMs": 2.64,
+        "meanCalls": 100
+      },
+      {
+        "source": "outdoor-artifacts",
+        "recordedSamples": 40,
+        "meanCompletedCpuMs": 1.42,
+        "meanPreparationMs": 0.3775,
+        "meanBindDrawMs": 1.0425,
+        "meanCalls": 52
+      },
+      {
+        "source": "tree",
+        "recordedSamples": 40,
+        "meanCompletedCpuMs": 1.075,
+        "meanPreparationMs": 0.2625,
+        "meanBindDrawMs": 0.8125,
+        "meanCalls": 30
+      },
+      {
+        "source": "mapped-surface",
+        "recordedSamples": 40,
+        "meanCompletedCpuMs": 0.56,
+        "meanPreparationMs": 0.1675,
+        "meanBindDrawMs": 0.3925,
+        "meanCalls": 13
+      },
+      {
+        "source": "campus-exterior",
+        "recordedSamples": 40,
+        "meanCompletedCpuMs": 0.28,
+        "meanPreparationMs": 0.06,
+        "meanBindDrawMs": 0.22,
+        "meanCalls": 8
+      },
+      {
+        "source": "landmark-reality",
+        "recordedSamples": 40,
+        "meanCompletedCpuMs": 0.245,
+        "meanPreparationMs": 0.1,
+        "meanBindDrawMs": 0.145,
+        "meanCalls": 5
+      }
+    ]
+  },
+  "flashlightActions": [
+    {
+      "seq": 1519,
+      "atMs": 312041.9,
+      "mainDrawCpuMs": 1047.6000001430511,
+      "completed": {
+        "calls": 144,
+        "cpuMs": 85.80000114440918,
+        "preparationMs": 55.9000027179718,
+        "bindDrawMs": 29.899998426437378
+      },
+      "counts": {
+        "attempts": 393,
+        "abandoned": 218,
+        "ambiguousSkipped": 31,
+        "budgetSkipped": 0,
+        "unmatchedBind": 31,
+        "unmatchedAfter": 31,
+        "unknownMaterials": 0,
+        "incompletePhases": 0,
+        "phases": 1,
+        "trackedMeshes": 2435,
+        "trackedMaterials": 223
+      },
+      "unattributedMainDrawMs": 961.799998998642
+    },
+    {
+      "seq": 1673,
+      "atMs": 330751.1,
+      "mainDrawCpuMs": 130.40000009536743,
+      "completed": {
+        "calls": 384,
+        "cpuMs": 91.09999823570251,
+        "preparationMs": 67.59999752044678,
+        "bindDrawMs": 23.500000715255737
+      },
+      "counts": {
+        "attempts": 391,
+        "abandoned": 7,
+        "ambiguousSkipped": 0,
+        "budgetSkipped": 0,
+        "unmatchedBind": 0,
+        "unmatchedAfter": 0,
+        "unknownMaterials": 0,
+        "incompletePhases": 0,
+        "phases": 1,
+        "trackedMeshes": 2458,
+        "trackedMaterials": 240
+      },
+      "unattributedMainDrawMs": 39.30000185966492
+    },
+    {
+      "seq": 1697,
+      "atMs": 335942.7,
+      "mainDrawCpuMs": 99,
+      "completed": {
+        "calls": 393,
+        "cpuMs": 93.19999861717224,
+        "preparationMs": 68.59999942779541,
+        "bindDrawMs": 24.59999918937683
+      },
+      "counts": {
+        "attempts": 393,
+        "abandoned": 0,
+        "ambiguousSkipped": 0,
+        "budgetSkipped": 0,
+        "unmatchedBind": 0,
+        "unmatchedAfter": 0,
+        "unknownMaterials": 0,
+        "incompletePhases": 0,
+        "phases": 1,
+        "trackedMeshes": 2458,
+        "trackedMaterials": 240
+      },
+      "unattributedMainDrawMs": 5.800001382827759
+    },
+    {
+      "seq": 1921,
+      "atMs": 348655.2,
+      "mainDrawCpuMs": 103.60000014305115,
+      "completed": {
+        "calls": 391,
+        "cpuMs": 78.59999942779541,
+        "preparationMs": 58.49999761581421,
+        "bindDrawMs": 20.1000018119812
+      },
+      "counts": {
+        "attempts": 392,
+        "abandoned": 1,
+        "ambiguousSkipped": 0,
+        "budgetSkipped": 0,
+        "unmatchedBind": 0,
+        "unmatchedAfter": 0,
+        "unknownMaterials": 0,
+        "incompletePhases": 0,
+        "phases": 1,
+        "trackedMeshes": 2461,
+        "trackedMaterials": 242
+      },
+      "unattributedMainDrawMs": 25.000000715255737
+    }
+  ]
+}

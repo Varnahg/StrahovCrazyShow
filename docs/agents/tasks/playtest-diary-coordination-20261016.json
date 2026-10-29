@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "playtest-diary-coordination-20261016",
+  "title": "Úzká koordinace úkolů pohybového a obrazového deníku",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/tasks/playtest-diary-timeline-20261016.json",
+    "docs/agents/tasks/playtest-diary-media-20261016.json",
+    "docs/agents/tasks/playtest-diary-report-20261016.json",
+    "docs/agents/tasks/playtest-diary-integration-20261016.json",
+    "docs/agents/tasks/playtest-diary-validation-20261016.json",
+    "docs/agents/tasks/playtest-diary-coordination-20261016.json",
+    "docs/agents/handoffs/playtest-diary-coordination-20261016.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Maintain only these six diary task definitions and own handoff; no adoption, editing or publication of older architecture/catalog/history WIP.",
+    "Keep one writer per source path and serialize resources through claims. Updating a definition does not update active claims; transfer/reclaim explicit scope changes before writes."
+  ],
+  "verification": [
+    "Inspect current registry and successful own claim before edits; validate task JSON, dependencies and scope boundaries.",
+    "No game build/GPU/integration for metadata alone; those belong to playtest-diary-validation-20261016."
+  ],
+  "notes": [
+    "Explicit narrow administrative handoff from repairs-01a13624-admin to diary-01a141c7-root on16Oct2026 at the diary coordinator request. Original creator authorizes --adopt-dirty only for the five existing diary definitions and this new coordination definition, copied byte-for-byte to playtest-diary worktree.",
+    "The existing broad dev-coordination-maintenance catalog reservation conflicts with these paths and continues to enforce one coordinator. Claim only after broad admin releases; no change to the coordination CLI or global rules is needed.",
+    "Three flashlight bootstrap JSON copies were byte-identical to960cb6f and removed only from diary worktree after exact backup, permitting its coordinator to perform the fast-forward. No runtime files or module claims were touched.",
+    "Source/claim handoff remains documented in main docs/agents/handoffs/dev-coordination-maintenance.md and profile-night-flashlight-20261015.md. Other old WIP ownership is not transferred."
+  ]
+}
