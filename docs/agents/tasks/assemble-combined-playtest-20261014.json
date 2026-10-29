@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "assemble-combined-playtest-20261014",
+  "title": "Složit společný testovací build B6, renderer, clock a phase",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/combined-playtest-20261014/candidate/",
+    ".cache/combined-playtest-20261014/assembly/",
+    "docs/agents/handoffs/assemble-combined-playtest-20261014.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Začít z ověřeného immutable IMAGE checkpointu d032be65… (B6+engine+IMAGE+celýwave3) a zachovat všechno mimo šest výslovných overlay cest. Žádná nová implementace nebo obecný výzkum.",
+    "Overlay: plný Game z již ověřené wave4 phase verze SHA b40a8a97…; NetworkTimeline a3phase testy z finální publication assembly f2bf323c…; network-latency-recovery test z publication4f41b37. Přesný seznam6 cest a SHA musí být v manifestu.",
+    "Staticky porovnat skutečné phase metody, relevantní frame callsites a Timeline API v plném Game oproti publication Game; žádný ručně zkopírovaný algoritmus, žádné přepsání clock prevence. Zachovat full diagnostics/startup/render metadata původního produkčního základu.",
+    "Nový snapshot zahrnuje všechny testy. Assety a patched node_modules používají známé read-only reference; ověřit engine patch/core/schema identity. Zachovat všechny staré snapshoty a jejich logy.",
+    "Předat source manifest, hash/AST parity a přesnou assembly evidence; vlastní krátké helpery skončí. Root pak provede jedinou společnou full pipeline a vydá novouURL."
+  ],
+  "verification": [
+    "Pouze souborové kopie/hash/AST parity, žádný fullsuite/build/server/GPU/instalace nebo commit. V případě skutečného nesouladu zastavit přenos a doložit konkrétní chybu, nevymýšlet další runtime fix."
+  ],
+  "notes": [
+    "Pouze ownership WT C:/Users/rezac/.codex/worktrees/image-processing-ownership/StrahovCrazyShow. Zdroj .cache/material-image-processing-validation/candidate/source-manifest.json, snapshotd032be6510b1a94c9bbada421ad84da50ddfc97e0498df4bc4eb896f1145c19f.",
+    "Phase publication WT HEAD4f41b37 s pěti hotovými phase deltami,84targetedPASS a scopedTS0; agent ukončil zápisy a uvolnilclaim. AssemblyfileSHA f2bf323ca4d63ee036e635f5e20ec8e636a95ae7061c7795cf04c3a04fad4bfb.",
+    "Šest overlay cest: client/game.ts, client/network-timeline.ts, tests/game-interpolation.test.ts, tests/network-timeline.test.ts, tests/room-callbacks.test.ts, tests/network-latency-recovery.test.ts. Plný Game zdroj wave4 client/game.ts SHA b40a8a97a9100a0c872fda1771fcb9d9fd7fbaa8bc6e3d3278bdaa3208d07954.",
+    "Hraný4186 B6, main, ostatníWT source a node_modules jsou read-only. Nový GPU výkon/vzhled zatím netvrdit.",
+    "Ověřeno: společný snapshot1cddfe82303f6d7365df5470fc09f9a3fa71b4c4021150b3c67c131c3401562c,922/922+build+celá integracePASS,515sourcehashů beze změny, vlastnípipelineukončená/2568volný. Assembly a validation claims uvolněné; lze převzít portový start4187/2582."
+  ]
+}

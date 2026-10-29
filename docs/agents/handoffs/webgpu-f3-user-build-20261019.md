@@ -1,4 +1,15 @@
-# Živé předání F3 verze4201
+# Předání F3 verze4201 — odstaveno 19. 10. 2026
+
+## Koordinované odstavení
+
+Stav k 2026-10-19 20:26:09 UTC (22:26:09 Praha): vlastní služby jsou ukončené. Nový pokyn koordinátora z chatu `01a155b2-1927-7681-9a9e-090b6c7bd974` navazuje na ověřenou lidskou zprávu `01a155d5-373c-7601-862a-9a983e7eeb54` „ostatní relace klidně odstav“. Následující původní záznam živého předání je historický.
+
+- Ověřen PID, přesný čas startu, cesta executable, příkaz a parent vztahy. Ukončeny API `11976` a preview `39820`; jejich pomocné procesy `20816`, `36272`, `35440` také zanikly. Po kontrole nezůstal žádný z těchto procesů ani listener na `4201/2596`.
+- Při druhé kontrole Windows již znovu použil číslo PID `11976` pro cizí `msedgewebview2.exe` se startem `2026-10-19T20:27:28.7166818Z`. Tento proces se neukončoval. Původní Node API se startem `2026-10-19T11:04:35.4278900Z` skončilo; konečná kontrola porovnává celou identitu, nikoli pouhé číslo PID.
+- Důkazy před/po jsou v `.cache/webgpu-f3-user-build-20261019/live/shutdown-20261019-before.json` a `shutdown-20261019-after.json`. Původní `runtime.json`, logy, source snapshot, dist a SDK jsou zachované. Nebyl spuštěn build, test, GPU scéna ani commit/integrace.
+- Handoff je připravený pro release `webgpu-f3-user-build-20261019` / `webgpu-01a15102-f3-user`; následný výsledek release určuje živý registr. Uvolnění služby neznamená přijetí migrace ani svolení přepsat či smazat obnovitelný frozen dist a dependencies. Restart vyžaduje nový claim a kontrolu portů/identit.
+
+## Původní předání
 
 **URL:** http://127.0.0.1:4201/?renderBackend=webgpu. Owner `webgpu-01a15102-f3-user`, task `webgpu-f3-user-build-20261019`, cwd29fa. Rezervace portů4201/2596 i immutable vypůjčeného dist/deps **zůstává aktivní**, protože služby běží pro uživatele. Task zůstáváready; nejde o Done celé migrace.
 

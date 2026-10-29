@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "profile-night-flashlight-20261015",
+  "title": "KEY-3: reprodukce nočního světelného řetězce a variant",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/night-flashlight-20261015/",
+    "docs/performance/research-20261015/night-flashlight.md",
+    "docs/performance/evidence/night-flashlight-20261015/",
+    "docs/agents/handoffs/profile-night-flashlight-20261015.md",
+    "dist/",
+    "docs/verification.md",
+    "client/stable-light-state.ts",
+    "client/gltf-light-budget.ts",
+    "tests/stable-light-state.test.ts",
+    "tests/gltf-light-budget.test.ts",
+    "docs/agents/handoffs/stabilize-light-variants-20261015.md",
+    "client/game.ts",
+    "client/light-preparation.ts",
+    "tests/light-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-diagnostics.test.ts",
+    "tests/game-light-lifecycle.test.ts",
+    "docs/performance/research-20261016/light-preparation.md",
+    "docs/agents/handoffs/prepare-light-variants-20261016.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4189",
+    "port:2584",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Research complete chain/variants, baseline actual production game before edits, record GPU/CSS/internal resolution,HUB/avatar and cold/warm ON/OFF effects.",
+    "Use existing unmodified frozen4188 baseline with separate synthetic agent session; candidate4189/API2584 will be separate. Only one activeGPUscene, no simultaneous build/fulltest withGPU measurement.",
+    "Retain raw samples/worst frames, no warmup hiding first interaction. No claim all stalls solved from NullEngine."
+  ],
+  "verification": [
+    "Current published main a8edf56 content in owned idle key17 WT, metadataHEAD2c7. Frozen4188 and its borrowed dependencies remain immutable. No installs or edits in served source.",
+    "Exact claim before writes, research/decision before implementation, meaningful real-Babylon regressions, preserve visual semantics/owner caps/lifecycle."
+  ],
+  "notes": [
+    "User explicitly requests fix/test/commit/push night+flashlight stalls15Oct; old broad goal remains paused. This is a bounded authorized issue KEY3 with relatedKEY5/4/16.",
+    "Root coordinates GPU/heavy steps. Subagents only own explicit source paths; no live processes/build/fulltest/GPU without separate validation reservation.",
+    "Root explicitly owns existing current-main verification overlay and adds only two fixture controllers in tests/game-diagnostics. Feature agent requested this separate fixture scope; Game/helper files remain exclusively feature-owned until handoff.",
+    "Root receives explicit released handoff key3-light-variants-20261015,scopehashf66a8daa578f7e4eed6844a22974f1c7dfe51abe6c3740c9037797ba6807ae61;52focused+root4diagnostic testsPASS. Exact historical source modules are received, not foreign WIP. Root will perform candidate A/B before finalcompleteclaim.",
+    "V1 integrated/pushed as114389e and9d98ffc after942test/build/integration and actualGPU A/B. Exact Game+twofixturepaths transferred to prepare-light-variants-20261016 while root retains validationresources/evidence/otherhelpers. No owned candidateprocess remains live.",
+    "Root received released prepare-light-variants-20261016 handoff and exact72test candidate; sourceId0e7830707349f65faecf85894d01a82b4436ba3eacc27d4626aeaff145e5aa7d. V2 strictTS exposed one controlled test SmartArray fixture type error; root will repair before new immutable checkpoint. No candidate/helper process live during transfer.",
+    "Final bounded feature accepted as technical checkpoint3593bd1d:959tests/build/integrationPASS, GPUfirstF157.8ms; remainingbroaderhitches are explicitly open inLinearKEY3/5. Seeprofilehandoff; resourcesreleasedafterpublication."
+  ]
+}

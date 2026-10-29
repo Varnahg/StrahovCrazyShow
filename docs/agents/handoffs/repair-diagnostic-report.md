@@ -1,0 +1,35 @@
+# Předání: repair-diagnostic-report
+
+- Vlastník: `repairs-01a13624-report` (`/root/repair_reporting`); příjemce: koordinátor `repairs-01a13624-root`.
+- Pracovní kopie/větev: `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`, `main`; výchozí commit `91ee88f0aaa902c79fad589aeb84bc086a66c9ea`.
+- Výsledek: dokončena oprava KEY-1 v samostatném čtecím reportu. Výchozí adresářový výběr přeskočí novější menu bez skutečných intervalů nebo `game-ready`; rotované části se spojí. Není-li herní důkaz nikde, vrátí nejnovější relaci s výslovným vysvětlením. Explicitní soubor stále čte pouze požadovaný soubor, `--all` všechny zachované relace. Výběr je podle času poslední změny souborů a report tento klíč uvádí.
+- Změněné soubory: `scripts/diagnostics-report.mjs`, `tests/diagnostics-report.test.ts`, tento handoff. Žádný runtime, sdílený kontrakt, vstupní log ani společná dokumentace nebyly upraveny.
+- Převzatý WIP: koordinátor výslovně předal oba původně untracked soubory, vytvořené původním vlastníkem a přijaté v `automatic-diagnostics-storage`. Claim s `--adopt-dirty` se týkal právě těchto dvou souborů. Zachováno čtení starého formátu, deduplikace, percentily, rotace, zdrojové identity, informace o retenci a neúplných záznamech.
+- Podklady: lokální zdroj `client/session-diagnostics.ts`, `client/game.ts`, `client/ui.tsx`, `shared/session-diagnostics.ts`, předání `automatic-diagnostics-storage` a audit `docs/performance/playtest-diagnostics-20261013.md`; skutečný nezměněný uživatelský JSONL z 13. 10. 2026. Žádné domnělé příčiny shaderů/GPU nebo internetu report nepotvrzuje.
+
+## Výstupní kontrakt a refaktoring
+
+- Nové `severity` a `incidents[]` oddělují explicitní chybové události od pomalých intervalů, overflow, tvrdých korekcí, resynců, chybějících důvodů, nekonzistentního připojení a neúplného záznamu. Nulový počet runtime chyb nesmí být interpretován jako zdravá hra. Resync a korekce jsou pozorování; text připomíná možné úmyslné změny režimu/respawn a neurčuje příčinu.
+- `performance.thresholds` a `allVisibilityPerformance.thresholds`: `atLeast50Ms`, `atLeast100Ms`, `atLeast250Ms`, `atLeast1000Ms`. Nové `excludedVisibilityPerformance` vykazuje explicitně skryté a přechodové intervaly. Počty jsou ze všech doručených surových intervalů, nikoli ze vzorkovaných hitch událostí nebo překrývajících se longtask/LoAF pozorování.
+- `network`: počty overflow a dolní mez zahozených vstupů (`droppedInputs`, fallback staré `queued`), resynců včetně chybějících důvodů a zaznamenaných nul, histogram důvodů `resyncReason`, tvrdých non-resync korekcí ≥0,35 m a přesné nearest-rank median/p95/p99/max. `modeChanged` a `respawn` mají samostatné počty; chybějící/neplatné vzdálenosti nejsou považované za nulu. Stav připojení kontroluje posloupnost connect/disconnect a stáří vzorkovaného kontextu.
+- `worstForegroundFrameHitches` obsahuje původní `previousFrame`/`previousContext` pro pomalé intervaly. Text explicitně vypisuje předchozí CPU, fáze i volitelné `enginePhases`, vzorkovaný kontext a jeho stáří. `worstObserverEntries` a `observerCounts` vedou longtask/LoAF odděleně; text rozlišuje jejich skutečný `startTime` od doručení observeru. `actions` a lifecycle se nyní vypisují také v lidském reportu.
+- `gameplay` vysvětluje herní důkaz. `counts` obsahuje úplné počty kategorií. Původní pole zůstávají dostupná; `errors`, `changes`, `gaps`, `lifecycle`, `actions` drží nejnovějších nejvýše 200 detailních záznamů se zřetelným varováním při omezení; nejhorší záznamy mají strop 30. Plný detail zůstává v nezměněných JSONL.
+- Refaktoring paměti: streamované čtení, okamžitá agregace intervalů do přesných frekvenčních tabulek, žádné držení všech JSON objektů a několika kopií surových intervalů. Pro deduplikaci a kontrolu pořadí zůstává kompaktní mapa sequence/time. Běžně seřazené detailní události nevyžadují opakované třídění. Žádný timer, pomocný server, cache soubor ani dlouhožijící proces.
+
+## Ověření
+
+- 13. 10. 2026 přibližně 20:22 Praha: `pnpm exec tsx --test tests/diagnostics-report.test.ts` **12/12 PASS**, exit 0. Pokrývá staré/nové korekce, explicitní/all/default výběr, rotaci, menu fallback, game-ready bez snímků, globální percentily, inkluzivní hranice 50/100/250/1000 ms, hidden/transition, překryv observerů a jejich startTime, chybějící důvody, stav připojení včetně out-of-order záznamů a starého vzorku, bounded detail bez zkreslení agregátů, chybný JSON a duplicity. Původních pět regresí je zachovaných a rozšířených.
+- `pnpm exec prettier --write` pouze nad vlastními dvěma soubory; `git diff --check -- scripts/diagnostics-report.mjs tests/diagnostics-report.test.ts` exit 0. Protože tyto soubory jsou dosud untracked, identitu jejich celého obsahu zajišťují SHA níže.
+- Plain Node `--help` prošel. Read-only integrační kontrola CLI funkcí nad skutečnými pěti relacemi: výchozí výběr přeskočil menu a vrátil `c0c87474-6d36-487d-b9c7-a180bb43c5fd`; explicitní archiv vrátil 2 741 událostí; `--all` ekvivalent vrátil všech pět relací. Textový formatter obsahoval předchozí CPU kontext. Žádný výstup se neukládal mimo vlastní scope.
+- Skutečný uživatelský log: **17 437 foreground intervalů**, **43,253597 FPS**, p95 **41,7 ms**, p99 **89,8 ms**, max **2 713,8 ms**, hranice **507 / 150 / 40 / 12**. **8 overflow / nejméně 520 zahozených vstupů, 420 tvrdých non-resync korekcí, 174 resynců bez důvodu, 412 nekonzistentních connection oken**. Test tyto hodnoty asertoval proti dřívějšímu nezávislému auditu.
+- SHA256 archivního JSONL `.cache/playtest-diagnostics-20261013/session.jsonl` před/po čtení shodné: `30f15b76b579f872d127c61bbdd4821e8779a6082fffb18001878391d2215f6d`. Vrchol RSS krátkého procesu pro default + explicit + všech pět relací byl 104 644 KiB; nejde o zátěžový důkaz pro plných 128 MiB retenčního limitu.
+- Snapshot SHA256 včetně testů:
+  - `scripts/diagnostics-report.mjs`: `cd2e3fe170e90518caaaa16a862db4896bab6ea234d8e971d5be3e43638a83a4`
+  - `tests/diagnostics-report.test.ts`: `bdf8c8349c5b12120390b48b063497e421f437f28f531ac915285e0bfdb7859c`
+
+## Předání a omezení
+
+- Procesy/zdroje: všechny vlastní krátké testy skončily; testovací fixtures odstranily vlastní dočasné adresáře. Žádné GPU, port, build, celá sada ani produkční integrace nebyly spuštěny. Původní živé služby zůstaly beze změny.
+- Omezení: log umí doložit měřené incidenty a chybějící důkazy, nikoli zpětně opravit nulové legacy resync vzdálenosti nebo určit shader/GPU/transportní příčinu. Výpis detailů je záměrně omezený a označený; měřené počty a percentily nikoli. Bez rámců nebo game-ready nelze tvrdit, že daná relace skutečně obsahuje hru.
+- Rezervace: handoff dokončen 13. 10. 2026 20:24 Praha; následný `release --task repair-diagnostic-report --owner repairs-01a13624-report`. Nebyl vytvořen commit ve společném dirty checkoutu.
+- Integrátor: převzít kontrakt do případných navazujících spotřebitelů a společného `docs/verification.md`, zkontrolovat diff a označit KEY-1/task přijatý až po vlastní integraci. Celkové opravy herních incidentů a produkční ověření zůstávají v péči koordinátora; tento handoff je neprohlašuje za hotové.

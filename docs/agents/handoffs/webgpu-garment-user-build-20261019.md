@@ -1,4 +1,14 @@
-# Neměnná uživatelská verze4202
+# Neměnná uživatelská verze4202 — odstaveno 19. 10. 2026
+
+## Koordinované odstavení
+
+Stav k 2026-10-19 20:26:10 UTC (22:26:10 Praha): vlastní služby jsou ukončené podle ověřeného lidského pokynu „ostatní relace klidně odstav“ v koordinačním chatu `01a155b2-1927-7681-9a9e-090b6c7bd974`, zpráva `01a155d5-373c-7601-862a-9a983e7eeb54`. Původní informace o aktivním servírování níže jsou historické.
+
+- Ověřen PID, přesný start, executable, příkaz a parent vztahy. Ukončeny API `29960` a preview `28192`; pomocné procesy `29484`, `26412`, `39004` také zanikly. Kontrola potvrdila nepřítomnost těchto procesů a listenerů `4202/2597`.
+- Důkazy: `.cache/webgpu-garment-user-build-20261019/live/shutdown-20261019-before.json` a `shutdown-20261019-after.json`. Snapshot, dist, logy a původní runtime metadata zůstaly zachované; žádné testy, build, GPU, commit ani integrace.
+- Připraveno pro release `webgpu-garment-user-build-20261019` / `webgpu-01a15102-garment-user`; konečný výsledek release je v živém registru. Nadále zachovat readonly `.cache/webgpu-shadow-share-native-qa-20261019/clean/node_modules/`: používají je také předané reprodukce. Uvolnění serveclaimu není povolení SDK či frozen snapshot přepsat/smazat. Restart pouze po nové rezervaci.
+
+## Původní předání
 
 **http://127.0.0.1:4202/?renderBackend=webgpu** — source `c29a7da7dd9e66024a8ae59db803ef1b0e16a74d62ab0e533d8ac2821c49fe58`. Aktivní task `webgpu-garment-user-build-20261019`, owner `webgpu-01a15102-garment-user`, porty4202/2597. Stav ready zde znamená aktivní servírování, nikoli hotovou migraci; rezervaci držet a obnovovat.
 

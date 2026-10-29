@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shadow-pass-state-helper-20261019",
+  "title": "KEY-31: reprodukovat shadow Effect lifetime a změny DEPTHPREPASS",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-shadow-pass-state-helper-20261019/",
+    "docs/agents/handoffs/webgpu-shadow-pass-state-helper-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přesná vlastní CPU kopie současného source65d028 a readonly SDWf8/garment068 závislostí; žádný zápis do root/main runtime, sdílených node_modules či hraných snapshotů.",
+    "Oddělit actual engine Effect/refcount reproduktory: stejný originalEffect a depth A→B→A/lastowner; dva různé živé originalEffects se stejným odvozeným zdrojem+ABI+finaldefines; skutečný PBR+TreeWind+Freshwrapper+PCF readiness/render colorWrite přechod se0/1POINT.",
+    "Nezaměnit exact final WGSL duplicate za stejný původnísource/ABI/effectkey nebo konkrétní materiál. Uvést cacheacquires/releases, token/baseEffectidentity, colorWrite/DEPTHPREPASS a skutečné výjimky. Doložený mechanismus odlišit od hypotézy a chybějícího GPU důkazu.",
+    "Porovnat kanonizaci tokenu, vlastněný bounded lease, casterprewarm a přípravu base materialu ve skutečném PCF depthcolorstavu. Bez dalšího rozhodnutí koordinátora neimplementovat runtime opravu, cache ani SDK patch. Výstupem je nejmenší reprodukce, volba řešení a portable regresní zadání."
+  ],
+  "verification": [
+    "Pouze lehké cílené CPU fixture testy; žádný GPU/browser/build/install/servery/plná sada. Root neprovádí současně GPU měření.",
+    "Hashované vstupy, testy/logy/diff a handoff. Zachovat neúspěšné reproduktory; žádné vymyšlené FPS/CPUshare tvrzení."
+  ],
+  "notes": [
+    "Current medium-vehicle checkpoint main6a402ea3: nepřijatý candidate65d028; g1jen4z8novýchmodulecalls jsou rawdupes; g2všech5novýchfulfilledprogramů SM_LIGHTTYPE_SPOTLIGHT,4PBR+DEPTHPREPASSon/off,usersunmatched5. Nepřevzít donor overlay jako runtimebaseline.",
+    "Read-onlyprůzkum identifikoval PCF customIsReady předcolorWritefalse, actual onBeforeRender/afterUnbind měnícolorwrite, MaterialHelper měníDEPTHPREPASS, Fresh připravíbase předSDW. SDW jinábaseidentity vymaže depthentries;lastrefEffectdisposeodstranícache. Každou nezávislou cestu nejprve skutečně reprodukovat.",
+    "Přímé zadání helperu bez rekurzivního BMAD; root pokračuje v původním BMAD QA a rozhoduje o dalším rozsahu před implementací. Root/main Game WIP se nepřebírá."
+  ]
+}

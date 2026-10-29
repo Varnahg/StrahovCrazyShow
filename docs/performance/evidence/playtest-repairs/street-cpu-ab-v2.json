@@ -1,0 +1,366 @@
+{
+  "scope": "Controlled Node CPU streetVertexData A/B only; not browser or GPU performance",
+  "gcBetweenRuns": true,
+  "sourceSha": "7ff214452c91162fffc77809bd7c07f9511e694d2a7b48bc316d7b5865cedb62",
+  "inputSha": "c488b1a446ea61e65380d0ae4e7a3a70a54085e107e4834f70a2cf3ad4257d5d",
+  "unchanged": true,
+  "before": {
+    "client/streets-renderer.ts": "e67e3266d54948c96c7909904d6678500f9bc20813e2c01d974aa26b2f5542cc",
+    ".cache/performance-snapshot/playtest-repairs-baseline/client/streets-renderer.ts": "ab2661bf9a15c876674be46afd0d40ce8d70f078ddd8051d5e6a110887ba315c",
+    "shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+    "shared/streets.ts": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/streets.ts": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9",
+    "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    "shared/data/map.json": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/data/map.json": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    "shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14"
+  },
+  "after": {
+    "client/streets-renderer.ts": "e67e3266d54948c96c7909904d6678500f9bc20813e2c01d974aa26b2f5542cc",
+    ".cache/performance-snapshot/playtest-repairs-baseline/client/streets-renderer.ts": "ab2661bf9a15c876674be46afd0d40ce8d70f078ddd8051d5e6a110887ba315c",
+    "shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+    "shared/streets.ts": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/streets.ts": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9",
+    "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    "shared/data/map.json": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/data/map.json": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    "shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+    ".cache/performance-snapshot/playtest-repairs-baseline/shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14"
+  },
+  "equalWarmupBuffers": true,
+  "warmupDigests": {
+    "original": {
+      "asphalt": "d79282a1cbfa2394f41d9c48cf5f6e2df457d64318a5280a26ed41a88fabc4bf",
+      "sett": "26a146495314c77c048951151eba6188ba6d4d211b51cbca7afabb2308e9f239",
+      "paving": "aa56c1164c52b5c5335a8da5a5b41f5a82a5a46863d4255739d2144ed198c187",
+      "gravel": "139bdedfb21af52da5f0b17307624f59bace725ee5bc6b67974bd83f734a0585"
+    },
+    "current": {
+      "asphalt": "d79282a1cbfa2394f41d9c48cf5f6e2df457d64318a5280a26ed41a88fabc4bf",
+      "sett": "26a146495314c77c048951151eba6188ba6d4d211b51cbca7afabb2308e9f239",
+      "paving": "aa56c1164c52b5c5335a8da5a5b41f5a82a5a46863d4255739d2144ed198c187",
+      "gravel": "139bdedfb21af52da5f0b17307624f59bace725ee5bc6b67974bd83f734a0585"
+    }
+  },
+  "rows": [
+    {
+      "variant": "original",
+      "warmup": true,
+      "ms": 5117.462299999999,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 1835.4163999999996,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 2499.044,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 574.8890000000001,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 208.11289999999917,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "current",
+      "warmup": true,
+      "ms": 3484.1354999999985,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 1773.3140000000003,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 338.5702999999994,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 1032.6564999999991,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 339.59469999999965,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "original",
+      "warmup": false,
+      "ms": 3152.4917000000005,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 2042.8011999999999,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 324.77499999999964,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 561.3263000000006,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 223.58920000000035,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "current",
+      "warmup": false,
+      "ms": 2757.253300000004,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 1671.332699999999,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 288.19990000000143,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 516.8678000000018,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 280.8529000000017,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "current",
+      "warmup": false,
+      "ms": 2716.063299999998,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 1707.663099999998,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 300.09189999999944,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 523.8685000000005,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 184.4398000000001,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "original",
+      "warmup": false,
+      "ms": 3377.783999999996,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 2183.618200000001,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 370.6817999999985,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 564.0120999999999,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 259.4718999999968,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "original",
+      "warmup": false,
+      "ms": 3262.202299999997,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 2204.577300000001,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 341.34089999999924,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 499.9520999999986,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 216.33199999999852,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "current",
+      "warmup": false,
+      "ms": 2722.2535000000025,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 1671.5086999999985,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 281.3145000000004,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 553.887700000003,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 215.54260000000068,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "current",
+      "warmup": false,
+      "ms": 2868.4909000000007,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 1707.5724999999984,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 409.5784999999996,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 508.14860000000044,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 243.19130000000223,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    },
+    {
+      "variant": "original",
+      "warmup": false,
+      "ms": 3338.263500000012,
+      "groups": [
+        {
+          "material": "asphalt",
+          "ms": 2126.8794000000016,
+          "triangles": 104199,
+          "vertices": 312597
+        },
+        {
+          "material": "sett",
+          "ms": 356.8952000000063,
+          "triangles": 18976,
+          "vertices": 56979
+        },
+        {
+          "material": "paving",
+          "ms": 611.3136000000013,
+          "triangles": 30521,
+          "vertices": 91566
+        },
+        {
+          "material": "gravel",
+          "ms": 243.1753000000026,
+          "triangles": 12363,
+          "vertices": 37131
+        }
+      ]
+    }
+  ],
+  "medians": {
+    "original": 3300.2329000000045,
+    "current": 2739.7534000000032
+  }
+}

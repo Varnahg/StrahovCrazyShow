@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-live-network-audit",
+  "title": "KEY-6/7: vysvětlit skutečné V11 probe timeouty, latency budget a rebase během GPU testu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["docs/performance/repair-live-network-audit.md", "docs/agents/handoffs/repair-live-network-audit.md"],
+  "resources": [],
+  "acceptance": ["Z reálného wave2 logu oddělit velké vizuální korekce, časové rebases, chybějící záznamy a legitimní mode transitions. Žádný závěr o chybějících intervalech bez důkazu.", "Prověřit26probe-timeouts, startup RTT992/1401ms z hlavního vlákna → latency-budget,498corrections/476senderresets/505lateinputs/0overflow/6resync ve finálním context. Najít konkrétní mechanismy a minimální robustní opravy.", "Primární store.rate limit1probe/s vs UI interval1000ms+arrival jitter, monotonic receipt/UTC a případné burst authority replay. Návrh API/scopes/testů před runtime změnou."],
+  "verification": ["Read-only kód i raw record projekce z .cache/playtest-repairs-validation/wave2-session.jsonl. Report má nekompletní záznam a777drops; nepoužívat ho jako úplnou časovou osu.", "Lehké CPU reprodukce smějí být in-memory; žádná server/služba/GPU/heavy zátěž."],
+  "notes": ["Původní V10 příčina a V11 fix jsou v repair-network-cause/primitives/server handoffech. Wave2SDK1 integrace0d08190c… prošla všech4skriptů po opraveném testhelperu. To nenahrazuje browserlatency přejímku.", "Root vlastní Game/UI/timeline, repair-log-delivery vlastní recorder/shared/serverstorage. Tento task pouzeaudituje, runtime scope následně přidělíroot."]
+}

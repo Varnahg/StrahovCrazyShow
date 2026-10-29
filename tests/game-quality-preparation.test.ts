@@ -42,7 +42,7 @@ const compiled = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(`(function(environment) {
-  const { prepareRenderQualities, MANUAL_HARDWARE_SCALING, isRenderQualityMode, isRenderTargetFps, performance, prepareLightVariants, PlayerFlashlight, selectLightingPreview } = environment;
+  const { prepareRenderQualities, MANUAL_HARDWARE_SCALING, isRenderQualityMode, isRenderTargetFps, performance, prepareLightVariants, PlayerFlashlight, selectLightingPreview, sessionDiagnostics } = environment;
   ${compiled}; return QualityGame;
 })`).runInThisContext();
 const complete = (): LightPreparationResult => ({
@@ -66,6 +66,7 @@ function fixture(mode: RenderQualityMode = "auto") {
   const applied: string[] = [];
   const adaptive = new AdaptiveQualityController({ mode });
   const Game = make({
+    sessionDiagnostics: { event() {} },
     prepareRenderQualities,
     MANUAL_HARDWARE_SCALING,
     isRenderQualityMode,

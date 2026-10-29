@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "serve-combined-playtest-20261014",
+  "title": "Spustit společný ověřený testovací update na4187",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/combined-playtest-20261014/live-preview/",
+    ".cache/combined-playtest-20261014/candidate/.cache/",
+    "docs/agents/handoffs/serve-combined-playtest-20261014.md"
+  ],
+  "resources": [
+    "port:4187",
+    "port:2582"
+  ],
+  "acceptance": [
+    "Start až po úspěšné full pipeline, uvolnění validátora a skutečném ověření volných portů. Ponechat staré4186 nezměněné.",
+    "Identita vlastních procesů sPID/startUTC/command pouze vcache; hiddenStart-Process a bezpečný stop jen dle ověřené identity. HTTP health a shoda skutečně servírovaného HTML/JS/CSS se sestaveným dist.",
+    "URL4187 otevřít přímo přes app panel podle uživatelova pokynu; automatické logy bez ručního zapínání. Queued není render/GPU důkaz."
+  ],
+  "verification": [
+    "Nepouštět těžké testy ani GPU měření během uživatelského hraní; nové logy zůstanou u tohoto přesného snapshotu. Předání se skutečnými výsledky, služba drží vlastní rezervaci po celou dobu běhu."
+  ],
+  "notes": [
+    "Pouze ownership WT. Zdroj nový combined-playtest candidate; přesný source hash a runtime handoff doplní root po validaci. Bez Computer Use.",
+    "Ověřeno: společný snapshot1cddfe82303f6d7365df5470fc09f9a3fa71b4c4021150b3c67c131c3401562c,922/922+build+celá integracePASS,515sourcehashů beze změny, vlastnípipelineukončená/2568volný. Assembly a validation claims uvolněné; lze převzít portový start4187/2582."
+  ]
+}
