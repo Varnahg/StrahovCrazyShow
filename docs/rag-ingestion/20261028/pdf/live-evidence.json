@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-28T22:04:51.392Z",
+  "planHash": "8530808fe075db5b4575cd59d57f0b9f58a857d7499bfe2894bd75921d810505",
+  "sourceSha256": "57372e7a9e951ae10a625527fc2dfbe243c40eb8865602cc28cd2d507bb3c024",
+  "testSha256": "a07285407678c0952a51c7a01e7a50aea11ab40ba581cd5da2a54a0a8a0af3ee",
+  "profile": {
+    "id": "4a39d75cb77d0b07333432025e25e023cb780481fab87dffaf955be6671950c8",
+    "version": 1,
+    "provider": "openai",
+    "model": "gpt-6.1-sol",
+    "reasoningEffort": "low",
+    "detail": "high",
+    "promptSha256": "2ed2b142a7b195726c8cdb12b6ed089ef59d11542df9733c5f5b114b751a64dc",
+    "schemaSha256": "05d73d515954254c85b715cb66bced9bf99c1c5260adf86db5feacbc169b1c24"
+  },
+  "configuration": {
+    "model": "gpt-6.1-sol",
+    "reasoningEffort": "low",
+    "detail": "high",
+    "maxInputTokens": 20000,
+    "maxOutputTokens": 8192
+  },
+  "cases": [
+    {
+      "id": "contract",
+      "sourceUrl": "https://www.suz.cvut.cz/cz/media/file/smlouva-o-ubytovani-pro-studenty",
+      "bytes": 198187,
+      "sha256": "8ef4883e3ee2bdc4788425db2cb428a53574cf6aa7e4ebad664d26756ad82a62",
+      "pageCount": 1,
+      "count": {
+        "inputTokens": 2710,
+        "elapsedMs": 1805.1855000000003,
+        "requestIdSha256": "a91ae88c7ba6594bdb8b812a59309049d0757ee1fd6283065f178b0d853fd64a",
+        "usage": null,
+        "billing": "unknown"
+      },
+      "extraction": {
+        "observedModel": "gpt-6.1-sol",
+        "elapsedMs": 17544.8376,
+        "candidateSha256": "9eed4e300f1a0e1fa81213493c05dbd89c4e105bba34ca27804d303b6ab9f0b9",
+        "requestHash": "fbfcbb46cf29854f77c5e9ea0e48af5797470b3e49b958810c675ac589067eec",
+        "requestIdSha256": "20b345ee6c35bdcf005649f922583673f43645900960748e2a6e8082515450ff",
+        "usage": {
+          "inputTokens": 2710,
+          "outputTokens": 2627,
+          "totalTokens": 5337,
+          "cachedInputTokens": 0,
+          "cacheWriteTokens": 2707,
+          "reasoningTokens": 21
+        },
+        "pages": 1,
+        "blocks": 56,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "screenshot",
+      "sourceUrl": "https://www.suz.cvut.cz/cz/media/file/potvrzeni-zajmu-o-ubytovani-2026",
+      "bytes": 96519,
+      "sha256": "c8fa5f785f4fad80cba311a560665b4dfef1f2bcfd45ade7ce8b2c4618b4023b",
+      "pageCount": 1,
+      "count": {
+        "inputTokens": 1788,
+        "elapsedMs": 1059.5189,
+        "requestIdSha256": "31b76feee6ccf3a6a20198092ba9cdeda3d0df3c8a61b15233df0c41824d58dc",
+        "usage": null,
+        "billing": "unknown"
+      },
+      "extraction": {
+        "observedModel": "gpt-6.1-sol",
+        "elapsedMs": 5315.8198,
+        "candidateSha256": "aef4cba414fda46e038cd579519e7cc11e90324fab6e9c110968fd2276536077",
+        "requestHash": "f310abd85aabb2f8297caa3eaa0fc648a812614a84719fec8e6c445abdd76fe0",
+        "requestIdSha256": "1c74597e84a74fe8983e465e4b8877c8dc6c4f829ad4d824330f0b9d2021a7d8",
+        "usage": {
+          "inputTokens": 1788,
+          "outputTokens": 330,
+          "totalTokens": 2118,
+          "cachedInputTokens": 0,
+          "cacheWriteTokens": 1785,
+          "reasoningTokens": 0
+        },
+        "pages": 1,
+        "blocks": 16,
+        "unresolved": 0
+      }
+    }
+  ],
+  "calls": {
+    "count": 2,
+    "extract": 2,
+    "failures": 0,
+    "uncertain": 0,
+    "automaticRetries": 0,
+    "remainingCount": 0,
+    "remainingExtract": 0
+  },
+  "confirmedGenerationUsage": {
+    "inputTokens": 4498,
+    "outputTokens": 2957,
+    "totalTokens": 7455,
+    "cachedInputTokens": 0,
+    "cacheWriteTokens": 4492,
+    "reasoningTokens": 21
+  },
+  "countBilling": "unknown",
+  "quality": {
+    "contract": {
+      "referenceWords": 1166,
+      "rawMatchedWordOccurrences": 1160,
+      "missingNumericOccurrences": {},
+      "extraNumericOccurrences": {},
+      "missingHeadings": [],
+      "nativeSplitWordsRejoined": 3,
+      "manualAssessment": "Both columns, numbered clauses, negations and blank labels retained. Raw word differences correspond to three split native-text words and column-order normalization, not a summary. This is a two-sample pilot, not a universal fidelity guarantee."
+    },
+    "screenshot": {
+      "missingRequiredLabels": [],
+      "missingRequiredDates": [],
+      "highlightedExampleDatePresent": true,
+      "preferredDormPairPresent": true,
+      "alternateDormPairPresent": true,
+      "checkedYearRoundOptionRepresented": true,
+      "selectedListRowExplicitlyRepresented": false,
+      "note": "All text checks do not prove complete visual-state preservation; selected row/highlight styling is not fully encoded.",
+      "manualAssessment": "All required visible labels/dates, dormitory pairs and checked checkbox retained. Highlighted example date recovered. Selected list row and red emphasis styling are not fully represented; source must remain identified as illustrative UI, not current account/deadline evidence."
+    }
+  },
+  "resumeGuard": {
+    "duplicateCaseRejectedBeforeHttp": true,
+    "ledgerUnchanged": true
+  },
+  "publicationApproved": false,
+  "rawArtifacts": "Only the owned ignored validation cache; no original PDF or full candidate in Git."
+}
