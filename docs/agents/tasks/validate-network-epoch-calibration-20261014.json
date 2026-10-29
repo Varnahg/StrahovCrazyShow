@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-network-epoch-calibration-20261014",
+  "title": "Ověřit úzký clock-calibration fix v celém stabilním checkpointu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/network-epoch-calibration-validation/",
+    "docs/performance/evidence/network-epoch-calibration-20261014/",
+    "docs/agents/handoffs/validate-network-epoch-calibration-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Po explicitním ukončení runtime/test zápisů převzít3 předané source/test delty oproti c677d47. Každý ostatní source/test/config soubor ověřit proti Git HEAD, nikoli proti širšímu pracovnímu main.",
+    "Zmrazit snapshot včetně testů a původních neměnných assetů; provést sekvenčně pnpm test, pnpm build a celou izolovanou pnpm test:integration. Zachovat všechny neúspěchy a nedeklarovat PASS neprovedených kroků.",
+    "Po pipeline ověřit source parity, původní core identitu/schema verzi a ukončení vlastních procesů2568. Připravit přesný podklad pro samostatný fix commit a main integraci.",
+    "Přesně odlišit opravenou over-budget epochovou kalibraci od otevřené rawRTT policyA, unsupported latency, phase a GPU problémů."
+  ],
+  "verification": [
+    "Před každou heavy fází ověřit skutečné klienty4186/2581 a nové herní JSONL; při hraní další zátěž odložit. Hraný B6 build, main a jeho dependencies se nemění.",
+    "Pouze existující vlastní frozen publication node_modules přes read-only snapshot junction; žádná instalace nebo dependency upgrade. Bez browseru/GPU/Blenderu.",
+    "Ostatní source Git parity zahrnuje2-řádkový testový follow-up c677d47; nepoužívat starý room fixture hash z předchozího03b597 snapshotu jako současný základ."
+  ],
+  "notes": [
+    "Pouze publication WT C:/Users/rezac/.codex/worktrees/wave3-feature-publication/StrahovCrazyShow, HEADc677d47fd5722475ea1700b44fb3aea6ea581955. Implementuje samostatný owner fix-network-epoch-calibration-20261014; root nikdy nepřepisuje jeho zdroje.",
+    "Předchůdce V11snapshot03b597a6…819/819+build+integrace, c677d47 má pouze věrnější testovýScene mock24/24. Nový clock fix má vlastní3-source snapshot a předchozí red reprodukci, nikoli přepsanou historickou evidenci.",
+    "Tento task končí důkazy a předáním, samotný staging/commit převezme nový explicitní root scope. ProvozníPID zůstávají jen vcache.",
+    "Root převzal dokončený full checkpoint b773dc71…:827/827+build+celá integrace PASS,492 source hashů beze změny,2568 volný. Validátor ukončil procesy i zápisy, uvolnil rezervaci; přesná evidence/handoff uložené."
+  ]
+}

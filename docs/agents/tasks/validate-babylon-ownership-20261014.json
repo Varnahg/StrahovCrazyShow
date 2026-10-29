@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-babylon-ownership-20261014",
+  "title": "KEY-17: ověřit verzovaný ownership patch v úplném herním checkpointu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/babylon-ownership-validation/",
+    "docs/performance/evidence/babylon-ownership-20261014/",
+    "docs/agents/handoffs/validate-babylon-ownership-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Převzít konkrétní předaný package patch/test a jeho hashes; stabilní snapshot zahrnuje testy, konfiguraci, patch a přesnou identitu vyřešených závislostí.",
+    "Výchozí herní vstupy jsou neměnný B6 candidate cbc158068138e3454a6959a0d7a945465ea2974e6c246e86ed231abf92a4b5dc (wave3+B6); delta jen package/workspace/lock/patch a nový ownership test. Žádná nepřijatá IMAGE-01 nebo další glTF oprava.",
+    "Spustit pnpm test, pnpm build a izolované pnpm test:integration nad stabilním checkpointem. Zachovat výsledky a původní neúspěchy; nevydávat CPU/HTTP za GPU důkaz.",
+    "Předat přesný source/patch hash a exit codes. Žádné změny starých snapshotů, main dependencies nebo ostatních runtime WIP."
+  ],
+  "verification": [
+    "Claim až po ukončení package agentových procesů a release heavy-validation. Source/fixtures z frozen B6 kopírovat bez spuštění starého instalátoru; vlastní dist a závislosti nové validace.",
+    "Nový runtime balíček instalovat z předaného frozen lockfile nebo odkazovat pouze na stabilní samostatnou patched instalaci po přesné kontrole identity; nezapisovat do původních dependency junctionů.",
+    "Před integrací ověřit skutečně volný2568 a po ukončení vlastní PID/port. Žádný browser, GPU/Blender ani uživatelský test."
+  ],
+  "notes": [
+    "Pouze nová WT C:/Users/rezac/.codex/worktrees/image-processing-ownership/StrahovCrazyShow. Root koordinuje a drží odpovědnost za zdroje.",
+    "Starý B6 reference je v C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow/.cache/b6-transform-validation/candidate. Vše pouze pro čtení, původní hash zachovat.",
+    "Samostatný package commit se nesmí vydávat za vyřešené noční barvy nebo celý projekt. Runtime IMAGE-01 a grafická přejímka jsou následné otevřené kroky.",
+    "14.10 přijato: snapshot8eea61632293796a6ea9a72434d44fc03e8a455c86eb13532590ace23b73fb17,8409vstupů/512source. Přesně4package/test delty oproti B6,888/888test+build+integracePASS,512posthashů bez změn, stejné finální testy nad původním core1PASS/9FAIL. Port2568volný; commit6df08fb6b4003bc958a72fd58592ee24fa74dc41 obsahuje jen packagefix/test/výzkum/evidenci. Všechny vlastní helpery skončily, živé preview drží jiný serve task."
+  ]
+}

@@ -104,3 +104,11 @@ Trvající nároky z [ověření](../verification.md) a [README](../../README.md
 [scripts/performance-snapshot.mjs](../../scripts/performance-snapshot.mjs) kopíruje zdroje, assety **i testy**, klíčovou konfiguraci a stadium fixture `docs/reality-pack/landmarks/geometry-source.json` do `.cache/performance-snapshot/<jméno>`, porovnává SHA před/po kopii a zachovává velké zdrojové balíčky. Zbytek průběžně měněné dokumentace není runtime snapshot. Nová testová datová závislost mimo zahrnuté adresáře vyžaduje vědomou aktualizaci snapshotu.
 
 Při tomto dokumentačním průzkumu byly čteny skutečné soubory, importy, generátory, lockfile a historická evidence; nebyly spouštěny servery, generátory assetů, full suite, build, integrace ani GPU měření. Platnost cest a místních odkazů tohoto dokumentu byla zkontrolována samostatně.
+
+## Automatické lokální záznamy — doplnění 13. 10. 2026
+
+Na výslovné zadání uživatele nyní lokální stránka spouští `client/session-diagnostics.ts` z `client/main.tsx` automaticky; `client/game.ts` a `client/ui.tsx` poskytují časování, kontext a technické události. `shared/session-diagnostics.ts` určuje omezený sanitizovaný formát, `server/session-diagnostics.ts` ukládá dávky do ignorované `.cache/game-diagnostics/`. Nastavení ani export není potřeba zapínat. Toto je samostatná cesta od desetisekundového benchmarku a nezastavuje adaptivní kvalitu.
+
+Při následném hlášení problému načti existující lokální záznamy sám: `node scripts/diagnostics-report.mjs --all --json`, následně vyber odpovídající relaci/čas a případně čti její JSONL. Nejnovější relace může být vlastní kontrolní browser; porovnej čas, režim, zdrojovou identitu a události, než ji přiřadíš uživateli. Nevyžaduj ruční start FPS testu ani export, pokud automatický záznam existuje. Provozní stdout/stderr původního dev serveru zůstávají v jeho vlastním handoffu.
+
+Log je omezený časovou/místní retencí a může obsahovat explicitní mezery. Zdroje pozorované při serverovém příjmu nejsou důkazem totožnosti dříve načteného dev klienta; produkční klient ukládá také svůj build snapshot ID. Pravidla interpretace, příkazy a limity jsou v [automatic-diagnostics.md](../performance/automatic-diagnostics.md), skutečné ověření v [předání integrace](handoffs/automatic-diagnostics-integration.md). Záznam běžného hraní není sám o sobě srovnávací GPU přejímka.

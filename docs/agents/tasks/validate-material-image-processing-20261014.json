@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-material-image-processing-20261014",
+  "title": "KEY-14/4: ověřit materiálové korekce barev v úplném produkčním checkpointu",
+  "status": "done",
+  "dependsOn": [
+    "fix-babylon-image-processing-ownership-20261014"
+  ],
+  "writePaths": [
+    ".cache/material-image-processing-validation/",
+    "docs/performance/evidence/material-image-processing-20261014/",
+    "docs/agents/handoffs/validate-material-image-processing-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Použít stabilní engine checkpoint8eea6163 jako základ; přenést pouze runtime hunk na jeho původní wave3 cinematic, zachovat reuse WIP. Přidat nový7test a jediný opravený boolean assertion ve starém testu.",
+    "Snapshot zahrnuje testy; skutečná delta pouze cinematic a dva testové soubory. Žádný Game phase nebo jiná nová optimalizace.",
+    "Pnptest/build/test:integration PASS nad stabilním checkpointem, před/kopie/po SHA a přesný samostatný commit. Skutečný obraz/FPS zůstává neprokázaný bez GPU."
+  ],
+  "verification": [
+    "Před každým náročným krokem ověřit absenci herní aktivity4186/2581 a nového JSONL. Pokud začne hra, další zatěžování odložit.",
+    "Engine instalace je nezávislá a ověřená patchem f1bedab…; žádný install/resolver nebo zásah do main dependencies.",
+    "Ověřit aplikaci přesného hunku a výsledný wave3 cinematic SHA64f4c6f942b8c51e9d612934859deac1d8dfc06140e4298cf0ae5c14c4679ca3. Nepoužít celý nový HEAD cinematic, který nemá starší reuse změny."
+  ],
+  "notes": [
+    "Pouze ownership WT C:/Users/rezac/.codex/worktrees/image-processing-ownership/StrahovCrazyShow; root koordinátor.",
+    "Převzetí podle final handoffu fix-material-image-processing-20261014, jeho cache final-manifest/head-delta/wave3-runtime-delta. Původní wave4 working i frozen kandidát jen read-only.",
+    "Živé preview na4186 není tento nový checkpoint a nesmí být přepsané během validace. Integrace main a vizuální přejímka jsou následné kroky.",
+    "14.10 přijato: snapshotd032be6510b1a94c9bbada421ad84da50ddfc97e0498df4bc4eb896f1145c19f,8410vstupů/513source, přesně3delty proti engine checkpointu.895/895test+build+celá integracePASS,513posthashů a enginehashy bez změny. Wave3 reuse zachován přes přesnýhunk/SHA64f4c6…. Commit557eb880b6caff433f2d8e87211b20165baa4c12; vlastníprocesy skončily a rezervace uvolněna."
+  ]
+}

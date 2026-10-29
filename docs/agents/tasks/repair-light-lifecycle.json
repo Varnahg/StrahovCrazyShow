@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-light-lifecycle",
+  "title": "KEY-3/4: prokázat a opravit synchronní změny světel a stínů",
+  "writePaths": [
+    "client/vehicle-lighting.ts",
+    "client/flashlight.ts",
+    "client/cinematic.ts",
+    "client/stable-light-state.ts",
+    "tests/stable-light-state.test.ts",
+    "tests/vehicle-lighting.test.ts",
+    "tests/flashlight.test.ts",
+    "tests/cinematic-atmosphere.test.ts",
+    "docs/agents/handoffs/repair-light-lifecycle.md"
+  ],
+  "resources": [],
+  "status": "ready",
+  "dependsOn": [],
+  "acceptance": [
+    "Přímý autorizovaný cíl opravit všechny problémy z auditu13.10.2026; zachovat původní fungující chování a podklady.",
+    "Vlastní implementaci předat společně s cíleným refaktoringem, relevantním ověřením a přesnou evidencí; žádné neprokázané Done."
+  ],
+  "verification": [
+    "Cílené levné testy v tasku, GPU/build/integrace pouze koordinátorem pod repair-production-validation.",
+    "Příčiny měřit v aktuálním kódu a skutečné produkční scéně; podklady primární zdroje a původní log."
+  ],
+  "notes": [
+    "Koordinátor repairs-01a13624-admin/root. Linear projekt P-KEY-3.",
+    "Dirty soubory z předchozích automatic-diagnostics tasků jsou doloženě předané tomuto rootu; zachovat diff. Podagent může adopt-dirty pouze jako explicitní příjemce těchto konkrétních souborů dle delegace.",
+    "Nereservovat ani ukončovat původní live-dev5173/2567/buildingpreview."
+  ]
+}

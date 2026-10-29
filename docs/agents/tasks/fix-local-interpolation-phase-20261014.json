@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "fix-local-interpolation-phase-20261014",
+  "title": "KEY-12/7: sjednotit skutečnou renderovou fázi s plánovačem síťových ticků",
+  "status": "blocked",
+  "dependsOn": [
+    "reproduce-game-interpolation-20261014",
+    "research-netcode-camera-20261014"
+  ],
+  "writePaths": [
+    "client/game.ts",
+    "client/network-timeline.ts",
+    "tests/game-interpolation.test.ts",
+    "tests/network-timeline.test.ts",
+    "tests/client-recovery.test.ts",
+    "docs/performance/research-20261014/local-interpolation-phase.md",
+    "docs/agents/handoffs/fix-local-interpolation-phase-20261014.md",
+    ".cache/local-interpolation-phase/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před funkční editací zapsat rozhodnutí a porovnání accumulator/fract/clamp/pair-bound variant, opřené o skutečný red5FAIL/1PASS a původní výzkum; žádná změna lead policy, transportu, protokolu, reconciliation offsetu nebo kamery.",
+    "NetworkTimeline advanced výsledek poskytne fázi s epoch/currentSeq ze stejného estimatedServerSeq, který plánoval physics steps. Game použije jednu platnou fázi pro local/avatar/camera target i driven-car pozici/rotaci; offline zachová vlastní accumulator.",
+    "Při stejném páru timeline instance/epoch/seq fáze necouvá; běžný zero-step stále interpoluje a waiting drží poslední platnou fázi. Nová relace/epoch/rebase nesmí smíchat starý pár; respektovat skutečné Game reset/reconcile a respawnPending.",
+    "Skutečné Game red regrese přejdou na green bez oslabení assertions. Doplnit lead decrease, timeline instance replacement a offline kontrakt, pokud existující testy nepokrývají; zachovat neutral catch-up, sender/input sekvence a replays.",
+    "Cílený refaktoring společně: jeden výpočet/render phase zdroj, žádný zbytečný unbounded stav/cache nebo časový odhad po rendereru. Předat přesný delta a testy proti wave3/reproduction; neprohlašovat odstranění všech síťových korekcí nebo GPU třesení."
+  ],
+  "verification": [
+    "Před cílenými lehkými CPU testy ověřit aktuální absence herního TCP4186/2581 a nový game-diagnostics. Při skutečné hře nezahajovat další zatěžování a informovat koordinátora.",
+    "Původní red zachovat. Nové Game/timeline/recovery testy a související deterministické timeline/replay testy podle skutečného dopadu, narrow types. Žádný fullsuite/build/instalace/server/GPU bez samostatné root rezervace.",
+    "Předání obsahuje source hashes, příkazy, skutečné výsledky, limity a propojení skutečné frame cesty na testované metody."
+  ],
+  "notes": [
+    "Pouze wave4 WT C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow. Žádná editace právě servírovaného immutable .cache/b6-transform-validation/candidate ani main.",
+    "Root výslovně předává Game+client-recovery svůj wave3 WIP z repair-game-integration/repair-wave4-bootstrap a mechanickou extraction z reproduce tasku; příjemce je původní reprodukční agent. NetworkTimeline/test je jeho předchozí předaný repair-live-network-timing WIP. Adopt-dirty má tyto konkrétní handoffy, ne volné převzetí.",
+    "Neměnit dříve předané jiné moduly/UI/server/cinematic/source assety. Metadata a společná docs/verification patří rootu.",
+    "Root ověří samostatný nový delta; starší V11/startup/diagnostics WIP musí před vlastní integrací vyřešit jako oddělené feature commity. Agent nesmí stageovat nebo přibalit celý Game diff a netvrdí nový fix samostatný vůči HEAD, který starší WIP neobsahuje.",
+    "KEY-12/7 zůstávají otevřené: změny leadu mohou stále vyvolat burst/freeze, RTT policy/resync amplitudy a kompozice korekce mají samostatné příčiny a nejsou v tomto fixu. Praktická GPU/řízení přejímka je další krok.",
+    "14.10 implementace a cílené52testů/narrowTS hotové, nezávislý review bez nálezu; root celý izolovaný checkpoint2aaa3f42… ověřil892/892+build+integracePASS. Source511/511 beze změny. Blocked zde znamená čekající oddělení starších diagnostických/V11 feature commitů a následnou samostatnou publikaci nového phase delta, nikoli chybějící implementaci. Rozpracované soubory nejsou volné pro druhého autora; přesný handoff a delta jsou uchované."
+  ]
+}

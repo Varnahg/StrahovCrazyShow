@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "resources": [],
+  "verification": [
+    "Čerstvý registr/HEAD, prázdný index, přesný whitelist a SHA každého staged blobu; žádné široké Git operace nebo zahrnutí jiného WIP.",
+    "Převzít jen dokončený validovaný checkpoint včetně testů. Po commitu ověřit runtime/test/config/assets obsah a zachování ostatních pracovních souborů."
+  ],
+  "id": "commit-network-epoch-calibration-20261014",
+  "title": "Samostatně commitovat ověřenou opravu epochové kalibrace",
+  "writePaths": [
+    "client/network-timeline.ts",
+    "tests/network-timeline.test.ts",
+    "tests/network-latency-recovery.test.ts",
+    "docs/performance/research-20261014/network-epoch-calibration.md",
+    "docs/agents/handoffs/fix-network-epoch-calibration-20261014.md",
+    "docs/performance/research-20261014/network-latency-recovery.md",
+    "docs/agents/handoffs/reproduce-network-latency-recovery-20261014.md",
+    "docs/performance/evidence/network-epoch-calibration-20261014/",
+    "docs/agents/handoffs/validate-network-epoch-calibration-20261014.md",
+    ".cache/network-epoch-calibration-commit/",
+    "docs/agents/handoffs/commit-network-epoch-calibration-20261014.md"
+  ],
+  "acceptance": [
+    "Začít až po celém checkpointu b773dc71 a dokončeném handoffu/uvolnění validátora; žádný commit podle samotné zahájené pipeline.",
+    "Přesně3 source/test delty a jejich původní výzkum, rozhodnutí, handoff a důkazy. Zachovat hlavní rawRTT problémA jako otevřený, nepřidávat phase nebo jiné změny.",
+    "Předat přesný commit a postcommit source audit pro main; žádný push nebo změna živého preview."
+  ],
+  "notes": [
+    "Pouze publication WT, předchozí HEADc677d47fd5722475ea1700b44fb3aea6ea581955. AssemblyFileSHA5bcd81fbfbcc48f766af9d7276c489b7241a069280ca8729bc8650bab9525106.",
+    "Source snapshot b773dc713420ad445379d20e4e968030a835bc49f4c5f7afc037f8580acc026d má8389 vstupů/492 source. Pipeline právě běží; ready nastaví root až podle skutečných výsledků. Root je příjemce explicitních fix/repro/validation handoffů, adopt-dirty jen pro tento předaný obsah.",
+    "Root převzal dokončený full checkpoint b773dc71…:827/827+build+celá integrace PASS,492 source hashů beze změny,2568 volný. Validátor ukončil procesy i zápisy, uvolnil rezervaci; přesná evidence/handoff uložené.",
+    "Přijat přesný publication commit4f41b37fb145e5a00414bf256fd431744b6ba462 nadc677d47. Full b773dc71…827/827+build+integracePASS,492 source Git blobů i SHA shodných,65 publication working souborů zachováno. Předchozí source/validation/commit claimy uvolněné; main základ9c76d3f3f0486d103357a318202ee73a70d8fdf9."
+  ]
+}

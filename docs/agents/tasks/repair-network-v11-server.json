@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-network-v11-server",
+  "title": "KEY-6/7: zapojit časovou epochu do serveru a skutečných SDK producentů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/index.ts",
+    "server/respawn.ts",
+    "shared/netcode.ts",
+    "shared/network-diagnostics.ts",
+    "shared/input-timeline.ts",
+    "client/network-input-buffer.ts",
+    "tests/network-input-buffer.test.ts",
+    "tests/network-diagnostics.test.ts",
+    "tests/input-timeline.test.ts",
+    "tests/input-backlog.test.ts",
+    "tests/netcode.test.ts",
+    "tests/server-respawn.test.ts",
+    "tests/timeline-sender.test.ts",
+    "docs/agents/handoffs/repair-network-v11-server.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Server V11 řeší právě aktuální simulační tick vlastní epochy, ack je resolved-time frontier, pozdní/old-epoch/futureoutofbounds příkazy neakcelerují ani neopakují čas.",
+    "Každý sim.tick a authority.time nese stejný UTC čas skutečně odsimulovaného kroku; epoch bariéry projoin/respawn/serverdrop/clientrecovery, bezpečný cizí řidič a jediný společný svět.",
+    "Priority flush první dávky epochy bypassuje pouze cadence, ne ratebudget; spojený timeline+sender regression přiRTT200/jitter/15FPS a jumpedge.",
+    "Skutečné SDK testy/producenti aktualizované na plánované tick příkazy; zachovat nebo posílit manévrové assertions, žádné uvolnění thresholdů kvůli timeoutu."
+  ],
+  "verification": [
+    "Cílené levné CPU testy a typy přiděleného rozsahu; root spouští skutečné síťové integrace/GPU po zapojeníGame.",
+    "Zachovat předchozí fail log wave1-integration timeout D wheels; explicitně rozlišit potvrzenou příčinu od možných dalších závad."
+  ],
+  "notes": [
+    "Explicitní root převod vlastního předaného server/netcode/sender diffu zrepair-network-transport-timing a primitives; lzeadopt-dirty po tomto předání.",
+    "SDK producenti a jejich helper jsou delegováni do disjunktního repair-network-v11-sdk; serverový agent koordinuje kontrakt, ale do scripts nepíše.",
+    "Root současně integrujeclient/game.ts/ui.tsx, client/network-timeline.ts a vlastní client recovery/replay fixtures. Do těchto cestagent nepíše; nutný API handshake.",
+    "Neměnit zmrazený wave1 snapshot, který právě prošel786testy/build a má zachovaný integration fail. Main může být během koordinované wire migrace dočasně nekompatibilní; nedeklarovat dokončení před společnoupřejímkou."
+  ]
+}

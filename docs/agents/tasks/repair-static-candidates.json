@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-static-candidates",
+  "title": "KEY-5: konzervativní předvýběr statických kandidátů mimo frustum",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/active-mesh-candidates.ts",
+    "tests/active-mesh-candidates.test.ts",
+    "docs/agents/handoffs/repair-static-candidates.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Odstranit prokazatelně zbytečné native traversal kroky pouze pro bezpečně statické noninstanced/noLOD/frozen a nedeformované meshe; zachovat vstupní pořadí a všechny nejisté případy.",
+    "Ve výchozí kompatibilní cestě musí zůstat původní chování; root zvolí A/B hook/enable až po přejímce. Bounded counters vysvětlují kandidáty/nativní práci."
+  ],
+  "verification": [
+    "Cílené native Babylon/NullEngine paritní testy aktuální a nové, matrix/material/instance/LOD/skinning/camera/multiplecamera lifecycle; žádné FPS tvrzení z NullEngine.",
+    "Následná produkční A/B GPU přejímka rootem na témže source snapshotu/podmínkách."
+  ],
+  "notes": [
+    "Přímá návaznost repair-render-cost-cause evidence; nejde o odstranění geometrií ani fyziky.",
+    "Pouze explicitně doložené static eligibility, změny bounding info/parentů a neznámý provider musí bezpečně bypassovat. Pokud nelze dokázat správnost candidate, nevyřazovat jej.",
+    "game.ts, render-cost/model-review a jejich nové capture fields patří rootu/novému tasku."
+  ]
+}

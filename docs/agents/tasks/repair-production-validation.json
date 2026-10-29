@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-production-validation",
+  "title": "KEY-11: koordinovat stabilní produkční profily a přejímku oprav",
+  "writePaths": [
+    ".cache/performance-snapshot/playtest-repairs-baseline/",
+    ".cache/performance-snapshot/playtest-repairs-wave1/",
+    ".cache/performance-snapshot/playtest-repairs-wave2/",
+    ".cache/playtest-repairs-validation/",
+    "docs/performance/evidence/playtest-repairs/",
+    "docs/agents/handoffs/repair-production-validation.md",
+    "dist/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4176",
+    "port:2571",
+    "port:2568"
+  ],
+  "status": "ready",
+  "dependsOn": [],
+  "acceptance": [
+    "Přímý autorizovaný cíl opravit všechny problémy z auditu13.10.2026; zachovat původní fungující chování a podklady.",
+    "Vlastní implementaci předat společně s cíleným refaktoringem, relevantním ověřením a přesnou evidencí; žádné neprokázané Done."
+  ],
+  "verification": [
+    "Cílené levné testy v tasku, GPU/build/integrace pouze koordinátorem pod repair-production-validation.",
+    "Příčiny měřit v aktuálním kódu a skutečné produkční scéně; podklady primární zdroje a původní log."
+  ],
+  "notes": [
+    "Koordinátor repairs-01a13624-admin/root. Linear projekt P-KEY-3.",
+    "Dirty soubory z předchozích automatic-diagnostics tasků jsou doloženě předané tomuto rootu; zachovat diff. Podagent může adopt-dirty pouze jako explicitní příjemce těchto konkrétních souborů dle delegace.",
+    "Nereservovat ani ukončovat původní live-dev5173/2567/buildingpreview."
+  ]
+}

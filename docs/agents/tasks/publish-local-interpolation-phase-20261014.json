@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "publish-local-interpolation-phase-20261014",
+  "title": "Přenést samostatný Game phase fix na publikovaný V11 a clock-calibration základ",
+  "status": "ready",
+  "dependsOn": [
+    "publish-wave3-v11-network-20261014",
+    "fix-network-epoch-calibration-20261014",
+    "reproduce-game-interpolation-20261014"
+  ],
+  "writePaths": [
+    "client/game.ts",
+    "client/network-timeline.ts",
+    "tests/game-interpolation.test.ts",
+    "tests/network-timeline.test.ts",
+    "tests/room-callbacks.test.ts",
+    ".cache/local-interpolation-publication/",
+    "docs/performance/research-20261014/local-interpolation-publication.md",
+    "docs/agents/handoffs/publish-local-interpolation-phase-20261014.md",
+    "docs/performance/research-20261014/local-interpolation-phase.md",
+    "docs/performance/research-20261014/game-interpolation-reproduction.md",
+    "docs/agents/handoffs/fix-local-interpolation-phase-20261014.md",
+    "docs/agents/handoffs/reproduce-game-interpolation-20261014.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před přenosem zapsat rozhodnutí a skutečný hunk audit. Převzít pouze předaný phase delta zwave4, nikoli celé staré Game/Timeline soubory; zachovat všechny V11, nové clock-calibration a testové Scene změny.",
+    "Timeline patch/type/advance a append testů podle read-only git apply --check procházejí nad4f41b37; acceptAuthority/canCalibrate nesmí být změněné. Čtyři nové clock testy zůstávají.",
+    "Dva Game kontextové konflikty řešit pouze importem TimelinePresentation a vložením networkPresentation vedle networkTimeline. Nepřenášet MeshDrawProfile, StableLightState ani chybějící profilerové pole z okolí patche. Zbylých6 Game hunků zachovat podle ověřené phase opravy.",
+    "Room callback test musí dále vykonávat skutečné UI wiring/frame/advance a nově skutečnou AST metodu updateNetworkPresentation, s odstraněním jen TypeScript private modifieru. Fake planner vrací odpovídající presentation pro vyrobený tick; neimplementovat kopii helperu. Zachovat19 původních testových těl, wiring a4 lifecycle scénáře včetně Scene mocku.",
+    "Phase chování: jeden render phase zdroj pro pěší/car/camera target, monotónní alpha stejného páru, zero-step interpolace, waiting hold, správná invalidace při skutečné změně identity/epoch/pose collapse, offline accumulator zachovaný. Žádná změna clock policy, lead, input/replay/protokolu, camera spring nebo korekčních prahů.",
+    "Předat implementaci, cílený refaktoring/lifecycle kontrolu a relevantní testy/typy společně. Původní repro/phase research a handoffy převzít byte-exact do tohoto feature; staré logy/snapshoty nezměnit."
+  ],
+  "verification": [
+    "Před každým CPU během zkontrolovat4186/2581 a novéJSONL. Pouze lehké Game interpolation/Timeline/clock-regression/room wiring/related recovery/sender/physics testy a scopedTypeScript. Žádný fullsuite/build/integrace/server/GPU/instalace nebo staging/commit.",
+    "Původní wave4 red5FAIL/1PASS a52 targeted/892 full výsledky zachovat jako historickou identitu, novému mezistavu nepřiřazovat jejich PASS bez vlastního ověření. Root vytvoří nový plný snapshot po explicitním freeze-ready.",
+    "Přesné před/po sourcehashy a delta proti aktuálnímu HEAD. Client-recovery je proti wave4 shodný a zůstává pouze read-only test vstup."
+  ],
+  "notes": [
+    "Pouze publication WT C:/Users/rezac/.codex/worktrees/wave3-feature-publication/StrahovCrazyShow, čistý runtime HEAD4f41b37fb145e5a00414bf256fd431744b6ba462. Tento strom odpovídá main98ce8fc a full b773dc71…827/827+build+integrace. Všechny předchozí runtime claims uvolněné.",
+    "Zdroj phase delta je původníwave4 .cache/local-interpolation-phase a fix/reproduce handoffy; autor repair_network_causes je původní vlastník i příjemce. Root výslovně předává dokončené Game/Timeline/test delta a jejich dokumenty, nikoli celé wave3WIP.",
+    "Read-only audit14.10 potvrdil Timeline patch offsets4, test append offset105 a nový Game test PASS applycheck; dva Game konflikty jsou pouze kontext. Nový room fixture dependency je nutný pro věrné provedení skutečné metody.",
+    "Timeline před přenosem SHA b4bfa1aee25502fb0a90b6e486183052f564989c90c70cb7ef7bf1dafacb9d13. Nikdy jej nepřepsat starým c5007… zwave4; výsledkem musí být součet clock prevence a phase dodatku.",
+    "Hraný B6candidate, main pracovní soubory, dependencies a foreignvegetation jsou read-only. Celý cíl ani odstranění viditelného třesení/GPU záseků se netvrdí samotnými CPU testy."
+  ]
+}
