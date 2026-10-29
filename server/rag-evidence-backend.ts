@@ -3,6 +3,7 @@ import {
   CURRENT_KNOWLEDGE_SCOPE,
   crazyTypkaScopeKey,
   isCrazyTypkaKnowledgeScope,
+  mergeCrazyTypkaSources,
   type CrazyTypkaKnowledgeScope,
   type CrazyTypkaErrorCode,
 } from "../shared/crazy-typka";
@@ -346,7 +347,9 @@ export function createRagEvidenceBackend(options: {
             Buffer.byteLength(
               JSON.stringify(crazyTypkaEvidencePayload(candidate)),
               "utf8",
-            ) <= CRAZY_TYPKA_EVIDENCE_BYTES
+            ) <= CRAZY_TYPKA_EVIDENCE_BYTES &&
+            mergeCrazyTypkaSources(candidate.map((chunk) => chunk.source)) !==
+              null
           )
             selected.push(hit);
         }
