@@ -1,0 +1,112 @@
+✔ report computes global percentiles from raw intervals, separating hidden frames (20.1079ms)
+✔ report exposes incomplete tails, missing sequences, source changes, settings and errors (9.5547ms)
+✔ directory selects gameplay behind a newer idle menu and combines rotation; explicit/all do not substitute (26.2141ms)
+✔ game-ready establishes gameplay without frames; menu-only fallback explains the missing evidence (10.6786ms)
+✔ duplicate deliveries do not inflate FPS samples (11.5721ms)
+✔ HTTP failures are errors and nonpersisted pagehide is a clean close (5.133ms)
+✔ threshold counts use raw frame intervals, inclusive boundaries and visibility scope without observer double counting (7.6073ms)
+✔ legacy overflow and resync records remain visible incidents despite zero runtime errors (5.1888ms)
+✔ new correction reasons and intentional mode/respawn flags are preserved; unknown distances are not zero (6.8805ms)
+✔ connection inconsistency checks event order and sampled-context age, excluding guest and disconnected states (4.9083ms)
+✔ large repeated detail streams are bounded while incident and raw sample counts remain exact (15.4794ms)
+✔ corrupt entries and duplicate sequences are reported without duplicating raw frame counts (4.3217ms)
+✖ server clock separates observed increments, sampled callbacks and historical lifetime peaks (11.9708ms)
+✖ server clock without a comparable pair is unavailable, including repeated cached authority (11.7288ms)
+✖ server clock sorts shuffled parts and deduplicates batch/context delivery (13.7167ms)
+✖ server clock excludes every conflicting context copy and never bridges the conflict (13.2168ms)
+✖ server clock conflicting duplicate sequences are order independent even against non-clock records (14.0581ms)
+✖ server clock refuses ambiguous batch contents regardless of which copy appears first (13.7781ms)
+✖ server clock resets and impossible same-callback changes do not add a new lifetime baseline (10.7366ms)
+✖ server clock respects connection/game boundaries, gaps and stale sampled context (12.5388ms)
+✖ server clock rejects malformed scalars/context timestamps and tolerates recorder rounding (9.8023ms)
+✖ server clock reports aggregate overflow as unavailable and bounds segment detail (10.4906ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 12
+ℹ fail 10
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 510.8384
+
+✖ failing tests:
+
+test at tests\diagnostics-report.test.ts:530:1
+✖ server clock separates observed increments, sampled callbacks and historical lifetime peaks (11.9708ms)
+  TypeError: Cannot read properties of undefined (reading 'status')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:542:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:559:1
+✖ server clock without a comparable pair is unavailable, including repeated cached authority (11.7288ms)
+  TypeError: Cannot read properties of undefined (reading 'status')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:568:37)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:575:1
+✖ server clock sorts shuffled parts and deduplicates batch/context delivery (13.7167ms)
+  TypeError: Cannot read properties of undefined (reading 'observed')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:583:28)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:587:1
+✖ server clock excludes every conflicting context copy and never bridges the conflict (13.2168ms)
+  TypeError: Cannot read properties of undefined (reading 'observed')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:597:26)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:602:1
+✖ server clock conflicting duplicate sequences are order independent even against non-clock records (14.0581ms)
+  TypeError: Cannot read properties of undefined (reading 'observed')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:608:28)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:612:1
+✖ server clock refuses ambiguous batch contents regardless of which copy appears first (13.7781ms)
+  TypeError: Cannot read properties of undefined (reading 'status')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:618:24)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:623:1
+✖ server clock resets and impossible same-callback changes do not add a new lifetime baseline (10.7366ms)
+  TypeError: Cannot read properties of undefined (reading 'observed')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:632:26)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:637:1
+✖ server clock respects connection/game boundaries, gaps and stale sampled context (12.5388ms)
+  TypeError: Cannot read properties of undefined (reading 'observed')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:653:26)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:660:1
+✖ server clock rejects malformed scalars/context timestamps and tolerates recorder rounding (9.8023ms)
+  TypeError: Cannot read properties of undefined (reading 'observed')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:674:26)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\diagnostics-report.test.ts:678:1
+✖ server clock reports aggregate overflow as unavailable and bounds segment detail (10.4906ms)
+  TypeError: Cannot read properties of undefined (reading 'status')
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:686:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

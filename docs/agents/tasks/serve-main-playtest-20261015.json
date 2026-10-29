@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "serve-main-playtest-20261015",
+  "title": "Udržovat uživatelský frozen main test4188 s automatickými logy",
+  "status": "ready",
+  "dependsOn": [
+    "prepare-main-playtest-20261015"
+  ],
+  "writePaths": [
+    ".cache/main-playtest-20261015/live/",
+    ".cache/main-playtest-20261015/frozen/",
+    "docs/agents/handoffs/serve-main-playtest-20261015.md",
+    "node_modules/"
+  ],
+  "resources": [
+    "port:4188",
+    "port:2583"
+  ],
+  "acceptance": [
+    "Pouze source snapshot4dcb3f6f z main e1b03fe, obsah a dist potvrzené přípravou; nikdy HMR.",
+    "Vlastní hidden procesy sPID/startUTC/command a kontrolou portu; health a recorder enabled, server/client snapshot identity a přesné HTTP HTML/JS/CSS bytes.",
+    "Automatický collector smoke označen synthetic/not-game, potvrzen vlastní JSONL na disku. Skutečný uživatelský test následně odlišit od smoku.",
+    "Během hraní se source/dist/dependencies nemění a neběží konkurenčníheavy/GPU práce."
+  ],
+  "verification": [
+    "Otevřít přímo URL přes app panel, ne Computer Use; queued není potvrzený browser render.",
+    "Předat srozumitelný plán ověřených ovládacích prvků a hranic logů; uživatel nemusí diagnostiku ručně zapínat ani exportovat."
+  ],
+  "notes": [
+    "Nový samostatný port; staré claims/procesy zůstávají původním vlastníkům. Persistent serve claim se neuvolňuje za běhu.",
+    "Požadavek obsahuje praktický uživatelský test, nikoli implementaci další feature. Linear KEY11 a projekt průběžně doplnit přesnou adresou/identitou a čekající přejímkou.",
+    "Frozen source/dist and borrowed owned-WT node_modules are held immutably while serving; only frozen/.cache logs may grow. Do not install or edit source/dist during user testing."
+  ]
+}

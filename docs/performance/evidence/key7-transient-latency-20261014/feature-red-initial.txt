@@ -1,0 +1,140 @@
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT34, 15FPS (20.7546ms)
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT34, 60FPS (12.2512ms)
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT34, 144FPS (8.1081ms)
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT200, 15FPS (6.7628ms)
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT200, 60FPS (6.6824ms)
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT200, 144FPS (7.1652ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 470.0189
+
+✖ failing tests:
+
+test at tests\network-transient-latency.test.ts:1:4099
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT34, 15FPS (20.7546ms)
+  AssertionError [ERR_ASSERTION]: a single uncertain raw spike must not stop a warm supported transport
+  
+  16 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\network-transient-latency.test.ts:121:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 16,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\network-transient-latency.test.ts:1:4099
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT34, 60FPS (12.2512ms)
+  AssertionError [ERR_ASSERTION]: a single uncertain raw spike must not stop a warm supported transport
+  
+  65 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\network-transient-latency.test.ts:121:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 65,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\network-transient-latency.test.ts:1:4099
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT34, 144FPS (8.1081ms)
+  AssertionError [ERR_ASSERTION]: a single uncertain raw spike must not stop a warm supported transport
+  
+  157 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\network-transient-latency.test.ts:121:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 157,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\network-transient-latency.test.ts:1:4099
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT200, 15FPS (6.7628ms)
+  AssertionError [ERR_ASSERTION]: a single uncertain raw spike must not stop a warm supported transport
+  
+  19 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\network-transient-latency.test.ts:121:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 19,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\network-transient-latency.test.ts:1:4099
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT200, 60FPS (6.6824ms)
+  AssertionError [ERR_ASSERTION]: a single uncertain raw spike must not stop a warm supported transport
+  
+  75 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\network-transient-latency.test.ts:121:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 75,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\network-transient-latency.test.ts:1:4099
+✖ isolated raw spike preserves actual delivered controls across an epoch at RTT200, 144FPS (7.1652ms)
+  AssertionError [ERR_ASSERTION]: a single uncertain raw spike must not stop a warm supported transport
+  
+  180 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\network-transient-latency.test.ts:121:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 180,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

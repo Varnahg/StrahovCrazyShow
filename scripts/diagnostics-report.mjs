@@ -75,12 +75,274 @@ function retainWorst(list, record, limit = 30) {
   if (list.length > limit) list.pop();
 }
 
+const CLOCK_TIMINGS = ["elapsedMs", "cpuMs", "elapsedMaxMs", "cpuMaxMs"];
+const CLOCK_BOUNDARIES = new Set([
+  "session-start",
+  "session-end",
+  "game-start",
+  "game-dispose",
+  "game-disposed",
+  "game-end",
+  "mode-change",
+  "network-connecting",
+  "network-connected",
+  "network-disconnected",
+  "network-left",
+]);
+const nonnegative = (value) => finite(value) && value >= 0;
+
+// Only scalar evidence is retained. Game contexts can contain large inventories
+// and unrelated private metadata; the offline clock summary does not need them.
+function clockEvidence(record) {
+  const { seq, atMs, kind, data } = record;
+  if (CLOCK_BOUNDARIES.has(kind) || kind === "recording-gap")
+    return { seq, atMs, type: kind === "recording-gap" ? "gap" : "boundary" };
+  if (kind !== "frame-window") return null;
+  const clock = data.context?.network?.server?.clock;
+  if (clock == null) return { seq, atMs, type: "missing" };
+  const contextAtMs = data.contextAtMs;
+  if (
+    typeof clock !== "object" ||
+    Array.isArray(clock) ||
+    !nonnegative(contextAtMs) ||
+    contextAtMs > atMs + 1 ||
+    !Number.isSafeInteger(clock.callbacks) ||
+    clock.callbacks < 0 ||
+    !nonnegative(clock.droppedTotalMs)
+  )
+    return { seq, atMs, type: "invalid" };
+  const values = [
+    clock.callbacks,
+    clock.droppedTotalMs,
+    ...CLOCK_TIMINGS.map((key) =>
+      nonnegative(clock[key]) ? clock[key] : null,
+    ),
+  ];
+  return {
+    seq,
+    atMs,
+    contextAtMs,
+    type: "sample",
+    values,
+    signature: JSON.stringify(values),
+  };
+}
+
+function emptyServerClock() {
+  return {
+    status: "unavailable",
+    scope:
+      "Observed counter increments between comparable retained server-clock snapshots; not a full-session total. Each segment's first value is a baseline, not observed work. The sum is a lower bound only assuming counter continuity inside those segments. No server-instance ID is recorded: an unobserved restart may be undetectable. Unsampled start/end, gaps and callback peaks remain unknown. Room clock counters are separate from player queue counters and recovery events.",
+    samples: 0,
+    comparableIntervals: 0,
+    observed: { callbacks: null, droppedMs: null },
+    sampledCurrentMaxMs: { elapsed: null, cpu: null },
+    reportedLifetimeMaxMs: { elapsed: null, cpu: null },
+    diagnostics: {
+      ambiguousLog: false,
+      ambiguousSequences: 0,
+      duplicateContexts: 0,
+      conflictingContexts: 0,
+      missingSamples: 0,
+      invalidSamples: 0,
+      unavailableTimingValues: 0,
+      staleContexts: 0,
+      counterResets: 0,
+      clockConflicts: 0,
+      sequenceGaps: 0,
+      recordingGaps: 0,
+      lifecycleBoundaries: 0,
+      numericOverflows: 0,
+    },
+    segments: [],
+    omittedSegments: 0,
+  };
+}
+
+function summarizeServerClock(ordered, evidence, ambiguous, ambiguousLog) {
+  const result = emptyServerClock();
+  result.diagnostics.ambiguousLog = !!ambiguousLog;
+  // The legacy reader intentionally retains its original first-delivery result
+  // and integrity warning. No new clock conclusion may depend on which corrupt
+  // batch/session copy happened to be read first.
+  if (ambiguousLog) return result;
+  const contexts = new Map(),
+    conflicts = new Set();
+  for (const [seq, sample] of evidence) {
+    if (ambiguous.has(seq) || sample.type !== "sample") continue;
+    const existing = contexts.get(sample.contextAtMs);
+    if (existing) {
+      if (existing.signature !== sample.signature)
+        conflicts.add(sample.contextAtMs);
+      existing.latestAtMs = Math.max(existing.latestAtMs, sample.atMs);
+    } else
+      contexts.set(sample.contextAtMs, {
+        signature: sample.signature,
+        latestAtMs: sample.atMs,
+      });
+  }
+  result.diagnostics.conflictingContexts = conflicts.size;
+  const seenContexts = new Set();
+  let previousSeq = -1,
+    lastContextAt = -Infinity,
+    boundaryAt = -Infinity;
+  let previous = null,
+    segment = null,
+    callbacks = 0,
+    droppedMs = 0;
+  const finish = () => {
+    if (segment) {
+      if (result.segments.length < DETAIL_LIMIT) result.segments.push(segment);
+      else result.omittedSegments++;
+    }
+    segment = null;
+    previous = null;
+  };
+  const barrier = (atMs) => {
+    boundaryAt = Math.max(boundaryAt, atMs);
+    finish();
+  };
+  const endpoint = (sample) => ({
+    callbacks: sample.values[0],
+    droppedTotalMs: sample.values[1],
+  });
+  const start = (sample) => {
+    previous = sample;
+    segment = {
+      fromSeq: sample.seq,
+      toSeq: sample.seq,
+      fromContextAtMs: sample.contextAtMs,
+      toContextAtMs: sample.contextAtMs,
+      baseline: endpoint(sample),
+      last: endpoint(sample),
+      intervals: 0,
+      callbacksDelta: 0,
+      droppedMsDelta: 0,
+    };
+  };
+  for (const [seq, atMs] of ordered) {
+    if (seq > previousSeq + 1) {
+      result.diagnostics.sequenceGaps++;
+      // The missing event's time is unknown. Conservatively require a sample
+      // no older than the first retained delivery after the gap.
+      barrier(ambiguous.get(seq) ?? atMs);
+    }
+    previousSeq = seq;
+    if (ambiguous.has(seq)) {
+      result.diagnostics.ambiguousSequences++;
+      barrier(ambiguous.get(seq));
+      continue;
+    }
+    const sample = evidence.get(seq);
+    if (!sample) continue;
+    if (sample.type === "boundary" || sample.type === "gap") {
+      result.diagnostics[
+        sample.type === "gap" ? "recordingGaps" : "lifecycleBoundaries"
+      ]++;
+      barrier(sample.atMs);
+      continue;
+    }
+    if (sample.type === "missing" || sample.type === "invalid") {
+      result.diagnostics[
+        sample.type === "missing" ? "missingSamples" : "invalidSamples"
+      ]++;
+      barrier(sample.atMs);
+      continue;
+    }
+    if (conflicts.has(sample.contextAtMs)) {
+      barrier(contexts.get(sample.contextAtMs).latestAtMs);
+      continue;
+    }
+    if (sample.contextAtMs < boundaryAt || sample.contextAtMs < lastContextAt) {
+      result.diagnostics.staleContexts++;
+      // A rejected stale delivery is not a new lifecycle boundary. Moving the
+      // boundary to every flush would indefinitely reject normally lagged data.
+      finish();
+      continue;
+    }
+    if (seenContexts.has(sample.contextAtMs)) {
+      result.diagnostics.duplicateContexts++;
+      continue;
+    }
+    seenContexts.add(sample.contextAtMs);
+    lastContextAt = sample.contextAtMs;
+    if (
+      previous &&
+      sample.values[0] === previous.values[0] &&
+      sample.signature !== previous.signature
+    ) {
+      result.diagnostics.clockConflicts++;
+      barrier(sample.atMs);
+      continue;
+    }
+    result.samples++;
+    result.diagnostics.unavailableTimingValues += sample.values
+      .slice(2)
+      .filter((value) => value === null).length;
+    for (const [name, offset] of [
+      ["sampledCurrentMaxMs", 2],
+      ["reportedLifetimeMaxMs", 4],
+    ])
+      for (const [key, index] of [
+        ["elapsed", offset],
+        ["cpu", offset + 1],
+      ])
+        if (sample.values[index] !== null)
+          result[name][key] = Math.max(
+            result[name][key] ?? 0,
+            sample.values[index],
+          );
+    if (
+      previous &&
+      (sample.values[0] < previous.values[0] ||
+        sample.values[1] < previous.values[1])
+    ) {
+      result.diagnostics.counterResets++;
+      finish();
+    }
+    if (!previous) {
+      start(sample);
+      continue;
+    }
+    // Re-sampling one cached authority is not a fresh server-clock endpoint.
+    if (sample.values[0] === previous.values[0]) continue;
+    const callbackDelta = sample.values[0] - previous.values[0];
+    const droppedDelta = sample.values[1] - previous.values[1];
+    if (
+      !Number.isSafeInteger(callbacks + callbackDelta) ||
+      !finite(droppedMs + droppedDelta)
+    ) {
+      result.diagnostics.numericOverflows++;
+    } else {
+      callbacks += callbackDelta;
+      droppedMs += droppedDelta;
+    }
+    result.comparableIntervals++;
+    segment.toSeq = sample.seq;
+    segment.toContextAtMs = sample.contextAtMs;
+    segment.last = endpoint(sample);
+    segment.intervals++;
+    segment.callbacksDelta = sample.values[0] - segment.baseline.callbacks;
+    segment.droppedMsDelta = sample.values[1] - segment.baseline.droppedTotalMs;
+    previous = sample;
+  }
+  finish();
+  if (result.comparableIntervals && !result.diagnostics.numericOverflows) {
+    result.status = "observed-intervals";
+    result.observed = { callbacks, droppedMs };
+  }
+  return result;
+}
+
 /** Read only. Broken/incomplete lines remain on disk and are reported rather
  * than silently making a failed or interrupted session look successful. */
 export async function summarizeDiagnosticFiles(files) {
   const sequenceTimes = new Map(),
     batches = new Map(),
     sources = new Map();
+  const serverClockEvidence = new Map(),
+    ambiguousClockSequences = new Map();
+  let ambiguousClockLog = false;
   const warnings = new Set();
   let omittedWarnings = 0;
   const warn = (message) => {
@@ -174,6 +436,7 @@ export async function summarizeDiagnosticFiles(files) {
         continue;
       }
       if (sessionId && row.sessionId !== sessionId) {
+        ambiguousClockLog = true;
         integrityIssues++;
         warn(`${basename(file)}:${lineNumber}: mixed session ignored`);
         continue;
@@ -181,6 +444,7 @@ export async function summarizeDiagnosticFiles(files) {
       sessionId = row.sessionId;
       if (batches.has(row.batchId)) {
         if (batches.get(row.batchId) !== row.digest) {
+          ambiguousClockLog = true;
           integrityIssues++;
           warn(`Conflicting duplicate batch ${row.batchId}`);
         }
@@ -213,11 +477,21 @@ export async function summarizeDiagnosticFiles(files) {
           continue;
         }
         if (sequenceTimes.has(record.seq)) {
+          ambiguousClockSequences.set(
+            record.seq,
+            Math.max(
+              ambiguousClockSequences.get(record.seq) ??
+                sequenceTimes.get(record.seq),
+              record.atMs,
+            ),
+          );
           integrityIssues++;
           warn(`Duplicate record sequence ${record.seq}`);
           continue;
         }
         sequenceTimes.set(record.seq, record.atMs);
+        const clock = clockEvidence(record);
+        if (clock) serverClockEvidence.set(record.seq, clock);
         kinds[record.kind] = (kinds[record.kind] ?? 0) + 1;
         const { data, kind } = record;
         if (kind === "frame-window") {
@@ -324,6 +598,12 @@ export async function summarizeDiagnosticFiles(files) {
     }
   }
   const ordered = [...sequenceTimes].sort((a, b) => a[0] - b[0]);
+  const serverClock = summarizeServerClock(
+    ordered,
+    serverClockEvidence,
+    ambiguousClockSequences,
+    ambiguousClockLog,
+  );
   const missingSequences = [];
   let previous = -1,
     previousTime = -Infinity;
@@ -485,6 +765,7 @@ export async function summarizeDiagnosticFiles(files) {
         : "none-observed",
     incidents,
     network,
+    serverClock,
     counts,
     errors,
     worstHitches: hitches,
@@ -563,6 +844,7 @@ export function formatDiagnosticsReport(report) {
   const number = (value) => (finite(value) ? value.toFixed(2) : "unavailable");
   if (report.selection) lines.push(`Selection: ${report.selection}`);
   for (const session of report.sessions) {
+    const serverClock = session.serverClock ?? emptyServerClock();
     lines.push(
       `Session ${session.sessionId}`,
       `Received ${session.receivedFromUTC} → ${session.receivedToUTC}; ${session.records} records / ${session.batches} batches`,
@@ -572,6 +854,10 @@ export function formatDiagnosticsReport(report) {
       `Excluded hidden/transition intervals: ${session.excludedVisibilityPerformance.frames}; ≥50/100/250/1000 ms: ${THRESHOLDS.map((threshold) => session.excludedVisibilityPerformance.thresholds[`atLeast${threshold}Ms`]).join(" / ")}`,
       `Observer entries: ${session.observerCounts.sampledFrameHitches} sampled frame hitches, ${session.observerCounts.longtask} longtasks, ${session.observerCounts.longAnimationFrame} long-animation-frames. These can overlap and are not added to raw stall counts.`,
       `Network: ${session.network.inputOverflowEvents} input overflows / at least ${session.network.droppedInputsAtLeast} discarded inputs; ${session.network.resyncEvents} resyncs (${session.network.resyncsWithoutReason} without reason); ${session.network.hardCorrectionEvents} non-resync corrections ≥0.35 m; median/p95/max ${number(session.network.hardCorrectionMetres.median)} / ${number(session.network.hardCorrectionMetres.p95)} / ${number(session.network.hardCorrectionMetres.max)} m.`,
+      `Server clock: ${serverClock.status}; observed increments ${serverClock.observed.callbacks ?? "unavailable"} callbacks / ${number(serverClock.observed.droppedMs)} ms dropped across ${serverClock.comparableIntervals} comparable intervals; ${serverClock.samples} retained samples.`,
+      `Server clock sampled callback maxima elapsed/CPU: ${number(serverClock.sampledCurrentMaxMs.elapsed)} / ${number(serverClock.sampledCurrentMaxMs.cpu)} ms; reported lifetime maxima elapsed/CPU: ${number(serverClock.reportedLifetimeMaxMs.elapsed)} / ${number(serverClock.reportedLifetimeMaxMs.cpu)} ms (may include work before the first observation).`,
+      `Server clock scope: ${serverClock.scope}`,
+      `Server clock coverage: ${JSON.stringify(serverClock.diagnostics)}; ${serverClock.omittedSegments} segment details omitted.`,
       `Sources: ${session.sources.map((source) => `${source.gitHead ?? "no-git"} / ${source.contentSha256} / dirty=${source.dirty}`).join(", ")}`,
     );
     for (const item of session.incidents)

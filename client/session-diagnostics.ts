@@ -24,6 +24,19 @@ const KEEPALIVE_BUDGET_BYTES = DIAGNOSTICS_CLIENT_BATCH_BYTES;
 // Leave headroom under the collector's shared 120 POST/minute limit for tails.
 const NORMAL_POSTS_PER_MINUTE = 110;
 const MAX_WINDOW_FRAMES = 512;
+// Keep lifecycle evidence aligned with the offline report's clock boundaries.
+const FRAME_CONTEXT_BOUNDARIES = new Set([
+  "session-end",
+  "game-start",
+  "game-dispose",
+  "game-disposed",
+  "game-end",
+  "mode-change",
+  "network-connecting",
+  "network-connected",
+  "network-disconnected",
+  "network-left",
+]);
 
 export type DiagnosticsState =
   "idle" | "starting" | "recording" | "retrying" | "disabled" | "stopped";
@@ -43,6 +56,7 @@ export interface DiagnosticFrame {
   frameStartedAtMs?: number;
   frameMs: number;
   cpuMs: number;
+  /** Newly available asynchronous GPU query; not necessarily this CPU frame. */
   gpuMs: number | null;
   phases: Record<string, number>;
   renderWork?: RenderIncidentSnapshot;
@@ -218,6 +232,8 @@ export class SessionDiagnostics {
       timeOrigin: this.environment.wallNow() - now,
       automatic: true,
       frameTiming: "frameMs=preceding interval; cpuMs/phases=current render",
+      gpuTiming:
+        "gpuMs=newly available asynchronous query; may describe an earlier frame",
       tailPolicy:
         "1s or 48KiB triggered sequential drain; bounded memory; best-effort 60KiB lifecycle tail; abrupt crashes/offline may lose unsaved records",
       userAgent: this.environment.window?.navigator.userAgent,
@@ -249,6 +265,9 @@ export class SessionDiagnostics {
 
   event(kind: string, data: unknown = {}): void {
     if (!this.isRecording || !isDiagnosticsKind(kind)) return;
+    const contextBoundary = FRAME_CONTEXT_BOUNDARIES.has(kind);
+    // Privacy and attribution cannot depend on the event's remaining budget.
+    if (contextBoundary) this.resetFrameContext();
     const now = this.environment.now();
     if (now - this.eventWindowAt >= 1000) {
       this.eventWindowAt = now;
@@ -262,10 +281,21 @@ export class SessionDiagnostics {
           ? ++this.resourcesInWindow > 256
           : ++this.eventsInWindow > 100;
     if (limitReached) {
+      // The report treats missing sequences as barriers. Without this reserved
+      // sequence it could join rooms before the later recording-gap is emitted.
+      if (contextBoundary) this.sequence++;
       this.drop("eventRate");
       return;
     }
     this.enqueue(kind, data, now);
+  }
+
+  /** End the old frame group; callers also emit the relevant lifecycle event. */
+  resetFrameContext(): void {
+    this.finishWindow();
+    this.sampledContext = {};
+    this.contextAt = -Infinity;
+    this.previousFrame = null;
   }
 
   recordFrame(frame: DiagnosticFrame, contextFactory: () => unknown): void {
@@ -285,6 +315,7 @@ export class SessionDiagnostics {
         this.sampledContext = sanitizeDiagnosticsData(contextFactory());
         this.contextAt = now;
       } catch (error) {
+        this.sampledContext = {};
         this.event("context-error", technicalError(error));
         this.contextAt = now;
       }

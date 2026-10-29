@@ -21,6 +21,11 @@ const MAX_LEAD_TICKS = MAX_FUTURE_INPUT_TICKS - 4;
 // Cover a 15FPS producer plus one-way transport; future bound still leaves four
 // extra server ticks. Lead alone cannot repair an indefinitely stalled renderer.
 const DELIVERY_MARGIN_TICKS = 5;
+const RTT_CONFIRMATION_MS = 2500;
+// 1050ms reply cooldown + up to 1000ms UI timer phase + a ~534ms spike.
+const RTT_BASELINE_MAX_AGE_MS = 3000;
+const requiredLeadTicks = (rttMs: number) =>
+  Math.ceil(rttMs / 2 / STEP_MS) + DELIVERY_MARGIN_TICKS;
 export type PredictedTimelineStep = TimelineStep & { time: number };
 export type TimelinePresentation = {
   inputEpoch: number;
@@ -61,6 +66,14 @@ export class NetworkTimeline {
   private predictedSeq = 0;
   private inputs = new Map<number, TimelineInput>();
   private rttMs = 0;
+  private rawRttMs: number | null = null;
+  private rttMeasuredAt: number | null = null;
+  private supportedRttMeasuredAt: number | null = null;
+  private pendingRtt: {
+    rttMs: number;
+    measuredAt: number;
+    expiresAt: number;
+  } | null = null;
   private mode: TimelineMode = { vehicle: false, yaw: 0 };
   // State packets can arrive late. Their receipt must not rewind the separate
   // estimate of the continuously advancing server clock inside this epoch.
@@ -69,29 +82,83 @@ export class NetworkTimeline {
   private hasTimingSample = false;
   private clockNeedsCalibration = true;
 
-  setRtt(rttMs: number): boolean {
+  setRtt(rttMs: number, measuredAt?: number): boolean {
     if (!Number.isFinite(rttMs) || rttMs < 0) return false;
+    if (
+      measuredAt !== undefined &&
+      (!Number.isFinite(measuredAt) ||
+        measuredAt < 0 ||
+        (this.rttMeasuredAt !== null && measuredAt <= this.rttMeasuredAt))
+    )
+      return false;
+    // Legacy/bootstrap callers have no freshness evidence. Preserve their
+    // conservative immediate behavior, never inventing a baseline timestamp.
+    if (measuredAt === undefined) {
+      this.resetRttSelection();
+      this.rawRttMs = rttMs;
+      this.applyRtt(rttMs);
+      return true;
+    }
+    this.expirePendingRtt(measuredAt);
+    this.rawRttMs = rttMs;
+    this.rttMeasuredAt = measuredAt;
+    if (requiredLeadTicks(rttMs) <= MAX_LEAD_TICKS) {
+      this.pendingRtt = null;
+      this.supportedRttMeasuredAt = measuredAt;
+      this.applyRtt(rttMs);
+    } else if (
+      this.pendingRtt === null &&
+      !this.deliveryBudgetExceeded &&
+      this.supportedRttMeasuredAt !== null &&
+      measuredAt - this.supportedRttMeasuredAt <= RTT_BASELINE_MAX_AGE_MS
+    ) {
+      // One uncertain excursion cannot immediately disable a warm supported
+      // producer. A second independent high sample or this fixed deadline wins.
+      this.pendingRtt = {
+        rttMs,
+        measuredAt,
+        expiresAt: measuredAt + RTT_CONFIRMATION_MS,
+      };
+    } else {
+      this.pendingRtt = null;
+      this.supportedRttMeasuredAt = null;
+      this.applyRtt(rttMs);
+    }
+    return true;
+  }
+
+  /** Connection-scoped confidence only: preserve command frontiers and clock.
+   * A pending high sample becomes conservative evidence when its owner leaves. */
+  resetRttSelection(): void {
+    if (this.pendingRtt) this.applyRtt(this.pendingRtt.rttMs);
+    this.pendingRtt = null;
+    this.rttMeasuredAt = null;
+    this.supportedRttMeasuredAt = null;
+  }
+
+  private expirePendingRtt(now: number): void {
+    if (this.pendingRtt && now >= this.pendingRtt.expiresAt) {
+      this.applyRtt(this.pendingRtt.rttMs);
+      this.pendingRtt = null;
+      this.supportedRttMeasuredAt = null;
+    }
+  }
+
+  private applyRtt(rttMs: number): void {
     this.rttMs = rttMs;
     if (!this.hasTimingSample) this.clockNeedsCalibration = true;
     this.hasTimingSample = true;
-    return true;
   }
 
   get leadTicks() {
     return Math.min(
       MAX_LEAD_TICKS,
-      Math.max(
-        DEFAULT_INPUT_LEAD_TICKS,
-        Math.ceil(this.rttMs / 2 / STEP_MS) + DELIVERY_MARGIN_TICKS,
-      ),
+      Math.max(DEFAULT_INPUT_LEAD_TICKS, requiredLeadTicks(this.rttMs)),
     );
   }
 
   get deliveryBudgetExceeded() {
-    return (
-      Math.ceil(this.rttMs / 2 / STEP_MS) + DELIVERY_MARGIN_TICKS >
-      MAX_LEAD_TICKS
-    );
+    return requiredLeadTicks(this.rttMs) > MAX_LEAD_TICKS;
   }
 
   acceptAuthority(
@@ -115,14 +182,16 @@ export class NetworkTimeline {
             authority.ack <= previous.ack)))
     )
       return { accepted: false, reason: "stale" };
+    this.expirePendingRtt(receivedAt);
     const epochChanged =
       !previous || authority.inputEpoch !== previous.inputEpoch;
     const rebase =
       epochChanged ||
       authority.ack > this.predictedSeq ||
       this.predictedSeq - authority.ack > MAX_TIMELINE_REPLAY_TICKS;
-    // A sample that already exceeds our delivery budget cannot establish a
-    // clock offset. Keep calibration pending until an eligible sample arrives.
+    // Clock and delivery lead use the same selected estimate, including the
+    // bounded baseline during an unconfirmed spike. Raw high never calibrates.
+    // A confirmed/expired over-budget sample still leaves calibration pending.
     const canCalibrate = this.hasTimingSample && !this.deliveryBudgetExceeded;
     if (epochChanged) {
       this.clockSeq =
@@ -169,6 +238,8 @@ export class NetworkTimeline {
     inputForStep: (seq: number) => Input,
     applyStep: (step: PredictedTimelineStep) => void,
   ): TimelineAdvance {
+    if (Number.isFinite(now) && now >= this.receivedAt)
+      this.expirePendingRtt(now);
     if (!this.anchor) return { status: "waiting", reason: "no-authority" };
     if (this.deliveryBudgetExceeded)
       return { status: "waiting", reason: "latency-budget" };
@@ -246,6 +317,12 @@ export class NetworkTimeline {
       predictedSeq: this.predictedSeq,
       retainedInputs: this.inputs.size,
       rttMs: this.rttMs,
+      rawRttMs: this.rawRttMs,
+      rttMeasuredAtMs: this.rttMeasuredAt,
+      supportedRttMeasuredAtMs: this.supportedRttMeasuredAt,
+      pendingRttMs: this.pendingRtt?.rttMs ?? null,
+      pendingRttMeasuredAtMs: this.pendingRtt?.measuredAt ?? null,
+      pendingRttExpiresAtMs: this.pendingRtt?.expiresAt ?? null,
       leadTicks: this.leadTicks,
       deliveryBudgetExceeded: this.deliveryBudgetExceeded,
       clockSeqAtAnchor: this.clockSeq,

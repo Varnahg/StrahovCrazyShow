@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "fix-key7-transient-latency-20261014",
+  "title": "KEY-7: zabránit zastavení ovládání po jediném nepotvrzeném RTT výkyvu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/network-timeline.ts",
+    "client/ui.tsx",
+    "scripts/timeline-client.ts",
+    "tests/network-timeline.test.ts",
+    "tests/network-transient-latency.test.ts",
+    "tests/room-callbacks.test.ts",
+    "docs/performance/research-20261014/network-transient-latency.md",
+    "docs/agents/handoffs/fix-key7-transient-latency-20261014.md",
+    ".cache/key7-transient-latency/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací zapsat rozhodnutí, varianty a konkrétní state machine; root potvrdí bounded Timeline policy po nezávislém review.",
+    "Pouze timestamped fresh supported baseline dovolí krátký odklad prvního over-budget vzorku. Druhý novější high nebo pevná expirace potvrdí vysokou hodnotu; cold/legacy/stale baseline high ihned. Raw měření zachovat.",
+    "Expiry skutečně uvnitř advance/acceptAuthority/setRtt, bez posouvání deadline. Během grace používá lead i epoch clock stejný fresh effective baseline; raw high nikdy nekalibruje. Po potvrzení/expiraci zůstává B guard. Stale/invalid/duplicate timestamps nic nepřepíší.",
+    "UI předá receive measurement.measuredAt; startup seed ponechá bez timestampu. SDK adaptér použije vlastní monotónní now. Žádné wire/server/guest/rate/future/replay/fixedDT změny.",
+    "Red/green regrese na skutečných Probe/Timeline/Queue/Sender + UI wiring, cílený refaktoring O(1) stavu, related physics/phase/recovery testy. Původní B testy neoslabovat.",
+    "Úzký reset RTT selection při bind/leave musí zachovat simulation frontiers a clock; same-identity reconnect nesmí zdědit fresh baseline/pending. Warm200+epoch musí prokázat přijímané inputy přes skutečnou Queue a symetrický100+100ms transport."
+  ],
+  "verification": [
+    "Pracovat jen v idle WT key17-ownership-integration; ověřená úplná source/test/config parity main7cc5a59, vlastní patched dependencies a všech12 LFS objektů. Nepotřebuje instalaci, branch switch ani regeneraci.",
+    "Lehké cílené CPU testy; žádná plná pipeline/build/server/GPU bez jiné root rezervace.",
+    "Předat přesné soubory/hashes, logy a zbývající limity; bez vlastního commitu/pushe."
+  ],
+  "notes": [
+    "Root předává svůj vlastní idle WT po KEY-17; HEAD zůstává2c7aec9, ale aktuální source/test/config odpovídá commitnutému main7cc5a59. Staré KEY17 evidence/LFS/dokumenty jsou read-only a mimo scope.",
+    "Aktivní main UI WIP není součástí převzetí; zdejší UI je čistý committed obsah. Root později aplikuje jen ověřený hunk do main a preserve-index postup zachová ostatní WIP.",
+    "Coordinator refinement before final implementation: freshness3000ms, grace2500ms;1s UI poll +1050ms cooldown +534ms spike may age a1ms baseline to2533ms. Deadline still never extends.",
+    "Root accepted snapshota13a88d0b68f0c81fa209bfdcd801d22c7b24d54f765515f0d116f643472500c:106 targeted/869 full tests, build/integration and actual SDK delayed-probe test PASS; broader visual KEY-7 remains open."
+  ]
+}

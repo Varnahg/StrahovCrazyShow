@@ -1,0 +1,56 @@
+✔ report computes global percentiles from raw intervals, separating hidden frames (18.472ms)
+✔ report exposes incomplete tails, missing sequences, source changes, settings and errors (6.1453ms)
+✔ directory selects gameplay behind a newer idle menu and combines rotation; explicit/all do not substitute (18.418ms)
+✔ game-ready establishes gameplay without frames; menu-only fallback explains the missing evidence (6.0794ms)
+✔ duplicate deliveries do not inflate FPS samples (4.1935ms)
+✔ HTTP failures are errors and nonpersisted pagehide is a clean close (3.9536ms)
+✔ threshold counts use raw frame intervals, inclusive boundaries and visibility scope without observer double counting (4.534ms)
+✔ legacy overflow and resync records remain visible incidents despite zero runtime errors (4.8343ms)
+✔ new correction reasons and intentional mode/respawn flags are preserved; unknown distances are not zero (4.1063ms)
+✔ connection inconsistency checks event order and sampled-context age, excluding guest and disconnected states (4.2652ms)
+✔ large repeated detail streams are bounded while incident and raw sample counts remain exact (12.3958ms)
+✔ corrupt entries and duplicate sequences are reported without duplicating raw frame counts (4.154ms)
+✔ server clock separates observed increments, sampled callbacks and historical lifetime peaks (4.3354ms)
+✔ server clock without a comparable pair is unavailable, including repeated cached authority (20.7174ms)
+✔ server clock sorts shuffled parts and deduplicates batch/context delivery (6.0006ms)
+✔ server clock excludes every conflicting context copy and never bridges the conflict (3.9052ms)
+✔ server clock conflicting duplicate sequences are order independent even against non-clock records (5.4797ms)
+✔ server clock refuses ambiguous batch contents regardless of which copy appears first (10.2189ms)
+✔ server clock resets and impossible same-callback changes do not add a new lifetime baseline (4.2396ms)
+✔ server clock respects connection/game boundaries, gaps and stale sampled context (4.1019ms)
+✖ server clock rejects malformed scalars/context timestamps and tolerates recorder rounding (5.7006ms)
+✔ server clock reports aggregate overflow as unavailable and bounds segment detail (18.6744ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 21
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 364.5652
+
+✖ failing tests:
+
+test at tests\diagnostics-report.test.ts:660:1
+✖ server clock rejects malformed scalars/context timestamps and tolerates recorder rounding (5.7006ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   callbacks: 30,
+  +   droppedMs: 15
+  -   callbacks: 20,
+  -   droppedMs: 5
+    }
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\diagnostics-report.test.ts:674:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { callbacks: 30, droppedMs: 15 },
+    expected: { callbacks: 20, droppedMs: 5 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

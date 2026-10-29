@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-server-clock-report-20261014",
+  "title": "KEY-18: ověřit offline čtečku, archivní výsledky a integrovat do main",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/server-clock-report/",
+    "docs/performance/evidence/server-clock-report-20261014/",
+    "docs/agents/handoffs/validate-server-clock-report-20261014.md",
+    "docs/verification.md",
+    "dist/",
+    "scripts/diagnostics-report.mjs",
+    "tests/diagnostics-report.test.ts",
+    "docs/performance/research-20261014/server-clock-report.md",
+    "docs/agents/handoffs/report-server-clock-deltas-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build"
+  ],
+  "acceptance": [
+    "Main/Linear synchronizace byla dokončena před výběrem práce. Přijmout pouze offline report/test delta proti af4d6ef a jeho evidence.",
+    "Nezávislý review aritmetiky, discontinuity a parser bezpečnosti; praktický plain Node CLI nad existujícím logem, origin SHA beze změny. Žádný herní test není podmínkou přijetí.",
+    "Po stabilním předání pnpm test a pnpm build jednou; server/integration ani GPU není pro tuto offline změnu potřeba.",
+    "Před main zápisy převzít uvolněné přesné feature cesty pod rozšířeným claimem. Commit jen ověřené soubory, zachovat ostatní WIP a staré previews/dependencies, push a aktualizovat KEY-18 i rodičovský KEY-2."
+  ],
+  "verification": [
+    "Manifest obsahuje testy a odvozuje se od předchozího B6 checkpointu; before/after source hashe musí souhlasit.",
+    "Před těžkým ověřením zkontrolovat běžící uživatelské relace, žádné souběžné herní/GPU měření.",
+    "Main čistý index, explicitní staging; docs/verification.md pouze append s uchováním předchozího nestagovaného obsahu."
+  ],
+  "notes": [
+    "Žádná instalace, server, browser, GPU, model generace ani změna gameplay. Starý široký cíl zůstává pozastavený; tato konkrétní podúloha je výslovně objednaná.",
+    "Po ukončení feature a validačních procesů root výslovně přebírá čtyři source/test/research/handoff cesty od key18-session-counter-audit-20261014. Finální script/test review hashes3c402e4c/e1e8c131, handoff manifestc3d64d0a. Adopt-dirty kryje tyto předané soubory a vlastní evidenci; ostatní main WIP zůstává zachovaný.",
+    "Root accepted snapshot54f3532699e234a935b9cc7e8d85bc99d6aafc939903f631c262ebb5670e4d08:29 focused/892 full tests, build and plain Node JSON/text archive proof PASS. KEY-18 complete without game testing; parent KEY-2 remains open."
+  ]
+}

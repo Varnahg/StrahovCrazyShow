@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-key7-transient-latency-20261014",
+  "title": "KEY-7: ověřit izolovanou opravu RTT, bezpečně integrovat a pushnout",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/key7-main/",
+    "docs/performance/evidence/key7-transient-latency-20261014/",
+    "docs/agents/handoffs/validate-key7-transient-latency-20261014.md",
+    "docs/verification.md",
+    "dist/",
+    "client/network-timeline.ts",
+    "client/ui.tsx",
+    "scripts/timeline-client.ts",
+    "tests/network-timeline.test.ts",
+    "tests/network-transient-latency.test.ts",
+    "tests/room-callbacks.test.ts",
+    "docs/performance/research-20261014/network-transient-latency.md",
+    "docs/agents/handoffs/fix-key7-transient-latency-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Pouze jeden KEY-7 celek, nezávislý security/interaction review, red/green a cílená+úplná pipeline nad stabilním checkpointem včetně testů.",
+    "Před integrací feature agent uvolní svoji rezervaci; koordinátor pak výslovně rozšíří scope o přesné předané source cesty a získá novou rezervaci.",
+    "Commit pouze ověřená delta; main dirty UI a verification přidat po hunks/indexovém čistém obsahu, vše ostatní byteově zachovat. Push main a aktualizace Linearu s přesnými limity přejímky."
+  ],
+  "verification": [
+    "Přebraný idle key17 WT již obsahuje main7cc5a59, vlastní patche a12 ověřených LFS objektů; žádná nová instalace ani obnovování assetů.",
+    "Před těžkou pipeline ověřit skutečnou aktivitu preview a volný2568; pnpm test/build/test:integration sekvenčně až po stabilním předání.",
+    "Manifest posledního KEY17 checkpointu plus přesná nová source delta, příslušné before/after hashe; neklonovat opakovaně celé historické manifesty."
+  ],
+  "notes": [
+    "Staré KEY17 evidence a živé4186/4187 read-only. Main dependency instalace read-only; dosavadní broad goal zůstává paused.",
+    "Root přebírá vlastní idle WT a vlastní původní evidence; přijetí aktuálního main ověřeno491 source/test/config blobů +12LFS SHA256.",
+    "After validation helpers exited, root accepts released key7-next-network-20261014 handoff/manifest b42c17eeacc9cc780d8bc8212b3792e9e28053fb0343bba5ce161a0e5c0c3fac. Source/test and research/handoff ownership explicitly transferred; adopt-dirty covers only these received files and root own prior docs. Main writes are only guarded exact delta; old dirty UI preserved with reversible patch and clean index.",
+    "Root accepted snapshota13a88d0b68f0c81fa209bfdcd801d22c7b24d54f765515f0d116f643472500c:106 targeted/869 full tests, build/integration and actual SDK delayed-probe test PASS; broader visual KEY-7 remains open."
+  ]
+}

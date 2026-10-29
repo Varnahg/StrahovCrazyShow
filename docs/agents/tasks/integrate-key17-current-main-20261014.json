@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "integrate-key17-current-main-20261014",
+  "title": "KEY-17: ověřit jediný ownership fix nad aktuálním main a publikovat",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/fix-babylon-image-processing-ownership-20261014.md",
+    "docs/agents/handoffs/validate-babylon-ownership-20261014.md",
+    "docs/performance/evidence/babylon-ownership-20261014/README.md",
+    "docs/performance/evidence/babylon-ownership-20261014/checkpoint.json",
+    "docs/performance/evidence/babylon-ownership-20261014/pipeline.jsonl",
+    "docs/performance/research-20261014/image-processing-ownership.md",
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "tests/babylon-image-processing-ownership.test.ts",
+    "docs/verification.md",
+    "docs/performance/evidence/key17-main-20261014/",
+    "docs/agents/handoffs/integrate-key17-current-main-20261014.md",
+    ".cache/key17-main/",
+    "node_modules/",
+    "dist/",
+    "public/models/vegetation/runtime/far.glb",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Pouze přesný package/test delta commitu 6df08fb nad main 2c7aec9; žádný IMAGE, B6, síťový ani cizí WIP.",
+    "Před integrací zapsat příčinu, varianty, dopady a nezávislý bezpečnostní audit.",
+    "Čerstvá offline frozen instalace, cílené lifecycle testy a jednou úplná sada test/build/integration nad stabilními vstupy včetně testů.",
+    "Samostatný commit, bezpečné začlenění do main, push a aktualizace KEY-17; ostatní issue zůstanou otevřené."
+  ],
+  "verification": [
+    "Zachovat patch/lock hashes a schema5.0.36; původní instalace pouze číst.",
+    "Před těžkou kontrolou ověřit živé relace a volný port2568, po ní cleanup a neměnnost zdrojů.",
+    "docs/verification.md přidat jen nový záznam; main cizí dirty obsah zachovat a do indexu dát pouze čistý HEAD plus nový záznam."
+  ],
+  "notes": [
+    "Koordinátor root autorizuje převzetí přesných blobů dříve dokončeného kandidáta6df08fb, žádný převod ostatního WIP.",
+    "Vlastní instalace a build pouze C:/Users/rezac/.codex/worktrees/key17-ownership-integration/StrahovCrazyShow; nikdy main nebo staré WT node_modules.",
+    "Stejný vlastník následně aplikuje validovanou deltu do main po byte auditu původního WIP. Starý široký cíl zůstává paused.",
+    "Root-owned preparation failure retained: new worktree contained LFS pointers for two runtime GLBs. Materialize only their exact tracked SHA256 objects from local Git LFS store; no asset generation or change to Git blobs. Root reclaims its own unchanged candidate/evidence after previous helper exit; adopt-dirty documents that ownership.",
+    "The rerun850/851 exposed one authoring Blender fixture still stored as a pointer. Complete all12 tracked LFS objects from the local store, preserving both failed runs and Git identities; no model generation. Root resumes only its own files after helpers exited.",
+    "Accepted by root:26 focused and851 full tests, frozen install/build/integration PASS; snapshotfe5fc15ff3c4e745f30cab4cdc21a2725b8f19732e2c9431a576d853b3b76993. Main integration is restricted to this exact issue."
+  ]
+}

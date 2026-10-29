@@ -1,0 +1,104 @@
+✔ actual clock and own queue retain valid telemetry, without unlisted packet or future private fields (2.1921ms)
+✔ plain and null-prototype own data work; legacy queues, inherited data and exotic objects do not (0.3542ms)
+✔ known and unknown getters are never evaluated by any diagnostic projector (0.4817ms)
+✔ optional proxy failures and throwing callbacks are contained without inspecting values through get (0.3936ms)
+✖ clock identity counters reject fractions, unsafe integers, coercion and nonfinite values (2.7073ms)
+✖ queue and rejection counters reject nonintegers while valid fractional ages remain usable (0.3875ms)
+✖ transport projection preserves selected scalar types and excludes arbitrary nested metadata (0.3393ms)
+✖ timeline retains fractional clock estimates but validates sequences and flags explicitly (0.2953ms)
+✔ captured authority, transport and timeline values remain detached from later source mutations (0.3672ms)
+✔ fixed whitelist does not enumerate large arbitrary objects or copy unknown fields (7.7853ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 6
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 443.3569
+
+✖ failing tests:
+
+test at .cache\frame-projection-tests\projection-mutant.test.ts:206:1
+✖ clock identity counters reject fractions, unsafe integers, coercion and nonfinite values (2.7073ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1.5 !== null
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\.cache\frame-projection-tests\projection-mutant.test.ts:246:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1.5,
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at .cache\frame-projection-tests\projection-mutant.test.ts:253:1
+✖ queue and rejection counters reject nonintegers while valid fractional ages remain usable (0.3875ms)
+  AssertionError [ERR_ASSERTION]: depth
+  
+  0.5 !== null
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\.cache\frame-projection-tests\projection-mutant.test.ts:279:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0.5,
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at .cache\frame-projection-tests\projection-mutant.test.ts:290:1
+✖ transport projection preserves selected scalar types and excludes arbitrary nested metadata (0.3393ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  2.5 !== null
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\.cache\frame-projection-tests\projection-mutant.test.ts:324:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2.5,
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at .cache\frame-projection-tests\projection-mutant.test.ts:344:1
+✖ timeline retains fractional clock estimates but validates sequences and flags explicitly (0.2953ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  2.5 !== null
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\.cache\frame-projection-tests\projection-mutant.test.ts:362:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2.5,
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

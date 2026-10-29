@@ -1,0 +1,18 @@
+✔ actual clock and own queue retain valid telemetry, without unlisted packet or future private fields (2.2213ms)
+✔ plain and null-prototype own data work; legacy queues, inherited data and exotic objects do not (0.3527ms)
+✔ known and unknown getters are never evaluated by any diagnostic projector (0.5022ms)
+✔ optional proxy failures and throwing callbacks are contained without inspecting values through get (0.4539ms)
+✔ clock identity counters reject fractions, unsafe integers, coercion and nonfinite values (0.7199ms)
+✔ queue and rejection counters reject nonintegers while valid fractional ages remain usable (0.247ms)
+✔ transport projection preserves selected scalar types and excludes arbitrary nested metadata (0.2765ms)
+✔ timeline retains fractional clock estimates but validates sequences and flags explicitly (0.3739ms)
+✔ captured authority, transport and timeline values remain detached from later source mutations (0.4582ms)
+✔ fixed whitelist does not enumerate large arbitrary objects or copy unknown fields (7.7667ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 424.4641

@@ -1,0 +1,32 @@
+{
+  "completed": true,
+  "protocol": 11,
+  "endpoint": "http://127.0.0.1:2568",
+  "burstReceivedSeq": 16,
+  "burstResolvedAck": 16,
+  "firstBurstReplyMs": 21.912500000000023,
+  "firstBurstDisplacementX": 0.07666778564453125,
+  "steadyIntentionalLeadTicksP95": 6,
+  "steadySamples": 50,
+  "unaffectedPeerResyncs": 0,
+  "rejectionCounters": {
+    "invalid": 1,
+    "epoch": 1,
+    "late": 3,
+    "ahead": 1,
+    "duplicate": 1
+  },
+  "recovery": {
+    "inputEpoch": 26,
+    "inputTickBase": 959,
+    "tick": 959,
+    "ack": 0
+  },
+  "checks": [
+    "future window resolves on world time without acceleration",
+    "continuous held input stays within bounded lead",
+    "invalid/late/old-epoch/ahead/duplicate input rejected without resync storm",
+    "explicit recovery creates fresh epoch and remains responsive",
+    "other player unaffected"
+  ]
+}

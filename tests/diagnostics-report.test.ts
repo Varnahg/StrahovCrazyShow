@@ -499,3 +499,438 @@ test("corrupt entries and duplicate sequences are reported without duplicating r
     ),
   );
 });
+
+const clockRecord = (
+  seq: number,
+  callbacks: number,
+  droppedTotalMs: number,
+  contextAtMs = seq * 1000,
+  overrides: Record<string, unknown> = {},
+) =>
+  record(seq, "frame-window", {
+    frameMs: [16],
+    contextAtMs,
+    context: {
+      network: {
+        server: {
+          clock: {
+            callbacks,
+            droppedTotalMs,
+            elapsedMs: 20,
+            cpuMs: 2,
+            elapsedMaxMs: 1109,
+            cpuMaxMs: 1108,
+            ...overrides,
+          },
+        },
+      },
+    },
+  });
+
+test("server clock separates observed increments, sampled callbacks and historical lifetime peaks", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  const first = clockRecord(0, 86629, 3966.6666666666665);
+  await writeFile(
+    path,
+    row(0, [
+      first,
+      { ...first, seq: 1, atMs: 1000 },
+      clockRecord(2, 108024, 4250.000000000001, 1999, {
+        cpuMs: 15.3898,
+        elapsedMs: 32.0614,
+      }),
+      record(3, "frame-hitch", {
+        ...first.data,
+        contextAtMs: 3000,
+        frameMs: 9999,
+      }),
+      record(4, "session-end", {}),
+    ]),
+  );
+  const result = await summarizeDiagnosticFiles([path]);
+  const clock = result.serverClock;
+  assert.equal(clock.status, "observed-intervals");
+  assert.equal(clock.samples, 2);
+  assert.equal(clock.comparableIntervals, 1);
+  assert.equal(clock.observed.callbacks, 21395);
+  assert.ok(Math.abs(clock.observed.droppedMs - 283.3333333333344) < 1e-8);
+  assert.deepEqual(clock.sampledCurrentMaxMs, {
+    elapsed: 32.0614,
+    cpu: 15.3898,
+  });
+  assert.deepEqual(clock.reportedLifetimeMaxMs, { elapsed: 1109, cpu: 1108 });
+  assert.equal(clock.diagnostics.duplicateContexts, 1);
+  assert.equal(clock.segments[0].baseline.droppedTotalMs, 3966.6666666666665);
+  assert.equal(clock.segments[0].last.droppedTotalMs, 4250.000000000001);
+  const human = formatDiagnosticsReport({ sessions: [result], warnings: [] });
+  assert.match(human, /observed increments.*21395.*283\.33 ms/);
+  assert.match(human, /sampled callback maxima.*32\.06.*15\.39/);
+  assert.match(human, /reported lifetime maxima.*1109\.00.*1108\.00/);
+  assert.match(human, /not a full-session total/);
+});
+
+test("server clock without a comparable pair is unavailable, including repeated cached authority", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  for (const records of [
+    [record(0, "session-start", {})],
+    [clockRecord(0, 40, 80)],
+    [clockRecord(0, 40, 80), clockRecord(1, 40, 80)],
+  ]) {
+    await writeFile(
+      path,
+      row(0, [...records, record(records.length, "session-end", {})]),
+    );
+    const result = await summarizeDiagnosticFiles([path]);
+    assert.equal(result.serverClock.status, "unavailable");
+    assert.deepEqual(result.serverClock.observed, {
+      callbacks: null,
+      droppedMs: null,
+    });
+    assert.equal(
+      result.warnings.length,
+      0,
+      "absence of optional server data does not flood warnings",
+    );
+    assert.match(
+      formatDiagnosticsReport({ sessions: [result], warnings: [] }),
+      /Server clock: unavailable/,
+    );
+  }
+});
+
+test("server clock sorts shuffled parts and deduplicates batch/context delivery", async (t) => {
+  const directory = await fixture(t),
+    a = join(directory, "a.jsonl"),
+    b = join(directory, "b.jsonl");
+  const first = row(0, [clockRecord(0, 100, 10), clockRecord(1, 110, 20)]);
+  await writeFile(a, first + "\n" + first);
+  await writeFile(
+    b,
+    row(1, [
+      clockRecord(3, 120, 30),
+      clockRecord(2, 110, 20, 1000),
+      record(4, "session-end", {}),
+    ]),
+  );
+  const forward = (await summarizeDiagnosticFiles([a, b])).serverClock;
+  const reverse = (await summarizeDiagnosticFiles([b, a])).serverClock;
+  assert.deepEqual(forward, reverse);
+  assert.deepEqual(forward.observed, { callbacks: 20, droppedMs: 20 });
+  assert.equal(forward.diagnostics.duplicateContexts, 1);
+});
+
+test("server clock excludes every conflicting context copy and never bridges the conflict", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 100, 10),
+      clockRecord(1, 110, 20, 1000),
+      clockRecord(2, 120, 30, 1000),
+      clockRecord(3, 130, 40),
+      clockRecord(4, 140, 45),
+    ]),
+  );
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 10, droppedMs: 5 });
+  assert.equal(clock.diagnostics.conflictingContexts, 1);
+  assert.equal(clock.samples, 3);
+});
+
+test("server clock conflicting duplicate sequences are order independent even against non-clock records", async (t) => {
+  const directory = await fixture(t),
+    a = join(directory, "a.jsonl"),
+    b = join(directory, "b.jsonl");
+  await writeFile(
+    a,
+    row(0, [
+      clockRecord(0, 100, 10),
+      clockRecord(1, 110, 20),
+      clockRecord(2, 120, 30),
+      clockRecord(3, 130, 35),
+    ]),
+  );
+  await writeFile(b, row(1, [record(1, "game-start", {})]));
+  const forward = (await summarizeDiagnosticFiles([a, b])).serverClock;
+  assert.deepEqual(
+    forward,
+    (await summarizeDiagnosticFiles([b, a])).serverClock,
+  );
+  assert.deepEqual(forward.observed, { callbacks: 10, droppedMs: 5 });
+  assert.equal(forward.diagnostics.ambiguousSequences, 1);
+});
+
+test("server clock refuses ambiguous batch contents regardless of which copy appears first", async (t) => {
+  const directory = await fixture(t),
+    a = join(directory, "a.jsonl"),
+    b = join(directory, "b.jsonl");
+  await writeFile(
+    a,
+    row(0, [clockRecord(0, 100, 10), clockRecord(1, 110, 20)]),
+  );
+  await writeFile(
+    b,
+    row(0, [clockRecord(0, 200, 30), clockRecord(1, 220, 40)]).replace(
+      '"digest":"0"',
+      '"digest":"conflict"',
+    ),
+  );
+  const forward = (await summarizeDiagnosticFiles([a, b])).serverClock;
+  assert.deepEqual(
+    forward,
+    (await summarizeDiagnosticFiles([b, a])).serverClock,
+  );
+  assert.equal(forward.status, "unavailable");
+  assert.deepEqual(forward.observed, { callbacks: null, droppedMs: null });
+  assert.deepEqual(forward.sampledCurrentMaxMs, { elapsed: null, cpu: null });
+});
+
+test("server clock resets and impossible same-callback changes do not add a new lifetime baseline", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 100, 100),
+      clockRecord(1, 110, 110),
+      clockRecord(2, 10, 3),
+      clockRecord(3, 20, 8),
+      clockRecord(4, 30, 2),
+      clockRecord(5, 40, 4),
+      clockRecord(6, 40, 99),
+      clockRecord(7, 50, 100),
+      clockRecord(8, 60, 103),
+    ]),
+  );
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 40, droppedMs: 20 });
+  assert.equal(clock.diagnostics.counterResets, 2);
+  assert.equal(clock.diagnostics.clockConflicts, 1);
+});
+
+test("server clock respects connection/game boundaries, gaps and stale sampled context", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 100, 10),
+      clockRecord(1, 110, 12),
+      record(2, "network-connected", {}),
+      clockRecord(3, 130, 50, 1900),
+      clockRecord(4, 140, 60),
+      clockRecord(5, 150, 63),
+      record(6, "recording-gap", { dropped: 1 }),
+      clockRecord(7, 170, 80),
+      clockRecord(8, 180, 84),
+      clockRecord(10, 200, 100),
+      clockRecord(11, 210, 105),
+      record(12, "game-start", {}),
+      clockRecord(13, 230, 200),
+      clockRecord(14, 240, 206),
+      clockRecord(15, 250, 250, 13500),
+      clockRecord(16, 260, 300),
+      clockRecord(17, 270, 307),
+    ]),
+  );
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 60, droppedMs: 27 });
+  assert.equal(clock.diagnostics.sequenceGaps, 1);
+  assert.equal(clock.diagnostics.recordingGaps, 1);
+  assert.equal(clock.diagnostics.lifecycleBoundaries, 2);
+  assert.equal(clock.diagnostics.staleContexts, 2);
+});
+
+test("server clock rejects malformed scalars/context timestamps and tolerates recorder rounding", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  const records = [
+    clockRecord(0, 100, 10, 0.1),
+    clockRecord(1, 110, 12, 1000.9),
+    clockRecord(2, 120, 20, 2001.1),
+    clockRecord(3, 130, 30, 3000, { callbacks: "130" }),
+    clockRecord(4, 140, -1),
+    clockRecord(5, 150, 50, 5000, { cpuMs: null }),
+    clockRecord(6, 160, 60, 6000, { callbacks: Number.MAX_SAFE_INTEGER + 1 }),
+    clockRecord(7, 170, 70, 7000, { elapsedMaxMs: Infinity }),
+    clockRecord(8, 180, 80),
+    clockRecord(9, 190, 83),
+  ];
+  await writeFile(path, row(0, records));
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 30, droppedMs: 15 });
+  assert.equal(clock.diagnostics.invalidSamples, 4);
+  assert.equal(clock.diagnostics.unavailableTimingValues, 2);
+});
+
+test("server clock optional timing fields can be unavailable without losing valid counter increments", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  const noTimings = {
+    cpuMs: undefined,
+    elapsedMs: undefined,
+    cpuMaxMs: undefined,
+    elapsedMaxMs: undefined,
+  };
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 100, 10, 0, noTimings),
+      clockRecord(1, 120, 15, 1000, noTimings),
+    ]),
+  );
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 20, droppedMs: 5 });
+  assert.deepEqual(clock.sampledCurrentMaxMs, { elapsed: null, cpu: null });
+  assert.deepEqual(clock.reportedLifetimeMaxMs, { elapsed: null, cpu: null });
+  assert.equal(clock.diagnostics.unavailableTimingValues, 8);
+});
+
+test("server clock missing fields break continuity and old context copies cannot cross reconnect", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 100, 10),
+      clockRecord(1, 110, 20),
+      record(2, "frame-window", {
+        frameMs: [16],
+        contextAtMs: 2000,
+        context: {},
+      }),
+      clockRecord(3, 130, 300),
+      clockRecord(4, 140, 305),
+      record(5, "network-disconnected", {}),
+      record(6, "network-connected", {}),
+      clockRecord(7, 140, 305, 4000),
+      clockRecord(8, 180, 800),
+      clockRecord(9, 190, 803),
+    ]),
+  );
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 30, droppedMs: 18 });
+  assert.equal(clock.diagnostics.missingSamples, 1);
+  assert.equal(clock.diagnostics.staleContexts, 1);
+});
+
+test("server clock reports aggregate overflow as unavailable and bounds segment detail", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 0, 0),
+      clockRecord(1, Number.MAX_SAFE_INTEGER, Number.MAX_VALUE),
+      record(2, "game-start", {}),
+      clockRecord(3, 0, 0),
+      clockRecord(4, 1, Number.MAX_VALUE),
+    ]),
+  );
+  const overflow = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.equal(overflow.status, "unavailable");
+  assert.deepEqual(overflow.observed, { callbacks: null, droppedMs: null });
+  assert.equal(overflow.diagnostics.numericOverflows, 1);
+  const records = Array.from({ length: 205 }, (_, i) => [
+    record(i * 3, "game-start", {}),
+    clockRecord(i * 3 + 1, 100, 100),
+    clockRecord(i * 3 + 2, 110, 105),
+  ]).flat();
+  await writeFile(path, row(0, records));
+  const bounded = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(bounded.observed, { callbacks: 2050, droppedMs: 1025 });
+  assert.equal(bounded.segments.length, 200);
+  assert.equal(bounded.omittedSegments, 5);
+});
+
+test("server clock excludes previously unseen contexts sampled before missing/invalid deliveries", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  for (const unknown of [
+    record(2, "frame-window", { frameMs: [16], context: {} }),
+    clockRecord(2, -1, 0),
+  ]) {
+    await writeFile(
+      path,
+      row(0, [
+        clockRecord(0, 100, 10),
+        clockRecord(1, 110, 15),
+        unknown,
+        clockRecord(3, 130, 100, 1500),
+        clockRecord(4, 140, 110),
+        clockRecord(5, 150, 113),
+      ]),
+    );
+    const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+    assert.deepEqual(clock.observed, { callbacks: 20, droppedMs: 8 });
+    assert.equal(clock.diagnostics.staleContexts, 1);
+  }
+});
+
+test("server clock cannot bridge a sequence gap using a newly delivered pre-gap context", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 100, 10),
+      clockRecord(1, 110, 15),
+      clockRecord(3, 130, 100, 1500),
+      clockRecord(4, 140, 110),
+      clockRecord(5, 150, 113),
+    ]),
+  );
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 20, droppedMs: 8 });
+  assert.equal(clock.diagnostics.sequenceGaps, 1);
+  assert.equal(clock.diagnostics.staleContexts, 1);
+});
+
+test("server clock ambiguous sequence barrier uses all delivery times independently of file order", async (t) => {
+  const directory = await fixture(t),
+    a = join(directory, "a.jsonl"),
+    b = join(directory, "b.jsonl");
+  await writeFile(
+    a,
+    row(0, [
+      clockRecord(0, 100, 10),
+      clockRecord(1, 110, 15),
+      clockRecord(2, 120, 20),
+      clockRecord(3, 130, 100, 3000),
+      clockRecord(4, 140, 110),
+      clockRecord(5, 150, 113),
+    ]),
+  );
+  await writeFile(b, row(1, [record(2, "game-start", {}, 3500)]));
+  const forward = (await summarizeDiagnosticFiles([a, b])).serverClock;
+  assert.deepEqual(
+    forward,
+    (await summarizeDiagnosticFiles([b, a])).serverClock,
+  );
+  assert.deepEqual(forward.observed, { callbacks: 20, droppedMs: 8 });
+  assert.equal(forward.diagnostics.staleContexts, 1);
+});
+
+test("server clock conflict groups block older unseen contexts without sliding the boundary on stale delivery", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(
+    path,
+    row(0, [
+      clockRecord(0, 100, 10),
+      clockRecord(1, 110, 20, 1000),
+      clockRecord(2, 120, 30, 1000),
+      clockRecord(3, 130, 100, 500),
+      clockRecord(4, 140, 110, 2500),
+      clockRecord(5, 150, 113, 3500),
+    ]),
+  );
+  const clock = (await summarizeDiagnosticFiles([path])).serverClock;
+  assert.deepEqual(clock.observed, { callbacks: 10, droppedMs: 3 });
+  assert.equal(clock.diagnostics.conflictingContexts, 1);
+  assert.equal(clock.diagnostics.staleContexts, 1);
+});
+
+test("formatter accepts a stored legacy report without serverClock and does not mutate it", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(path, row(0, [record(0, "session-end", {})]));
+  const legacy = await summarizeDiagnosticFiles([path]);
+  delete legacy.serverClock;
+  const before = JSON.stringify(legacy);
+  assert.match(
+    formatDiagnosticsReport({ sessions: [legacy], warnings: [] }),
+    /Server clock: unavailable; observed increments unavailable callbacks/,
+  );
+  assert.equal(JSON.stringify(legacy), before);
+});

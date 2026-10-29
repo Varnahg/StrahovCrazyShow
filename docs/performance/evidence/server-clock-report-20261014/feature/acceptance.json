@@ -1,0 +1,91 @@
+{
+  "atUTC": "2026-10-14T20:31:06.516Z",
+  "archive": {
+    "path": "C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/playtest-repairs-validation/snapshots/wave3/.cache/game-diagnostics/07c227f8-d2f8-4011-a6f8-5d27ad0627a4.jsonl",
+    "sha256": "0ebf9512e10df06d94121358a57133885b7d0371b10d3b0b3027dbbce4b46dbb"
+  },
+  "runtime": {
+    "path": "scripts/diagnostics-report.mjs",
+    "sha256": "523b77a3890f4c89d5333a6b93c9012061f9fee889222d99b6298763edb82dab"
+  },
+  "tests": {
+    "path": "tests/diagnostics-report.test.ts",
+    "sha256": "00d5788655a2b0d75ed39006749d029bccd3a404548b6cf3d7e8d9a9c0398b13"
+  },
+  "results": {
+    "status": "observed-intervals",
+    "scope": "Observed counter increments between comparable retained server-clock snapshots; not a full-session total. Each segment's first value is a baseline, not observed work. The sum is a lower bound only assuming counter continuity inside those segments. No server-instance ID is recorded: an unobserved restart may be undetectable. Unsampled start/end, gaps and callback peaks remain unknown. Room clock counters are separate from player queue counters and recovery events.",
+    "samples": 479,
+    "comparableIntervals": 475,
+    "observed": {
+      "callbacks": 21395,
+      "droppedMs": 283.3333333333344
+    },
+    "sampledCurrentMaxMs": {
+      "elapsed": 32.06140000000596,
+      "cpu": 15.38980000000447
+    },
+    "reportedLifetimeMaxMs": {
+      "elapsed": 1108.652699999977,
+      "cpu": 1108.5656999999192
+    },
+    "diagnostics": {
+      "ambiguousLog": false,
+      "ambiguousSequences": 0,
+      "duplicateContexts": 17,
+      "conflictingContexts": 0,
+      "missingSamples": 0,
+      "invalidSamples": 0,
+      "unavailableTimingValues": 0,
+      "staleContexts": 0,
+      "counterResets": 0,
+      "clockConflicts": 0,
+      "sequenceGaps": 0,
+      "recordingGaps": 0,
+      "lifecycleBoundaries": 6,
+      "numericOverflows": 0
+    },
+    "segments": [
+      {
+        "fromSeq": 259,
+        "toSeq": 1796,
+        "fromContextAtMs": 74830.30000019073,
+        "toContextAtMs": 564182.8000001907,
+        "baseline": {
+          "callbacks": 86629,
+          "droppedTotalMs": 3966.6666666666665
+        },
+        "last": {
+          "callbacks": 108024,
+          "droppedTotalMs": 4250.000000000001
+        },
+        "intervals": 475,
+        "callbacksDelta": 21395,
+        "droppedMsDelta": 283.3333333333344
+      }
+    ],
+    "omittedSegments": 0
+  },
+  "files": [
+    {
+      "path": ".cache/server-clock-report-feature/red.log",
+      "sha256": "c40d4692752a567353e819dbdd9839bb717200e79c96f89241b444b86a4755ff"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/green-1.log",
+      "sha256": "fd18051944468d5c350546cbab4e7b16f069515139ebcb1a86b68c557e063280"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/green-2.log",
+      "sha256": "f7636efebe3b2415488fb33a6c561e8702be34d5343e8cf772d055c26d8618e9"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/archive-report.json",
+      "sha256": "e86dab225b58ca205900d60cc819b9ee465d0e288038ebcfa02b9998df673d75"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/archive-report.txt",
+      "sha256": "6737fc7e36fc09b5860e7214889a6a21b9951c7b504f6f0668472b5bd5841fc2"
+    }
+  ]
+}

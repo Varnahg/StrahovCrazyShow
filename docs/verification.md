@@ -385,3 +385,72 @@ Final B3 source `e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a
 B3 full validation completed:684/684 tests and build PASS; first integration had a right-wheel-steering timeout. The unchanged complete isolated retry PASS is retained separately alongside the original failure and actual vehicle evidence. Root cause of the first timeout is not established; no timing threshold or physics was changed to make it pass. [Both attempts](verification-evidence/building-models-20261012/b3-integration-retry.json).
 
 Published locally: main7f65653, B3 source e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a6 on4179/API2570. All8357 source files and277 served build files match,0 differences; health/collector PASS and live station weather restored. [Publication evidence](verification-evidence/building-models-20261012/b3-publication.json). Foreign untracked vegetation-audit files were preserved; no whole-checkout-clean claim.
+
+
+## KEY-17: Babylon ownership fix, 14 October 2026
+
+Current-main checkpoint `fe5fc15ff3c4e745f30cab4cdc21a2725b8f19732e2c9431a576d853b3b76993` contains 8393 tracked non-document inputs, including all156 test files and tracked assets. The existing candidate6df08fb was applied to main2c7aec9 with only four package/test changes: the pinned Babylon9.30.0 patch, lockfile, workspace configuration and ten lifecycle regressions. Independent review found no blocking ownership/security issue; no dependency version, shader, network, guest-isolation or gameplay API changed.
+
+Fresh offline frozen install PASS;26/26 focused tests,851/851 full tests, TypeScript/production build and the complete isolated multiplayer integration PASS. Two preparation failures are retained:843/846 with runtime GLB pointers, then850/851 with an authoring Blender pointer. All12 tracked LFS objects were subsequently restored and verified locally; no implementation/test change was made. All8393 corrected-checkpoint input hashes stayed identical. Original main dependency module/config hashes and resolved paths stayed unchanged. [Decision, security/impact review, exact manifest and full logs](performance/evidence/key17-main-20261014/README.md).
+
+This fixes owned-wrapper cleanup and preserves borrowed-wrapper subscribers; it does not establish GPU performance or visual acceptance. KEY-4/14 and movement/B6/texture issues remain open. Existing previews and their shared installed packages are unchanged; the committed lock/patch applies on a frozen install.
+
+
+## KEY-7: isolated RTT spike no longer stops supported controls, 14 October 2026
+
+Main7cc5a59 plus five source/test paths: timestamped bounded confirmation in NetworkTimeline, UI connection wiring and SDK time forwarding, with focused regressions. First high after a fresh supported baseline receives at most2500ms grace; second newer high or deadline confirms. Freshness is bounded3000ms, legacy/cold/stale samples remain conservative. Raw probes, hard server/future/replay/frame/rate limits, physics and graphics remain unchanged.
+
+Six actual Probe/Timeline/Sender/Queue cases went red→green,106/106 targeted tests and types passed. Final869/869 full tests, build and complete isolated integration PASS. Snapshot`a13a88d0b68f0c81fa209bfdcd801d22c7b24d54f765515f0d116f643472500c` includes8394 inputs and all157 test files; before/after hashes unchanged. Independent security review found no blocker. Actual authenticated Colyseus/SDK test with1s polling and a534ms hold of only the second probe callback:0 latency waits,87 sent commands,86 server-accepted commands and6.436m authoritative actor travel during the uncertain interval. This is a controlled callback-delay experiment, not proof of the original delay's source or a GPU playthrough.
+
+[Decision, impacts, exact delta, security review and complete logs](performance/evidence/key7-transient-latency-20261014/README.md). Sustained300/500ms can generate bounded late commands during confirmation; it is not newly supported latency. Existing previews/main installed dependencies remain unchanged, and overall visual KEY-7 acceptance is still open.
+
+
+## KEY-16: stop redundant B6 pivot invalidation, 14 October 2026
+
+Currentmain0607003 plus exactly client/b6-reality.ts and tests/b6-render-lifecycle.test.ts. The runtime is byte-identical to reviewed candidatef63039b: synchronize only a stale editable pivot and use controller-owned scratch-toRef values. No changed geometry, colliders, LOD, material/light settings, server or network behavior. The previous general GPU-before-main plan is now separated into acceptance of this specific reproduced lifecycle correction and still-open production acceptance of KEY-16.
+
+Three walking updates reproduced405 root/402 child recalculations before the fix and0/0 afterward. Six native B6/VehicleLighting lifecycle regressions include ancestor-only same-render changes and freeze/unfreeze behavior. 49/49 targeted tests and narrow types PASS; independent security review without blocker. Stable snapshot`b6c02a10837c2e4ba708f1eb9c8bbbfa3f8e3c20a8c4500920eb10a17b3c4e33` contains8395 inputs and158 test files: **875/875 full tests, build and complete isolated integration PASS**, all input hashes unchanged.
+
+[Decision, impact analysis, exact delta and logs](performance/evidence/b6-current-main-20261014/README.md). Current CUA inventory empty and direct IAB open returned unavailable, so no graphics/GPU/FPS result is claimed. Both-stair entry/exit, visible occlusion and frame-time comparison remain open; CPU counts do not prove elimination of all6–8FPS incidents. Old previews, dependency aliases and unrelated main WIP are preserved.
+
+
+## KEY-18: trustworthy offline server-clock summaries, 14 October 2026
+
+After synchronizing main/Linear at af4d6ef, completed the existing KEY-2 requirement to distinguish observed server counter increments from lifetime values. Only scripts/diagnostics-report.mjs and tests/diagnostics-report.test.ts change. The reader handles comparable baselines, duplicate/conflicting contexts, lifecycle/time barriers, missing data and numeric overflow; sampled callback maxima and historical maxima are separate. Legacy formatting remains compatible.
+
+29/29 focused tests and independent parser/security review PASS. Plain Node JSON/text reports on the retained07c log agree with an independent oracle:21395 observed callbacks,283.333333ms dropped increment, sampledCPUmax15.3898ms versus lifetime1108.5657ms.496 raw records reduce to479 unique contexts/475 comparable intervals. Raw source SHA unchanged; no original log was rewritten.
+
+Snapshot`54f3532699e234a935b9cc7e8d85bc99d6aafc939903f631c262ebb5670e4d08`: **892/892 full tests and build PASS**,8395 source/test/asset hashes unchanged. [Research, exact delta, archive oracle and full validation](performance/evidence/server-clock-report-20261014/README.md). No game/browser/GPU/server test is required for this offline CLI change. Without server-instance identity hidden resets can remain undetectable; output is observed intervals, not complete-session runtime. Missing emitter data is unavailable, never a fabricated zero. KEY-18 can close; broader KEY-2 remains separate.
+
+
+## KEY-19 — automatický frame sběr a oddělení relací (14.10.2026)
+
+Game na publikovaném main f4f6116 neměl callsite recordFrame. Nový producer používá šest existujících časových fází, raw interval a pouze čerstvé asynchronní GPU výsledky. Vlastní síťové údaje mají whitelist; guest nevolá transport a lifecycle odděluje recorder cache i při event limitu. Diagnostický reset nemění predikci ani simulaci.
+
+Snapshot **4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0**:916 testů, build a izolovaná SDK/HTTP integrace2568 PASS. Skutečný Game.frame→recorder→collector→JSONL→report ověřen automaticky;45 recovery/UI testů ověřilo i adaptaci zachovaného pracovního WIP. První typová chyba fixture a její oprava jsou v evidenci, finální pipeline běžela znovu. Žádný nový browser/GPU či FPS důkaz; běžící preview i původní main dependencies zachované.
+
+[Kompletní důkazy a limity](performance/evidence/automatic-frames-20261014/README.md). KEY-19 dokončuje sběr, širší KEY-2 a grafická přejímka zůstávají otevřené.
+
+
+## Uživatelský test main4188 — 15.10.2026
+
+Runtime e1b03fe, snapshot4dcb3f6f. Relace5c950ac1… archivována sSHA6c540c3700bbd1c26a9cf0455275916a085fbbc3c4fbaa403c129c8f8954b0c4;4126 záznamů/420 dávek bezseqmezer, jeden source, game-ready a opuštění/dispose. Menu-only a synthetic smoke vyloučené.
+
+Uživatel potvrzuje výrazné zlepšení a žádné červené záblesky v této relaci; přetrvávají hlavně noční/svítilnové dropy a posuny polohy při FPS pádu.41 114 foreground snímků:51.24FPS,p95 34.3ms,p99 77.5ms,max3509ms;22 intervalů≥1s. Jejich preceding callbacky vysvětlují99.05% času, dominantně scene.render.115 korekcí≥0.35m mimo respawn/změnu režimu,max21.087m.0latency-budget waitů/overflow/probe timeoutů;83stale-authority a7prediction-budget upozornění nejsou počty epizod.
+
+B6 sampled-context40.28FPS a opakované blokace i při téměř stejné poloze. Samostatný5.640s LongTask při odchodu do menu je mimoframe statistics. Jediná resource chyba favicon404, nikoli pád hry. Lighting/flashlight/camera a vybranýGPU model nejsou zaznamenané; vnitřní render/teardown příčina zůstává neprokázaná. Žádný runtime fix ani nový benchmark nebyl spuštěn.
+
+[Reprodukovatelné výpočty, kompletní nálezy a limity](performance/evidence/playtest-20261015/README.md). Měřicí GPU/heavy okno po hotovo uvolněné; frozenpreview zůstává neměnné a běží.
+
+
+## KEY-3 světelné varianty — 16.10.2026, první celek
+
+Snapshot2983a71a…:942 testů,build a izolovanáintegrace PASS. ActualGTX1060/2040×986/medium/multiplayer1+HUD A/B: opakovanéFcykly max1913→93ms,p9534.9→21.5ms; prvníF2389.7→1114.4ms, stáleotevřený. StableLightState a rozpoznanáglTFcapoprava zachovávajípřispěvatele/ownercaps,včetněmožných5aktivníchsvětel. Žádnéintenzity/geometrie/net změny. Jedna neplatnáviewport-transition sérieuchovanáavyloučená. [Důkazy a meze](performance/evidence/night-flashlight-20261015/README.md). CelýKEY-3 neuzavřen; pokračuje oddělená příprava coldvariant předhraním s měřenýmstartupcost.
+
+## KEY-3: příprava nočních kombinací před hraním — 16.10.2026
+
+Snapshot3593bd1d46b70aa6591e527e7caf47c7eb617d5dd34ae53967c063ad25f24a56: **959 testů, strictTS/build a izolovaná integrace PASS**. Příprava skutečné scény předready má konečnou9stavovou matici současné/nočníOFF–ON a0/1/2 pouliční lampy, actualeffect readiness, cancellation/30sdeadline a obnovu aktuálních nastavení. Žádná změna herního světelného dosahu, intenzity, simulace či oprávnění. Doplněno budget→stable pořadí pro4→5 aktivníchzdrojů.
+
+GTX1060,2040×986,medium,celáhra/HUD: prvníF2389,7→157,8ms. Doložený první pohyb přes poslední lampu851,9→54,4ms veV4, ale finálníV5 opakování má širší propady až374,9ms a warmF269,8ms; nezamlčeno. Tři reálné relace s různými avatary19,7FPS/max207,8ms a0render/asseterrors. Nová příprava v posledním běhu16,386s, celý mode→ready44,391s; delší načítání je výslovný tradeoff. V4narazila na20sdeadline při restore; V5complete. Změnaquality může stále zadrhnout, všechny B6/LOD/novéavatar/car kombinace nejsou ověřené. KEY-3 a související výkonová přejímka zůstávají otevřené.
+
+[Reprodukovatelné výsledky, neúspěšné iterace a omezení](performance/evidence/night-flashlight-20261015/preparation.md). Frozen4188 neměnný; vlastníGPU/preview/SDK procesy ukončené předceloutestovací sadou. Širší původní WIPGame zachovaný samostatně; výkonové důkazy platí pro čistý commitovaný snapshot, nikoli automaticky pro pracovní overlay.

@@ -12,6 +12,8 @@ import {
   type Authority,
 } from "../shared/netcode";
 import { SPAWN } from "../shared/world";
+import { NetworkClockTiming } from "../shared/network-diagnostics";
+import { TimelineInputQueue } from "../shared/input-timeline";
 
 await initPhysics();
 function context(network = true) {
@@ -100,6 +102,68 @@ function context(network = true) {
     dispose: () => simulation.dispose(),
   };
 }
+
+test("actual Game keeps only accepted independent telemetry and optional getters cannot affect authority", (t) => {
+  const c = context();
+  t.after(() => c.dispose());
+  const clock = new NetworkClockTiming();
+  clock.record({ elapsedMs: 20, cpuMs: 2, steps: 1, droppedMs: 3, accumulatorMs: 0 });
+  const network = { clock: clock.snapshot(), queue: new TimelineInputQueue(1, 0).diagnostics(100) };
+  const packet = (tick: number): Authority => ({ inputEpoch: 1, inputTickBase: 0, tick, ack: tick, receivedSeq: tick, time: 1000 + tick * 1000 / 60, resync: true, state: c.actor.capture(), network });
+  const read = () => (c.game as any).diagnosticNetworkContext();
+  assert.equal(c.game.reconcile(packet(1), 100), true);
+  const accepted = read().server;
+  assert.equal(accepted.clock.droppedTotalMs, 3);
+  network.clock.droppedTotalMs = 9999;
+  assert.equal(read().server.clock.droppedTotalMs, 3, "accepted telemetry is detached from source mutation");
+  let getters = 0;
+  const withGetter = (tick: number) => Object.defineProperty(packet(tick), "network", { enumerable: true, get() { getters++; throw new Error("optional telemetry getter"); } });
+  assert.equal(c.game.reconcile(withGetter(0), 101), false);
+  assert.equal(c.game.reconcile(withGetter(1), 102), false);
+  assert.equal(read().server, accepted, "both stale tick and stale timeline rejection retain accepted telemetry");
+  c.game.respawnPending = true;
+  assert.equal(c.game.reconcile({ ...packet(2), resync: false }, 103), false);
+  c.game.respawnPending = false;
+  c.game.ready = false;
+  assert.equal(c.game.reconcile(withGetter(2), 104), false);
+  c.game.ready = true;
+  assert.equal(c.game.reconcile(withGetter(2), 105), true, "optional telemetry must not prevent a valid correction");
+  assert.equal(getters, 0, "neither accepted nor rejected authority invokes optional getters");
+  assert.equal(read().server, null);
+  const missing = packet(3);
+  delete missing.network;
+  assert.equal(c.game.reconcile(missing, 106), true);
+  assert.equal(read().server, null);
+  c.game.disposed = true;
+  assert.equal(c.game.reconcile(withGetter(4), 107), false);
+  assert.equal(getters, 0);
+  assert.equal(read(), null);
+});
+
+test("diagnostic-only reset clears connection evidence while same identity retains prediction frontier", (t) => {
+  const c = context();
+  t.after(() => c.dispose());
+  const packet: Authority = { inputEpoch: 1, inputTickBase: 0, tick: 10, ack: 10, receivedSeq: 10, time: 1000, resync: true, state: c.actor.capture(), network: { clock: new NetworkClockTiming().snapshot(), queue: new TimelineInputQueue(1, 0).diagnostics() } };
+  c.game.reconcile(packet, 100);
+  const read = () => (c.game as any).diagnosticNetworkContext();
+  const timeline = c.game.networkTimeline;
+  const frontier = timeline.snapshot();
+  const prediction = c.game.prediction;
+  assert.ok(read().server);
+  c.game.setLocalId(c.game.localId);
+  assert.ok(read().server, "same ID alone is not a transport transition");
+  c.game.resetDiagnosticContext();
+  assert.equal(read().server, null);
+  assert.equal(read().authorityAgeMs, null);
+  assert.equal(c.diagnosticNetwork.authorityPackets, 0);
+  assert.equal(c.game.networkTimeline, timeline);
+  assert.deepEqual(timeline.snapshot(), frontier);
+  assert.equal(c.game.prediction, prediction);
+  assert.equal(c.game.lastAuthorityTick, 10);
+  c.game.setLocalId("new-local-identity");
+  assert.equal(read().server, null);
+  assert.equal(c.game.lastAuthorityTick, -1);
+});
 
 test("forced correction logs the actual displacement and authority frontier", (t) => {
   const c = context();

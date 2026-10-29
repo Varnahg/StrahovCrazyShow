@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-automatic-frames-20261014",
+  "title": "KEY-2: ověřit a integrovat automatický frame sběr",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/automatic-frames/",
+    "docs/performance/evidence/automatic-frames-20261014/",
+    "docs/agents/handoffs/validate-automatic-frames-20261014.md",
+    "docs/verification.md",
+    "dist/",
+    "client/game-diagnostics.ts",
+    "client/game.ts",
+    "client/session-diagnostics.ts",
+    "client/ui.tsx",
+    "tests/client-recovery.test.ts",
+    "tests/game-diagnostics-projection.test.ts",
+    "tests/game-diagnostics.test.ts",
+    "tests/room-callbacks.test.ts",
+    "tests/session-diagnostics.test.ts",
+    "docs/performance/research-20261014/automatic-frame-context.md",
+    "docs/agents/handoffs/record-game-frames-20261014.md",
+    "docs/agents/handoffs/isolate-recorder-context-20261014.md",
+    "docs/agents/handoffs/verify-frame-projections-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Accept exact producer+recorder delta against main f4f6116 after independent review. Full tests/build/SDK integration in idle owned WT.",
+    "Preserve old main Game/UI WIP; semantic merge must not duplicate existing WIP recorder call. Index uses clean validated source, docs verification only new appendix.",
+    "All inputs/tests in hashed snapshot, main original dependencies untouched, no graphics/FPS claims. Commit/push, verify remote and update Linear."
+  ],
+  "verification": [
+    "Idle root-owned key17-ownership-integration WT over main f4f6116. No install, browser, GPU or live-preview changes. Light targeted CPU tests only unless heavy-validation reserved.",
+    "Research before edits; handoff includes exact source/test hashes and actual results."
+  ],
+  "notes": [
+    "Existing KEY-2 scope, newly tracked bounded child. Root transfers its current-main overlay content in the named owned WT only; adopt-dirty permitted for those inherited published files. Foreign main WIP is not transferred.",
+    "All task catalog writes are owned by repairs-01a13624-admin. No commit/push by subagent; root integrates exact validated delta.",
+    "All three agents explicitly handed off and released: key19-game-context-20261014, key19-recorder-context-20261014, key19-projection-tests-20261014. Root receives exact frozen delta and handoffs, source snapshot00538ba8. Initial full916PASS; build found missing receivedSeq in one new fixture. Root will fix only fixture, retain original evidence, rerun final checkpoint and integrate exact validated bytes.",
+    "Root also owns prior historical main Game/UI integration WIP; it will receive only guarded semantic feature adaptations with all unrelated members/bytes preserved. Index stages clean validated bytes, not the wider working WIP.",
+    "Root accepted final snapshot4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0:916 tests/build/integration2568 PASS,45 WIP callback/recovery regressions. Evidence preserves initial fixture typing failure and successful rerun. KEY-19 complete, graphics/whole KEY-2 still open."
+  ]
+}

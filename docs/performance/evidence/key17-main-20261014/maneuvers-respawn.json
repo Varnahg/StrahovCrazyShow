@@ -1,0 +1,530 @@
+{
+  "startedAt": "2026-10-14T18:46:55.889Z",
+  "endpoint": "http://127.0.0.1:2568",
+  "protocol": 11,
+  "sourceSnapshotId": null,
+  "harnessSha256": "4890ec773852edd29b12fc8a6a66b5796d2d91d5058cffaa14bc5f52aeb3dfe7",
+  "completed": true,
+  "lastStage": "both SDK peers receive current respawn presence, without stale vehicle or coordinates",
+  "checks": [
+    "respawn driver initial authority",
+    "respawn observer initial authority",
+    "ordinary resync receives its own authoritative reply",
+    "ordinary resync receives its own authoritative reply",
+    "walk within car entry range",
+    "walking timeline resolved before entering",
+    "actual vehicle entry",
+    "respawn replies with forced authority in a fresh input epoch at ack zero",
+    "both SDK peers receive current respawn presence, without stale vehicle or coordinates",
+    "two authority samples after duplicate input",
+    "fresh scheduled input moves the recovered pedestrian",
+    "observer receives movement after recovery",
+    "walk within car entry range",
+    "walking timeline resolved before entering",
+    "actual vehicle entry",
+    "drive shared car away from its canonical recovery pose",
+    "brake before testing another player's respawn",
+    "respawn replies with forced authority in a fresh input epoch at ack zero",
+    "both SDK peers receive current respawn presence, without stale vehicle or coordinates",
+    "another player's respawn retains the different driver and displaced shared car",
+    "respawn replies with forced authority in a fresh input epoch at ack zero",
+    "both SDK peers receive current respawn presence, without stale vehicle or coordinates"
+  ],
+  "resets": [
+    {
+      "id": "ba38d83d-613a-4a6a-8235-773bc9cc6941",
+      "ackBefore": 14,
+      "epochBefore": 3,
+      "burstLastSeq": 46,
+      "queuedBurst": 32,
+      "forced": {
+        "inputEpoch": 5,
+        "inputTickBase": 81,
+        "tick": 81,
+        "ack": 0,
+        "receivedSeq": 0,
+        "time": 1792003616277,
+        "state": {
+          "position": {
+            "x": 110,
+            "y": -2.1440000534057617,
+            "z": 12
+          },
+          "yaw": 0,
+          "speed": 0,
+          "vertical": 0,
+          "grounded": false,
+          "vehicle": false,
+          "vehicleState": {
+            "id": "campus-car",
+            "driverId": null,
+            "parked": true,
+            "parking": {
+              "position": {
+                "x": 110,
+                "y": -3.19320011138916,
+                "z": 16
+              },
+              "rotation": {
+                "x": 0.006686203181743622,
+                "y": 0.00010695189121179283,
+                "z": -0.015993505716323853,
+                "w": 0.9998497366905212
+              }
+            },
+            "position": {
+              "x": 110,
+              "y": -3.19320011138916,
+              "z": 16
+            },
+            "rotation": {
+              "x": 0.006686203181743622,
+              "y": 0.00010695189121179283,
+              "z": -0.015993505716323853,
+              "w": 0.9998497366905212
+            },
+            "linvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "angvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "steering": 0,
+            "wheelSpin": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "wheelSuspension": [
+              0.25,
+              0.25,
+              0.25,
+              0.25
+            ],
+            "wheelContact": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "force": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "torque": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "sleeping": false
+          }
+        },
+        "resync": true,
+        "respawn": true,
+        "resyncReason": "respawn",
+        "network": {
+          "queue": {
+            "inputEpoch": 5,
+            "inputTickBase": 81,
+            "tick": 81,
+            "ack": 0,
+            "receivedSeq": 0,
+            "resolution": "scheduled-tick",
+            "depth": 0,
+            "maxDepth": 16,
+            "accepted": 22,
+            "consumed": 6,
+            "idleTicks": 14,
+            "idleTicksSinceInput": 0,
+            "lastAppliedTick": 74,
+            "modeMismatchTicks": 0,
+            "resets": 2,
+            "discarded": 16,
+            "lastInputAgeMs": null,
+            "oldestQueuedAgeMs": null,
+            "rejected": {
+              "invalid": 0,
+              "epoch": 0,
+              "late": 2,
+              "ahead": 14,
+              "duplicate": 0
+            }
+          },
+          "clock": {
+            "elapsedMs": 31.24810000000025,
+            "cpuMs": 1.1817999999998392,
+            "steps": 2,
+            "droppedMs": 0,
+            "accumulatorMs": 4.91139999999999,
+            "callbacks": 64,
+            "elapsedMeanMs": 21.170490625,
+            "cpuMeanMs": 0.8420187499999798,
+            "elapsedMaxMs": 31.65219999999999,
+            "cpuMaxMs": 10.951900000000023,
+            "droppedTotalMs": 0
+          }
+        }
+      },
+      "localPresence": {
+        "id": "ba38d83d-613a-4a6a-8235-773bc9cc6941",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 0,
+        "zone": "outside"
+      },
+      "observerPresence": {
+        "id": "ba38d83d-613a-4a6a-8235-773bc9cc6941",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 0,
+        "zone": "outside"
+      }
+    },
+    {
+      "id": "c4954cb9-93aa-4347-ab72-f470b6cad350",
+      "ackBefore": 131,
+      "epochBefore": 4,
+      "burstLastSeq": 163,
+      "queuedBurst": 32,
+      "forced": {
+        "inputEpoch": 6,
+        "inputTickBase": 198,
+        "tick": 198,
+        "ack": 0,
+        "receivedSeq": 0,
+        "time": 1792003618227,
+        "state": {
+          "position": {
+            "x": 110,
+            "y": -2.1440000534057617,
+            "z": 12
+          },
+          "yaw": 0,
+          "speed": 0,
+          "vertical": 0,
+          "grounded": false,
+          "vehicle": false,
+          "vehicleState": {
+            "id": "campus-car",
+            "driverId": "ba38d83d-613a-4a6a-8235-773bc9cc6941",
+            "parked": false,
+            "parking": {
+              "position": {
+                "x": 110,
+                "y": -3.19320011138916,
+                "z": 16
+              },
+              "rotation": {
+                "x": 0.006686203181743622,
+                "y": 0.00010695189121179283,
+                "z": -0.015993505716323853,
+                "w": 0.9998497366905212
+              }
+            },
+            "position": {
+              "x": 110.00800323486328,
+              "y": -3.228559970855713,
+              "z": 18.7654972076416
+            },
+            "rotation": {
+              "x": 0.012992053292691708,
+              "y": -0.0001389930403092876,
+              "z": -0.014096804894506931,
+              "w": 0.9998162388801575
+            },
+            "linvel": {
+              "x": 0.004662775434553623,
+              "y": -0.07131721079349518,
+              "z": -0.020441006869077682
+            },
+            "angvel": {
+              "x": -0.05953856557607651,
+              "y": 0.0015796696534380317,
+              "z": 0.0004628651950042695
+            },
+            "steering": 0,
+            "wheelSpin": [
+              1.8540706221372474,
+              1.8540706221372474,
+              1.8540706221372474,
+              1.8540706221372474
+            ],
+            "wheelSuspension": [
+              0.3135165870189667,
+              0.3097587525844574,
+              0.3445846736431122,
+              0.3475777804851532
+            ],
+            "wheelContact": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "force": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "torque": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "sleeping": false
+          }
+        },
+        "resync": true,
+        "respawn": true,
+        "resyncReason": "respawn",
+        "network": {
+          "queue": {
+            "inputEpoch": 6,
+            "inputTickBase": 198,
+            "tick": 198,
+            "ack": 0,
+            "receivedSeq": 0,
+            "resolution": "scheduled-tick",
+            "depth": 0,
+            "maxDepth": 16,
+            "accepted": 16,
+            "consumed": 0,
+            "idleTicks": 135,
+            "idleTicksSinceInput": 0,
+            "lastAppliedTick": null,
+            "modeMismatchTicks": 0,
+            "resets": 2,
+            "discarded": 16,
+            "lastInputAgeMs": null,
+            "oldestQueuedAgeMs": null,
+            "rejected": {
+              "invalid": 0,
+              "epoch": 0,
+              "late": 0,
+              "ahead": 16,
+              "duplicate": 0
+            }
+          },
+          "clock": {
+            "elapsedMs": 30.920399999999972,
+            "cpuMs": 0.9261999999998807,
+            "steps": 2,
+            "droppedMs": 0,
+            "accumulatorMs": 8.390799999999706,
+            "callbacks": 145,
+            "elapsedMeanMs": 22.816488275862067,
+            "cpuMeanMs": 0.8411606896551536,
+            "elapsedMaxMs": 31.797799999999828,
+            "cpuMaxMs": 10.951900000000023,
+            "droppedTotalMs": 0
+          }
+        }
+      },
+      "localPresence": {
+        "id": "c4954cb9-93aa-4347-ab72-f470b6cad350",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 0,
+        "zone": "outside"
+      },
+      "observerPresence": {
+        "id": "c4954cb9-93aa-4347-ab72-f470b6cad350",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 0,
+        "zone": "outside"
+      }
+    },
+    {
+      "id": "ba38d83d-613a-4a6a-8235-773bc9cc6941",
+      "ackBefore": 117,
+      "epochBefore": 5,
+      "burstLastSeq": 117,
+      "queuedBurst": 0,
+      "forced": {
+        "inputEpoch": 7,
+        "inputTickBase": 201,
+        "tick": 201,
+        "ack": 0,
+        "receivedSeq": 0,
+        "time": 1792003618277,
+        "state": {
+          "position": {
+            "x": 110,
+            "y": -2.1440000534057617,
+            "z": 12
+          },
+          "yaw": 0,
+          "speed": 0,
+          "vertical": 0,
+          "grounded": false,
+          "vehicle": false,
+          "vehicleState": {
+            "id": "campus-car",
+            "driverId": null,
+            "parked": true,
+            "parking": {
+              "position": {
+                "x": 110,
+                "y": -3.19320011138916,
+                "z": 16
+              },
+              "rotation": {
+                "x": 0.006686203181743622,
+                "y": 0.00010695189121179283,
+                "z": -0.015993505716323853,
+                "w": 0.9998497366905212
+              }
+            },
+            "position": {
+              "x": 110,
+              "y": -3.19320011138916,
+              "z": 16
+            },
+            "rotation": {
+              "x": 0.006686203181743622,
+              "y": 0.00010695189121179283,
+              "z": -0.015993505716323853,
+              "w": 0.9998497366905212
+            },
+            "linvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "angvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "steering": 0,
+            "wheelSpin": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "wheelSuspension": [
+              0.25,
+              0.25,
+              0.25,
+              0.25
+            ],
+            "wheelContact": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "force": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "torque": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "sleeping": false
+          }
+        },
+        "resync": true,
+        "respawn": true,
+        "resyncReason": "respawn",
+        "network": {
+          "queue": {
+            "inputEpoch": 7,
+            "inputTickBase": 201,
+            "tick": 201,
+            "ack": 0,
+            "receivedSeq": 0,
+            "resolution": "scheduled-tick",
+            "depth": 0,
+            "maxDepth": 16,
+            "accepted": 126,
+            "consumed": 110,
+            "idleTicks": 30,
+            "idleTicksSinceInput": 0,
+            "lastAppliedTick": 198,
+            "modeMismatchTicks": 0,
+            "resets": 3,
+            "discarded": 16,
+            "lastInputAgeMs": null,
+            "oldestQueuedAgeMs": null,
+            "rejected": {
+              "invalid": 0,
+              "epoch": 1,
+              "late": 3,
+              "ahead": 14,
+              "duplicate": 0
+            }
+          },
+          "clock": {
+            "elapsedMs": 27.97519999999986,
+            "cpuMs": 0.8014000000002852,
+            "steps": 2,
+            "droppedMs": 0,
+            "accumulatorMs": 4.445299999999895,
+            "callbacks": 147,
+            "elapsedMeanMs": 22.819355782312925,
+            "cpuMeanMs": 0.8410115646258302,
+            "elapsedMaxMs": 31.797799999999828,
+            "cpuMaxMs": 10.951900000000023,
+            "droppedTotalMs": 0
+          }
+        }
+      },
+      "localPresence": {
+        "id": "ba38d83d-613a-4a6a-8235-773bc9cc6941",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 0,
+        "zone": "outside"
+      },
+      "observerPresence": {
+        "id": "ba38d83d-613a-4a6a-8235-773bc9cc6941",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 0,
+        "zone": "outside"
+      }
+    }
+  ],
+  "errors": [],
+  "openAuthenticatedConnectionsAfterCleanup": 0,
+  "scope": "Real HTTP session issuance and authenticated SDK messages on an isolated production server; no privileged position mutation, no GPU/FPS benchmark, no access to live API2570.",
+  "exitCode": 0,
+  "status": "passed",
+  "finishedAt": "2026-10-14T18:46:58.320Z"
+}

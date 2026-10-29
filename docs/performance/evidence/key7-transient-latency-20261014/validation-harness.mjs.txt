@@ -1,0 +1,34 @@
+import fs from 'node:fs';
+import cp from 'node:child_process';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import { once } from 'node:events';
+const evidence='docs/performance/evidence/key7-transient-latency-20261014';
+fs.mkdirSync(evidence,{recursive:true});
+const h=b=>crypto.createHash('sha256').update(b).digest('hex');
+const basePath='docs/performance/evidence/key17-main-20261014/checkpoint.json';
+const base=JSON.parse(fs.readFileSync(basePath));
+const files=base.files.map(x=>({...x}));
+const added=['tests/network-transient-latency.test.ts'];
+for(const p of added)if(!files.some(x=>x.path===p))files.push({path:p,sha256:'',bytes:0});
+files.sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+const delta=[];
+for(const entry of files){const data=fs.readFileSync(entry.path),sha=h(data);if(sha!==entry.sha256){delta.push({path:entry.path,sha256:sha,bytes:data.length});entry.sha256=sha;entry.bytes=data.length;}}
+const allowed=new Set(['client/network-timeline.ts','client/ui.tsx','scripts/timeline-client.ts','tests/network-timeline.test.ts','tests/network-transient-latency.test.ts','tests/room-callbacks.test.ts']);
+if(delta.some(x=>!allowed.has(x.path)))throw Error('Unrelated validation input changed');
+const snapshotId=h(JSON.stringify(files));
+fs.writeFileSync(evidence+'/checkpoint.json',JSON.stringify({baseMain:'7cc5a596a2c00ad497873e196bd0b16de1e4a245',baseManifest:'../key17-main-20261014/checkpoint.json',baseSnapshotId:base.snapshotId,snapshotId,files:files.length,tests:files.filter(x=>x.path.startsWith('tests/')).length,delta,scope:'Reconstruct complete inputs by overriding/appending delta paths in baseManifest.files and sorting by path. Includes all tests and12 materialized LFS objects.'},null,2)+'\n');
+const pwsh='C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe';
+const main='C:/Users/rezac/Documents/GitHub/StrahovCrazyShow';
+const originals=['node_modules/@babylonjs/core/PostProcesses/imageProcessingPostProcess.js','node_modules/@babylonjs/core/PostProcesses/postProcess.pure.js','node_modules/@colyseus/schema/package.json'].map(p=>({path:p,sha256:h(fs.readFileSync(main+'/'+p)),realpath:fs.realpathSync(main+'/'+p)}));
+for(const stage of ['test','build','test:integration','live-probe']){
+ cp.execFileSync(pwsh,['-NoProfile','-Command',"$c=@(Get-NetTCPConnection -State Established -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in @(4187,2582,4186,2581,4179,2570,5173,2567,5191) }); if ($c.Count) { throw 'Preview has active clients' }; if (Get-NetTCPConnection -State Listen -LocalPort 2568 -ErrorAction SilentlyContinue) { throw 'Port2568 occupied' }"],{windowsHide:true});
+ const logName=stage.replace(':','-')+'-output.txt';const log=fs.createWriteStream(evidence+'/'+logName,{flags:'wx'});const startedAt=new Date().toISOString();
+ const env={...process.env,VITE_SOURCE_SNAPSHOT_ID:snapshotId,STRAHOV_SOURCE_SNAPSHOT_ID:snapshotId,STRAHOV_INTEGRATION_EVIDENCE:path.resolve(evidence,'maneuvers.json'),STRAHOV_NETWORK_EVIDENCE:path.resolve(evidence,'network.json'),STRAHOV_INPUT_BACKLOG_EVIDENCE:path.resolve(evidence,'backlog.json')};
+ const command=stage==='live-probe'?'node --import tsx .cache/key7-main/live-probe.ts':'pnpm '+stage;
+ const child=cp.spawn(process.env.ComSpec??'cmd.exe',['/d','/s','/c',command],{env,windowsHide:true,stdio:['ignore','pipe','pipe']});child.stdout.pipe(log,{end:false});child.stderr.pipe(log,{end:false});const [exitCode,signal]=await once(child,'close');log.end();await once(log,'finish');
+ const result={stage,command,startedAt,finishedAt:new Date().toISOString(),exitCode,signal,snapshotId,log:logName,logSha256:h(fs.readFileSync(evidence+'/'+logName))};fs.appendFileSync(evidence+'/pipeline.jsonl',JSON.stringify(result)+'\n');console.log(JSON.stringify(result));if(exitCode!==0){process.exitCode=exitCode??1;break;}
+}
+const changed=files.filter(x=>h(fs.readFileSync(x.path))!==x.sha256).map(x=>x.path);
+const originalChanged=originals.filter(x=>h(fs.readFileSync(main+'/'+x.path))!==x.sha256||fs.realpathSync(main+'/'+x.path)!==x.realpath);
+fs.writeFileSync(evidence+'/post-check.json',JSON.stringify({snapshotId,checkedFiles:files.length,changed,originalDependencies:originals,originalChanged},null,2)+'\n');if(changed.length||originalChanged.length)throw Error('Input or original dependency mutation');console.log(JSON.stringify({snapshotId,sourceStable:true,files:files.length}));

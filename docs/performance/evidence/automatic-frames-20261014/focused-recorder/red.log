@@ -1,0 +1,81 @@
+✖ lifecycle boundaries separate serialized multiplayer and guest frames inside the context cache interval (32.9409ms)
+✖ a rate-limited lifecycle boundary still invalidates context and separates serialized evidence (3.8479ms)
+✖ explicit repeated context reset preserves the historical window only once and clears preceding work (2.5889ms)
+✖ a failing context factory cannot preserve stale data across reset or a later sample (2.4052ms)
+✖ context resets preserve global rate budgets and disabled recorders emit nothing (1.9081ms)
+✔ automatic local startup proves persisted receipt and source identity without a manual action (3.7949ms)
+✔ render profile fields retain preceding work and aggregate nested phases without inventing GPU time (4.6068ms)
+✔ public host never sends telemetry or starts a timer (0.3009ms)
+✔ frame windows retain every interval at high refresh rates and immutable sampled settings (3.0422ms)
+✔ a hitch attributes the preceding interval to previous work and bounds costly context sampling (1.7775ms)
+✔ failed save retries exact batch bytes and IDs while new events remain queued (1.5028ms)
+✔ offline memory remains bounded and recording gaps are explicit after recovery (53.4567ms)
+✔ visibility changes close windows, classify resumed frames and remove listeners on dispose (3.6621ms)
+✔ sanitization drops user content, getters, cycles, secrets and URL queries (0.5265ms)
+✔ wire validation rejects unsafe identifiers, out of order sequences and excessive size (0.4404ms)
+✔ hitch timestamps use rAF start even when current rendering finishes much later (3.7901ms)
+✔ asset storms preserve gameplay and errors, summarize successes and clean up observers and console (5.0842ms)
+✔ invalid save receipt never pretends the batch was persisted (1.0163ms)
+✔ healthy automatic transport drains sustained production-sized hitches and preserves every sequence and lifecycle event (594.5765ms)
+ℹ {"status":{"state":"recording","sessionId":"0b8c490b-1740-4aba-8a1c-f36d0b28108a","sourceId":"abc","lastSavedAt":"2023-11-14T22:16:21.200Z","pending":0,"dropped":0,"droppedByReason":{"queueCapacity":0,"recordSize":0,"eventRate":0},"pendingBytes":0,"error":null},"posts":306,"bytes":15194427,"records":939,"hitchCount":723,"maxPendingBytes":65123}
+✔ offline pressure is bounded, reason-specific and cannot bypass exponential retry with events (70.1568ms)
+✔ record-size and event-rate omissions have distinct cumulative diagnostics (2.2162ms)
+✔ pagehide replaces a pending ordinary POST with the same keepalive batch and a bounded tail (3.1164ms)
+✔ dispose during capability discovery finishes its tail without retaining timers or observers (0.8852ms)
+✔ lifecycle budget retains an oversized offline tail for recovery and does not claim it was saved (4.8801ms)
+✔ a late receipt from a replaced ordinary request cannot overwrite the acknowledged lifecycle drain (1.0496ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 20
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1081.4781
+
+✖ failing tests:
+
+test at tests\session-diagnostics.test.ts:97:1
+✖ lifecycle boundaries separate serialized multiplayer and guest frames inside the context cache interval (32.9409ms)
+  AssertionError [ERR_ASSERTION]: session-end
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\session-diagnostics.test.ts:119:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\session-diagnostics.test.ts:139:1
+✖ a rate-limited lifecycle boundary still invalidates context and separates serialized evidence (3.8479ms)
+  TypeError: f.recorder.resetFrameContext is not a function
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\session-diagnostics.test.ts:156:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\session-diagnostics.test.ts:170:1
+✖ explicit repeated context reset preserves the historical window only once and clears preceding work (2.5889ms)
+  TypeError: f.recorder.resetFrameContext is not a function
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\session-diagnostics.test.ts:179:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\session-diagnostics.test.ts:200:1
+✖ a failing context factory cannot preserve stale data across reset or a later sample (2.4052ms)
+  TypeError: f.recorder.resetFrameContext is not a function
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\session-diagnostics.test.ts:211:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\session-diagnostics.test.ts:227:1
+✖ context resets preserve global rate budgets and disabled recorders emit nothing (1.9081ms)
+  TypeError: f.recorder.resetFrameContext is not a function
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\session-diagnostics.test.ts:233:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

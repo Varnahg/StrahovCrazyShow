@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-b6-current-main-20261014",
+  "title": "KEY-16: ověřit aktuální main, dostupnost grafické přejímky a samostatně integrovat B6 fix",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/b6-current-main/",
+    "docs/performance/evidence/b6-current-main-20261014/",
+    "docs/agents/handoffs/validate-b6-current-main-20261014.md",
+    "docs/verification.md",
+    "dist/",
+    "client/b6-reality.ts",
+    "tests/b6-render-lifecycle.test.ts",
+    "docs/performance/research-20261014/b6-current-main.md",
+    "docs/agents/handoffs/integrate-b6-pivot-candidate-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "gpu",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Přesný main0607003 plus pouze B6 runtime/test delta; nová plná pipeline jednou po stabilizaci a předání zdrojů.",
+    "Dostupnost browseru kontrolovat povolenou CUA API. Neobcházet bezpečnostní omezení jinou automatizací. Při nedostupnosti oddělit CPU/lifecycle důkazy od GPU/FPS a ponechat KEY-16 otevřené.",
+    "Nezávislý bezpečnostní a dopadový review; zachovat main WIP a původní previews. Po uvolnění feature claimu koordinovaně převzít přesné cesty pro jediný commit/push."
+  ],
+  "verification": [
+    "Před GPU ověřit aktivní scény a spojení; během měření nespouštět celou testovací sadu. Previews4186/4187 vlastní samostatné serve tasky a nesmějí se přepisovat.",
+    "pnpm test, pnpm build a pnpm test:integration sekvenčně ve vlastní worktree; manifest zahrnuje testy a LFS, před/po hashe musí souhlasit.",
+    "Staging explicitních cest; do docs/verification.md přidat jen nový záznam a přes index zachovat původní nestagovaný obsah."
+  ],
+  "notes": [
+    "Původní široký cíl zůstává pozastavený. Nová GPU scéna smí běžet pouze pod vlastní rezervací; cizí procesy a porty se nepřebírají.",
+    "Samostatná integrace tohoto doloženého CPU/lifecycle fixu není přijetí celého KEY-16. Starých878 testů se netýká aktuálního main; matrix counts nejsou důkaz zlepšení FPS.",
+    "Root převzal ukončené předání repairs-01a13624-b6-current-implementation a jeho čtyři přesné source/test/research/handoff cesty. Po dokončení všech validačních procesů získává rozšířený claim pro main integraci. Adopt-dirty je doložené převzetí vlastní a předané práce; ostatní main WIP zůstává chráněný.",
+    "Root accepted exact two-file checkpointb6c02a10837c2e4ba708f1eb9c8bbbfa3f8e3c20a8c4500920eb10a17b3c4e33:6 lifecycle/49 targeted/875 full tests, types/build/integration PASS. KEY16 graphical acceptance remains open."
+  ]
+}

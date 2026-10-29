@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "integrate-b6-pivot-candidate-20261014",
+  "title": "KEY-16: převzít úzkou B6 pivot opravu do aktuálního main a doplnit parent/freeze regrese",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/b6-reality.ts",
+    "tests/b6-render-lifecycle.test.ts",
+    "docs/performance/research-20261014/b6-current-main.md",
+    "docs/agents/handoffs/integrate-b6-pivot-candidate-20261014.md",
+    ".cache/b6-current-main-feature/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Převzít pouze přesný runtime a testy kandidáta f63039b, nikoli jeho větev. Aktuální main má stejné předchůdce; před změnou zaznamenat rozhodnutí, varianty a dopady.",
+    "Zopakovat skutečný red na současném main, potom přenést přesný runtime a původní čtyři testy. Doplnit přímé regrese změn předků ve stejném render ID a freeze/unfreeze s nezávislými číselnými oracles.",
+    "Zachovat geometrii, kolize, členství světel a casterů, rekvizity, editovatelnost pivotu i opravy KEY-7/17. Nepřepisovat obecný VehicleLighting a nepřidávat dlouhodobou cache.",
+    "Provést cílené B6, world-asset, vehicle-lighting, physics a surface testy, typovou kontrolu a předání. GPU výkon ani dokončení celého KEY-16 neodvozovat z NullEngine counts."
+  ],
+  "verification": [
+    "Pouze vlastní neaktivní worktree key17-ownership-integration s obsahem main0607003. Staré důkazy KEY-17/7 a LFS objekty jsou pouze pro čtení; vlastní patched instalace je již připravená.",
+    "Claim před zápisem; agent spouští jen lehké cílené CPU testy. Plnou pipeline, servery a GPU koordinuje root. Hlavní WIP a živé snapshoty se nemění."
+  ],
+  "notes": [
+    "Root na nový pokyn uživatele pokračovat dalším issue přebírá technický rozsah KEY-16. Nové integrační rozhodnutí odděluje přijetí jednotlivého reprodukovaného lifecycle fixu od otevřené grafické přejímky celého issue; historické důkazy se nepřepisují.",
+    "Původní WIP se nepřebírá. Zdrojem je konkrétní kandidát f63039b a jeho předání; root zajišťuje samostatný commit a push až po aktuálním ověření.",
+    "Root accepted exact two-file checkpointb6c02a10837c2e4ba708f1eb9c8bbbfa3f8e3c20a8c4500920eb10a17b3c4e33:6 lifecycle/49 targeted/875 full tests, types/build/integration PASS. KEY16 graphical acceptance remains open."
+  ]
+}

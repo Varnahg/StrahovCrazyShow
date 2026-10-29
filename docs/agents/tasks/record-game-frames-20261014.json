@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "record-game-frames-20261014",
+  "title": "KEY-2: automatický frame producer a vlastní síťový kontext",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/game-diagnostics.ts",
+    "tests/game-diagnostics.test.ts",
+    "tests/room-callbacks.test.ts",
+    "tests/client-recovery.test.ts",
+    "docs/performance/research-20261014/automatic-frame-context.md",
+    "docs/agents/handoffs/record-game-frames-20261014.md",
+    ".cache/game-frame-feature/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Once per real production Game.frame; raw interval, six reused phase timings, fresh GPU only. No expensive context work when recorder disabled.",
+    "Explicit O(1) scalar context, no profiles/ids/peers. Safe independent whitelist of accepted authority diagnostics; malformed optional diagnostics cannot break accepted authority.",
+    "Diagnostic-only reset on room bind/rebind/leave/dispose/identity change. Guest does not call transport callback. Same-ID reconnect retains physics/prediction/frontiers.",
+    "Recorder API resetFrameContext() is supplied by disjoint recorder task. Record context callback is named diagnosticContext to facilitate guarded historical WIP integration.",
+    "Meaningful red/green real frame and UI lifecycle tests, refactor, independent security review."
+  ],
+  "verification": [
+    "Idle root-owned key17-ownership-integration WT over main f4f6116. No install, browser, GPU or live-preview changes. Light targeted CPU tests only unless heavy-validation reserved.",
+    "Research before edits; handoff includes exact source/test hashes and actual results."
+  ],
+  "notes": [
+    "Existing KEY-2 scope, newly tracked bounded child. Root transfers its current-main overlay content in the named owned WT only; adopt-dirty permitted for those inherited published files. Foreign main WIP is not transferred.",
+    "All task catalog writes are owned by repairs-01a13624-admin. No commit/push by subagent; root integrates exact validated delta.",
+    "Root accepted final snapshot4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0:916 tests/build/integration2568 PASS,45 WIP callback/recovery regressions. Evidence preserves initial fixture typing failure and successful rerun. KEY-19 complete, graphics/whole KEY-2 still open."
+  ]
+}
