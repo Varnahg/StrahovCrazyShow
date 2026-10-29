@@ -1053,6 +1053,8 @@ export function validateKnowledgeDatasetV3(
         sourceVersionId: doc.sourceVersionId,
         contentSha256: raw.contentSha256,
       });
+      // Published chunks must be representable by the public citation contract.
+      citationForDocument(doc, chunk.spans, policy);
       chunkGroups.get(doc.sourceVersionId)!.push(chunk);
       return chunk;
     });
