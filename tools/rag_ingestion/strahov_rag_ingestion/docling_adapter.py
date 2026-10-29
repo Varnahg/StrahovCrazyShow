@@ -165,11 +165,46 @@ def native_layout_issues(document):
     return sorted(set(issues))
 
 
+def _convert_html(data, request):
+    # The pinned declarative backend materializes a DoclingDocument directly.
+    # Avoid general converter/enrichment initialization for this format only.
+    from docling.backend.html_backend import HTMLDocumentBackend
+    from docling.datamodel.backend_options import HTMLBackendOptions
+    from docling.datamodel.base_models import ConversionStatus, InputFormat
+    from docling.datamodel.document import ConversionResult, InputDocument
+    from docling.datamodel.settings import DocumentLimits
+
+    with io.BytesIO(data) as stream:
+        input_document = None
+        try:
+            input_document = InputDocument(stream, format=InputFormat.HTML,
+                backend=HTMLDocumentBackend, filename="input.html",
+                backend_options=HTMLBackendOptions(fetch_images=False),
+                limits=DocumentLimits(max_num_pages=request.limits.maxPages,
+                                      max_file_size=request.limits.maxInputBytes))
+            if not input_document.valid:
+                raise ExtractionError("parser-incomplete", "review-required")
+            try:
+                document = input_document._backend.convert()
+            except Exception as error:
+                # Same failed-conversion boundary as raises_on_error=False in
+                # DocumentConverter, never a partially accepted document.
+                raise ExtractionError("parser-incomplete", "review-required") from error
+            return ConversionResult(input=input_document, document=document,
+                                    status=ConversionStatus.SUCCESS)
+        finally:
+            backend = getattr(input_document, "_backend", None)
+            if backend is not None:
+                backend.unload()
+
+
 def convert(data, fmt, request, standard=False):
-    from docling.document_converter import DocumentConverter, NativePdfFormatOption, HTMLFormatOption, MarkdownFormatOption, WordFormatOption, ExcelFormatOption
+    if fmt == "html":
+        return _convert_html(data, request)
+    from docling.document_converter import DocumentConverter, NativePdfFormatOption, MarkdownFormatOption, WordFormatOption, ExcelFormatOption
     from docling.datamodel.base_models import InputFormat
     from docling.datamodel.pipeline_options import NativePdfPipelineOptions
-    from docling.datamodel.backend_options import HTMLBackendOptions, MarkdownBackendOptions, MsWordBackendOptions, MsExcelBackendOptions
+    from docling.datamodel.backend_options import MarkdownBackendOptions, MsWordBackendOptions, MsExcelBackendOptions
     from docling.datamodel.accelerator_options import AcceleratorOptions, AcceleratorDevice
     from docling_core.types.io import DocumentStream
 
@@ -184,8 +219,6 @@ def convert(data, fmt, request, standard=False):
                 parser_threads=1, generate_page_images=False, generate_picture_images=False,
                 accelerator_options=AcceleratorOptions(device=AcceleratorDevice.CPU, num_threads=1),
                 document_timeout=request.limits.timeoutSeconds, enable_remote_services=False, allow_external_plugins=False))
-    elif fmt == "html":
-        options[input_format] = HTMLFormatOption(backend_options=HTMLBackendOptions(fetch_images=False))
     elif fmt == "md":
         options[input_format] = MarkdownFormatOption(backend_options=MarkdownBackendOptions(fetch_images=False))
     elif fmt == "docx":

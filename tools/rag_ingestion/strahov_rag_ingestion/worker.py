@@ -73,12 +73,23 @@ def implementation_hash():
                    for path in sorted(root.glob("*.py"))])
 
 
+def package_versions():
+    packages = {}
+    excluded = {"pytest", "reportlab", "iniconfig", "colorama"}
+    for distribution in distributions():
+        # metadata is a parsed file, not a cached property. Version comes from
+        # this same map instead of distribution.version reading the file again.
+        metadata = distribution.metadata
+        name = metadata.get("Name")
+        if name and name.lower() not in excluded:
+            packages[name.lower()] = metadata.get("Version")
+    return dict(sorted(packages.items()))
+
+
 def run(request: Request) -> dict:
     result = empty_result(request)
     try:
-        packages = {dist.metadata["Name"].lower(): dist.version for dist in distributions()
-                    if dist.metadata.get("Name") and dist.metadata["Name"].lower() not in {"pytest", "reportlab", "iniconfig", "colorama"}}
-        result["parserProfile"]["packages"] = dict(sorted(packages.items()))
+        result["parserProfile"]["packages"] = package_versions()
         result["parserProfile"]["configurationHash"] = digest({"adapter": "1", "mode": request.mode,
             "implementationSha256": implementation_hash(),
             "tokenizer": "cl100k_base", "inputVersion": "title-heading-text-v2", "cpuThreads": 1,
