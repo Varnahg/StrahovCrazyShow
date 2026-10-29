@@ -9,3 +9,8 @@ Runtime `a86136ef` → main `42f7336f`. Clean 1387/1387 a combined 1447/1447, ob
 HTTP health a skutečný Edge vstup ověřeny. Běžné počasí, žádný jemný profiler; 41 přípravných etap complete, network-connect→ready 65,42 s, health valid/pending0/render/asset errors0. Stacionární smoke: auto low77 %, CSS1912×866/interně1470×666, 57,8 FPS, p95 22 ms, p99 30,9 ms, max 63,1 ms. Nejde o měření hladké jízdy. Root odešel do menu; uživatelská karta zůstala otevřená. Původní 4196/4195/4193/4192/4188 se nemění.
 
 Root smoke je zmrazený v evidenci; živý application session log může později obsahovat další uživatelský průchod. Rozlišovat segmenty podle ready/dispose, nikoli podle samotného názvu souboru. Uživatel dostal otázku, zda nyní testuje; při jeho testu nepouštět GPU ani náročné testy.
+
+
+## Odstavení na pokyn koordinátora KEY-44 — 19. 10. 2026
+
+Vlastní API a preview procesy byly po ověření přesné identity ukončeny; porty jsou bez listeneru. Snapshot, build, závislosti a veškerá evidence zůstávají zachované. Procesní rezervace se po tomto předání uvolňuje; před restartem je nutný nový claim. Souhrn vlastníků, obnovitelných cest a operačních receipts: [webgpu-hitch-validation-20261017.md](webgpu-hitch-validation-20261017.md), oddíl Pozastavení a předání koordinátorovi KEY-44. Žádný commit, integrace ani nový test/build/GPU běh.

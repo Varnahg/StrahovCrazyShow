@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-authored-light-coverage-proof-20261018",
+  "title": "KEY-31: rozlišit pokrytí a uchování skutečných glass/outdoor světelných variant",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-authored-light-coverage-proof-20261018/",
+    "docs/agents/handoffs/webgpu-authored-light-coverage-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Jediný izolovaný CPU proof nad frozen grass-preparation-v2 4a968ff7. Žádné native/primary/dependency/hraný-build změny, žádný nový runtime kandidát bez výsledku.",
+    "Použít skutečnou architecture-reality factory omezenou na původní objekt53929057 a jeho glass0 0 /glass0 1, skutečný outdoor-artifacts factory nad plánem objektu node/4002100657 s outdoor-dark-metal a skutečné Cinematic reflection/Fresnel/environment nastavení. Generické boxové materiály nejsou ekvivalentní.",
+    "Výslovný headless canvas/TextureIO adaptér je přípustný jen pro IO, zachovat skutečné texture metadata/defines. Žádné monkeypatch readiness, hardcoded effect cache/refCount, umělé fixed MAXLIGHTCOUNT4 nebo ruční kopie materiálových receptů. Syntetické pixely a NullEngine GLSL nejsou WGSL/GPU/obrazový důkaz.",
+    "Skutečný Game přípravný řetězec a pořadí medium→high→low se všemi41etapami, původní timeouty a úplná readiness. Pokud nelze celé zapojení reprodukovat bez nepřiznané imitace, doložit přesný limit a koordinovat menší platný proof; nic nepředstírat.",
+    "Dvě kontrolní situace v oddělených engine cache: skutečné tři rodiny aktivní a skutečně kreslené během přípravy; stejné původní meshe mimo aktivní pohled až do následné aktivace. Po skutečném event-loop/endFrame deferred cleanup porovnat oba car stavy0/1POINT, celédefines/attributes, Effect/context identity, disposed stav, novéprogramy a camera-pass draw.",
+    "Zaznamenat skutečný maxSimultaneousLights při každé etapě, relevantní image-processing a reflection/Fresnel flags, žádnéSHADOWdefines v cílovýchcarvariantách. Rozliš nedostatečné pokrytí, reset/dispose a případný další doložený mechanismus; první hypotézu nepotvrzovat umělou scénou.",
+    "Výzkum variant: cíleně zahrnout skutečné přijímající meshe tří rodin do stávajících vehicle etap; přípravný pohled po alignVehicleCamera; plošná readiness/draw všechmeshů; konkrétní lifecycle oprava jen pokud se uvolněníprokáže. Posoudit vzhled, čas, paměť, stavobnovy a zdrojovévlastnictví. Žádná globálníEffectcache/PersistentMode ani automatické prodlouženítimeoutu."
+  ],
+  "verification": [
+    "Lehké cílené CPU proof/testy se skutečnými produkčními factory a připnutými dependencies readonly; stejné base source/test SHA a uložený vstupní manifest. Ukládat všechny pokusy, odlišit chybufixture od reprodukceproduktu.",
+    "Cílený refaktoring fixture, cleanup všech vlastníchcontroller/material/observer/engine zdrojů. Nad výsledkem nejvýše jeden integračně použitelný návrh dalšího zásahu a explicitní GPU/trajectorylimity.",
+    "Bez fullsuite/fullTS/build/GPU/server/packageinstall, stagingu/commitu a rekurzivníhoBMAD. Předat manifest a handoff, ukončit vlastníprocesy a release."
+  ],
+  "notes": [
+    "Průzkum obou nezávislých čtecích agentů: vehicle příprava zapínácar root, ale přeskočíupdateCameraFollow; skutečný vstupalignVehicleCamera měníyawπ→0. Scene frustum omezujeactive list a finálníreadiness kontrolujejen požadovanéEffecty.",
+    "Pinned DrawWrapper.setEffect nepoužívádispose; release nastává přesDrawWrapper.dispose/resetDrawCache/refCount/_releaseEffect. Architecture/outdoorLOD pouze setEnabled; Cinematicreset je ažpři skutečnémdispose. To nepodporuje obecnouhypotézu, že pouhé41přepnutí automaticky zahodívšechnyvarianty, ale chybí přímáhistorie konkrétních6klíčů.",
+    "Trace28e287…: request618–620 S/P/H,629–631 S/H, všechnyMAXLIGHTCOUNT4 a bezSHADOW, glassreceiveShadowsfalse/outdoortrue. SkloDIFFUSE/REFLECTION/FRESNEL; litnavícEMISSIVE; outdoorREFLECTION/USESPHERICALFROMREFLECTIONMAP. VšechnyTONEMAPPING0. Celéfull defines a technickágeometrie v docs/performance/evidence/webgpu-migration-20261016/program-attribution/.",
+    "GltfLightBudget máautomatic floor4, nezávisí přímo na kvalitě. Medium/high předchází posledním low15etapám; první vypnutíimageprocessingu samo není prokázaná příčina. Osm dalších NPCvariant má jiný source/LOD rozsah a tímto proofem se neprohlásí za opravené.",
+    "Aktivní BMADspec-key-31-long-frame-gaps pokračuje v kroku03, frozenintent bezezměny. Uživatel prioritizuje plynuléhraní a dovoluje delšístart, ale limity/readiness se nemění. CizíWIP a hrané4197/staršíbuildy zachovat.",
+    "Proof3/3PASS přijat po nezávislémreview[] jako CPU důkazcoverage vsretention. Navazující2stagekandidát všakneprošel: StandardlateIBLkey přidal2programy; tenzůstávánepřijatý, žádnýnativezměna. Evidence docs/performance/evidence/webgpu-migration-20261016/authored-light-coverage/."
+  ]
+}

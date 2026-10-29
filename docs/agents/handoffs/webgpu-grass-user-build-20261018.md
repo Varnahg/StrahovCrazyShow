@@ -9,3 +9,8 @@ První pokus byl v neaktivní kartě:30ticks/30s v prvnívehicle etapě, timeout
 Krátký stacionární smoke:58,1FPS, p9522,5/p9932,2/max38,9ms, CSS1528×650, interní1053×448, automatická low69 %. Nejde o srovnání s předchozími benchmarky ani o průjezdový důkaz. Health na začátku i konci ready/valid/pending0/errors0. Uživatel má kartu v menu, služby běží; procesní PID/rezervace zůstávají pouze v lokálnícache. Snapshot se nebude přestavovat.
 
 Koordinátor: webgpu-grass-user-build-01a14497. Aktivní služby patří tasku webgpu-grass-user-build-20261018, start/stop podle ověřené identity v lokálnícache. Release ažpo skutečném ukončení vlastníchslužeb. Celý migrační cíl a KEY-31 nejsou dokončené.
+
+
+## Odstavení na pokyn koordinátora KEY-44 — 19. 10. 2026
+
+Vlastní API a preview procesy byly po ověření přesné identity ukončeny; porty jsou bez listeneru. Snapshot, build, závislosti a veškerá evidence zůstávají zachované. Procesní rezervace se po tomto předání uvolňuje; před restartem je nutný nový claim. Souhrn vlastníků, obnovitelných cest a operačních receipts: [webgpu-hitch-validation-20261017.md](webgpu-hitch-validation-20261017.md), oddíl Pozastavení a předání koordinátorovi KEY-44. Žádný commit, integrace ani nový test/build/GPU běh.

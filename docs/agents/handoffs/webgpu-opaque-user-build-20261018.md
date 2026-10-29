@@ -11,3 +11,8 @@ HealthHTTP a skutečný Edge vstup ověřeny. Nový defaultauto průchod použí
 Vlastní QA hráč odešel do menu; Edge karta4196 zůstává označená jako uživatelský výstup. Služby4196/2591 nadále běží, rezervace zůstává aktivní. Hraný4195/4193/4192/4188 a jejich soubory/služby byly ponechány beze změny.
 
 Omezení: výchozí backend bez query se ještě nepřepíná; WebGPU compatibility mode zůstává kandidátem. B6 první svítilna má stále chybějící varianty a sekundový zásek; celková1/3relace funkční/FPS přejímka a60FPS nejsou splněné. Material-first úspora nemění alpha/transparent/shadow fronty ani herní kvalitu a pro WebGL zachovává původní řazení.
+
+
+## Odstavení na pokyn koordinátora KEY-44 — 19. 10. 2026
+
+Vlastní API a preview procesy byly po ověření přesné identity ukončeny; porty jsou bez listeneru. Snapshot, build, závislosti a veškerá evidence zůstávají zachované. Procesní rezervace se po tomto předání uvolňuje; před restartem je nutný nový claim. Souhrn vlastníků, obnovitelných cest a operačních receipts: [webgpu-hitch-validation-20261017.md](webgpu-hitch-validation-20261017.md), oddíl Pozastavení a předání koordinátorovi KEY-44. Žádný commit, integrace ani nový test/build/GPU běh.

@@ -1,0 +1,152 @@
+{
+  "baseSnapshotId": "4a968ff7e2fe262bd2dec98bd771f705eb7682418e2dd975f8bf33ae436bee61",
+  "cases": [
+    {
+      "covered": true,
+      "status": "complete",
+      "qualities": [
+        {
+          "quality": "medium",
+          "stages": 13
+        },
+        {
+          "quality": "high",
+          "stages": 13
+        },
+        {
+          "quality": "low",
+          "stages": 15
+        }
+      ],
+      "stageCount": 41,
+      "drawnStages": 41,
+      "caps": [
+        4
+      ],
+      "disposedAfterDeferred": 0,
+      "replayNewPrograms": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "restored": {
+        "cameraPosition": [
+          99.25303863370225,
+          9.756104907989503,
+          12.367739966188815
+        ],
+        "cameraRotation": [
+          -0.3718560619309074,
+          3.141592653589793,
+          0
+        ],
+        "yaw": 0,
+        "pitch": 0.28,
+        "quality": "low",
+        "car": false,
+        "parked": true,
+        "actorVehicle": false
+      }
+    },
+    {
+      "covered": false,
+      "status": "complete",
+      "qualities": [
+        {
+          "quality": "medium",
+          "stages": 13
+        },
+        {
+          "quality": "high",
+          "stages": 13
+        },
+        {
+          "quality": "low",
+          "stages": 15
+        }
+      ],
+      "stageCount": 41,
+      "drawnStages": 0,
+      "caps": [
+        4
+      ],
+      "disposedAfterDeferred": 0,
+      "replayNewPrograms": [
+        3,
+        3,
+        0,
+        0
+      ],
+      "restored": {
+        "cameraPosition": [
+          99.25303863370225,
+          9.756104907989503,
+          28.367739966188815
+        ],
+        "cameraRotation": [
+          -0.37185606193090737,
+          0,
+          0
+        ],
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "quality": "low",
+        "car": false,
+        "parked": true,
+        "actorVehicle": false
+      }
+    }
+  ],
+  "wholeDefinesDifferences": [
+    {
+      "family": "reality glass 0 0",
+      "onlyCovered": [
+        "#define USESPHERICALFROMREFLECTIONMAP"
+      ],
+      "onlyOpposite": [],
+      "coveredSpherical": {
+        "value": true,
+        "key": true
+      },
+      "oppositeSpherical": {
+        "value": true,
+        "key": false
+      }
+    },
+    {
+      "family": "reality glass 0 1",
+      "onlyCovered": [
+        "#define USESPHERICALFROMREFLECTIONMAP"
+      ],
+      "onlyOpposite": [],
+      "coveredSpherical": {
+        "value": true,
+        "key": true
+      },
+      "oppositeSpherical": {
+        "value": true,
+        "key": false
+      }
+    },
+    {
+      "family": "outdoor-artifacts:outdoor-dark-metal",
+      "onlyCovered": [],
+      "onlyOpposite": [],
+      "coveredSpherical": {
+        "value": true,
+        "key": true
+      },
+      "oppositeSpherical": {
+        "value": true,
+        "key": true
+      }
+    }
+  ],
+  "validation": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 4668.4982
+  }
+}

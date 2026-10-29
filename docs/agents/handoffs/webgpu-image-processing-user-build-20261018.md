@@ -15,3 +15,8 @@ Přímo na nové4199 proběhl skutečný vstup a obraz, následný zdravý rende
 Známé omezení: původní cílová plynulost není splněná, existují čtyři kratší záseky při přepnutí světel a pozdější mezery mimo callback. Následuje oddělení přípravy materiálů od bind/draw přes existující omezený profiler. KEY-31 a celý migrační cíl zůstávají otevřené.
 
 Přesné vlastní soubory: lokální .cache/webgpu-image-processing-user-build-20261018/ včetně snapshotu, čtyř service skriptů, build identity a smoke evidence; tento handoff. Živé PID nejsou verzované. Služby nebyly ukončené a claim se neuvolňuje. Hrané4198 a starší zdroje/dist/deps beze změny.
+
+
+## Odstavení na pokyn koordinátora KEY-44 — 19. 10. 2026
+
+Vlastní API a preview procesy byly po ověření přesné identity ukončeny; porty jsou bez listeneru. Snapshot, build, závislosti a veškerá evidence zůstávají zachované. Procesní rezervace se po tomto předání uvolňuje; před restartem je nutný nový claim. Souhrn vlastníků, obnovitelných cest a operačních receipts: [webgpu-hitch-validation-20261017.md](webgpu-hitch-validation-20261017.md), oddíl Pozastavení a předání koordinátorovi KEY-44. Žádný commit, integrace ani nový test/build/GPU běh.

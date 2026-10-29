@@ -7,3 +7,8 @@ Vše ve vlastní `.cache/webgpu-day13-user-build-20261018/`: snapshot-v2 (source
 Build/fullTS,1427testů a izolovaná integrationPASS. Aktivní Edge vstup, auto→low prvníF a high/medium/low roundtrip zdravé. Startup~58s; původní~4s prvnílowF nyní~150ms, zbývají kratšíhitches aFPS. Přesnéexporty/raw/snímky jsou vedlebuildidentity; podrobnépředání Gamequality tasku omezuje rozsah přijetí.
 
 První snapshot bez qualitymatrix (`snapshot`,runtime) je zachovaný a služby zastavené. Jeho neaktivnítab timeout a následná platná reprodukce auto-low4s nejsou přepsané. Hrané4193/4192/4188 se nemění. Před dalšími GPU/heavy testy ověřit, zda uživatel novou4195 právě nehraje; předání URL není souhlas přepisovat tuto živou verzi.
+
+
+## Odstavení na pokyn koordinátora KEY-44 — 19. 10. 2026
+
+Vlastní API a preview procesy byly po ověření přesné identity ukončeny; porty jsou bez listeneru. Snapshot, build, závislosti a veškerá evidence zůstávají zachované. Procesní rezervace se po tomto předání uvolňuje; před restartem je nutný nový claim. Souhrn vlastníků, obnovitelných cest a operačních receipts: [webgpu-hitch-validation-20261017.md](webgpu-hitch-validation-20261017.md), oddíl Pozastavení a předání koordinátorovi KEY-44. Žádný commit, integrace ani nový test/build/GPU běh.
