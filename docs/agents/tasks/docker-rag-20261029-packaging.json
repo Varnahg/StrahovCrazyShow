@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-rag-20261029-packaging",
+  "title": "Docker: jednoduchý Compose celek pro hru, pgvector a automatický import",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "compose.yaml",
+    "compose.ai.yaml",
+    "compose.rag.yaml",
+    "Dockerfile",
+    ".dockerignore",
+    ".env.example",
+    "docs/deployment/docker.md",
+    ".cache/docker-rag-packaging-20261029/",
+    "docs/agents/handoffs/docker-rag-20261029-packaging.md",
+    "_bmad/render/bmad-build/strahovcrazyshow-50835127d9e0/",
+    "_bmad-output/implementation-artifacts/docker-rag-20261029/",
+    "compose.full.yaml",
+    ".gitignore",
+    "tests/docker-full-config.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zajistit jeden srozumitelný Compose startup na jiném notebooku s vloženými uživatelskými secrets: hra, pgvector, bootstrap/migrace/role/import ve společném Docker celku a trvalá embedding cache. Navázat na kontrakt disjunktních bootstrap skriptů.",
+    "Porovnat jen potřebné varianty existujících Compose overlays vs výchozího celku a zvolit nejjednodušší přenositelné řešení. Zachovat funkční start hry bez nakonfigurovaného AI a jasně popsat aktivaci AI/importu, persistence a skutečně podporovaný korpus.",
+    "Secrets nesmí vstoupit do image/build args/frontend bundle či veřejných logů. Zachovat non-root runtime, server-only AI, omezené DB role, interní DB síť bez zbytečného host portu a zdravotní/pořadové podmínky startu.",
+    "Persistentní DB/cache/credentials mají přežít restart a doložený přesun; nepoužívat destruktivní výchozí reset nebo opakované placené přepočítání. Dokumentace rozliší dodané veřejné seed embeddingy od importu nového či změněného dokumentu.",
+    ".env.example obsahuje jen placeholdery a nutné volby; uživatel nemá ručně tvořit role, migrovat DB či skládat připojovací řetězce tam, kde to bootstrap může odvodit.",
+    "BMAD renderer a staging jen v rezervovaném prefixu, další případné artefakty v taskovém implementation/cache prefixu. Nepřepisovat týmové/upstream BMAD soubory ani nespouštět nový široký audit. Sdílené API/bootstrap skripty/package/lock/CI nejsou v tomto scope."
+  ],
+  "verification": [
+    "Lehké statické a targeted kontroly konfigurace/dokumentace s falešnými secrets; žádné docker compose config s reálnými hodnotami v tool výstupu. Lokální node_modules jen číst, bez pnpm exec/run.",
+    "Skutečný build, Docker start, migrace, restart, volume transfer a porty až samostatný validační task. Tento task nemá heavy-validation ani porty, GPU nebo paid resource.",
+    "Po dokončení porovnat pouze vlastní diff, dokumentovaný jediný příkaz, secret hranice a lifecycle. Integrační přijetí vyžaduje také přijatý bootstrap a seed nebo výslovně doloženou variantu bez seedu."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Nová přímá lidská priorita ověřena v chatu01a17e9d-dd4a-7fe3-91ac-4f3bc548982d: vložit pouze secrets a jednoduše spustit celý Docker celek včetně embeddingů a vektorové DB.",
+    "Při registraci nebyl nalezen aktivní Docker ani překrývající se renderer owner; existující dotčené soubory byly Gitclean. Před zápisem vlastní claim, ready neruší případnou pozdější kolizi.",
+    "Odlehčený postup, jeden stručný plán funkčního celku, cílené testy a společné review před integrací. Přímý implementační podagent další BMAD workflow nespouští.",
+    "Žádné změny RAG/shared runtime API, žádný automatický reset/prune původní DB nebo placené cache, žádné secret hodnoty v Gitu či logu. Docker/build/DB/liveAPI validace potřebuje samostatný konkrétní plán a resource okno.",
+    "Disjunktní část B pro root koordinátora. BMAD prefix byl dříve v rag-auto-20261028-research, ale jeho claim při registraci již není aktivní; starý research task se nesmí současně znovu claimnout na tentýž prefix.",
+    "Úpravy metadata původní C větve se nesynchronizují z main automaticky; budoucí čistý export naváže na accepted main43175fc4 s ověřeným konkrétním diffem. WebGPU diagnostika zůstává samostatně blocked.",
+    "Na konkrétní navazující požadavek přidán compose.full.yaml pro zvažovaný jediný příkaz docker compose -f compose.full.yaml up -d --build. Existující game/ai/rag Compose se mění jen při doložené potřebě. Generované oddělené owner/reader/ingester credentials mohou být persistentními interními secret soubory; uživatel má dodat jen skutečně potřebné vlastní key file.",
+    "Po doloženém zastavení zápisů/release ownera docker-rag-packaging-01a17e9d přidány .gitignore pro secrets/ a tests/docker-full-config.test.ts. Vlastní WIP compose.full.yaml, dvě COPY změny Dockerfile, spec a handoff má zapsaný původ; stejný owner jej po novém claimu může doloženě převzít přes --adopt-dirty. Žádný runtime/source soubor admin tímto krokem neupravoval.",
+    "S bootstrap autorem potvrzené rozhraní: owner+ingester credentials v odděleném owner volume, reader v druhém, OpenAI key file jako runtime secret; seed-cache schemaVersion1/entries(profile,input,inputHash,vector), seed-documents schemaVersion1/bundles(KnowledgeDocumentBundleV3). Hodnoty secrets nepatří do těchto artefaktů.",
+    "29.10.2026 přijato jako KEY70 v PR39/main9fbc76477bfd941bc3a71bc8dbc5ad645af4ebd2. Exact-head verify/secrets/project-acceptance success na94a0cc32, merge tree e3ed142a6b8633f8808adff164d26b7b2b5c9c32 shodný a D main ff-only/clean/0-0. Skutečné Docker fresh/restart/druhýprojekt/ACL/safe-failure a101vectors/0attempts doložené v handoffu. Done nepokrývá celý crawler, všechny katalogové zdroje, fyzický druhý notebook ani WebGPU timeout. Policy-blokovaný volitelný cleanup se neopakuje."
+  ]
+}

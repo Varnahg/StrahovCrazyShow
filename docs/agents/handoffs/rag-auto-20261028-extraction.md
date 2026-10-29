@@ -72,6 +72,8 @@ Serializer nyní používá stejnou množinu renderovaných řádků pro source 
 
 Nové skutečné RED3/3 před opravou jsou v `table-lineage-red.log`; GREEN3/3 v `table-lineage-green.log`. Test používá skutečné DoclingDocument/TableData/TableCell a skutečný Chunker, ověřuje nesouvislé hlavičky s kontextem, přesnou body rekonstrukci s multiplicitou, sparse parser row a CSV/TSV. Následná sada nových i relevantních HTML/DOCX/table regresí prošla **17/17** za28,94 s, log `table-lineage-regressions.log`. Žádná síť, modelová inference, instalace, API nebo změna cizího scope; pomocníci skončili. Nový test je `tools/rag_ingestion/tests/test_table_lineage.py`.
 
+Table lineage checkpoint je commit `1de033a4`; původní HTML výkonový checkpoint `dfeb1916` zůstává samostatně doložený. Root nyní uvolňuje celý extraction prefix pro disjunktní navazující `rag-auto-20261028-normalizer`, jehož příjemcem bude `/root/implement_openai_normalizer`. Předává pouze potřebu číst stávající worker/chunker a měnit přidělený serializer/README spolu s novými normalizačními soubory; nejde o volné převzetí ostatního Pythonu. Poslední vlastní dirty změnou je tento root handoff, žádný pomocník neběží. Foundation současně zapisuje pouze své Node/shared typy/validátory, nikoli tento Python prefix.
+
 ## HTML kandidát — 28. 10. 2026, 21:42 UTC
 
 Příjemce `/root/implement_html_extraction` převzal původní task claimem `rag-html-refactor-01a17e9d --adopt-dirty`, pouze předaný handoff byl dirty. Upravuje `docling_adapter.py`, `worker.py`, nový `tests/test_html_backend.py` a tento záznam; žádné staging/commity. Současný nadřazený HEAD se mezitím posunul na `a5ac67d199be1a94ba8d05df16610f857e31e6a9`; jiné změny agent nepřebírá.

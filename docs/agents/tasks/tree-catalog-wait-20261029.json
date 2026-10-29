@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "tree-catalog-wait-20261029",
+  "title": "Stromy: doložit a případně opravit čekání na dokončení detailu v katalogovém testu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/tree-catalog-loading.test.ts",
+    ".cache/tree-catalog-wait-20261029/",
+    "docs/agents/handoffs/tree-catalog-wait-20261029.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Prověřit konkrétní selhání PR37 CI verify40859139264 na head fabf7978e59adf18eba431e46a10f65985cb9fd1: test late catalog detail obeys current winter and transformed source root očekává2 near meshes, po settle dostal0. Rozlišit pozorovaný stav, doložený async mechanismus a dosud chybějící důkaz.",
+    "Před případnou editací doložit, zda pevných14 setImmediate v helperu settle skutečně čeká na fetch/body/SHA/decode/publish chain. Izolované PASS samo nevysvětluje selhání celé CI sady; nezvyšovat počet ticků nebo sleep pouze podle odhadu.",
+    "Je-li příčinou čekání fixture, použít skutečnou bounded completion condition/promise původní operace při zachování všech winter/transform/visibility assertions a neprázdné mesh kontroly. Nezamaskovat loadError, nezměnit produkční runtime a nepřidat produkční test hook.",
+    "Předat malý test-only diff, cílený refaktoring, konkrétní důkaz původního selhání a výsledky odpovídajících testů/strict TS. Pokud se doloží runtime chyba, pouze ji předat koordinátorovi pro samostatný scope."
+  ],
+  "verification": [
+    "Číst související loader/renderer řetězec a existující opravenou tree-cluster-streaming fixture. Případné kontrolované delayed-response/body/decode probe jen ve vlastní cache, bez změny runtime a bez velkých assetů.",
+    "Spouštět přímo node node_modules/tsx/dist/cli.mjs --test tests/tree-catalog-loading.test.ts, případně úzce související testy; nikdy pnpm exec/run. Strict TS musí zahrnout změněnou fixture, protože předchozí podobná oprava zachytila implicit-any až při plné kontrole.",
+    "Žádná celá sada, build, instalace, GPU, hra, server, placené API či asset regenerace. CPU NullEngine je pouze důkaz testovacího chování, nikoli vykreslování/výkonu.",
+    "Staging/commit/integraci provede koordinátor v jeho integračním okně; původní neúspěšné CI zůstává evidované. Nový PR head musí mít vlastní CI."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Přímé úzké zadání RAG koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d jako oprava jediné CI překážky PR37.",
+    "CI hlásí2810 total,2807 pass,1 fail,2skip; build/SDK přeskočené, nejde o PASS. Pozorovaná fixture má settle14ticků; přesné přiřazení příčiny musí doložit autor, není předem prohlášené.",
+    "Soubor při registraci Gitclean a bez aktivního writera. Před zápisem vlastní claim; nepřebírat cizí WIP podle stáří.",
+    "Použít odlehčený postup a již běžící read-only průzkum, neopakovat BMAD workflow. Předchozí pnpm exec incident změnil sdílené dependencies; explicitní přímý Node příkaz je povinný.",
+    "29.10.2026 přijato po merge PR37 na8d3e69eccbce326ea198351507b5ea3a52e7cf82 a ověření celého accepted tree23aa5a8c2d8a55aaa638634cb9f283c9d7f22f1c. D main synchronizovaný ff-only, čistý a0/0; žádná nová hra/build/DB/instalace."
+  ]
+}

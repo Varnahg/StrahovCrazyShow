@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-ui-20261029-viewport-loader",
+  "title": "Úvod hry: opravit viewport a CTA prvních obrazovek a sjednotit SCS loader",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/style.css",
+    "client/welcome-screen.css",
+    "client/welcome-screen.tsx",
+    "client/loading-screen.tsx",
+    "client/use-viewport-height.ts",
+    "tests/welcome-screen.test.ts",
+    "tests/startup-progress.test.ts",
+    ".cache/rag-ui-20261029-viewport-loader/",
+    "docs/agents/handoffs/rag-ui-20261029-viewport-loader.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Začít implementaci až po skutečné integraci PR37 do main, předání jeho finálního merge/source checkpointu a výslovném přepnutí tohoto tasku na ready koordinátorem katalogu. Do té doby pouze čtecí příprava bez rezervace či změn source.",
+    "Podle přímého navazujícího zadání uživatele opravit velikost, okraje, využití viewportu a dostupnost CTA prvních dvou obrazovek. Zachovat již přijatý Jantar onboarding, profil/editor/back flow, přístupnost a funkční chování.",
+    "Sjednotit načítací obrazovku do požadovaného futuristického SCS vzhledu. Zachovat skutečné startup stage/progress/error stavy a jejich význam; nevymýšlet procenta či dokončení a neobcházet readiness.",
+    "Úpravy globálního style.css omezit na konkrétní dotčené onboarding/loading selektory. Volitelný use-viewport-height.ts přidat jen při doložené potřebě; správný resize/visualViewport listener lifecycle a cleanup bez per-frame polling.",
+    "Nedotýkat se game.ts, ui.tsx, rendereru, WebGPU timeoutu, startup runtime ani serveru/SQL/RAG. Potřebu jiného souboru nebo integračního API nejprve předat koordinátorovi.",
+    "Implementaci, cílený refaktoring a lehké testy předat společně. Respektovat reduced-motion, klávesnici, dlouhé CZ/EN texty a malé/nízké viewporty bez schovaných CTA nebo nechtěného ořezu."
+  ],
+  "verification": [
+    "Po odblokování ověřit accepted main a konkrétní stávající DOM/CSS/progress řetězec, shrnout jednu zvolenou úpravu. Průběžně cílené testy welcome-screen/startup-progress a odpovídající strict TypeScript přímými Node nástroji bez dependency synchronizace.",
+    "CPU testy mohou ověřit markup, stavy a lifecycle. Vizuální posouzení velikostí/okrajů není prokázané pouze testem CSS textu; následnou skutečnou vizuální kontrolu koordinátor naplánuje odděleně s potřebnými rezervacemi.",
+    "Bez plného buildu/sady, prohlížečové 3D scény, GPU, serveru, instalace nebo placených API pod tímto taskem. Žádný zásah do živých neměnných4278/4280 služeb.",
+    "Odlehčený postup: jeden stručný plán, cílené testy a jedno společné review funkčního celku před integrací. Nové cache/temp výstupy pouze ve vlastním prefixu; handoff uvede skutečné výsledky a neprovedené vizuální kontroly."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Navazující přímé uživatelské zadání předané RAG koordinátorem01a17e9d-dd4a-7fe3-91ac-4f3bc548982d; jde o oddělený celek po AI/RAG commit/main.",
+    "29.10.2026 blokace odstraněna: PR37 skutečně merged na main8d3e69eccbce326ea198351507b5ea3a52e7cf82 po green CI632c61c1; přijatý tree23aa5a8c2d8a55aaa638634cb9f283c9d7f22f1c ověřený. UI autor může získat vlastní claim; runtime/source výchozí stav musí navazovat na tento accepted checkpoint.",
+    "Tyto source cesty při registraci neměly aktivního writera a existující cesty byly Gitclean. use-viewport-height.ts zatím neexistuje a je pouze volitelný přidělený nový soubor, nikoli povinnost jej vytvořit.",
+    "Budoucí samostatný WebGPU timeout má vlastní zadání a nesmí se přibalit do tohoto UI diffu. Samotná příprava tasku neposouvá přijetí rendereru ani celé hry.",
+    "29.10.2026 přijato v PR38/main43175fc4ae1b855686638821b164867fe614a598; celý tree d5f20e7ebb56f4a2ff935fb2fb5fecfb9b6b52d1 shodný s77a2a661, exact-head verify/secrets/project-acceptance success. D main ff-only synchronizovaný, čistý a0/0. Done se týká přijatého UI layout/loader rozsahu; healthy GPU preview, herní startup, WebGPU timeout a celý RAG katalog se tím neuzavírají."
+  ]
+}

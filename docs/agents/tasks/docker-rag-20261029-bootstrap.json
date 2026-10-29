@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-rag-20261029-bootstrap",
+  "title": "Docker: idempotentní bootstrap RAG a spuštění hry",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/docker-rag-bootstrap.ts",
+    "scripts/docker-game-entrypoint.mjs",
+    "scripts/docker-rag-secrets.mjs",
+    "tests/docker-rag-bootstrap.test.ts",
+    "tests/docker-game-entrypoint.test.ts",
+    ".cache/docker-rag-bootstrap-20261029/",
+    "docs/agents/handoffs/docker-rag-20261029-bootstrap.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Automatizovat DB bootstrap, omezené role, verzované migrace a import nad již existujícími RAG kontrakty. Rozhraní env/secret souborů, exitů, health a pořadí služeb nejprve stručně domluvit s vlastníkem Docker packaging tasku; nevytvářet druhou ingest/cache infrastrukturu.",
+    "Nové skripty umožní uživateli vložit pouze skutečné uživatelské secrets a spustit jeden Compose celek. Interní DB credentials a jejich persistentní uložení řešit automaticky bez logování hodnot; hra nesmí dostat vlastnická/migrační práva DB.",
+    "Bootstrap je idempotentní, bezpečný při restartech a přerušeném pokusu; zachovat stávající embedding profily, hashe, trvalou cache a ledger nejistých pokusů. Stejný korpus nesmí při restartu automaticky znovu spotřebovat placené embeddingy.",
+    "Přijatý seed číst jen přes domluvené schéma a validaci. Kompatibilitu model/provider/dimensions/input identity ověřit před použitím; query/chat/private data neimportovat jako veřejné dokumenty. Nehotovou hromadnou akvizici/crawler nepředstírat hotovým seed importem.",
+    "Entrypoint správně předává SIGTERM/exit status, uklízí vlastní child/resources a nevytváří nekonečný retry při neplatném secretu, migraci nebo nejistém placeném pokusu. Chyby logovat bez citlivých hodnot.",
+    "Společně předat implementaci, cílený refaktoring, fake/unit/strict TS a přesný kontrakt pro packaging. Jen tyto skripty/testy, žádný Dockerfile/compose, server/shared API či package/lock zápis."
+  ],
+  "verification": [
+    "Přímé Node/tsx fake/unit testy bootstrapu a entrypointu; žádná instalace nebo pnpm exec/run. Testy pokryjí fresh/restart/migration failure, omezení rolí, persistence/cache reuse, nekompatibilní seed a signal/exit cleanup.",
+    "Pod tímto bezresource taskem nespouštět skutečný Docker/build/DB/server, nečíst soukromé klíče ani neposílat API. Všechny nové test/cache/temp výstupy pouze do vlastního cache prefixu.",
+    "Reálné cold start/restart/transfer přijetí je následné samostatné okno root koordinátora; fake test není doklad bezplatného restartu skutečného placeného importu."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Nová přímá lidská priorita ověřena v chatu01a17e9d-dd4a-7fe3-91ac-4f3bc548982d: vložit pouze secrets a jednoduše spustit celý Docker celek včetně embeddingů a vektorové DB.",
+    "Při registraci nebyl nalezen aktivní Docker ani překrývající se renderer owner; existující dotčené soubory byly Gitclean. Před zápisem vlastní claim, ready neruší případnou pozdější kolizi.",
+    "Odlehčený postup, jeden stručný plán funkčního celku, cílené testy a společné review před integrací. Přímý implementační podagent další BMAD workflow nespouští.",
+    "Žádné změny RAG/shared runtime API, žádný automatický reset/prune původní DB nebo placené cache, žádné secret hodnoty v Gitu či logu. Docker/build/DB/liveAPI validace potřebuje samostatný konkrétní plán a resource okno.",
+    "Disjunktní implementační část A. bootstrap je podle posledního požadavku TypeScript (.ts), game entrypoint a případný secrets helper jsou .mjs; alternativní bootstrap.mjs zde není přidělený.",
+    "Veřejné bootstrap-cache.json/bootstrap-documents.json má samostatný seed task, zde jsou pouze čtecí vstupy po přijetí.",
+    "29.10.2026 přijato jako KEY70 v PR39/main9fbc76477bfd941bc3a71bc8dbc5ad645af4ebd2. Exact-head verify/secrets/project-acceptance success na94a0cc32, merge tree e3ed142a6b8633f8808adff164d26b7b2b5c9c32 shodný a D main ff-only/clean/0-0. Skutečné Docker fresh/restart/druhýprojekt/ACL/safe-failure a101vectors/0attempts doložené v handoffu. Done nepokrývá celý crawler, všechny katalogové zdroje, fyzický druhý notebook ani WebGPU timeout. Policy-blokovaný volitelný cleanup se neopakuje."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-openai-pdf",
+  "title": "RAG: samostatný OpenAI PDF extrakční adaptér",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/rag-pdf-extraction.ts",
+    "tests/rag-pdf-extraction.test.ts",
+    ".cache/rag-auto-openai-pdf-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-openai-pdf.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat jen Node adaptér podle docs/rag-ingestion/20261028/openai-pdf-contract.md. Před implementací znovu ověřit skutečný primární request/response tvar fixed count a Responses PDF endpointů; nevymýšlet page_range nebo nedoloženou podporu.",
+    "PDF přijímat jako již získané bytes s očekávaným SHA a explicitním počtem stran. Před sítí kontrolovat hash, signaturu a limity; žádné file_url, další upload, tools nebo dokumentem volený endpoint/model.",
+    "Oddělit count receipt od generace a pevně jej svázat s request hashem a neměnným extraction profilem. Změna chunkování nesmí sama vyvolat opakovanou placenou extrakci. Count není deklarovaný jako bezplatný nebo jako dokončená extrakce.",
+    "Strict structured výstup je validovaný kandidát: kontrolovat očekávané stránky, bounded bloky/tabulky, nepřekrývající se buňky a skutečně doložitelné provenance. Refusal/incomplete/invalid JSON/limit nejsou částečný publikační úspěch; schema samo neprokazuje věrnost PDF.",
+    "Bounded API/body/abort/late-response cleanup, právě jeden onAttempt po lokální validaci, žádný automatický retry. Zachovat skutečné/nejisté usage včetně reasoning podmnožiny, bez raw PDF textu, hlaviček nebo klíčů v chybách/logu.",
+    "Pouze fake HTTP testy, refaktoring a strict TypeScript. Žádné skutečné API klíče/livecalls, Python, SQL/shared/provider/router/package/CI změny, build nebo listener."
+  ],
+  "verification": [
+    "Testovat skutečnou serializaci count i Responses requestu, hash/profile/receipt vazbu, nulové volání při lokálně neplatném vstupu a bezpečný callback rejection.",
+    "Pokrytí invalidních stránek/tabulek, refusal/incomplete/malformed response/usage, budgetů, stream deadline, caller abort a ignorující late response. Použít syntetické fixtures a fake transport; neověřovat jen kopii konstant.",
+    "Přímo explicitní Node/tsx/TypeScript vstupy, žádný pnpm exec/run nebo install. Výsledek neoznačovat za kvalitativní přijetí skutečné PDF extrakce; případný živý pilot potřebuje následný konkrétní rozpočet/task."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, současná větev codex/automated-document-rag; samostatná komponenta otevřeného KEY-67.",
+    "Uživatelský návrh OpenAI převodu PDF a hlavní priorita Decisions jsou oddělené: tato komponenta nesmí měnit router PR35 ani jeho podmínky/rozpočet. Automatický ingest a archiv tím nejsou uzavřené.",
+    "Kontrakt/research jsou read-only vstup vlastněný koordinátorem; child má pouze svůj modul/test/cache/handoff. Před zápisem vlastní claim; bez rekurzivního BMAD workflow.",
+    "Admin registroval metadata; nečetl žádný klíč, nevolal API a nepublikoval extrahovaný obsah."
+  ]
+}

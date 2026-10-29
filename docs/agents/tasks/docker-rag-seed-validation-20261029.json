@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-rag-seed-validation-20261029",
+  "title": "Docker seed: čtecí audit již pořízených veřejných embeddingů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/docker-rag-seed-validation-20261029/",
+    "docs/agents/handoffs/docker-rag-seed-validation-20261029.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "port:5468"
+  ],
+  "acceptance": [
+    "Root nejdřív ověří identitu, původní stav, volume a port5468 svého existujícího kontejneru strahov-rag-20261028. Při potvrzeném vlastnictví jej smí dočasně spustit pro tento čtecí audit; žádný cizí listener se neukončuje podle portu.",
+    "Z chráněné legacy DB číst pouze dokumentové embeddingy explicitního veřejného korpusu pro kompatibilní default large3072 profil. Ze scratch rag_auto_0dadab175ad3_test číst jen56v3 dokumentových vektorů podle předaného plánu. Žádný plošný cache/DB dump.",
+    "V3 vstup .cache/rag-auto-20261028/first-document-plan.json má SHA256 efea7de81b31c563a0250584f6c6daced20289d25561e128ad13ea800d49ff18,56bloků/chunků,11159UTF8B, sourceVersion cde828c736d37d42aba3a79689e7e9fdced81e5a6438969ca6a7cd2f258e7157 a profile bfa5e41dd0947f3e7cf1be3b4cb55dc9c1fcec6ec28f258e8967585a10d72937/title-heading-text-v2. Legacy a v3 profily se nepřeznačují.",
+    "DB operace pouze read-only: žádné migrace, změny rolí, import, zápisy head/cache nebo ledgeru. Žádné API volání; staré placené rozpočty zůstávají zavřené.",
+    "Nejdřív pracovní export ve vlastní cache, potom whitelist/provenance/quality/metadata/sourceVersion/input/profile hash, finite3072dimenzionální vektory a kontrola nepřítomnosti secrets/query/chat/session dat. Dva veřejné JSON lze publikovat jen pod současným docker-rag-20261029-seed claimem.",
+    "Zachovat původní DB head/cache/vector stavy i volume, doložit před/po a zavřít vlastní klienty. Vlastní kontejner vrátit do ověřeného původního stopped stavu před release; žádný Docker reset/prune, build, GPU, hra nebo další server."
+  ],
+  "verification": [
+    "Před jakýmkoli startem oba claims a skutečný container/volume/port preflight. Původní název/PID sám vlastnictví nedokazuje.",
+    "Offline validace přesného veřejného exportu a bezpečný manifest zahrnutých dokumentů/profilů/hashů bez tajných hodnot. Query/private cache se do artefaktu nesmí dostat.",
+    "Pouze explicitní nástroje bez instalace/pnpm exec/run. Tento audit ještě nedokládá plný Docker cold start/restart/transfer na druhý notebook."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Konkrétní plán autorizovaného RAG koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d navazuje na přímou lidskou prioritu jednoduchého Docker celku.",
+    "Kontejner byl hlášen jako stopped; skutečný stav musí root ověřit znovu. Export/provenience předchází veřejné publikaci, nejde o oprávnění exportovat celou DB.",
+    "Packaging/build a jakékoli nové modelové volání mají jiné oprávnění a validační okno; tento task pouze audit/export již pořízených dokumentových vektorů.",
+    "29.10.2026 přijato jako KEY70 v PR39/main9fbc76477bfd941bc3a71bc8dbc5ad645af4ebd2. Exact-head verify/secrets/project-acceptance success na94a0cc32, merge tree e3ed142a6b8633f8808adff164d26b7b2b5c9c32 shodný a D main ff-only/clean/0-0. Skutečné Docker fresh/restart/druhýprojekt/ACL/safe-failure a101vectors/0attempts doložené v handoffu. Done nepokrývá celý crawler, všechny katalogové zdroje, fyzický druhý notebook ani WebGPU timeout. Policy-blokovaný volitelný cleanup se neopakuje."
+  ]
+}
