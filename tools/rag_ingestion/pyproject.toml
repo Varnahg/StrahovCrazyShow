@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "strahov-rag-ingestion"
+version = "0.1.0"
+description = "Isolated, provenance-preserving document extraction worker"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "docling-slim[convert-core,format-pdf,format-office,format-web,format-opendocument]==2.144.0",
+  "docling-core==2.105.0",
+  "defusedxml==0.7.1",
+  "tiktoken==0.12.0",
+  "pypdf==6.10.0",
+  "protego==0.7.0",
+]
+
+[project.optional-dependencies]
+cpu-models = [
+  "docling-slim[models-local,feat-ocr-easyocr]==2.144.0",
+  "docling-ibm-models==4.0.4",
+  "easyocr==1.7.2",
+  "torch==2.9.1+cpu",
+  "torchvision==0.24.1+cpu",
+]
+
+[tool.uv]
+environments = ["sys_platform == 'win32'", "sys_platform == 'linux'"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
+[dependency-groups]
+dev = ["pytest==8.4.2", "reportlab==4.4.4"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["strahov_rag_ingestion"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

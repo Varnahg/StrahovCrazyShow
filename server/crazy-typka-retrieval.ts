@@ -4,66 +4,23 @@ import {
   CRAZY_TYPKA_LIMITS,
   CRAZY_TYPKA_SOURCE_HOSTS,
   isCrazyTypkaSource,
-  type CrazyTypkaSource,
+  type LegacyCrazyTypkaSource,
 } from "../shared/crazy-typka";
-
-const topics = [
-  "membership",
-  "network",
-  "office",
-  "projects",
-  "sport",
-  "documents",
-  "housing",
-  "housing-payments",
-  "housing-arrival",
-  "housing-termination",
-  "housing-maintenance",
-  "dining",
-  "photography",
-  "printing",
-  "game-room",
-] as const;
-export type KnowledgeTopic = (typeof topics)[number];
-export type KnowledgeAuthority = "silicon-hill" | "suz";
-export type KnowledgeDocument = {
-  id: string;
-  title: string;
-  url: string;
-  discoveryUrl: string;
-  authority: KnowledgeAuthority;
-  status: "current";
-  checkedAt: string;
-  reviewAfter: string;
-  effectiveFrom: string | null;
-  effectiveUntil: string | null;
-  author: string | null;
-  license: string | null;
-  licenseUrl: string | null;
-  sourceUpdatedAt: string | null;
-  documentDate: string | null;
-  authorityLevel: string;
-  versionNote: string;
-};
-export type KnowledgeChunk = {
-  id: string;
-  text: string;
-  sourceLocator: string;
-  source: CrazyTypkaSource;
-  document: Readonly<KnowledgeDocument>;
-  versionNote: string;
-  contentSha256: string;
-  topic: KnowledgeTopic;
-};
-export type RawKnowledgeChunk = {
-  id: string;
-  sourceId: string;
-  text: string;
-  sourceLocator: string;
-  topic: KnowledgeTopic;
-  keywords: string[];
-  contentSha256: string;
-};
+import {
+  KNOWLEDGE_TOPICS as topics,
+  type KnowledgeTopic,
+  type KnowledgeAuthority,
+  type KnowledgeDocument,
+  type KnowledgeChunk,
+  type RawKnowledgeChunk,
+} from "./rag-knowledge-types";
+export type {
+  KnowledgeTopic,
+  KnowledgeAuthority,
+  KnowledgeDocument,
+  KnowledgeChunk,
+  RawKnowledgeChunk,
+} from "./rag-knowledge-types";
 function object(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -162,7 +119,7 @@ function sourceUrl(
     return false;
   }
 }
-function citationFor(source: KnowledgeDocument): CrazyTypkaSource {
+function citationFor(source: KnowledgeDocument): LegacyCrazyTypkaSource {
   return Object.freeze({
     id: source.id,
     title: source.title,

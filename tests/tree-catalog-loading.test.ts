@@ -17,7 +17,6 @@ import { encodeSeasonalGlb } from "../scripts/tree-seasonal-stream.mjs";
 
 const sha = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 const buffer = (bytes: Uint8Array) => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
-const settle = async () => { for (let i = 0; i < 14; i++) await new Promise<void>(resolve => setImmediate(resolve)); };
 
 /** Tiny actual GLBs for all known source identities; no private cache or large
  * authoring assets. FAR cards go through the same v4 bank/placement decoder. */
@@ -167,15 +166,23 @@ test("failure while applying a fully published catalog clears it before whole le
   assert.match(h.renderer.stats.loadError!, /first visibility/);
 });
 
-test("late catalog detail obeys current winter and transformed source root", async t => {
+test("late catalog detail obeys current winter and transformed source root", { timeout: 10000 }, async t => {
   const h = harness(t); await h.renderer.load(); const source = TREES[0], group = h.r.treeGroups.find((g: any) => g.id === source.osmId);
+  const detailLoads = t.mock.method(h.r, "loadDetail");
   const near = group.stream.prototype.lods[0]; let finish!: (response: Response) => void;
   t.mock.method(globalThis, "fetch", (url: unknown) => String(url) === near.url ? new Promise<Response>(resolve => finish = resolve) : h.fetchFixture(url));
   group.desired = 0; h.r.startDetailLoads();
+  assert.equal(detailLoads.mock.calls.length, 1);
+  const detail = detailLoads.mock.calls[0];
+  assert.equal(detail.arguments[0], group); assert.equal(detail.arguments[1], 0);
+  assert.ok(detail.result instanceof Promise);
   const moved = { x: source.x + 2, y: group.root.position.y + 1, z: source.z + 3 };
   h.renderer.setTreeTransform(source.osmId, moved, .5);
   h.renderer.update({ time: 1, quality: "low", player: { x: 10000, y: 0, z: 10000 }, wind: { x:0,z:0,speed:0 }, season: getTreeSeasonState(Date.UTC(2026,0,15)) });
-  finish(new Response(buffer(h.files.get(near.url)!))); await settle();
+  finish(new Response(buffer(h.files.get(near.url)!)));
+  // The original operation includes body/SHA validation, decode and publication.
+  // Event-loop turns cannot guarantee that asynchronous integrity work finished.
+  await detail.result;
   assert.equal(group.active, 2); assert.equal(group.lods[0].length, 2);
   for (const mesh of group.lods[0] as Mesh[]) {
     assert.equal(mesh.parent, group.root); assert.equal(mesh.isEnabled(), false);

@@ -9,6 +9,12 @@ import {
   CRAZY_TYPKA_LIMITS,
   CRAZY_TYPKA_SPEAKER,
   isCrazyTypkaRequestSeq,
+  CURRENT_KNOWLEDGE_SCOPE,
+  crazyTypkaScopeKey,
+  isCrazyTypkaKnowledgeScope,
+  mergeCrazyTypkaSources,
+  type CrazyTypkaKnowledgeScope,
+  type CrazyTypkaSource,
   type CrazyTypkaErrorCode,
   type CrazyTypkaChatResponse,
   type CrazyTypkaErrorResponse,
@@ -31,10 +37,10 @@ import {
   createConfiguredEvidenceBackend,
   prepareEvidenceQuery,
   RagEvidenceError,
+  isEvidenceCurrent,
   type AsyncEvidenceBackend,
   type EvidenceSnapshot,
 } from "./rag-evidence-backend";
-import { isKnowledgeDocumentUsable } from "./crazy-typka-retrieval";
 
 export type CrazyTypkaServiceLimits = {
   requestBytes: number;
@@ -136,6 +142,7 @@ type Session = {
   lastOperation?: Operation;
   /** Failed or blocked attempts clear this boundary without retaining rejected text. */
   previousSuccessfulUser?: string;
+  contextScope?: CrazyTypkaKnowledgeScope;
 };
 type TerminalResult = {
   status: number;
@@ -144,14 +151,23 @@ type TerminalResult = {
 type Operation = {
   seq: number;
   payloadHash: string;
+  scope: CrazyTypkaKnowledgeScope;
   evidence?: EvidenceSnapshot;
   terminal?: TerminalResult;
 };
 type Address = { requests: number[]; sessions: number[] };
-function evidenceCurrent(evidence: EvidenceSnapshot, instant: number) {
-  return evidence.chunks.every((chunk) =>
-    isKnowledgeDocumentUsable(chunk.document, instant),
-  );
+function citedSources(
+  evidence: EvidenceSnapshot,
+  ids: readonly string[],
+): CrazyTypkaSource[] {
+  const sources = ids.map((id) => {
+    const source = evidence.chunks.find((chunk) => chunk.id === id)?.source;
+    if (!source) throw new RequestError(502, "invalid-response");
+    return source;
+  });
+  const merged = mergeCrazyTypkaSources(sources);
+  if (!merged) throw new RequestError(502, "invalid-response");
+  return merged;
 }
 function rememberTerminal(
   session: Session,
@@ -164,6 +180,7 @@ function rememberTerminal(
     session.history.length = 0;
     operation.evidence = undefined;
     session.previousSuccessfulUser = undefined;
+    session.contextScope = undefined;
   }
   operation.terminal = result;
 }
@@ -317,7 +334,9 @@ export function createCrazyTypkaService(
       "decisionsPerProcess",
       "decisionTokenBudget",
       "complexGenerationsPerProcess",
-    ].includes(key) ? 0 : 1;
+    ].includes(key)
+      ? 0
+      : 1;
     if (!Number.isSafeInteger(value) || value < minimum)
       throw new Error("Invalid AI limits");
   }
@@ -400,7 +419,8 @@ export function createCrazyTypkaService(
     maxOutputTokens: 4096,
   });
   const router = enabled
-    ? (options.decisionRouter ?? createDecisionRouter({
+    ? (options.decisionRouter ??
+      createDecisionRouter({
         apiKey: providerOptions.apiKey,
         fetch: options.fetch,
       }))
@@ -634,19 +654,36 @@ export function createCrazyTypkaService(
       }
       if (
         Object.keys(body).some(
-          (key) => !["token", "requestSeq", "message", "locale"].includes(key),
+          (key) =>
+            ![
+              "token",
+              "requestSeq",
+              "message",
+              "locale",
+              "knowledgeScope",
+            ].includes(key),
         ) ||
         typeof body.message !== "string" ||
         !body.message.trim() ||
         body.message.length > CRAZY_TYPKA_LIMITS.messageChars ||
         /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(body.message) ||
         (body.locale !== "cs" && body.locale !== "en") ||
-        !isCrazyTypkaRequestSeq(body.requestSeq)
+        !isCrazyTypkaRequestSeq(body.requestSeq) ||
+        (body.knowledgeScope !== undefined &&
+          !isCrazyTypkaKnowledgeScope(body.knowledgeScope))
       )
         throw new RequestError(400, "invalid-request");
       const { key, session } = sessionFor(body.token, origin);
+      const scope =
+        body.knowledgeScope === undefined
+          ? CURRENT_KNOWLEDGE_SCOPE
+          : Object.freeze({
+              ...(body.knowledgeScope as CrazyTypkaKnowledgeScope),
+            });
       const message = body.message.trim(),
-        payloadHash = hash(JSON.stringify([message, body.locale]));
+        payloadHash = hash(
+          JSON.stringify([message, body.locale, crazyTypkaScopeKey(scope)]),
+        );
       const previous = session.lastOperation;
       if (previous?.seq === body.requestSeq) {
         if (previous.payloadHash !== payloadHash)
@@ -663,7 +700,7 @@ export function createCrazyTypkaService(
             now(),
             controller.signal,
           )) &&
-            evidenceCurrent(previous.evidence, now()));
+            isEvidenceCurrent(previous.evidence, now()));
         if (
           controller.signal.aborted ||
           sessions.get(key) !== session ||
@@ -682,7 +719,12 @@ export function createCrazyTypkaService(
         throw new RequestError(409, "request-out-of-order");
       if (session.inflight) throw new RequestError(409, "busy");
       trim(session.messages, now());
-      const digest = hash(message.toLocaleLowerCase("cs"));
+      const digest = hash(
+        JSON.stringify([
+          message.toLocaleLowerCase("cs"),
+          crazyTypkaScopeKey(scope),
+        ]),
+      );
       if (
         session.messages.length >= limits.messagesPerMinutePerSession ||
         (session.lastMessage?.hash === digest &&
@@ -702,12 +744,21 @@ export function createCrazyTypkaService(
       const operation: Operation = {
         seq: body.requestSeq,
         payloadHash,
+        scope,
         evidence: undefined,
       };
       session.lastOperation = operation;
       session.nextRequestSeq++;
       accepted = { key, session, operation };
+      if (
+        session.contextScope &&
+        crazyTypkaScopeKey(session.contextScope) !== crazyTypkaScopeKey(scope)
+      ) {
+        session.history.length = 0;
+        session.previousSuccessfulUser = undefined;
+      }
       if (greeting) {
+        session.contextScope = scope;
         session.history.push(
           { role: "user", content: message },
           { role: "assistant", content: greeting },
@@ -730,8 +781,7 @@ export function createCrazyTypkaService(
         session.expiresAt > now() &&
         !controller?.signal.aborted;
       const assertOperationActive = () => {
-        if (!operationActive())
-          throw new RequestError(409, "cancelled");
+        if (!operationActive()) throw new RequestError(409, "cancelled");
       };
       assertOperationActive();
       let decision: ComplexityDecision | undefined;
@@ -756,9 +806,7 @@ export function createCrazyTypkaService(
         recordUsage(decisions, decision.usage);
       } catch (error) {
         assertOperationActive();
-        if (
-          error instanceof DecisionRouterError && error.code === "cancelled"
-        )
+        if (error instanceof DecisionRouterError && error.code === "cancelled")
           throw new RequestError(409, "cancelled");
         const reason: RoutingFallback =
           error instanceof RequestError && error.code === "budget-exhausted"
@@ -774,6 +822,7 @@ export function createCrazyTypkaService(
         signal: controller.signal,
         now: now(),
         user: key,
+        scope,
         onEmbeddingAttempt: (inputBytes) => {
           // Preserve cancellation across the evidence backend's typed boundary.
           if (!operationActive()) throw new RagEvidenceError("cancelled");
@@ -797,13 +846,12 @@ export function createCrazyTypkaService(
           now(),
           controller.signal,
         )) ||
-        !evidenceCurrent(operation.evidence, now())
+        !isEvidenceCurrent(operation.evidence, now())
       )
         throw new RequestError(409, "response-expired");
       if (
         previous?.evidence &&
-        previous.evidence.snapshot.revisionId !==
-          operation.evidence.snapshot.revisionId
+        previous.evidence.snapshot?.id !== operation.evidence.snapshot?.id
       )
         session.history.length = 0;
       const evidence = operation.evidence.chunks;
@@ -832,6 +880,8 @@ export function createCrazyTypkaService(
         locale: body.locale as "cs" | "en",
         history: session.history,
         evidence,
+        scope,
+        now: now(),
         safetyIdentifier: key,
         signal: controller.signal,
         onGenerationStart: () => {
@@ -852,11 +902,12 @@ export function createCrazyTypkaService(
           now(),
           controller.signal,
         )) ||
-        !evidenceCurrent(operation.evidence, now())
+        !isEvidenceCurrent(operation.evidence, now())
       )
         throw new RequestError(409, "response-expired");
       assertOperationActive();
       session.previousSuccessfulUser = query.filterText;
+      session.contextScope = scope;
       session.history.push(
         { role: "user", content: message },
         { role: "assistant", content: answer.text },
@@ -868,14 +919,7 @@ export function createCrazyTypkaService(
           session.history.length - CRAZY_TYPKA_LIMITS.historyTurns * 2,
         ),
       );
-      const sources = [
-        ...new Map(
-          answer.sourceIds.map((id) => {
-            const source = evidence.find((chunk) => chunk.id === id)!.source;
-            return [source.id, source] as const;
-          }),
-        ).values(),
-      ];
+      const sources = citedSources(operation.evidence, answer.sourceIds);
       const result: CrazyTypkaChatResponse = {
         speaker: CRAZY_TYPKA_SPEAKER,
         text: answer.text,
