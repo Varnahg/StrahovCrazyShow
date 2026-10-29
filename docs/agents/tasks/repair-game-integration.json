@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-game-integration",
+  "title": "KEY-1/2/6: integrovat spolehlivou diagnostiku a měření příčin",
+  "writePaths": [
+    "docs/performance/playtest-repair-plan.md",
+    "docs/verification.md",
+    "docs/agents/handoffs/repair-game-integration.md",
+    ".cache/playtest-repairs/"
+  ],
+  "resources": [],
+  "status": "ready",
+  "dependsOn": [],
+  "acceptance": [
+    "Přímý autorizovaný cíl opravit všechny problémy z auditu13.10.2026; zachovat původní fungující chování a podklady.",
+    "Vlastní implementaci předat společně s cíleným refaktoringem, relevantním ověřením a přesnou evidencí; žádné neprokázané Done."
+  ],
+  "verification": [
+    "Cílené levné testy v tasku, GPU/build/integrace pouze koordinátorem pod repair-production-validation.",
+    "Příčiny měřit v aktuálním kódu a skutečné produkční scéně; podklady primární zdroje a původní log."
+  ],
+  "notes": [
+    "Koordinátor repairs-01a13624-admin/root. Linear projekt P-KEY-3.",
+    "Dirty soubory z předchozích automatic-diagnostics tasků jsou doloženě předané tomuto rootu; zachovat diff. Podagent může adopt-dirty pouze jako explicitní příjemce těchto konkrétních souborů dle delegace.",
+    "Nereservovat ani ukončovat původní live-dev5173/2567/buildingpreview.",
+    "14.10: runtime/test scope předán rootu do repair-wave4-bootstrap v izolované worktree; tento task drží pouze vlastní dokumentaci/cache vmain. Doloženo v handoffu."
+  ]
+}

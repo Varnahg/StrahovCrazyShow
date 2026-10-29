@@ -274,6 +274,7 @@ type AtmosphereInput = {
  * It does not move astronomical bodies or simulate weather independently. */
 export class CinematicAtmosphere {
   private pipeline?: DefaultRenderingPipeline;
+  private pipelineAttached = false;
   private shadow: ShadowGenerator;
   private environment: RawCubeTexture;
   private readonly reflection = new SkyReflectionSampler();
@@ -314,6 +315,8 @@ export class CinematicAtmosphere {
     shadowDarkness: 1,
     bloomThreshold: 0,
     bloomWeight: 0,
+    pipelineBuilds: 0,
+    pipelineAttached: false,
   };
 
   constructor(
@@ -471,24 +474,18 @@ export class CinematicAtmosphere {
         ? ShadowGenerator.QUALITY_MEDIUM
         : ShadowGenerator.QUALITY_LOW;
     if (!budget.postProcesses) {
-      this.pipeline?.dispose();
-      this.pipeline = undefined;
+      this.setPipelineAttached(false);
     } else if (!this.pipeline) {
       this.pipeline = new DefaultRenderingPipeline(
         "cinematic campus",
-        true,
+        false,
         this.scene,
         [this.camera],
         false,
       );
-      this.pipeline.imageProcessingEnabled = false;
-      // A recreated Babylon 9.30 pipeline initially assumes image processing
-      // is enabled, even if the previous one already disabled scene config.
-      // In that case the setter has no notification; synchronize its public
-      // configuration observable before preparing the chain (no extra build).
-      const imageProcessing = this.scene.imageProcessingConfiguration;
-      if (this.pipeline.imageProcessingEnabled !== imageProcessing.isEnabled)
-        imageProcessing.onUpdateParameters.notifyObservers(imageProcessing);
+      // Non-HDR keeps image processing in Standard/PBR materials and does not
+      // attach a fullscreen color pass over the display-space sky. Do not set
+      // imageProcessingEnabled=false: that also disables the scene's material grade.
       this.pipeline.fxaaEnabled = true;
       this.pipeline.bloomEnabled = true;
       this.pipeline.bloomScale = 0.5;
@@ -499,8 +496,35 @@ export class CinematicAtmosphere {
       // option above. Retain automatic updates after this initial transaction.
       this.pipeline.prepare();
       this.pipeline.automaticBuild = true;
+      this.pipelineAttached = this.stats.pipelineAttached = true;
+      this.stats.pipelineBuilds++;
+    } else {
+      this.setPipelineAttached(true);
     }
     this.scene.imageProcessingConfiguration.applyByPostProcess = false;
+  }
+
+  private setPipelineAttached(attached: boolean) {
+    if (!this.pipeline || this.pipelineAttached === attached) return;
+    const manager = this.scene.postProcessRenderPipelineManager;
+    // Keep the already compiled chain across quality switches. DefaultPipeline
+    // dispose/prepare recreates FXAA and its render effects, even when returning
+    // to the exact same settings. Low still has no postprocess passes. The one
+    // retained chain is bounded and released by dispose(), including from low.
+    if (attached) {
+      manager.attachCamerasToRenderPipeline(this.pipeline.name, this.camera);
+      this.pipeline.automaticBuild = true;
+      this.scene.autoClear =
+        (this.scene.activeCameras?.length ?? 0) > 1 ||
+        this.scene.activeCamera !== this.camera;
+    } else {
+      // An image-processing notification must not rebuild and silently reattach
+      // the suspended chain through DefaultPipeline._camerasToBeAttached.
+      this.pipeline.automaticBuild = false;
+      manager.detachCamerasFromRenderPipeline(this.pipeline.name, this.camera);
+      this.scene.autoClear = true;
+    }
+    this.pipelineAttached = this.stats.pipelineAttached = attached;
   }
 
   private configureGlass() {
@@ -627,7 +651,7 @@ export class CinematicAtmosphere {
     } else {
       this.stats.shadowCasters = this.stats.alphaCasters = 0;
     }
-    if (this.pipeline) {
+    if (this.pipeline && this.pipelineAttached) {
       const bloom = campusBloomResponse(daylight, input.rain);
       this.pipeline.bloomThreshold = bloom.threshold;
       this.pipeline.bloomWeight = bloom.weight;
@@ -672,7 +696,12 @@ export class CinematicAtmosphere {
     this.scene.onNewMaterialAddedObservable.remove(this.addedMaterial);
     this.scene.onMaterialRemovedObservable.remove(this.removedMaterial);
     this.pendingGlass.clear();
+    // Babylon disposes the chain by iterating its attached cameras. Restore the
+    // association before teardown when low detached it; no frame is rendered.
+    this.setPipelineAttached(true);
     this.pipeline?.dispose();
+    this.pipeline = undefined;
+    this.pipelineAttached = this.stats.pipelineAttached = false;
     this.shadow.dispose();
     for (const material of this.wrappers.keys())
       this.releaseShadowWrapper(material);

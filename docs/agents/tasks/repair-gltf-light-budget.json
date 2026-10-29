@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-gltf-light-budget",
+  "title": "KEY-3/4/8: zabránit glTF nafukování nevyužitých shader světelných slotů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/gltf-light-budget.ts", "tests/gltf-light-budget.test.ts", "docs/agents/handoffs/repair-gltf-light-budget.md"],
+  "resources": [],
+  "acceptance": ["Scénově vlastněný veřejnými API řízený lifecycle, bez patchování node_modules; řeší doložené glTF maxSimultaneousLights4→42/43 včetně disabled světel před skutečným renderem.", "Neodebrat skutečně působící světlo: zachovat owner-declared rozumný budget a pokrýt skutečně enabled světla; samotný pevný clamp4 není přijatý bez důkazu aktivních lightSources. Navrhnout API/politiku před kódem s root.", "Pokrýt staré i nové/loadované materiály, souběžné loadery a foreign scene, load error/cancel/dispose, zvolený pořádek před material readiness. Nevyvolávat vlastní readiness/render a nealokovat plný nový scene snapshot každý frame.", "Cílený refaktoring+skutečný minimal glTF load regression+define/cap/lifecycle evidence. Žádný FPS/compile příčinný claim bez následného GPU profilu."],
+  "verification": ["Primární instalovaný Babylon9.30 glTFLoader.pure.js412–417 a onReady/onMaterialLoaded hooks. NullEngine ověřímechanismus, neGPUrychlost.", "Root integruje Game/diagnostiku a produkční A/B. Cílené CPU testykoordinovat s právěplánovaným~40s rootstreetCPUbenchmarkem."],
+  "notes": ["Doložené wave2mainDraw3868ms při shaderCreation31–32ms,26/38novýchprogramů a stovkách effectchanges. Hypotéza CPUpreprocessing je zatímneprokázaná.", "Root má hlavní Game/UI; tato třída bude vytvořena hned po Scene před světovými materiály a disposepředScene. Výchozí material caps nebo actual-enabled bezpečný minimumbudget musí být čitelně vysvětlené a testované."]
+}

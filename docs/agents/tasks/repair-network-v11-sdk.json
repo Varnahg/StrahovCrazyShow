@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-network-v11-sdk",
+  "title": "KEY-6/7: převést skutečné SDK producenty na V11 plánované vstupy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/timeline-client.ts",
+    "scripts/integration.ts",
+    "scripts/integration-network.ts",
+    "scripts/integration-input-backlog.ts",
+    "scripts/integration-respawn.ts",
+    "scripts/performance-network.ts",
+    "tests/timeline-client.test.ts",
+    "docs/agents/handoffs/repair-network-v11-sdk.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "SDK producent plánuje příkazy podle skutečné autority, epochy a ticku; drží požadovaný vstup po celou dobu ověřovaného manévru.",
+    "Zachovat nebo posílit assertions řízení, pohybu, respawnu, výpadku a backlogu. Nezmírnit threshold kvůli předchozímu timeoutu.",
+    "Sdílený helper odstraní opakovanou logiku producentů a má cílené CPU regresní testy epochy, zastavení a příjmu authority."
+  ],
+  "verification": [
+    "Cílené lehké CPU testy; skutečné síťové integrace a zátěž spouští root v rezervovaném validačním okně.",
+    "Předat přesné soubory, změny, skutečné výsledky a omezení."
+  ],
+  "notes": [
+    "Koordinuje repair_network_causes a root; před zápisem vlastní claim. Sdílený kontrakt je v repair-network-v11-server, Game/UI vlastní root.",
+    "Zachovat wave1 integrační fail log. Žádné služby, GPU ani celou sadu testů bez zvláštní rezervace."
+  ]
+}

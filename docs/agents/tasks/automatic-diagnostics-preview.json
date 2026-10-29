@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "automatic-diagnostics-preview",
+  "title": "Dočasná produkční kontrola automatického recorderu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/automatic-diagnostics-preview/",
+    "docs/agents/handoffs/automatic-diagnostics-preview.md"
+  ],
+  "resources": [
+    "port:4176"
+  ],
+  "acceptance": [
+    "Spustit pouze vlastní krátkodobý Vite produkční preview, evidovat a ukončit přesný vlastní PID."
+  ],
+  "verification": [
+    "Browserové ověření drží koordinátor pod automatic-diagnostics-integration heavy-validation/gpu; preview nepřepisuje build."
+  ],
+  "notes": [
+    "API používá existující autorizovaný dev server2567 přes explicitní proxy zachovávající Host.",
+    "Před startem ověřit port4176; neukončovat žádný cizí proces."
+  ]
+}

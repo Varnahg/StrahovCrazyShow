@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-world-build-stages",
+  "title": "KEY-8: rozdělit synchronní stavbu světa do deterministických dávek",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/world-renderer.ts", "client/world-build-stages.ts", "tests/world-build-stages.test.ts", "tests/world-renderer-startup.test.ts", "docs/agents/handoffs/repair-world-build-stages.md"],
+  "resources": [],
+  "acceptance": [
+    "Jeden zdroj operací pro stávající sync buildWorld a nový staged API; totožné pořadí, controllers, asset identity, geometrie/materialy a polohy.",
+    "Skutečné event-loop yielding mezi deterministickými dávkami, AbortSignal/dispose guard před prací i po async hranici. Žádný pozdní zápis do zrušené scény, chybné ready ani přeživší časovač.",
+    "Phase timing identifikuje zbylé velké atomické funkce; neprohlásit 4ms budget za garanci u nerozdělených podkonstruktorů. Navazující širší scope musí zajistit koordinátor.",
+    "Implementace, cílený refaktoring a smysluplné parity/cancel/error/lifecycle testy předané společně."
+  ],
+  "verification": ["Primární audit repair-startup-cause; cílené CPU testy a narrow types, žádný build/fulltest/GPU/port.", "Koordinovat cílené delší NullEngine parity testy s root GPU oknem; root vlastní Game/UI a praktickou přejímku."],
+  "notes": ["Root přesune world job mimo Game constructor do start a integruje nové API, abort a phase diagnostics. Agent do Game/UI nepíše.", "Nesmí se schovat scéna, odstranit objekty, změnit geometrii či prostorové chunkování kvůli scheduleru. Výsledek musí zachovat původní prostorové podklady."]
+}

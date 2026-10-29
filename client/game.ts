@@ -1,11 +1,22 @@
 import "./render-shaders";
+import { sessionDiagnostics } from "./session-diagnostics";
+import { MeshDrawProfile, MESH_DRAW_PROFILE_SCOPE } from "./mesh-draw-profile";
+import { NetworkTimeline, type TimelinePresentation } from "./network-timeline";
+import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
+import { StableLightState } from "./stable-light-state";
+import { GltfLightBudget } from "./gltf-light-budget";
+import {
+  RenderIncidentProfile,
+  RENDER_INCIDENT_SCOPE,
+  type RenderIncidentSnapshot,
+} from "./render-incident-profile";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
   type AvatarRig,
 } from "./avatar-renderer";
-import { buildWorld } from "./world-renderer";
+import { buildWorld, createWorldBuildJob } from "./world-renderer";
 import { captureModelReview } from "./model-review";
 import { captureRenderCostInventory } from "./render-cost";
 import { snapshotBenchmarkDiagnostics } from "./benchmark-snapshot";
@@ -127,6 +138,50 @@ import {
   type Authority,
 } from "../shared/netcode";
 
+const vectorNear = (a: Vec3, b: Vec3, tolerance: number) =>
+  Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) < tolerance;
+const quaternionNear = (
+  a: VehicleState["rotation"],
+  b: VehicleState["rotation"],
+) =>
+  Math.min(
+    Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w),
+    Math.hypot(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w),
+  ) < 0.0001;
+const arrayNear = (a: number[], b: number[], tolerance: number) =>
+  a.length === b.length &&
+  a.every((value, index) => Math.abs(value - b[index]) < tolerance);
+
+/** Equal translation alone is not equal vehicle dynamics: steering, forces and
+ * roll/rotation can diverge before position does. Driver identity is local in
+ * the prediction world and intentionally compared only as occupied/vacant. */
+function vehiclePredictionMatches(
+  a: VehicleState | undefined,
+  b: VehicleState | undefined,
+) {
+  return (
+    !!a &&
+    !!b &&
+    a.id === b.id &&
+    !!a.driverId === !!b.driverId &&
+    a.parked === b.parked &&
+    a.sleeping === b.sleeping &&
+    vectorNear(a.position, b.position, 0.003) &&
+    quaternionNear(a.rotation, b.rotation) &&
+    vectorNear(a.linvel, b.linvel, 0.015) &&
+    vectorNear(a.angvel, b.angvel, 0.001) &&
+    vectorNear(a.force, b.force, 0.001) &&
+    vectorNear(a.torque, b.torque, 0.001) &&
+    vectorNear(a.parking.position, b.parking.position, 0.003) &&
+    quaternionNear(a.parking.rotation, b.parking.rotation) &&
+    Math.abs(a.steering - b.steering) < 0.0001 &&
+    arrayNear(a.wheelSpin, b.wheelSpin, 0.001) &&
+    arrayNear(a.wheelSuspension, b.wheelSuspension, 0.0001) &&
+    a.wheelContact.length === b.wheelContact.length &&
+    a.wheelContact.every((value, i) => value === b.wheelContact[i])
+  );
+}
+
 export type GameStats = {
   fps: number;
   triangles: number;
@@ -233,6 +288,7 @@ export class Game {
   lastGpuCounterAt = -Infinity;
   presentationRate: PresentationRateMeasurement | null = null;
   worldControllers?: ReturnType<typeof buildWorld>;
+  private worldBuildJob?: ReturnType<typeof createWorldBuildJob>;
   cinematic?: CinematicAtmosphere;
   surfacePack?: SurfacePack;
   b6Reality?: B6RealityController;
@@ -241,8 +297,11 @@ export class Game {
   sim!: Simulation;
   actor!: Actor;
   localId = "guest";
-  onInput?: (input: Input) => void;
-  onPredictionReset?: () => void;
+  onInput?: (input: TimelineInput) => void;
+  onInputFrame?: () => void;
+  onBeforeInputFrame?: () => void;
+  onNetworkDiagnostics?: () => unknown;
+  onPredictionReset?: (priority?: boolean) => void;
   onAction?: (action: string, data?: unknown) => void | boolean;
   onStats?: (stats: GameStats) => void;
   onNotice?: (message: string) => void;
@@ -279,7 +338,7 @@ export class Game {
     minAvatars: number;
     work: Record<string, number>;
     engineWork: Record<string, number>;
-    profile: BenchmarkRenderProfile;
+    profile?: BenchmarkRenderProfile;
     weatherAtStart: Weather | null;
   };
   network = false;
@@ -299,10 +358,21 @@ export class Game {
   quality = "medium";
   keys = new Set<string>();
   avatars = new Map<string, Avatar>();
+  private avatarSetupReady = false;
+  private pendingPlayers: Player[] | null = null;
   yaw = Math.PI;
   pitch = 0.28;
   distance = 8;
   seq = 0;
+  networkTimeline = new NetworkTimeline();
+  private networkPresentation?: TimelinePresentation & {
+    timeline: NetworkTimeline;
+  };
+  private lastTimelineRecoveryAt = -Infinity;
+  private meshDrawProfile?: MeshDrawProfile;
+  private gltfLightBudget?: GltfLightBudget;
+  private nextMeshDrawSampleAt = 0;
+  private pendingMeshDrawReason: string | null = "first-frame";
   accumulator = 0;
   lastStats = 0;
   profile: Profile;
@@ -314,8 +384,8 @@ export class Game {
   lamps: StandardMaterial;
   rain?: LinesMesh;
   rainLines: Vector3[][] = [];
-  car: TransformNode;
-  parkedCar: TransformNode;
+  car!: TransformNode;
+  parkedCar!: TransformNode;
   found = new Set<string>();
   localEmoteUntil = 0;
   setEmote(id: string, emote: string) {
@@ -336,6 +406,9 @@ export class Game {
   renderErrorCount = 0;
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
+  private stableLights?: StableLightState;
+  private renderIncidentProfile?: RenderIncidentProfile;
+  private lastRenderIncident?: RenderIncidentSnapshot;
   private enabledMeshCandidates: EnabledMeshCandidates;
   get assetLoadErrorCount() {
     return (
@@ -351,10 +424,19 @@ export class Game {
   prediction = new PredictionHistory();
   snapshots = new SnapshotBuffer();
   lastAuthorityTick = -1;
+  private lastAuthorityNetwork: Authority["network"] | null = null;
+  private readonly diagnosticNetwork = {
+    motionPackets: 0,
+    authorityPackets: 0,
+    corrections: 0,
+    resyncs: 0,
+    lastCorrectionMetres: null as number | null,
+    lastMotionAtMs: 0,
+  };
   visualOffset = Vector3.Zero();
   previousPosition = new Vector3(SPAWN.x, SPAWN.y, SPAWN.z);
   jumpWasDown = false;
-  skyWeather: SkyWeatherController;
+  skyWeather!: SkyWeatherController;
   environment?: { update(player: { x: number; y: number; z: number }): void };
   carSnapshots: { time: number; state: VehicleState }[] = [];
   respawnPending = false;
@@ -443,13 +525,20 @@ export class Game {
     this.canvas.dataset.renderErrorCount = "0";
     this.engine.onEffectErrorObservable.add(() => {
       this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
+      sessionDiagnostics.event("render-error", {
+        count: this.renderErrorCount,
+      });
       if (this.renderErrorCount === 1)
         this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
     });
     this.applyAdaptiveQuality(this.adaptive.state);
     this.gpu = readGpuDiagnostics(this.engine);
+    this.engine.onContextLostObservable.add(() => {
+      sessionDiagnostics.event("webgl-context-lost", {});
+    });
     this.engine.onContextRestoredObservable.add(() => {
       this.gpu = readGpuDiagnostics(this.engine);
+      sessionDiagnostics.event("webgl-context-restored", { gpu: this.gpu });
       this.lastGpuCounterCount = 0;
       this.lastGpuCounterAt = -Infinity;
     });
@@ -465,13 +554,28 @@ export class Game {
       }
     }
     this.scene = new Scene(this.engine);
+    this.gltfLightBudget = new GltfLightBudget(this.scene);
+    this.stableLights = new StableLightState(this.scene);
+    if (sessionDiagnostics.isRecording) {
+      this.renderIncidentProfile = new RenderIncidentProfile(this.scene);
+      this.meshDrawProfile = new MeshDrawProfile(this.scene);
+    }
     this.enabledMeshCandidates = new EnabledMeshCandidates(
       this.scene,
       this.scene.getActiveMeshCandidates,
+      {
+        // Opt-in production A/B until real-scene CPU and visual acceptance.
+        earlyStaticFrustum:
+          new URLSearchParams(location.search).get("staticFrustum") === "1",
+        isStaticMesh: (mesh) =>
+          mesh.metadata?.artStatic === true ||
+          mesh.metadata?.sourcePack === "architecture-reality",
+      },
     );
     this.textureDiagnostics = new SceneTextureDiagnostics(
       this.scene,
       (count) => {
+        sessionDiagnostics.event("asset-error", { count, scope: "textures" });
         this.canvas.dataset.assetLoadErrorCount = String(
           this.assetLoadErrorCount,
         );
@@ -523,34 +627,6 @@ export class Game {
     this.sun.intensity = 1.2;
     this.lamps = this.mat("#f7d590");
     this.lamps.emissiveColor = Color3.FromHexString("#f7d590").scale(0.4);
-    this.buildWorld();
-    this.car = this.makeCar();
-    this.car.setEnabled(false);
-    this.parkedCar = this.makeCar();
-    this.parkedCar.position.set(
-      CAR_SPAWN.x,
-      groundHeight(CAR_SPAWN.x, CAR_SPAWN.z),
-      CAR_SPAWN.z,
-    );
-    this.skyWeather = new SkyWeatherController(this.scene);
-    for (let i = 0; i < 160; i++) {
-      const x = ((i * 13.17) % 36) - 18,
-        z = ((i * 7.31) % 36) - 18,
-        y = (i * 3.73) % 18;
-      this.rainLines.push([
-        new Vector3(x, y, z),
-        new Vector3(x + 0.12, y - 0.7, z),
-      ]);
-    }
-    this.rain = MeshBuilder.CreateLineSystem(
-      "rain",
-      { lines: this.rainLines, updatable: true },
-      this.scene,
-    );
-    this.rain.color = new Color3(0.65, 0.77, 0.85);
-    this.rain.alpha = 0.45;
-    this.rain.isPickable = false;
-    this.rain.setEnabled(false);
     this.localPlayer = {
       ...profile,
       ...SPAWN,
@@ -578,7 +654,54 @@ export class Game {
     canvas.addEventListener("wheel", this.wheel, { passive: false });
     window.addEventListener("resize", this.resize);
   }
+  private createWorldPresentation() {
+    this.car = this.makeCar();
+    this.car.setEnabled(false);
+    this.parkedCar = this.makeCar();
+    this.parkedCar.position.set(
+      CAR_SPAWN.x,
+      groundHeight(CAR_SPAWN.x, CAR_SPAWN.z),
+      CAR_SPAWN.z,
+    );
+    this.skyWeather = new SkyWeatherController(this.scene);
+    for (let i = 0; i < 160; i++) {
+      const x = ((i * 13.17) % 36) - 18,
+        z = ((i * 7.31) % 36) - 18,
+        y = (i * 3.73) % 18;
+      this.rainLines.push([
+        new Vector3(x, y, z),
+        new Vector3(x + 0.12, y - 0.7, z),
+      ]);
+    }
+    this.rain = MeshBuilder.CreateLineSystem(
+      "rain",
+      { lines: this.rainLines, updatable: true },
+      this.scene,
+    );
+    this.rain.color = new Color3(0.65, 0.77, 0.85);
+    this.rain.alpha = 0.45;
+    this.rain.isPickable = false;
+    this.rain.setEnabled(false);
+  }
   async start() {
+    try {
+      await this.startContent();
+    } catch (error) {
+      this.dispose();
+      throw error;
+    }
+  }
+  private async startContent() {
+    sessionDiagnostics.event("game-start", {
+      mode: this.network ? "multiplayer" : "guest",
+      clientBuildSnapshotId: import.meta.env.VITE_SOURCE_SNAPSHOT_ID || null,
+      clientBuildMode: import.meta.env.MODE,
+      development: import.meta.env.DEV,
+      renderTimingScope: RENDER_INCIDENT_SCOPE,
+      meshDrawTimingScope: MESH_DRAW_PROFILE_SCOPE,
+      gpu: this.gpu,
+      rendering: this.adaptive.state,
+    });
     this.canvas.dataset.bootStage = "presentation";
     this.presentationRate = await measurePresentationRate();
     if (this.disposed) return;
@@ -589,22 +712,69 @@ export class Game {
           : null,
       ),
     );
+    this.canvas.dataset.bootStage = "world";
+    this.worldBuildJob = createWorldBuildJob(this, {
+      onPhase: (timing) =>
+        sessionDiagnostics.event("startup-world-phase", timing),
+    });
+    this.worldControllers = await this.worldBuildJob.run();
+    this.worldBuildJob = undefined;
+    if (this.disposed) return;
+    await this.startupPhase("world-presentation", () =>
+      this.createWorldPresentation(),
+    );
+    if (this.disposed) return;
     this.canvas.dataset.bootStage = "physics-library";
-    await initPhysics();
+    await this.startupPhase("physics-library", () => initPhysics());
     if (this.disposed) return;
     // Survey/photogrammetry is an offline spatial reference. Gameplay uses
     // separately authored assets on the same DMR terrain as its colliders.
     this.canvas.dataset.worldMode = "authored-separate-assets";
     this.canvas.dataset.scanStage = "reference-only";
     this.canvas.dataset.bootStage = "static-collisions";
-    this.sim = new Simulation();
+    this.sim = await this.startupPhase(
+      "static-collisions",
+      () => new Simulation(),
+    );
+    if (this.disposed) {
+      this.sim.dispose();
+      return;
+    }
     this.canvas.dataset.physicsStage = "ready";
     this.canvas.dataset.bootStage = "avatar-and-props";
     this.actor = this.sim.add("local");
+    await this.startupPhase("final-visual-setup", () => {
+      this.surfacePack = new SurfacePack(this.scene);
+      this.cinematic = new CinematicAtmosphere(
+        this.scene,
+        this.camera,
+        this.sun,
+      );
+      this.vehicleLighting = new VehicleLighting(this.scene);
+      this.avatarSetupReady = true;
+      this.updatePlayers(this.pendingPlayers ?? [this.localPlayer]);
+      this.pendingPlayers = null;
+      this.previousPosition.copyFromFloats(
+        this.actor.position.x,
+        this.actor.position.y,
+        this.actor.position.z,
+      );
+      this.updateCameraFollow(
+        this.previousPosition,
+        this.avatars.get(this.localId)?.eyeHeight ?? 1.63,
+        1,
+      );
+      this.updatePreloadVisuals();
+    });
+    if (this.disposed) return;
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
     const preloadRender = () => {
-      if (!this.disposed) this.scene.render();
+      if (!this.disposed) {
+        this.updatePreloadVisuals();
+        this.stableLights?.update();
+        this.scene.render();
+      }
     };
     this.engine.runRenderLoop(preloadRender);
     try {
@@ -624,9 +794,11 @@ export class Game {
         this.sim.surfaceHeight(x, z),
       );
       const [interior, vegetation, car] = await Promise.allSettled([
-        loadB6Reality(this.scene, {
-          foundationY: B6_LAYOUT.foundationOffset,
-        }).then(
+        this.startupPhase("b6-assets", () =>
+          loadB6Reality(this.scene, {
+            foundationY: B6_LAYOUT.foundationOffset,
+          }),
+        ).then(
           (value) => {
             this.canvas.dataset.b6Stage = "ready";
             return value;
@@ -636,8 +808,10 @@ export class Game {
             throw error;
           },
         ),
-        loadVegetation(this.scene),
-        loadCar(this.scene).then(
+        this.startupPhase("vegetation-assets", () =>
+          loadVegetation(this.scene),
+        ),
+        this.startupPhase("car-assets", () => loadCar(this.scene)).then(
           (value) => {
             this.canvas.dataset.carStage = "ready";
             return value;
@@ -648,7 +822,25 @@ export class Game {
           },
         ),
       ]);
-      if (this.disposed) return;
+      if (this.disposed) {
+        // A loader may resolve after the owning Game has been closed. Its
+        // controller was never assigned to this Game, so ordinary dispose
+        // could not release that late result's listeners/async resources.
+        const cleanupErrors: unknown[] = [];
+        for (const result of [interior, vegetation, car])
+          if (result.status === "fulfilled") {
+            try {
+              result.value.dispose();
+            } catch (error) {
+              cleanupErrors.push(error);
+            }
+          }
+        if (cleanupErrors.length)
+          sessionDiagnostics.event("startup-cleanup-error", {
+            errors: cleanupErrors.map(String),
+          });
+        return;
+      }
       if (interior.status === "fulfilled") {
         this.b6Reality = interior.value;
         if (this.worldControllers)
@@ -684,15 +876,70 @@ export class Game {
       console.warn("Používám geometrickou zálohu auta.", error);
     }
     if (this.disposed) return;
-    this.surfacePack = new SurfacePack(this.scene);
-    this.surfacePack.update(1, this.quality, this.weather?.rain ?? 0);
-    this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
-    this.vehicleLighting = new VehicleLighting(this.scene);
+    this.updatePreloadVisuals();
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
     this.engine.stopRenderLoop(preloadRender);
-    this.updatePlayers([this.localPlayer]);
     this.engine.runRenderLoop(() => this.frame());
+  }
+  private async startupPhase<T>(
+    phase: string,
+    work: () => T | Promise<T>,
+  ): Promise<T> {
+    const start = performance.now();
+    let outcome = "failed";
+    try {
+      const result = await work();
+      outcome = "complete";
+      return result;
+    } finally {
+      sessionDiagnostics.event("startup-phase", {
+        phase,
+        outcome,
+        durationMs: performance.now() - start,
+        scope: "game-start wall time",
+      });
+    }
+  }
+  /** Preload uses the final materials, camera and actual sky/light settings.
+   * New streamed resources join the same controllers instead of invalidating
+   * an entirely different preview configuration at the end of loading. */
+  private updatePreloadVisuals() {
+    const player = this.actor.position;
+    const instant = this.timeOverride ?? Date.now();
+    const { sun, moon } = this.skyWeather.update({
+      instant,
+      weather: this.weather,
+      player,
+      dt: 0,
+      quality: this.quality,
+    });
+    const lighting = applyArtLighting(this, {
+      sun,
+      moon,
+      atmosphere: this.skyWeather.atmosphere,
+      headlightRequested: false,
+      extraPracticalLightSlots: Number(
+        this.b6Reality?.interiorLightEnabled ?? false,
+      ),
+      weather: this.weather,
+      player,
+      dt: 0,
+      instant,
+    });
+    this.updateCarLighting?.(lighting.night);
+    this.surfacePack?.update(0, this.quality, this.weather?.rain ?? 0);
+    this.cinematic?.update({
+      dt: 0,
+      player,
+      quality: this.quality,
+      cloud: this.weather?.cloud ?? 0.4,
+      rain: this.weather?.rain ?? 0,
+      keySource: lighting.keySource,
+      daylight: sun.daylight,
+      avatars: this.avatars.values(),
+      localId: this.localId,
+    });
   }
   mat(hex: string) {
     if (this.materials.has(hex)) return this.materials.get(hex)!;
@@ -828,6 +1075,10 @@ export class Game {
     };
   }
   updatePlayers(players: Player[]) {
+    if (this.avatarSetupReady === false) {
+      this.pendingPlayers = players;
+      return;
+    }
     const ids = new Set(players.map((p) => p.id));
     for (const [id, a] of this.avatars)
       if (!ids.has(id)) {
@@ -854,6 +1105,8 @@ export class Game {
     this.avatarPool.pruneUnused();
   }
   setProfile(profile: Profile) {
+    // Appearance affects renderer cost; identity and social profile do not.
+    sessionDiagnostics.event("avatar-change", { appearance: profile.avatar });
     this.profile = profile;
     this.localPlayer = { ...this.localPlayer, ...profile };
     const a = this.avatars.get(this.localId);
@@ -870,6 +1123,8 @@ export class Game {
     // A newly issued session belongs to a new network epoch. Resuming the same
     // identity keeps its frontiers so delayed packets cannot rewind it.
     this.resetPredictionHistory();
+    this.networkTimeline = new NetworkTimeline();
+    this.networkPresentation = undefined;
     this.lastAuthorityTick = this.minimumMotionTick = -1;
     this.seq = 0;
     this.respawnPending = false;
@@ -889,6 +1144,8 @@ export class Game {
   }
   syncMotion(packet: MotionPacket) {
     if (packet.tick < this.minimumMotionTick) return;
+    this.diagnosticNetwork.motionPackets++;
+    this.diagnosticNetwork.lastMotionAtMs = performance.now();
     this.snapshots.push(packet);
     if (packet.car) {
       this.carSnapshots.push({ time: packet.time, state: packet.car });
@@ -912,18 +1169,31 @@ export class Game {
         });
     }
   }
-  reconcile(packet: Authority) {
-    if (!this.ready || packet.tick < this.lastAuthorityTick) return;
+  reconcile(packet: Authority, receivedAt = performance.now()): boolean {
+    if (!this.ready || packet.tick < this.lastAuthorityTick) return false;
     // Respawn is completed by a forced authority, not by replaying a packet
     // already in flight when the user asked to return to the start.
     const respawnReply = packet.resync === true && packet.respawn === true;
-    if (this.respawnPending && !respawnReply) return;
+    if (this.respawnPending && !respawnReply) return false;
     const explicitRespawn = this.respawnPending && respawnReply;
+    const acceptance = this.networkTimeline.acceptAuthority(
+      packet,
+      receivedAt,
+      {
+        vehicle: packet.state.vehicle,
+        yaw: packet.state.yaw,
+      },
+    );
+    if (!acceptance.accepted) return false;
+    this.lastAuthorityNetwork = packet.network ?? null;
+    this.diagnosticNetwork.authorityPackets++;
     this.lastAuthorityTick = packet.tick;
     const expected = this.prediction.states.get(packet.ack);
     const exact =
       expected &&
       expected.vehicle === packet.state.vehicle &&
+      expected.grounded === packet.state.grounded &&
+      Math.abs(expected.speed - packet.state.speed) < 0.01 &&
       Math.hypot(
         expected.position.x - packet.state.position.x,
         expected.position.y - packet.state.position.y,
@@ -937,47 +1207,63 @@ export class Game {
         ),
       ) < 0.003 &&
       (!packet.state.vehicle ||
-        (!!expected.vehicleState &&
-          !!packet.state.vehicleState &&
-          Math.hypot(
-            expected.vehicleState.linvel.x - packet.state.vehicleState.linvel.x,
-            expected.vehicleState.linvel.y - packet.state.vehicleState.linvel.y,
-            expected.vehicleState.linvel.z - packet.state.vehicleState.linvel.z,
-          ) < 0.015));
-    if (exact && !packet.resync) {
-      this.prediction.acknowledge(packet.ack, packet.state.vehicle);
+        vehiclePredictionMatches(
+          expected.vehicleState,
+          packet.state.vehicleState,
+        ));
+    if (
+      exact &&
+      !packet.resync &&
+      !acceptance.rebase &&
+      acceptance.replay.every((step) => step.source === "input")
+    ) {
+      this.prediction.acknowledge(packet.ack);
       this.seq = Math.max(this.seq, packet.ack);
-      return;
+      return true;
     }
     const old = packet.resync
         ? packet.state.position
         : { ...this.actor.position },
       modeChanged = this.actor.vehicle !== packet.state.vehicle;
-    if (packet.resync) {
+    if (modeChanged) this.pendingMeshDrawReason = "vehicle-mode-change";
+    // Recovery can arrive with an invalid old physics pose. Keep presentation's
+    // hard reset independent of optional diagnostics; authority against itself
+    // is not a measured zero displacement.
+    let beforeCorrection: Vec3 | null = packet.resync ? null : old;
+    if (packet.resync && !packet.respawn) {
+      try {
+        const position = this.actor.position;
+        if ([position.x, position.y, position.z].every(Number.isFinite))
+          beforeCorrection = { x: position.x, y: position.y, z: position.z };
+      } catch {
+        // Forced recovery can legitimately replace an unreadable old body.
+      }
+    }
+    const pendingInputs = this.prediction.inputs.length;
+    const localSequence = this.seq;
+    if (packet.resync || acceptance.rebase) {
       if (explicitRespawn) this.clearPendingMovement();
-      else this.resetPredictionHistory();
+      else this.resetPredictionHistory(true);
       this.seq = packet.ack;
       this.respawnPending = false;
       this.minimumMotionTick = packet.tick;
       this.carSnapshots.length = 0;
       this.snapshots.remove(this.localId);
     } else this.seq = Math.max(this.seq, packet.ack);
-    const replay = this.prediction.acknowledge(
-      packet.ack,
-      packet.state.vehicle,
-    );
+    this.prediction.acknowledge(packet.ack);
+    const replay = acceptance.replay;
     this.actor.restore(packet.state, packet.respawn === true);
     if (packet.resync && !packet.state.vehicle && packet.state.vehicleState)
       this.sim.restorePublicCar(packet.state.vehicleState);
     if (modeChanged && packet.state.vehicle && !packet.resync)
       this.alignVehicleCamera();
     if (!packet.resync) {
-      for (const input of replay) {
+      for (const { input, time } of replay) {
         this.actor.step(input, FIXED_DT);
         // Anchor replay to the authority's server time, independent of local
         // clock skew and mode-filtered sequence gaps. Dynamic contacts still
         // do not have a full world rollback.
-        this.sim.tick(packet.time + (input.seq - packet.ack) * FIXED_DT * 1000);
+        this.sim.tick(time);
         this.prediction.states.set(input.seq, this.actor.capture());
       }
     }
@@ -987,6 +1273,33 @@ export class Game {
         old.y - corrected.y,
         old.z - corrected.z,
       );
+    this.diagnosticNetwork.corrections++;
+    const measuredCorrection = beforeCorrection
+      ? Math.hypot(
+          beforeCorrection.x - corrected.x,
+          beforeCorrection.y - corrected.y,
+          beforeCorrection.z - corrected.z,
+        )
+      : null;
+    this.diagnosticNetwork.lastCorrectionMetres = measuredCorrection;
+    if (packet.resync) this.diagnosticNetwork.resyncs++;
+    if (packet.resync || error >= 0.35)
+      sessionDiagnostics.event("network-correction", {
+        resync: !!packet.resync,
+        respawn: !!packet.respawn,
+        correctionMetres: measuredCorrection,
+        correctionAvailable: measuredCorrection !== null,
+        modeChanged,
+        resyncReason: packet.resyncReason ?? null,
+        authorityAck: packet.ack,
+        authorityTime: packet.time,
+        localSequence,
+        pendingInputs,
+        replayInputs: replay.length,
+        authorityTick: packet.tick,
+        inputEpoch: packet.inputEpoch,
+        timelineRebase: acceptance.rebase,
+      });
     this.visualOffset.set(
       !modeChanged && !packet.resync && error < 0.35 ? old.x - corrected.x : 0,
       !modeChanged && !packet.resync && error < 0.35 ? old.y - corrected.y : 0,
@@ -1007,17 +1320,21 @@ export class Game {
         carPose.rotation.w,
       ),
     };
+    // Reconciliation has replaced both endpoints. Do not bind a new segment to
+    // the old phase; the current-pose fallback is exact for this collapsed pair.
+    this.networkPresentation = undefined;
     if (explicitRespawn) this.snapRecoveryPresentation();
+    return true;
   }
-  private resetPredictionHistory() {
+  private resetPredictionHistory(priority = false) {
     this.accumulator = 0;
     this.prediction.clear();
-    this.onPredictionReset?.();
+    this.onPredictionReset?.(priority);
   }
   private clearPendingMovement() {
     this.clearHeldInput();
     this.jumpWasDown = false;
-    this.resetPredictionHistory();
+    this.resetPredictionHistory(true);
   }
   private snapRecoveryPresentation() {
     const position = this.actor.position;
@@ -1032,6 +1349,7 @@ export class Game {
   /** One path for R and the GUI. Ordered transport sees old inputs before the
    * request; no fresh input is predicted or queued until the forced reply. */
   requestRespawn() {
+    sessionDiagnostics.event("action", { action: "respawn" });
     if (!this.ready || this.respawnPending) return false;
     this.clearPendingMovement();
     if (this.network) {
@@ -1063,6 +1381,11 @@ export class Game {
       return this.flashlightOn;
     this.flashlight ??= new PlayerFlashlight(this.scene);
     this.flashlightOn = !this.flashlightOn;
+    this.pendingMeshDrawReason = "action:flashlight";
+    sessionDiagnostics.event("action", {
+      action: "flashlight",
+      enabled: this.flashlightOn,
+    });
     this.canvas.dataset.flashlight = String(this.flashlightOn);
     return this.flashlightOn;
   }
@@ -1071,11 +1394,14 @@ export class Game {
   }
   setWeather(weather: Weather) {
     this.weather = weather;
+    sessionDiagnostics.event("weather-change", { weather });
   }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
     if (next.revision === this.appliedQualityRevision) return;
+    this.pendingMeshDrawReason = "quality-change";
     this.appliedQualityRevision = next.revision;
     this.quality = next.quality;
+    sessionDiagnostics.event("quality-change", { rendering: next });
     this.setCarQuality?.(this.quality);
     if (
       Math.abs(this.engine.getHardwareScalingLevel() - next.hardwareScaling) >
@@ -1084,28 +1410,39 @@ export class Game {
       this.engine.setHardwareScalingLevel(next.hardwareScaling);
   }
   setQuality(mode: string) {
-    if (isRenderQualityMode(mode))
+    if (isRenderQualityMode(mode)) {
+      this.pendingMeshDrawReason = "quality-change";
       this.applyAdaptiveQuality(this.adaptive.setMode(mode));
+    }
   }
   setTargetFps(fps: number) {
     if (isRenderTargetFps(fps))
       this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
   }
   startBenchmark() {
-    this.benchmark?.profile.dispose();
+    sessionDiagnostics.event("benchmark-start", { durationSeconds: 10 });
+    this.benchmark?.profile?.dispose();
     this.benchmark = {
       start: performance.now(),
       frames: [],
       minAvatars: this.avatars.size,
       work: {},
       engineWork: {},
-      profile: new BenchmarkRenderProfile(this.scene),
+      profile: this.renderIncidentProfile
+        ? undefined
+        : new BenchmarkRenderProfile(this.scene),
       weatherAtStart: this.weather ? structuredClone(this.weather) : null,
     };
   }
   interact() {
     if (!this.ready) return;
+    this.pendingMeshDrawReason = "action:interact";
     const p = this.actor.position;
+    sessionDiagnostics.event("action", {
+      action: "interact",
+      vehicle: this.actor.vehicle,
+      position: { x: p.x, y: p.y, z: p.z },
+    });
     // Driving takes priority over a collectible beside the road.
     if (this.actor.vehicle) {
       if (!vehicleExitAllowed(this.actor.speed)) {
@@ -1186,6 +1523,7 @@ export class Game {
     parked: boolean;
     state?: VehicleState;
   }) {
+    if (!this.parkedCar) return;
     this.parkedCar.position.set(data.x, data.state?.position.y ?? 0, data.z);
     this.parkedCar.rotation.y = data.yaw;
     if (this.sim && data.state && !this.actor.vehicle)
@@ -1272,6 +1610,11 @@ export class Game {
           else if (document.pointerLockElement === this.canvas)
             document.exitPointerLock();
         }
+        sessionDiagnostics.event("camera-change", {
+          firstPerson: this.firstPerson,
+          distance: this.distance,
+          vehicle: this.actor.vehicle,
+        });
       }
       if (e.code === "KeyR") this.requestRespawn();
       if (e.code === "KeyF") this.toggleFlashlight();
@@ -1587,68 +1930,132 @@ export class Game {
     );
   }
 
-  frame() {
-    if (!this.ready || this.disposed) return;
-    const frameStarted = performance.now();
-    const rawFrameMs = this.engine.getDeltaTime(),
-      dt = Math.min(0.1, rawFrameMs / 1000);
-    const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
-      ? this.engineInstrumentation.gpuFrameTimeCounter
-      : undefined;
-    if (gpuCounter && gpuCounter.count !== this.lastGpuCounterCount) {
-      this.lastGpuCounterCount = gpuCounter.count;
-      this.lastGpuCounterAt = frameStarted;
-      this.lastGpuFrameMs =
-        Number.isFinite(gpuCounter.current) && gpuCounter.current > 0
-          ? gpuCounter.current / 1e6
-          : undefined;
+  /** Evaluated by the recorder only at bounded context sampling points. */
+  private diagnosticContext = () => {
+    const pos = this.actor.position;
+    const camera = this.camera.globalPosition;
+    const lod = { near: 0, medium: 0, far: 0 };
+    for (const avatar of this.avatars.values()) lod[avatar.lod.level]++;
+    const active = this.scene.getActiveMeshes();
+    const materialClasses: Record<string, number> = {};
+    let submeshes = 0,
+      frozen = 0,
+      instances = 0;
+    for (let i = 0; i < active.length; i++) {
+      const mesh = active.data[i];
+      submeshes += mesh.subMeshes?.length ?? 0;
+      if (mesh.isWorldMatrixFrozen) frozen++;
+      if (mesh.getClassName() === "InstancedMesh") instances++;
+      const kind = mesh.material?.getClassName() ?? "none";
+      materialClasses[kind] = (materialClasses[kind] ?? 0) + 1;
     }
-    if (frameStarted - this.lastGpuCounterAt > 500)
-      this.lastGpuFrameMs = undefined;
-    this.applyAdaptiveQuality(
-      this.adaptive.update({
-        nowMs: frameStarted,
-        frameMs: rawFrameMs,
-        visible: !document.hidden,
-        suspended: !!this.benchmark,
-        cpuFrameMs: this.lastCpuFrameMs,
-        gpuFrameMs: this.lastGpuFrameMs,
-      }),
-    );
-    this.accumulator = this.respawnPending ? 0 : this.accumulator + dt;
-    if (
-      vehicleCameraCanFollow({
-        driving: this.actor.vehicle,
-        speed: this.actor.speed,
-        nowMs: frameStarted,
-        lastLookMs: this.lastCameraInput,
-        orbiting: this.orbiting,
-        uiModal: this.uiModal,
-      })
-    )
-      this.yaw = vehicleChaseYaw(this.yaw, this.actor.yaw, dt);
+    return {
+      mode: this.network ? "multiplayer" : "guest",
+      connection:
+        this.canvas.dataset.networkStage ??
+        (this.network ? "connecting" : "offline"),
+      position: { x: pos.x, y: pos.y, z: pos.z },
+      zone: zoneAt(pos),
+      speed: this.actor.speed,
+      vehicle: this.actor.vehicle,
+      flashlight: this.flashlightOn,
+      appearance: this.profile.avatar,
+      camera: {
+        x: camera.x,
+        y: camera.y,
+        z: camera.z,
+        yaw: this.yaw,
+        pitch: this.pitch,
+        distance: this.distance,
+        fov: this.camera.fov,
+        firstPerson: this.firstPerson,
+      },
+      rendering: this.adaptive.state,
+      viewport: {
+        width: this.canvas.clientWidth,
+        height: this.canvas.clientHeight,
+      },
+      renderResolution: {
+        width: this.engine.getRenderWidth(),
+        height: this.engine.getRenderHeight(),
+      },
+      devicePixelRatio: window.devicePixelRatio,
+      gpu: this.gpu,
+      lightOrdering: this.stableLights?.stats ?? null,
+      renderWork: this.lastRenderIncident?.cumulative ?? null,
+      gpuSampleAgeMs: Number.isFinite(this.lastGpuCounterAt)
+        ? performance.now() - this.lastGpuCounterAt
+        : null,
+      avatars: this.avatars.size,
+      avatarLod: lod,
+      drawCalls: this.instrumentation.drawCallsCounter.current,
+      activeMeshInventory: {
+        candidates: this.scene.getActiveMeshCandidates().length,
+        meshes: active.length,
+        potentialSubmeshes: submeshes,
+        frozenWorldMatrices: frozen,
+        regularInstances: instances,
+        materialClasses,
+        scope:
+          "sampled active-mesh list; potential submeshes are not actual draw calls",
+      },
+      triangles: Math.round(this.scene.getActiveIndices() / 3),
+      vegetation: this.vegetation?.stats ?? null,
+      ambient: this.transit?.counts ?? null,
+      weather: this.weather ?? null,
+      lightingInstant: this.timeOverride ?? Date.now(),
+      lightingPreview: this.timeOverride !== null,
+      uiModal: this.uiModal,
+      benchmarkActive: !!this.benchmark,
+      renderErrors: this.renderErrorCount,
+      meshCandidates: this.enabledMeshCandidates.stats,
+      lightBudgets: this.gltfLightBudget?.stats ?? null,
+      assetErrors: this.assetLoadErrorCount,
+      network: this.network
+        ? {
+            ...this.diagnosticNetwork,
+            lastMotionAgeMs: this.diagnosticNetwork.lastMotionAtMs
+              ? performance.now() - this.diagnosticNetwork.lastMotionAtMs
+              : null,
+            pendingInputs: this.prediction.inputs.length,
+            authorityTick: this.lastAuthorityTick,
+            timeline: this.networkTimeline.snapshot(),
+            visualCorrectionMetres: this.visualOffset.length(),
+            transport: this.onNetworkDiagnostics?.() ?? null,
+            server: this.lastAuthorityNetwork,
+          }
+        : null,
+    };
+  };
+
+  /** Called once per rendered frame; network time comes only from accepted
+   * authority, so a render stall cannot replay commands into elapsed ticks. */
+  advanceSimulation(dt: number, now: number) {
+    if (this.respawnPending) {
+      this.accumulator = 0;
+      return;
+    }
+    this.accumulator += dt;
     const forward =
         (this.keys.has("KeyW") || this.keys.has("ArrowUp") ? 1 : 0) -
         (this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0),
       side =
         (this.keys.has("KeyD") || this.keys.has("ArrowRight") ? 1 : 0) -
         (this.keys.has("KeyA") || this.keys.has("ArrowLeft") ? 1 : 0);
-    if (rawFrameMs > 250) {
-      this.accumulator = 0;
-      this.blur();
-      if (this.network) this.onAction?.("resync");
-    }
-    while (this.accumulator >= FIXED_DT) {
+    const makeInput = (seq: number): Input => {
       const jumpDown = this.keys.has("Space");
       const input = canonicalInput({
         ...movementFromKeys(forward, side, this.yaw, this.actor.vehicle),
         yaw: this.yaw,
         jump: this.actor.vehicle ? jumpDown : jumpDown && !this.jumpWasDown,
-        seq: ++this.seq,
+        seq,
         run: this.keys.has("ShiftLeft") || this.keys.has("ShiftRight"),
         vehicle: this.actor.vehicle,
       })!;
       this.jumpWasDown = jumpDown;
+      return input;
+    };
+    const applyStep = (input: Input, time: number) => {
       this.previousPosition.copyFromFloats(
         this.actor.position.x,
         this.actor.position.y,
@@ -1669,11 +2076,142 @@ export class Game {
         ),
       };
       this.actor.step(input, FIXED_DT);
-      this.sim.tick(this.trafficInstant());
-      if (this.network) this.prediction.push(input, this.actor.capture());
-      this.onInput?.(input);
-      this.accumulator -= FIXED_DT;
+      this.sim.tick(time);
+      this.seq = input.seq;
+    };
+    if (this.network) {
+      const result = this.networkTimeline.advance(now, makeInput, (step) => {
+        applyStep(step.input, step.time);
+        this.prediction.push(step.input, this.actor.capture());
+        // Neutral elapsed prefix is predicted for temporal alignment only.
+        // Sending it would create late packets and consume the sender budget.
+        if (step.source === "input") this.onInput?.(step.input);
+      });
+      if (result.status === "advanced") {
+        this.updateNetworkPresentation(result.presentation);
+        if (result.steps) this.accumulator %= FIXED_DT;
+      } else {
+        this.accumulator = 0;
+        if (
+          result.reason !== "no-authority" &&
+          now - this.lastTimelineRecoveryAt >= 1000
+        ) {
+          this.lastTimelineRecoveryAt = now;
+          const recoveryRequested = result.reason !== "latency-budget";
+          sessionDiagnostics.event("network-timeline-wait", {
+            reason: result.reason,
+            recoveryRequested,
+          });
+          if (recoveryRequested) this.onAction?.("resync");
+        }
+      }
+    } else {
+      while (this.accumulator >= FIXED_DT) {
+        applyStep(makeInput(this.seq + 1), this.trafficInstant());
+        this.accumulator -= FIXED_DT;
+      }
     }
+    this.onInputFrame?.();
+  }
+
+  private updateNetworkPresentation(presentation: TimelinePresentation) {
+    const previous = this.networkPresentation;
+    if (!previous) {
+      this.networkPresentation = {
+        ...presentation,
+        timeline: this.networkTimeline,
+      };
+      return;
+    }
+    const samePair =
+      previous.timeline === this.networkTimeline &&
+      previous.inputEpoch === presentation.inputEpoch &&
+      previous.currentSeq === presentation.currentSeq;
+    previous.alpha = samePair
+      ? Math.max(previous.alpha, presentation.alpha)
+      : presentation.alpha;
+    previous.timeline = this.networkTimeline;
+    previous.inputEpoch = presentation.inputEpoch;
+    previous.currentSeq = presentation.currentSeq;
+  }
+
+  private get interpolationAlpha() {
+    if (!this.network) return Math.min(1, this.accumulator / FIXED_DT);
+    return this.networkPresentation?.timeline === this.networkTimeline
+      ? this.networkPresentation.alpha
+      : 1;
+  }
+
+  /** Shared by the rendered frame and its timing regression. Keep the caller's
+   * captured position and the existing interpolation/offset order unchanged. */
+  interpolateLocalPosition(position: Vec3): Vector3 {
+    return Vector3.Lerp(
+      this.previousPosition,
+      new Vector3(position.x, position.y, position.z),
+      this.interpolationAlpha,
+    ).add(this.visualOffset);
+  }
+
+  /** The driven-car branch calls this only with an available previous pose. */
+  interpolateDrivenCarPose(position: Vector3, rotation: Quaternion): void {
+    const alpha = this.interpolationAlpha;
+    Vector3.LerpToRef(
+      this.previousCarPose!.position,
+      position,
+      alpha,
+      position,
+    );
+    Quaternion.SlerpToRef(
+      this.previousCarPose!.rotation,
+      rotation,
+      alpha,
+      rotation,
+    );
+  }
+
+  frame() {
+    if (!this.ready || this.disposed) return;
+    const frameStarted = performance.now();
+    this.onBeforeInputFrame?.();
+    const rawFrameMs = this.engine.getDeltaTime(),
+      dt = Math.min(0.1, rawFrameMs / 1000);
+    const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
+      ? this.engineInstrumentation.gpuFrameTimeCounter
+      : undefined;
+    let freshGpuSample = false;
+    if (gpuCounter && gpuCounter.count !== this.lastGpuCounterCount) {
+      freshGpuSample = true;
+      this.lastGpuCounterCount = gpuCounter.count;
+      this.lastGpuCounterAt = frameStarted;
+      this.lastGpuFrameMs =
+        Number.isFinite(gpuCounter.current) && gpuCounter.current > 0
+          ? gpuCounter.current / 1e6
+          : undefined;
+    }
+    if (frameStarted - this.lastGpuCounterAt > 500)
+      this.lastGpuFrameMs = undefined;
+    this.applyAdaptiveQuality(
+      this.adaptive.update({
+        nowMs: frameStarted,
+        frameMs: rawFrameMs,
+        visible: !document.hidden,
+        suspended: !!this.benchmark,
+        cpuFrameMs: this.lastCpuFrameMs,
+        gpuFrameMs: this.lastGpuFrameMs,
+      }),
+    );
+    if (
+      vehicleCameraCanFollow({
+        driving: this.actor.vehicle,
+        speed: this.actor.speed,
+        nowMs: frameStarted,
+        lastLookMs: this.lastCameraInput,
+        orbiting: this.orbiting,
+        uiModal: this.uiModal,
+      })
+    )
+      this.yaw = vehicleChaseYaw(this.yaw, this.actor.yaw, dt);
+    this.advanceSimulation(dt, frameStarted);
     const simulationEnded = performance.now();
     const pos = this.actor.position;
     this.worldControllers?.architecture?.update(
@@ -1719,11 +2257,7 @@ export class Game {
     const worldEnded = performance.now();
     const time = worldEnded / 1000;
     this.visualOffset.scaleInPlace(Math.exp(-dt * 18));
-    const renderPosition = Vector3.Lerp(
-      this.previousPosition,
-      new Vector3(pos.x, pos.y, pos.z),
-      Math.min(1, this.accumulator / FIXED_DT),
-    ).add(this.visualOffset);
+    const renderPosition = this.interpolateLocalPosition(pos);
     const localFeet = renderPosition.add(new Vector3(0, -0.8, 0));
     for (const [id, a] of this.avatars) {
       // Decide local visibility only after the camera's final collision solve.
@@ -1785,18 +2319,7 @@ export class Game {
         carState.rotation.w,
       );
     if (this.actor.vehicle && this.previousCarPose) {
-      Vector3.LerpToRef(
-        this.previousCarPose.position,
-        carPosition,
-        Math.min(1, this.accumulator / FIXED_DT),
-        carPosition,
-      );
-      Quaternion.SlerpToRef(
-        this.previousCarPose.rotation,
-        carRotation,
-        Math.min(1, this.accumulator / FIXED_DT),
-        carRotation,
-      );
+      this.interpolateDrivenCarPose(carPosition, carRotation);
     } else if (this.network && this.carSnapshots.length) {
       const sampleAt = Date.now() + (this.snapshots.offset ?? 0) - 100,
         list = this.carSnapshots;
@@ -1902,6 +2425,7 @@ export class Game {
       dt,
       quality: this.quality,
     });
+    const skyEnded = performance.now();
     const lighting = applyArtLighting(this, {
       sun,
       moon,
@@ -1929,6 +2453,7 @@ export class Game {
       localView.cameraLight,
       this.quality,
     );
+    const lightingEnded = performance.now();
     this.vegetation?.update({
       dt,
       time,
@@ -1937,12 +2462,14 @@ export class Game {
       player: pos,
       quality: this.quality,
     });
+    const vegetationEnded = performance.now();
     this.transit?.update({
       now: this.trafficInstant(),
       player: pos,
       quality: this.quality as "low" | "medium" | "high",
       dt,
     });
+    const transitEnded = performance.now();
     const raining =
       ((this.weather?.rain ?? 0) > 0.05 ||
         (this.weather?.snowfall ?? 0) > 0.005) &&
@@ -1963,7 +2490,9 @@ export class Game {
         instance: this.rain,
       });
     }
+    const particlesEnded = performance.now();
     this.surfacePack?.update(dt, this.quality, this.weather?.rain ?? 0);
+    const surfacesEnded = performance.now();
     this.cinematic?.update({
       dt,
       player: pos,
@@ -1976,9 +2505,27 @@ export class Game {
       localId: this.localId,
     });
     const environmentEnded = performance.now();
-    this.benchmark?.profile.beginFrame();
-    this.scene.render();
-    const engineWork = this.benchmark?.profile.endFrame();
+    this.stableLights?.update();
+    const lightOrderingEnded = performance.now();
+    this.renderIncidentProfile?.beginFrame();
+    this.benchmark?.profile?.beginFrame();
+    const drawSampleReason =
+      this.pendingMeshDrawReason ??
+      (frameStarted >= this.nextMeshDrawSampleAt ? "periodic" : null);
+    this.meshDrawProfile?.beginFrame(drawSampleReason);
+    if (drawSampleReason) {
+      this.pendingMeshDrawReason = null;
+      this.nextMeshDrawSampleAt = frameStarted + 5000;
+    }
+    try {
+      this.scene.render();
+    } finally {
+      const drawSample = this.meshDrawProfile?.endFrame();
+      if (drawSample) sessionDiagnostics.event("mesh-draw-sample", drawSample);
+    }
+    this.lastRenderIncident = this.renderIncidentProfile?.endFrame();
+    const engineWork =
+      this.lastRenderIncident?.cpuMs ?? this.benchmark?.profile?.endFrame();
     const renderEnded = performance.now();
     for (const [id, a] of this.avatars) {
       if (id === this.localId) continue;
@@ -2000,8 +2547,7 @@ export class Game {
       this.frames.push(rawFrameMs);
       if (this.frames.length > 600) this.frames.shift();
     }
-    if (this.benchmark) {
-      const b = this.benchmark;
+    if (this.benchmark || sessionDiagnostics.isRecording) {
       const breakdown = {
         simulation: simulationEnded - frameStarted,
         world: worldEnded - simulationEnded,
@@ -2009,9 +2555,36 @@ export class Game {
         environment: environmentEnded - avatarsEnded,
         render: renderEnded - environmentEnded,
         labels: performance.now() - renderEnded,
+        // These are children of environment, not additional whole-frame work.
+        sky: skyEnded - avatarsEnded,
+        artLighting: lightingEnded - skyEnded,
+        vegetation: vegetationEnded - lightingEnded,
+        transit: transitEnded - vegetationEnded,
+        particles: particlesEnded - transitEnded,
+        surfaces: surfacesEnded - particlesEnded,
+        cinematic: environmentEnded - surfacesEnded,
+        lightOrdering: lightOrderingEnded - environmentEnded,
       };
-      for (const [key, milliseconds] of Object.entries(breakdown))
-        b.work[key] = (b.work[key] ?? 0) + milliseconds;
+      sessionDiagnostics.recordFrame(
+        {
+          frameMs: rawFrameMs,
+          frameStartedAtMs: frameStarted,
+          cpuMs: performance.now() - frameStarted,
+          // Timer-query results arrive asynchronously; never count a cached
+          // value repeatedly as new GPU measurements.
+          gpuMs: freshGpuSample ? (this.lastGpuFrameMs ?? null) : null,
+          phases: breakdown,
+          renderWork: this.lastRenderIncident,
+        },
+        this.diagnosticContext,
+      );
+      if (this.benchmark)
+        for (const [key, milliseconds] of Object.entries(breakdown))
+          this.benchmark.work[key] =
+            (this.benchmark.work[key] ?? 0) + milliseconds;
+    }
+    if (this.benchmark) {
+      const b = this.benchmark;
       if (engineWork)
         for (const [key, milliseconds] of Object.entries(engineWork))
           b.engineWork[key] = (b.engineWork[key] ?? 0) + milliseconds;
@@ -2022,7 +2595,8 @@ export class Game {
           sum = b.frames.reduce((a, b) => a + b, 0);
         // Release before the callback: it may immediately start another run.
         this.benchmark = undefined;
-        b.profile.dispose();
+        b.profile?.dispose();
+        sessionDiagnostics.event("benchmark-end", { frames: b.frames.length });
         const durationSeconds = Number(
           ((performance.now() - b.start) / 1000).toFixed(2),
         );
@@ -2173,7 +2747,17 @@ export class Game {
     this.lastCpuFrameMs = performance.now() - frameStarted;
   }
   dispose() {
+    if (this.disposed) return;
     this.disposed = true;
+    sessionDiagnostics.event("game-dispose", {
+      renderErrors: this.renderErrorCount,
+      assetErrors: this.assetLoadErrorCount,
+    });
+    this.worldBuildJob?.cancel();
+    this.stableLights?.dispose();
+    this.renderIncidentProfile?.dispose();
+    this.meshDrawProfile?.dispose();
+    this.gltfLightBudget?.dispose();
     window.removeEventListener("keydown", this.keyDown);
     window.removeEventListener("keyup", this.keyUp);
     window.removeEventListener("blur", this.blur);
@@ -2196,7 +2780,7 @@ export class Game {
     this.sim?.dispose();
     this.labels.dispose();
     this.contactShadows.dispose();
-    this.benchmark?.profile.dispose();
+    this.benchmark?.profile?.dispose();
     this.benchmark = undefined;
     this.instrumentation.dispose();
     this.engineInstrumentation.dispose();
@@ -2207,7 +2791,7 @@ export class Game {
     this.worldControllers?.landmarks?.dispose();
     this.worldControllers?.campusExterior?.dispose();
     this.worldControllers?.outdoorArtifacts?.dispose();
-    this.skyWeather.dispose();
+    this.skyWeather?.dispose();
     this.vegetation?.dispose();
     this.disposeCarAssets?.();
     this.vehicleLighting?.dispose();

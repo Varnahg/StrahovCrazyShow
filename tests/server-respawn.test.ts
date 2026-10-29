@@ -1,22 +1,26 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { initPhysics, Simulation, type Actor } from "../shared/simulation";
-import { InputQueue, FIXED_DT } from "../shared/netcode";
+import { FIXED_DT } from "../shared/netcode";
+import { TimelineInputQueue } from "../shared/input-timeline";
 import { DEFAULT_PROFILE, type Player } from "../shared/types";
 import { SPAWN, CAR_SPAWN } from "../shared/world";
 import { validVehicleState } from "../shared/vehicle";
 import { respawnServerPlayer } from "../server/respawn";
 
 await initPhysics();
-function queuedVehicleInputs() {
-  const queue = new InputQueue();
+function queuedVehicleInputs(base = 35) {
+  const queue = new TimelineInputQueue(1, base);
   for (let seq = 1; seq <= 8; seq++)
     assert.equal(
-      queue.push({ x: 1, z: 1, yaw: 0.3, seq, jump: true, vehicle: true }, 100),
-      true,
+      queue.push(
+        { x: 1, z: 1, yaw: 0.3, seq, inputEpoch: 1, jump: true, vehicle: true },
+        100,
+      ),
+      "accepted",
     );
-  queue.consume(110);
-  queue.consume(110);
+  queue.consume(base + 1, { vehicle: true, yaw: 0.3 });
+  queue.consume(base + 2, { vehicle: true, yaw: 0.3 });
   return queue;
 }
 function presence(actor: Actor, ack: number): Player {
@@ -55,34 +59,43 @@ test("old respawn sequence demonstrably retains queued commands and broadcasts s
     actor.setVehicle(false);
     actor.setPosition(SPAWN);
     nearSpawn(actor.position);
-    assert.equal(queue.pending.length, 6);
+    assert.equal(queue.diagnostics().depth, 6);
     assert.equal(queue.ack, 2);
     assert.equal(player.vehicle, true);
     assert.equal(player.x, 1e6);
     // Start the fixed recovery from the same owned, distant car situation.
     actor.setVehicle(true);
-    const result = respawnServerPlayer(sim, player, queue, 37, 12345)!;
+    const result = respawnServerPlayer(sim, player, queue, {
+      inputEpoch: 2,
+      tick: 37,
+      time: 12345,
+    })!;
     assert.equal(result.carRecovered, true);
     assert.equal(result.authority.resync, true);
     assert.equal(result.authority.respawn, true);
     assert.equal(result.authority.tick, 37);
     assert.equal(result.authority.time, 12345);
-    assert.equal(result.authority.ack, 8);
-    assert.equal(queue.pending.length, 0);
-    assert.equal(queue.lastReceived, 8);
-    assert.equal(queue.ack, 8);
-    assert.deepEqual(queue.consume(120), {
+    assert.equal(result.authority.ack, 0);
+    assert.equal(result.authority.inputEpoch, 2);
+    assert.equal(result.authority.inputTickBase, 37);
+    assert.equal(queue.diagnostics().depth, 0);
+    assert.equal(queue.frontier().receivedSeq, 0);
+    assert.equal(queue.ack, 0);
+    assert.deepEqual(queue.consume(38, { vehicle: false, yaw: 0 }).input, {
       x: 0,
       z: 0,
       yaw: 0,
       jump: false,
-      seq: 8,
+      seq: 1,
+      inputEpoch: 2,
+      vehicle: false,
+      run: false,
     });
     assert.equal(result.authority.state.vehicle, false);
     nearSpawn(result.authority.state.position);
     nearSpawn(player);
     assert.equal(player.vehicle, false);
-    assert.equal(player.ack, 8);
+    assert.equal(player.ack, 0);
     assert.equal(player.speed, 0);
     assert.equal(player.yaw, 0);
     assert.ok(validVehicleState(result.authority.state.vehicleState!));
@@ -92,19 +105,35 @@ test("old respawn sequence demonstrably retains queued commands and broadcasts s
     assert.equal(result.authority.state.vehicleState!.position.z, CAR_SPAWN.z);
     assert.equal(
       queue.push(
-        { x: 1, z: 0, yaw: 0, jump: false, seq: 8, vehicle: true },
+        {
+          x: 1,
+          z: 0,
+          yaw: 0,
+          jump: false,
+          seq: 8,
+          inputEpoch: 1,
+          vehicle: true,
+        },
         130,
       ),
-      false,
+      "epoch",
     );
     assert.equal(
       queue.push(
-        { x: 1, z: 0, yaw: 0, jump: false, seq: 9, vehicle: false },
+        {
+          x: 1,
+          z: 0,
+          yaw: 0,
+          jump: false,
+          seq: 2,
+          inputEpoch: 2,
+          vehicle: false,
+        },
         130,
       ),
-      true,
+      "accepted",
     );
-    actor.step(queue.consume(140), FIXED_DT);
+    actor.step(queue.consume(39, { vehicle: false, yaw: 0 }).input, FIXED_DT);
     sim.tick(0);
     assert.ok(
       actor.position.x > SPAWN.x,
@@ -127,7 +156,11 @@ test("server forced recovery produces finite authoritative foot+car state from i
     sim.car.body.setTranslation({ x: NaN, y: Infinity, z: -Infinity }, true);
     actor.body.setTranslation({ x: NaN, y: NaN, z: NaN }, true);
     actor.vertical = NaN;
-    const result = respawnServerPlayer(sim, player, queue, 100, 54321)!;
+    const result = respawnServerPlayer(sim, player, queue, {
+      inputEpoch: 2,
+      tick: 100,
+      time: 54321,
+    })!;
     assert.equal(
       sim.actors.get(actor.id),
       actor,
@@ -135,7 +168,7 @@ test("server forced recovery produces finite authoritative foot+car state from i
     );
     assert.equal(result.authority.resync, true);
     assert.equal(result.authority.respawn, true);
-    assert.equal(result.authority.ack, 8);
+    assert.equal(result.authority.ack, 0);
     nearSpawn(result.authority.state.position);
     assert.equal(result.authority.state.vehicle, false);
     assert.equal(result.authority.state.speed, 0);
@@ -148,7 +181,10 @@ test("server forced recovery produces finite authoritative foot+car state from i
       "wire payload must not silently turn NaN/Infinity into null",
     );
     for (let i = 0; i < 4; i++) {
-      actor.step(queue.consume(200 + i), FIXED_DT);
+      actor.step(
+        queue.consume(101 + i, { vehicle: false, yaw: 0 }).input,
+        FIXED_DT,
+      );
       sim.tick(0);
     }
     assert.ok(
@@ -172,19 +208,30 @@ test("respawn of another player never resets the shared car's different owner", 
     owner.setVehicle(true);
     sim.car.body.setTranslation({ x: 120, y: 4, z: 35 }, true);
     const before = sim.car.capture(),
-      queue = queuedVehicleInputs(),
+      queue = queuedVehicleInputs(3),
       player = presence(walker, queue.ack);
     walker.setPosition({ x: 1e6, y: 1e6, z: 1e6 });
-    const result = respawnServerPlayer(sim, player, queue, 5)!;
+    const result = respawnServerPlayer(sim, player, queue, {
+      inputEpoch: 2,
+      tick: 5,
+      time: 12345,
+    })!;
     assert.equal(result.carRecovered, false);
     assert.deepEqual(sim.car.capture(), before);
     assert.deepEqual(result.authority.state.vehicleState, before);
     assert.equal(owner.vehicle, true);
     assert.equal(sim.car.driverId, owner.id);
     nearSpawn(player);
-    assert.equal(queue.pending.length, 0);
+    assert.equal(queue.diagnostics().depth, 0);
     sim.remove(walker.id);
-    assert.equal(respawnServerPlayer(sim, player, queue, 6), null);
+    assert.equal(
+      respawnServerPlayer(sim, player, queue, {
+        inputEpoch: 3,
+        tick: 6,
+        time: 12361,
+      }),
+      null,
+    );
   } finally {
     sim.dispose();
   }

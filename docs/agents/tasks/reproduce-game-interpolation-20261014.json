@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "reproduce-game-interpolation-20261014",
+  "title": "KEY-12/7: skutečná Game regrese nerovnoměrné interpolace před opravou",
+  "status": "done",
+  "dependsOn": [
+    "research-netcode-camera-20261014"
+  ],
+  "writePaths": [
+    "client/game.ts",
+    "tests/game-interpolation.test.ts",
+    "docs/performance/research-20261014/game-interpolation-reproduction.md",
+    "docs/agents/handoffs/reproduce-game-interpolation-20261014.md",
+    ".cache/game-interpolation-reproduction/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejprve zdokumentovat aktuální dataflow a varianty podle hotového síťového výzkumu. Připravit test, který volá skutečný Game.advanceSimulation a skutečnou produkční interpolaci; nesmí kopírovat alpha/modulo v testu.",
+    "Povolená změna Game je pouze mechanická extrakce stávající local position a driven-car position/quaternion interpolace do metod skutečně používaných frame. Původní alpha, pořadí kroků, networking i chování zůstávají beze změny. Funkční fix fáze se implementuje až po skutečném red důkazu a následném rozhodnutí.",
+    "Fixture skutečný Game prototype, NetworkTimeline, PredictionHistory a Babylon math; jen actor/sim konstantního pohybu jako test double. Krytí60/144FPS, zero-step, waiting a recovery epoch. Zachovat aktuální V11/startup/diagnostics WIP.",
+    "Předání konkrétního delta proti ověřenému wave3 a připravených testů; nepředstírat spuštěný red/green, pokud během userQA testy neběží. Žádný commit rootem bez vyřešení původu staršího Game WIP."
+  ],
+  "verification": [
+    "Zdrojová fáze předaná a uvolněná; po ověření absence herní relace koordinátor povoluje pouze připravený lehký cílený CPU test a narrow types. Před startem ověřit skutečnou TCP4186/2581 a herní logy; při nové hře nejdřív hlásit rootu. Žádná celá suite, install, build, server, GPU nebo zátěžový profil.",
+    "Budoucí red: po pouhé extrakci původního vzorce musí nový test reprodukovat původní60/144FPS problém. Samotný test budoucího helperu tuto podmínku nesplňuje."
+  ],
+  "notes": [
+    "Pouze WT C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow, NE main ani frozen candidate/baseline. root výslovně předává svůj Game WIP z repair-game-integration → repair-wave4-bootstrap; zdrojem je source-verified wave3. Adopt-dirty je doložené převzetí, ne obcházení kolize.",
+    "Hotový main research netcode-camera.md SHA82b74d998e781fc3a8c8e9fab4bafbac4cbfb4b356038bdb50d36055dfcb6df5 a předchozí read-only návrh agenta. NetworkTimeline/UI/server/camera smoothing/reconciliation jsou jen read-only závislosti tohoto reproduce tasku.",
+    "B6 server používá immutable .cache/b6-transform-validation/candidate; editace pracovního Game se do hrané hry nedostanou. Main/wave4 dependency junctiony se nemění. Všechny helpery a syntetické výsledky musí zůstat oddělené od uživatelských logů.",
+    "Před začátkem přečíst aktuální AGENTS/architekturu/koordinaci/current-work a svůj task, ověřit git status/worktrees/registry, získat vlastní claim. Předat a uvolnit scope před změnou fáze.",
+    "14.10 přijato jako hotová reprodukce: skutečné Game regrese5FAIL/1PASS bez fixture/import chyb, narrowTS0diagnostik.60FPS0 místo0.2m,144FPS0.066667 místo0.083333m,zero-step0.008 místo0.048m,stale/latencywait−0.06m bezphysstep. RecoveryepochPASS. Funkční oprava ještě není provedena; přesná evidence v handoffu, rezervace uvolněna."
+  ]
+}

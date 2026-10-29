@@ -16,6 +16,7 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import "@babylonjs/core/Meshes/instancedMesh";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import type { Geometry } from "@babylonjs/core/Meshes/geometry";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { AvatarConfig } from "../shared/types";
 import { avatarPreset } from "./avatar-presets";
 import geometry from "./data/character-geometry.json";
@@ -37,6 +38,8 @@ import {
   CharacterMaterials,
   type CharacterSurface,
 } from "./character-materials";
+import { AvatarPreviewFrameWork } from "./avatar-preview-cache";
+import { sessionDiagnostics } from "./session-diagnostics";
 
 export type AvatarRig = {
   /** Continuous CC0 anatomy, sharing the existing animation pivots. */
@@ -963,17 +966,83 @@ export function createAvatarRig(
 }
 export type AvatarPreviewController = {
   update(config: AvatarConfig): void;
+  setActive(active: boolean): void;
   rotate(radians: number): void;
   focus(detail: "body" | "face"): void;
   resetView(): void;
   dispose(): void;
 };
 
+/** Own one current rig, preserving shared geometry while replacing its users. */
+export class AvatarPreviewModel {
+  private readonly pool: AvatarPrimitivePool;
+  private config: AvatarConfig;
+  private disposed = false;
+  rig: AvatarRig;
+  readonly stats = { builds: 1, skippedUpdates: 0 };
+
+  constructor(
+    private readonly scene: Scene,
+    initial: AvatarConfig,
+  ) {
+    this.pool = new AvatarPrimitivePool(scene);
+    this.config = { ...initial };
+    this.rig = createAvatarRig(scene, this.config, this.pool, "preview");
+  }
+
+  update(config: AvatarConfig) {
+    if (this.disposed) return false;
+    if (
+      (Object.keys(this.config) as (keyof AvatarConfig)[]).every(
+        (key) => this.config[key] === config[key],
+      ) &&
+      (Object.keys(config) as (keyof AvatarConfig)[]).every(
+        (key) => this.config[key] === config[key],
+      )
+    ) {
+      this.stats.skippedUpdates++;
+      return false;
+    }
+    // Disposing the last geometry user first destroys Babylon's buffers and
+    // garment materials. Acquire their new users before releasing the old rig.
+    const next = createAvatarRig(this.scene, config, this.pool, "preview");
+    const previous = this.rig;
+    this.rig = next;
+    this.config = { ...config };
+    previous.root.dispose(false, false);
+    this.pool.pruneUnused();
+    this.stats.builds++;
+    return true;
+  }
+
+  dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.rig.root.dispose(false, false);
+    this.pool.dispose();
+  }
+}
+
+/** The editor never displays medium LODs or the pool's hidden source meshes. */
+export function avatarPreviewMeshesReady(meshes: readonly AbstractMesh[]) {
+  let ready = true;
+  for (const mesh of meshes)
+    if (
+      mesh.isEnabled() &&
+      mesh.isVisible &&
+      mesh.visibility > 0 &&
+      !mesh.isReady(true)
+    )
+      ready = false;
+  return ready;
+}
+
 /** Single, on-demand rendered canvas; no render loop or per-avatar engine. */
 export function createAvatarPreview(
   canvas: HTMLCanvasElement,
   initial: AvatarConfig,
 ): AvatarPreviewController {
+  const startedAt = performance.now();
   const engine = new Engine(
     canvas,
     true,
@@ -984,6 +1053,7 @@ export function createAvatarPreview(
     },
     false,
   );
+  const engineReadyAt = performance.now();
   const scene = new Scene(engine);
   scene.useRightHandedSystem = true;
   scene.clearColor = new Color4(0, 0, 0, 0);
@@ -1015,29 +1085,94 @@ export function createAvatarPreview(
   scene.imageProcessingConfiguration.toneMappingEnabled = true;
   scene.imageProcessingConfiguration.toneMappingType = 1;
   scene.imageProcessingConfiguration.exposure = 1.1;
-  const pool = new AvatarPrimitivePool(scene);
-  let rig = createAvatarRig(scene, initial, pool, "preview");
+  const sceneReadyAt = performance.now();
+  const model = new AvatarPreviewModel(scene, initial);
+  const modelReadyAt = performance.now();
+  sessionDiagnostics.event("avatar-preview", {
+    phase: "create",
+    engineCpuMs: engineReadyAt - startedAt,
+    sceneCpuMs: sceneReadyAt - engineReadyAt,
+    rigCpuMs: modelReadyAt - sceneReadyAt,
+    totalCpuMs: modelReadyAt - startedAt,
+    meshes: scene.meshes.length,
+    materials: scene.materials.length,
+    textures: scene.textures.length,
+  });
   let disposed = false;
   let detail: "body" | "face" = "body";
   const frame = () => {
     camera.radius = detail === "face" ? 0.9 : 3.65;
     camera.target.set(
       0,
-      (detail === "face" ? 1.565 : 0.75 / 1.03) * rig.root.scaling.y,
+      (detail === "face" ? 1.565 : 0.75 / 1.03) * model.rig.root.scaling.y,
       0.015,
     );
     camera.beta = detail === "face" ? 1.46 : 1.41;
   };
   frame();
-  let request: number | undefined;
-  const render = () => {
-    if (disposed || request !== undefined || document.hidden) return;
-    request = requestAnimationFrame(() => {
-      request = undefined;
-      if (!disposed) scene.render();
-    });
-  };
+  let pendingConfig: AvatarConfig | undefined;
+  let active = true;
+  let preparationStarted = startedAt;
+  let frames = 0;
+  let readinessCpuMs = 0;
+  let reportReady = false;
+  let activationStarted: number | undefined;
+  let awaitingReady = true;
+  let visibleMeshes = model.rig.root.getChildMeshes();
+  const work = new AvatarPreviewFrameWork({
+    render: () => {
+      const start = performance.now();
+      scene.render();
+      const renderCpuMs = performance.now() - start;
+      frames++;
+      if (
+        frames === 1 ||
+        reportReady ||
+        activationStarted !== undefined ||
+        renderCpuMs + readinessCpuMs >= 50
+      )
+        sessionDiagnostics.event("avatar-preview", {
+          phase: reportReady
+            ? "ready-frame"
+            : activationStarted !== undefined
+              ? "resume-frame"
+              : "frame",
+          renderCpuMs,
+          readinessCpuMs,
+          frames,
+          preparationAgeMs: performance.now() - preparationStarted,
+          activationAgeMs:
+            activationStarted === undefined
+              ? null
+              : performance.now() - activationStarted,
+          builds: model.stats.builds,
+          renderWidth: engine.getRenderWidth(),
+          renderHeight: engine.getRenderHeight(),
+        });
+      readinessCpuMs = 0;
+      reportReady = false;
+      activationStarted = undefined;
+    },
+    ready: () => {
+      // Scene.executeWhenReady compiles even invisible pool sources and disabled
+      // medium LODs. Only the preview's enabled visible meshes can contribute.
+      const start = performance.now();
+      const ready = avatarPreviewMeshesReady(visibleMeshes);
+      readinessCpuMs += performance.now() - start;
+      if (ready && awaitingReady) {
+        awaitingReady = false;
+        reportReady = true;
+      }
+      return ready;
+    },
+    requestFrame: (callback) => requestAnimationFrame(callback),
+    cancelFrame: (id) => cancelAnimationFrame(id),
+    requestCheck: (callback) => window.setTimeout(callback, 100),
+    cancelCheck: (id) => window.clearTimeout(id),
+  });
+  const render = () => work.invalidate();
   const resize = () => {
+    if (!active || document.hidden || disposed) return;
     const bounds = canvas.getBoundingClientRect();
     // Tiny editor previews do not need a full native-DPR framebuffer.
     const density = Math.min(1.5, window.devicePixelRatio || 1);
@@ -1050,43 +1185,89 @@ export function createAvatarPreview(
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
   const visible = () => {
-    if (!document.hidden) render();
+    work.setActive(active && !document.hidden);
+    if (active && !document.hidden) resume();
   };
   document.addEventListener("visibilitychange", visible);
+  const restored = engine.onContextRestoredObservable.add(() => {
+    awaitingReady = true;
+    preparationStarted = performance.now();
+    work.invalidate(true);
+  });
+  work.setActive(!document.hidden);
   resize();
-  // On-demand previews still need a frame after asynchronous shader compilation.
-  scene.executeWhenReady(render);
+  work.invalidate(true);
+  const update = (config: AvatarConfig) => {
+    const startedAt = performance.now();
+    if (!model.update(config)) return;
+    preparationStarted = startedAt;
+    awaitingReady = true;
+    sessionDiagnostics.event("avatar-preview", {
+      phase: "update",
+      rigCpuMs: performance.now() - startedAt,
+      builds: model.stats.builds,
+      meshes: scene.meshes.length,
+      materials: scene.materials.length,
+      textures: scene.textures.length,
+    });
+    visibleMeshes = model.rig.root.getChildMeshes();
+    frame();
+    work.invalidate(true);
+  };
+  const resume = () => {
+    if (pendingConfig) {
+      update(pendingConfig);
+      pendingConfig = undefined;
+    }
+    resize();
+  };
   return {
     update(config) {
       if (disposed) return;
-      rig.root.dispose(false, false);
-      rig = createAvatarRig(scene, config, pool, "preview");
-      pool.pruneUnused();
-      frame();
-      render();
-      scene.executeWhenReady(render);
+      if (!active || document.hidden) {
+        pendingConfig = { ...config };
+        return;
+      }
+      update(config);
+    },
+    setActive(value) {
+      if (disposed || active === value) return;
+      active = value;
+      if (active) activationStarted = performance.now();
+      sessionDiagnostics.event("avatar-preview", { phase: "active", active });
+      work.setActive(active && !document.hidden);
+      if (active && !document.hidden) resume();
     },
     rotate(radians) {
+      if (disposed) return;
       camera.alpha += radians;
       render();
     },
     focus(value) {
+      if (disposed) return;
       detail = value;
       frame();
       render();
     },
     resetView() {
+      if (disposed) return;
       camera.alpha = Math.PI / 2;
       render();
     },
     dispose() {
       if (disposed) return;
       disposed = true;
-      if (request !== undefined) cancelAnimationFrame(request);
+      sessionDiagnostics.event("avatar-preview", {
+        phase: "dispose",
+        frames,
+        builds: model.stats.builds,
+      });
+      work.dispose();
       observer.disconnect();
       document.removeEventListener("visibilitychange", visible);
-      rig.root.dispose(false, false);
-      pool.dispose();
+      engine.onContextRestoredObservable.remove(restored);
+      pendingConfig = undefined;
+      model.dispose();
       scene.dispose();
       engine.dispose();
     },

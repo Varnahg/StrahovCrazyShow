@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "prepare-deferred-b6-qa-20261014",
+  "title": "Připravit bezpečné pozdější spuštění B6 A/B bez GUI nebo serveru",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/b6-transform-validation/start-qa.ps1",
+    "docs/performance/evidence/b6-transform-20261014/README.md",
+    "docs/agents/handoffs/prepare-deferred-b6-qa-20261014.md",
+    ".cache/deferred-b6-qa-checks/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před startem ověřit skutečný validation claim s očekávaným ownerem, cwd a potřebnými resources; tento helper sám rezervaci nevytváří.",
+    "Při částečném selhání startu zachovat runtime.json s již spuštěným procesem a bezpečně uklidit pouze jeho ověřený PID+startUTC+command; nevytvořit nezaznamenaný živý proces.",
+    "Zachovat frozen baseline/candidate, dependencies, source manifesty a dosavadní runy. Vyjasnit manuální kroky koordinátora: readiness/bundle hash, shodný lightingInstant, archivace JSONL z variant cache."
+  ],
+  "verification": [
+    "Jen statický PowerShell parser a případný izolovaný mock failure test bez skutečných Node/server/GPU procesů. Žádný build/fullsuite ani instalace.",
+    "Předání konkrétního diffu, výsledků a zbývajících manuálních kontrol; nezaměňovat připravené helpery za provedenou GPU přejímku."
+  ],
+  "notes": [
+    "Pouze WT C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow. Vlastní start-qa.ps1 a README explicitně předává root z předchozího validate-b6-transform-20261014; claim před zápisem, žádné jiné úpravy.",
+    "Uživatel odložil své GUI testování. Nic nespouštět na4186/2581 ani neotevírat browser. Stop helper je read-only závislost; pokud potřebuje editaci, nejprve scope přes koordinátora.",
+    "Validation task zůstává blocked a jeho rezervace uvolněná. Tento přípravný task nesmí změnit skutečné validační zdroje ani dělat fake claim v reálném registru.",
+    "14.10 převzato koordinátorem: parser a 18/18 mock scénářů PASS na PowerShell Core7.6.5, žádný skutečný server/GPU/build. Start helper SHAb9d303e7136f34c5102fae1ef4e896ad941399b2dccb9ddce0269941b2a28e0c. Handoff/README ve WT, rezervace uvolněna; jde o dokončenou přípravu, nikoli GPU přejímku."
+  ]
+}

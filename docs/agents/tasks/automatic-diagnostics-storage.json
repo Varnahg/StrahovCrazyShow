@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "automatic-diagnostics-storage",
+  "title": "Ukládat automatické lokální záznamy a připravit čitelný souhrn pro analýzu",
+  "writePaths": [
+    "server/session-diagnostics.ts",
+    "server/index.ts",
+    "scripts/diagnostics-report.mjs",
+    "tests/session-diagnostics-server.test.ts",
+    "tests/diagnostics-report.test.ts",
+    "docs/agents/handoffs/automatic-diagnostics-storage.md"
+  ],
+  "resources": [],
+  "status": "done",
+  "dependsOn": [],
+  "acceptance": [
+    "Záznam se spouští automaticky; uživatel nemusí měření zapínat ani exportovat.",
+    "Diagnostika zachycuje FPS, nastavení, dění a chyby; paměť i disk jsou omezené a logování nemění automatickou kvalitu.",
+    "Proveď cílený refaktoring a odpovídající testy, předání v přiděleném handoffu."
+  ],
+  "verification": [
+    "Lehké cílené testy; integrátor po stabilizaci provede pnpm test, pnpm build a pnpm test:integration.",
+    "Praktické ověření automatického zápisu ze skutečné hry; není to srovnávací GPU výkonový důkaz."
+  ],
+  "notes": [
+    "Autorizováno uživatelem 13.10.2026: kompletní automatické logy pro pozdější samostatnou analýzu.",
+    "Koordinátor diagnostics-01a13624-admin; původní živé porty5173/2567 zůstávají ve vlastnictví local-dev-20261013.",
+    "Předávání API mezi samostatnými moduly koordinuje hlavní agent; žádná změna chatů, účtů ani veřejné telemetry."
+  ]
+}

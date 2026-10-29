@@ -9,6 +9,7 @@ import {
 } from "../shared/netcode";
 import type { Input } from "../shared/types";
 import { initPhysics, Simulation } from "../shared/simulation";
+import { TimelineInputQueue } from "../shared/input-timeline";
 
 const command = (seq: number, vehicle = false): Input => ({
   seq,
@@ -17,6 +18,30 @@ const command = (seq: number, vehicle = false): Input => ({
   yaw: 0,
   jump: true,
   vehicle,
+});
+
+test("V11 late bursts expire at their original deadlines instead of creating a permanent FIFO delay", () => {
+  const queue = new TimelineInputQueue(1, 0),
+    mode = { vehicle: false, yaw: 0 };
+  for (let tick = 1; tick <= 14; tick++) queue.consume(tick, mode);
+  for (let seq = 1; seq <= 16; seq++)
+    assert.equal(
+      queue.push({ ...command(seq), inputEpoch: 1 }),
+      seq <= 14 ? "late" : "accepted",
+    );
+  assert.equal(queue.diagnostics().depth, 2);
+  for (let tick = 15; tick <= 120; tick++) {
+    if (tick > 16)
+      assert.equal(queue.push({ ...command(tick), inputEpoch: 1 }), "accepted");
+    assert.equal(queue.consume(tick, mode).input.seq, tick);
+    assert.equal(queue.ack, tick);
+  }
+  assert.equal(queue.diagnostics().depth, 0);
+  assert.equal(
+    queue.diagnostics().resets,
+    0,
+    "normal missing/late packets do not trigger resync feedback",
+  );
 });
 
 test("a delayed FIFO burst stays queued at equal production/consumption rates until explicit recovery", () => {

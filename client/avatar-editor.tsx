@@ -17,6 +17,7 @@ type AvatarEditorProps = {
   profile: Profile;
   onChange: (profile: Profile) => void;
   compact?: boolean;
+  active?: boolean;
 };
 
 function Silhouette({
@@ -132,6 +133,7 @@ export function AvatarEditor({
   profile,
   onChange,
   compact = false,
+  active = true,
 }: AvatarEditorProps) {
   useLocale();
   const [section, setSection] = useState<"appearance" | "clothes">(
@@ -152,6 +154,21 @@ export function AvatarEditor({
   currentAvatar.current = config;
 
   useEffect(() => {
+    if (!active) {
+      if (
+        pointer.current &&
+        canvas.current?.hasPointerCapture(pointer.current.id)
+      )
+        canvas.current.releasePointerCapture(pointer.current.id);
+      pointer.current = null;
+      preview.current?.setActive(false);
+      return;
+    }
+    if (preview.current) {
+      preview.current.update(currentAvatar.current);
+      preview.current.setActive(true);
+      return;
+    }
     let cancelled = false;
     setPreviewStatus("loading");
     // The initial form itself does not eagerly import Babylon or initialize physics.
@@ -169,14 +186,19 @@ export function AvatarEditor({
       });
     return () => {
       cancelled = true;
+    };
+  }, [active]);
+
+  useEffect(() => {
+    return () => {
       preview.current?.dispose();
       preview.current = null;
     };
   }, []);
 
   useEffect(() => {
-    preview.current?.update(config);
-  }, [config]);
+    if (active) preview.current?.update(config);
+  }, [config, active]);
 
   const update = <K extends keyof AvatarConfig>(
     key: K,
