@@ -110,7 +110,7 @@ def normalize_doc(document, fmt, request):
     return blocks, sorted(set(issues)), tables
 
 
-def serialize_table(item, document):
+def serialize_table(item, document, *, header_rows_override=None):
     data = item.data
     rows = [[] for _ in range(data.num_rows)]
     header_rows = set()
@@ -132,6 +132,14 @@ def serialize_table(item, document):
             rows[row_index].append(canonical({"cell": coordinates, "text": value}))
         if cell.column_header:
             header_rows.update(range(cell.start_row_offset_idx, cell.end_row_offset_idx))
+    if header_rows_override is not None:
+        if (not isinstance(header_rows_override, (list, tuple)) or
+                any(type(index) is not int or not 0 <= index < data.num_rows for index in header_rows_override) or
+                len(set(header_rows_override)) != len(header_rows_override)):
+            raise ExtractionError("invalid-table-headers")
+        # OpenAI candidates declare row-level headers explicitly. Do not widen
+        # them because a cell spans both a header row and an adjacent data row.
+        header_rows = set(header_rows_override)
     lines = ["\t".join(row) for row in rows]
     # Source text and repeated header/body must share the same rendered rows.
     # A declared row with no parsed cells is unknown, not evidence of blank data.
