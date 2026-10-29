@@ -16,6 +16,7 @@ COPY --chown=node:node tsconfig.json ./
 COPY --chown=node:node server ./server
 COPY --chown=node:node shared ./shared
 COPY --chown=node:node scripts/rag-import.ts ./scripts/rag-import.ts
+COPY --chown=node:node scripts/docker-rag-bootstrap.ts scripts/docker-rag-secrets.mjs ./scripts/
 USER node
 ENTRYPOINT ["node", "--import", "tsx", "scripts/rag-import.ts"]
 CMD ["status"]
@@ -45,6 +46,7 @@ COPY --from=build --chown=node:node /app/package.json /app/tsconfig.json ./
 COPY --from=build --chown=node:node /app/server ./server
 COPY --from=build --chown=node:node /app/shared ./shared
 COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/scripts/docker-game-entrypoint.mjs /app/scripts/docker-rag-secrets.mjs ./scripts/
 RUN mkdir -p /data/feedback && chown node:node /data/feedback
 USER node
 EXPOSE 2567
