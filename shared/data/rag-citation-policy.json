@@ -1,0 +1,2755 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026-10-28.1",
+  "catalogSha256": "3e2e243764a50828b78f3bb3e67e74ec38b84ca975619d6cc022547fd1f044b7",
+  "deniedHostnames": [
+    "fotbalek.sh.cvut.cz",
+    "is.sh.cvut.cz",
+    "web.suz.cvut.cz",
+    "www.facebook.com"
+  ],
+  "deniedExactUrls": [
+    "https://su.cvut.cz/cs/logobanka/studentska-unie"
+  ],
+  "rules": [
+    {
+      "seedId": "seed-001",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-002",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/dokumenty",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/dokumenty/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-003",
+      "publisher": "su",
+      "exactUrl": "https://wiki.su.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/group/dokumenty/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-004",
+      "publisher": "su",
+      "exactUrl": "https://wiki.su.cvut.cz/_media/group/dokumenty/vyrocni_zpravy/vyrocni_zprava_su_cvut_2019.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-005",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/aktuality",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/aktuality/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-006",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/aktuality.rss",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/aktuality/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-007",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/aktuality.atom",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/aktuality/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-008",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/udalosti.rss",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/udalosti/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-009",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/udalosti.atom",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/udalosti/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-010",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/kalendare",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-011",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/kluby",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/kluby/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-012",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/projekty",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://su.cvut.cz",
+          "pathPrefix": "/cs/projekty/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-013",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/projekty/informacni-udalosti",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-014",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/kontakty",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-015",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/o-studentske-unii-cvut/organizacni-struktura/centrala-su-cvut",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-016",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/o-studentske-unii-cvut/organizacni-struktura/rada-studentskych-samosprav",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-017",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/o-studentske-unii-cvut/organizacni-struktura/studentsky-parlament",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-018",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/o-studentske-unii-cvut/historie",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-019",
+      "publisher": "su",
+      "exactUrl": "https://su.cvut.cz/cs/o-studentske-unii-cvut/podrobna-historie-studentske-unie-cvut",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.su.cvut.cz",
+          "pathPrefix": "/_media/group/dokumenty/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-021",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://www.siliconhill.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-022",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://www.siliconhill.cz/koleje-strahov",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-023",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://www.siliconhill.cz/pages/dokumenty",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-024",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/klub/projekty/",
+          "kind": "page",
+          "query": "wiki-revision"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/kolej/bloky/",
+          "kind": "page",
+          "query": "wiki-revision"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/vedeni/dokumenty/",
+          "kind": "page",
+          "query": "wiki-revision"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/vedeni/narizeni_predsedy/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-025",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/vedeni/dokumenty/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-026",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/stanovy",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-027",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/o_clenstvi",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-028",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/pravidla_site",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-029",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/jednaci_rad",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-030",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/volebni_rad",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-031",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/rad_projektu",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-032",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/rozpoctovy_rad",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-033",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/pravidla_kameroveho_systemu",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-034",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/predpisy/sazebnik_trestu",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-035",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/narizeni_predsedy",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/vedeni/narizeni_predsedy/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-036",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/manual_registratora",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-037",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/vedeni/dokumenty/pravidla_registratoru",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-038",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://zapisy.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-039",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://zapisy.sh.cvut.cz/prilohy/20251201-Stanovy_SH.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-040",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://zapisy.sh.cvut.cz/prilohy/20180605-Priloha3-Pravidla_site_klubu_Silicon_Hill.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-041",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://www.siliconhill.cz/rss",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-043",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/klub/projekty/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-044",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/3d_tisk",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-045",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://3dtisk.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-046",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/avc",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-047",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://avc.sh/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-048",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/fotbalek",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-050",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/fotokomora",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/klub/projekty/fotokomora/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-051",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/fotoatelier",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/klub/projekty/fotoatelier/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-052",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/gamedev",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/klub/projekty/gamedev/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-053",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://hudebny.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-054",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://macgyver.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-055",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://pinec.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-056",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://sherna.siliconhill.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-057",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://show.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-058",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/show",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-059",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/vcely",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-060",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://vcely.sh.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-061",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/zahradky",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-062",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/modelland",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-063",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/kompanie-monsilica",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-064",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub/projekty/vyrocni-zpravy-2018",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/klub/projekty/vyrocni-zpravy-2018/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-065",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://www.rechargingbar.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-067",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://klubcajovna.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-068",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://old-wiki.siliconhill.cz/%C4%8Cajovna",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-070",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/klub:sluzby:grilovaci_centrum",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-071",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/KLUB:Sluzby:Pipa",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-072",
+      "publisher": "su",
+      "exactUrl": "https://stoh.su.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-073",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://gym.siliconhill.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-074",
+      "publisher": "su",
+      "exactUrl": "https://www.strahovopenair.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-075",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/kolej/okoli",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-076",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/kolej/bloky/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/kolej/bloky/",
+          "kind": "page",
+          "query": "wiki-revision"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-077",
+      "publisher": "silicon-hill",
+      "exactUrl": "https://wiki.sh.cvut.cz/kolej/bloky/blok_11/mistnosti11a12",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/klub/projekty/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/kolej/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://wiki.sh.cvut.cz",
+          "pathPrefix": "/_media/vedeni/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://zapisy.sh.cvut.cz",
+          "pathPrefix": "/prilohy/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-078",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ceniky-dokumenty",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-079",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/media/file/scenar-ubytovani-2026-2027",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-080",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/media/file/postupy-pravidla-pri-poskytovani-ubytovani-na-kolejich-cvut-2026-2027",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-081",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/media/file/vseobecne-ubytovaci-podminky-priloha-c3-scenare-ubytovani-2026-2027",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-082",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/media/file/metodika-rezervaci-ubytovani-ar-2026-2027",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-083",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ubytovani-faq",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-084",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/koleje-strahov",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-085",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/zakladni-informace",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-086",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/zakladni-informace/oddeleni-pro-ubytovani",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-087",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/jak-ziskat-ubytovani",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-088",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/jak-ziskat-ubytovani/pokyny-k-nastupu-na-ubytovani-na-kolejich-cvut",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-089",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/platebni-metody",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-090",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/hotely-hostely/hostel-strahov",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-091",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/komercni-sluzby/pronajem-sportovist",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-092",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/archiv-aktualit",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-093",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/menzy-stravovani",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        },
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/menzy-stravovani/",
+          "kind": "page",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-094",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/menzy-stravovani/menza-strahov",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-095",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/menzy-stravovani/snack-bar-bufet",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-096",
+      "publisher": "suz",
+      "exactUrl": "https://agata.suz.cvut.cz/jidelnicky/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-097",
+      "publisher": "suz",
+      "exactUrl": "https://agata.suz.cvut.cz/jidelnicky/index.php?clPodsystem=1",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-098",
+      "publisher": "suz",
+      "exactUrl": "https://agata.suz.cvut.cz/jidelnicky/indexTyden.php?clPodsystem=1",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-099",
+      "publisher": "suz",
+      "exactUrl": "https://agata.suz.cvut.cz/jidelnicky/jidelnicek_pdf.php?lang=cs&podsystem=1",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-100",
+      "publisher": "suz",
+      "exactUrl": "https://agata.suz.cvut.cz/jidelnicky/oteviraci-doby.php",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-101",
+      "publisher": "suz",
+      "exactUrl": "https://agata.suz.cvut.cz/jidelnicky/kontakty.php",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    },
+    {
+      "seedId": "seed-103",
+      "publisher": "suz",
+      "exactUrl": "https://www.suz.cvut.cz/cz/dlouhodobe-ubytovani/dokumenty-0",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.suz.cvut.cz",
+          "pathPrefix": "/cz/media/file/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-104",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-105",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/vnitrni-predpisy",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-106",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/legislativa-tykajici-se-studia",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-107",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/poplatky-spojene-se-studiem",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-108",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/sites/default/files/content/d1dc93cd-5894-4521-b799-c7e715d3c59e/cs/20260304-poplatky-spojene-se-studiem-pro-rok-20262027.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-109",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/sites/default/files/content/d1dc93cd-5894-4521-b799-c7e715d3c59e/cs/20251009-harmonogram-akademickeho-roku-20262027.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-110",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/sites/default/files/content/74c76d2e-7f4d-4cb1-ac28-b0765c7f88f2/cs/20260113-studijni-a-zkusebni-rad-pro-studenty-cvut-xi-uplne-zneni-ucinnost-od-14112025-do-30112025.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-111",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/sites/default/files/content/74c76d2e-7f4d-4cb1-ac28-b0765c7f88f2/cs/20220503-eticky-kodex-cvut-v-praze-ucinnost-od-7-5-2022.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-112",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/eticka-komise",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-113",
+      "publisher": "cvut",
+      "exactUrl": "https://www.cvut.cz/sites/default/files/content/d1dc93cd-5894-4521-b799-c7e715d3c59e/cs/20240813-ubytovaci-stipendium-ucinnost-od-1102024.pdf",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": [
+        {
+          "origin": "https://www.cvut.cz",
+          "pathPrefix": "/sites/default/files/content/",
+          "kind": "document",
+          "query": "none"
+        }
+      ]
+    },
+    {
+      "seedId": "seed-114",
+      "publisher": "cvut",
+      "exactUrl": "https://akce.cvut.cz/",
+      "denyPathPrefixes": [
+        "/Login",
+        "/admin",
+        "/login",
+        "/users/sign_in"
+      ],
+      "scopes": []
+    }
+  ]
+}
