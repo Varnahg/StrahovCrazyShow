@@ -1,0 +1,90 @@
+# Complete local application: put the OpenAI key in secrets/openai_api_key.txt,
+# then run: docker compose -f compose.full.yaml up -d --build
+services:
+  rag-secrets:
+    image: strahov-rag-tools:local
+    build:
+      context: .
+      target: rag-tools
+    user: root
+    entrypoint: [node, scripts/docker-rag-secrets.mjs]
+    command: []
+    restart: "no"
+    volumes:
+      - rag-owner-credentials:/run/rag-owner
+      - rag-reader-credentials:/run/rag-reader
+
+  rag-db:
+    image: pgvector/pgvector:0.8.7-pg17-bookworm@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
+    restart: unless-stopped
+    depends_on:
+      rag-secrets:
+        condition: service_completed_successfully
+    environment:
+      POSTGRES_DB: strahov_rag
+      POSTGRES_USER: scs_rag_owner
+      POSTGRES_PASSWORD_FILE: /run/rag-owner/postgres-password
+    command: [postgres, -c, log_parameter_max_length=0, -c, log_parameter_max_length_on_error=0, -c, log_statement=none]
+    volumes:
+      - rag-data:/var/lib/postgresql/data
+      - rag-owner-credentials:/run/rag-owner:ro
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U scs_rag_owner -d strahov_rag]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rag-bootstrap:
+    image: strahov-rag-tools:local
+    build:
+      context: .
+      target: rag-tools
+    entrypoint: [node, --import, tsx, scripts/docker-rag-bootstrap.ts]
+    command: []
+    restart: "no"
+    depends_on:
+      rag-db:
+        condition: service_healthy
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-large}
+      OPENAI_EMBEDDING_DIMENSIONS: ${OPENAI_EMBEDDING_DIMENSIONS:-3072}
+      RAG_BOOTSTRAP_MAX_INPUTS: ${RAG_BOOTSTRAP_MAX_INPUTS:-256}
+      RAG_BOOTSTRAP_MAX_BYTES: ${RAG_BOOTSTRAP_MAX_BYTES:-1048576}
+    secrets:
+      - openai_api_key
+    volumes:
+      - rag-owner-credentials:/run/rag-owner:ro
+      - rag-reader-credentials:/run/rag-reader:ro
+
+  game:
+    extends:
+      file: compose.yaml
+      service: game
+    command: [node, scripts/docker-game-entrypoint.mjs]
+    depends_on:
+      rag-bootstrap:
+        condition: service_completed_successfully
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-6-luna}
+      OPENAI_REASONING_EFFORT: ${OPENAI_REASONING_EFFORT:-none}
+      OPENAI_COMPLEX_MODEL: ${OPENAI_COMPLEX_MODEL:-gpt-6.1-sol}
+      OPENAI_COMPLEX_REASONING_EFFORT: ${OPENAI_COMPLEX_REASONING_EFFORT:-low}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-large}
+      OPENAI_EMBEDDING_DIMENSIONS: ${OPENAI_EMBEDDING_DIMENSIONS:-3072}
+      CRAZY_TYPKA_ALLOWED_ORIGINS: ${CRAZY_TYPKA_ALLOWED_ORIGINS:-}
+    secrets:
+      - openai_api_key
+    volumes:
+      - rag-reader-credentials:/run/rag-reader:ro
+
+secrets:
+  openai_api_key:
+    file: ${OPENAI_SECRET_FILE:-./secrets/openai_api_key.txt}
+
+volumes:
+  feedback-data:
+  rag-data:
+  rag-owner-credentials:
+  rag-reader-credentials:
