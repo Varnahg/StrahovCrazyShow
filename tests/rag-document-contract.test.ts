@@ -482,6 +482,22 @@ test("bounded citations fail explicitly instead of silently discarding selected 
   invalid(() => buildDocumentCitation(built.document, spans), "citation-limit");
 });
 
+test("publication rejects chunks whose complete citation cannot be projected", () => {
+  const raw = fixture();
+  const spans = Array.from({ length: 9 }, (_, i) => ({
+    ...raw.blocks[0].spans[0], locator: `PDF strana 1, část ${i}`,
+  }));
+  raw.blocks[0].spans = spans;
+  raw.chunks[0].spans = spans;
+  invalid(() => bundle(raw), "citation-limit");
+
+  const direct = structuredClone(dataset(bundle()));
+  direct.blocks[0].spans = spans;
+  direct.chunks[0].spans = spans;
+  rekeySingleDocument(direct);
+  invalid(() => validateKnowledgeDatasetV3(direct), "citation-limit");
+});
+
 test("a valid v3 logical identifier remains valid in its public citation", () => {
   const raw = fixture();
   raw.sourceId = "suz.document_v3";
