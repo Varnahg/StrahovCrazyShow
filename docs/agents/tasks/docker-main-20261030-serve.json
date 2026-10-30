@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-main-20261030-serve",
+  "title": "Ponechat uživateli aktuální main s AI a RAG na Docker portu8080",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/docker-main-20261030-serve/", "docs/agents/handoffs/docker-main-20261030-serve.md"],
+  "resources": ["port:8080"],
+  "acceptance": ["Existující Compose projekt používá kanonický C checkout a zachované named volumes.", "GET /api/health vrací200, /api/ai/status enabled:true a hlavní stránka i její asset jsou dostupné.", "Uživatel dostane funkční localhost:8080; provozní claim zůstává držen po dobu běhu."],
+  "verification": ["Docker Compose stav, health a levné HTTP kontroly bez placeného AI volání.", "Ověřit source identity, secret bind cestu bez zveřejnění obsahu a zachování databázových volumes."],
+  "notes": ["Přímé zadání uživatele 30.10.2026: zapnout hlavní main přes Docker.", "Předchozí koordinátor main-consolidation-01a189cd skončil podle svého handoffu a chatového předání. Nový koordinátor přijímá administrativní katalog pouze se zachováním untracked main-lfs-index-recovery-20261030.json (SHA25686e394f505df5e2a23b32dd85fd6293ef7619f117da64e21e1fa522d64cc8e1b), bez pokračování jeho práce a bez zahrnutí souboru do commitu."]
+}
