@@ -42,6 +42,25 @@ test("full MID profile is explicit and scales its thresholds with the real proje
   assert.throws(()=>parseTreePilotManifest(raw),/LOD profile/);
 });
 
+test("low full-coverage FAR begins at 45 projected metres while other policies retain their boundaries", () => {
+  for (const [quality, far] of [["low", 45], ["medium", 100], ["high", 135], ["unknown", 75]] as const) {
+    assert.equal(treeDetailForProjection(far - .01, quality, "full-coverage"), 1, quality);
+    assert.equal(treeDetailForProjection(far, quality, "full-coverage"), 2, quality);
+  }
+  for (const scale of [.5, 2]) {
+    assert.equal(treeDetailForProjection(45 * scale - .01, "low", "full-coverage", scale), 1);
+    assert.equal(treeDetailForProjection(45 * scale, "low", "full-coverage", scale), 2);
+  }
+  for (const scale of [NaN, Infinity, 0, -1]) {
+    assert.equal(treeDetailForProjection(44.99, "low", "full-coverage", scale), 1);
+    assert.equal(treeDetailForProjection(45, "low", "full-coverage", scale), 2);
+  }
+  assert.equal(treeDetailForProjection(74.99, "low"), 1, "legacy low still keeps MID until 75 metres");
+  assert.equal(treeDetailForProjection(75, "low"), 2);
+  assert.equal(treeDetailForProjection(5.99, "unknown", "full-coverage"), 0);
+  assert.equal(treeDetailForProjection(6, "unknown", "full-coverage"), 1);
+});
+
 test("actual renderer protects a nearby third-person camera and responds to FOV without changing legacy", t => {
   const engine=new NullEngine({renderWidth:1280,renderHeight:720,textureSize:1,deterministicLockstep:false,lockstepMaxSteps:4});
   const scene=new Scene(engine);scene.useRightHandedSystem=true;
@@ -89,8 +108,8 @@ function fixture(tree = source) {
   return { tree, id, prototype, streamed, original, files, manifest };
 }
 
-function harness(t: any, fixtures = [fixture()]) {
-  const engine = new NullEngine(), scene = new Scene(engine); scene.useRightHandedSystem = true;
+function harness(t: any, fixtures = [fixture()], engine = new NullEngine()) {
+  const scene = new Scene(engine); scene.useRightHandedSystem = true;
   const selections = Object.fromEntries(fixtures.map(f => [f.tree.osmId, f.id]));
   const renderer = new TreeRenderer(scene, { treePilot: { manifestUrl: "/models/vegetation/seasonal-streamed/test.json", selections } }), r = renderer as any;
   for (const key of ["Bark012", "LeafSet024"]) r.materials.set(key, new PBRMaterial(key, scene));
@@ -100,6 +119,67 @@ function harness(t: any, fixtures = [fixture()]) {
   t.mock.method(r.loader, "asset", async (file: TreeAssetFile) => { calls.push(file.url); assert.ok(byUrl.has(file.url)); return byUrl.get(file.url)!; });
   t.after(() => { renderer.dispose(); scene.dispose(); engine.dispose(); });
   return { engine, scene, renderer, r, manifest, selections, byUrl, calls, load: () => r.loadPilot(manifest, Object.keys(selections)) };
+}
+
+test("low renderer retains FAR without a MID request until the real camera projection needs detail", async t => {
+  const f = fixture(); Object.assign(f.streamed, { lodProfile: "full-coverage" });
+  const engine = new NullEngine({ renderWidth: 1280, renderHeight: 720, textureSize: 1, deterministicLockstep: false, lockstepMaxSteps: 4 });
+  const h = harness(t, [f], engine); await h.load();
+  const player = { x: source.x - 60, y: 0, z: source.z };
+  const camera = new FreeCamera("low tree projection", new Vector3(player.x, 2, player.z), h.scene); camera.fov = .85;
+  const group = h.r.treeGroups[0], far = [...group.lods[2]];
+  h.renderer.update(input({ quality: "low", player })); await settle();
+  assert.equal(group.desired, 2); assert.equal(group.active, 2);
+  assert.deepEqual(h.calls, [f.streamed.lods[2].url], "the 45–75 metre band must not request MID in low");
+  assert.equal(h.renderer.stats.treeDetailReservedBytes, 0);
+  assert.ok(far.every(mesh => mesh.isEnabled()));
+
+  camera.fov = .42;
+  h.renderer.update(input({ time: 1.2, quality: "low", player })); await settle();
+  assert.equal(group.desired, 1); assert.equal(group.active, 1, "zoom must still request and display a detailed crown");
+  assert.deepEqual(h.calls, [f.streamed.lods[2].url, f.streamed.lods[1].url]);
+  assert.ok(far.every(mesh => !mesh.isEnabled()));
+
+  camera.fov = .85;
+  h.renderer.update(input({ time: 1.4, quality: "low", player })); await settle();
+  assert.equal(group.active, 2); assert.ok(far.every(mesh => mesh.isEnabled()));
+  assert.ok(group.lods[1].every((mesh: Mesh) => !mesh.isEnabled()));
+  assert.equal(h.calls.length, 2, "returning to FAR must not issue another geometry request");
+});
+
+for (const finishDuring of ["low", "high"] as const) {
+  test(`pending MID finishing in ${finishDuring} obeys the latest low/high selection and remains reusable`, async t => {
+    const f = fixture(); Object.assign(f.streamed, { lodProfile: "full-coverage" });
+    const h = harness(t, [f]); await h.load();
+    const group = h.r.treeGroups[0], far = [...group.lods[2]], player = { x: source.x - 60, y: 0, z: source.z };
+    let finish!: (buffer: ArrayBuffer) => void;
+    t.mock.method(h.r.loader, "asset", (file: TreeAssetFile) => {
+      h.calls.push(file.url);
+      assert.equal(file.url, f.streamed.lods[1].url);
+      return new Promise<ArrayBuffer>(resolve => finish = resolve);
+    });
+    h.renderer.update(input({ player }));
+    assert.equal(group.desired, 1); assert.equal(h.r.loadingTrees.size, 1);
+    assert.equal(h.renderer.stats.treeDetailReservedBytes, f.streamed.lods[1].bytes);
+    h.renderer.update(input({ time: 1.2, quality: "low", player }));
+    assert.equal(group.desired, 2); assert.equal(group.active, 2);
+    if (finishDuring === "high") h.renderer.update(input({ time: 1.4, player }));
+    finish(asBuffer(f.files[1])); await settle();
+
+    const mid = [...group.lods[1]], current = finishDuring === "low" ? 2 : 1;
+    assert.equal(group.active, current);
+    assert.ok(mid.every(mesh => mesh.isEnabled() === (current === 1)));
+    assert.ok(far.every(mesh => mesh.isEnabled() === (current === 2)));
+    assert.equal(h.r.loadingTrees.size, 0); assert.equal(h.renderer.stats.treeDetailReservedBytes, 0);
+    assert.equal(h.renderer.stats.treeDetailCacheEntries, 1);
+    h.renderer.update(input({ time: 1.6, quality: "low", player }));
+    assert.equal(group.active, 2); assert.ok(mid.every(mesh => !mesh.isEnabled()));
+    h.renderer.update(input({ time: 1.8, player })); await settle();
+    assert.equal(group.active, 1); assert.deepEqual(group.lods[1], mid);
+    assert.ok(mid.every(mesh => mesh.isEnabled() && !mesh.isDisposed()));
+    assert.ok(far.every(mesh => !mesh.isEnabled() && !mesh.isDisposed()));
+    assert.deepEqual(h.calls, [f.streamed.lods[2].url, f.streamed.lods[1].url], "quality changes reuse the same pending/cached MID");
+  });
 }
 
 test("full-coverage detail admission uses camera focus before distant-player candidates consume the byte budget", async t => {

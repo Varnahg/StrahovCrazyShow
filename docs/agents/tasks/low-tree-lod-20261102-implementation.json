@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "id": "low-tree-lod-20261102-implementation",
+  "title": "Dřívější FAR stromů v low při zachované projekci a detailním okolí",
+  "writePaths": [
+    "client/tree-renderer.ts",
+    "tests/tree-streaming.test.ts",
+    "docs/agents/handoffs/low-tree-lod-20261102-implementation.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze full-coverage + low používá první kandidát FAR45 místo75; near6, medium/high, legacy, camera-player segment a skutečná projekce zachovány.",
+    "Čitelný cílený refaktor LOD rozhodnutí, bez nového globálního stavu/assetů a bez změny kolizí, sezón či materiálů.",
+    "Meaningful regrese přes skutečný renderer: hranice, projekce/FOV, přepnutí low/high a pending streaming; pravdivé předání."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/tree-streaming.test.ts tests/tree-cluster-streaming.test.ts tests/tree-catalog-loading.test.ts",
+    "Bez build/GPU/fullsuite; společnou praktickou přejímku a commit provádí koordinátor."
+  ],
+  "notes": [
+    "Specifikace: _bmad-output/implementation-artifacts/low-tree-lod-20261102/SPEC.md. Cwd jedině C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/main.",
+    "Neimplementovat před uložením baseline buildu koordinátorem; čekat na explicitní zprávu. Žádný další BMAD workflow."
+  ]
+}

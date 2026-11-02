@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "id": "low-tree-lod-20261102-harness",
+  "title": "Reprodukovatelné A/B buildy bez kopie projektu pro low stromové LOD",
+  "writePaths": [
+    "docs/performance/evidence/low-tree-lod-20261102/harness/",
+    "docs/agents/handoffs/low-tree-lod-20261102-harness.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Harness buildí produkční bootstrap ze stejného main do přidělené .cache, žádné kopie zdrojů/branch/worktree, provider isolation a vlastní porty.",
+    "Manifest obsahuje source/tests/public identity; varianty nepřepisuje; kontroluje vlastní procesy a cleanup.",
+    "Real GPU browser a skutečné relace jsou řízené koordinátorem; žádný DEVhook/pose injection ve výkonovém výsledku."
+  ],
+  "verification": [
+    "Čtecí review a node --check všech mjs; skutečné spuštění/build/GPU pouze koordinátor s rezervací root tasku."
+  ],
+  "notes": [
+    "Zápis pouze harness/ a vlastní handoff. Root vlastní .cache/low-tree-lod-20261102/, dependency install, port2568/4179 a GPU.",
+    "Vite publicDir:false; preview musí obsloužit nezměněné a hashově ověřené public assety z kanonického main pouze pro čtení; nevytvářet kopii public/ ani node_modules."
+  ]
+}

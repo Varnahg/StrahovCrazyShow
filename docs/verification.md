@@ -1,5 +1,13 @@
 # Ověření dema a známá omezení
 
+## Úsporné stromové LOD · 2. listopadu 2026
+
+Na kanonickém `main` je implementován kandidát dřívějšího FAR pro `low` + `full-coverage`:45 normalizovaných metrů místo75. Blízký detail, Medium/High, historické profily, skutečná projekce, kamera–hráč, sezóny a kolize zůstávají zachované. [Výzkum, varianty, výsledky a meze](performance/evidence/low-tree-lod-20261102/results.md), [strojový souhrn](performance/evidence/low-tree-lod-20261102/validation.json).
+
+Cílené testy36/36 PASS; celý `pnpm test`2 848 PASS /0 FAIL /5 SKIP; TypeScript, `pnpm build`, samostatný kandidátní produkční build i izolovaný `pnpm test:integration` PASS. Integrace zahrnuje12 skutečných SDK peers; není GPU důkazem. První TypeScript průchod našel dvě readonly fixture přiřazení, opravená před zelenou plnou sadou. Nezávislé čtecí review bez nálezu.
+
+**GPU FPS a obrazová přejímka zůstávají neověřené:** Computer Use hlásí vypnuté `Local browser use` v nastavení Work; terminálové spuštění Edge automatická kontrola odmítla. Žádný FPS/p95/p99 zisk se netvrdí, KEY-5 se neuzavírá. Přesný kandidátní source/test hash `0786606868a5fa20259935ad315ea57c7a540136fcdcfea5ed1ddc74fd887bbe`; baseline i kandidát jsou pouze build výstupy v `.cache/low-tree-lod-20261102/`, bez kopií zdrojů či dalších worktrees. Původní Docker8080 zůstal nezměněný.
+
 ## Přijaté výsledky · 28. října 2026
 
 Společná přijatá runtime baseline je `801b2d07c884c51e42b0fc1a890e7a0f9dbc0196`. Následující přehled uzavírá dřívější pracovní checkpointy pro konkrétní funkce; jejich původní lokální FAIL, timeouty a incidenty níže zůstávají zachované.

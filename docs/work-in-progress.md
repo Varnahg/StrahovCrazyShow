@@ -6,6 +6,7 @@ Aktuální hra zachovává přijaté CAD modely, stromy, síť, Jantar, Docker a
 
 | Celek | Přesný uložený zdroj | Co ještě zbývá |
 | --- | --- | --- |
+| Úspornější stromové FAR v Low · 2. 11. 2026 | Současný `client/tree-renderer.ts` + `tests/tree-streaming.test.ts`, source/test SHA `0786606868a5fa20259935ad315ea57c7a540136fcdcfea5ed1ddc74fd887bbe`; [evidence](performance/evidence/low-tree-lod-20261102/results.md) | Implementace, cílené i plné testy, build a SDK integrace prošly. Kalibrace45 je stále kandidát bez GPU FPS/obrazové přejímky, blokované vypnutým Local browser use. Po zpřístupnění prohlížeče provést zachované A/B; neslibovat vyšší FPS ani přijmout celek podle CPU testů. |
 | Avatar preview cache a uspání editoru | `67f19cbab72e1b7c2e5c9466403810ad3c4f7fca` | Přenést do současného async WebGPU/Jantar lifecycle; ověřit cold/open scénář. |
 | Postupná stavba světa/ulic a startup diagnostika | `67f19cbab72e1b7c2e5c9466403810ad3c4f7fca` | Sladit se současným CAD a seasonal world; rozdělit zbývající atomické kroky a provést praktickou přejímku. |
 | Static frustum a MeshDrawProfile | `67f19cbab72e1b7c2e5c9466403810ad3c4f7fca` | Experiment byl výchozí vypnutý; chybí srovnatelné produkční A/B. |
