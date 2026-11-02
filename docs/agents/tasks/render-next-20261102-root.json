@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "dependsOn": [],
+  "id": "render-next-20261102-root",
+  "title": "Další měřená grafická optimalizace na main s Edge",
+  "writePaths": [
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/render-next-20261102/",
+    ".cache/render-profile-20261102/",
+    ".cache/render-next-20261102/",
+    ".cache/game-diagnostics/",
+    "docs/performance/evidence/render-next-20261102/",
+    "docs/agents/handoffs/render-next-20261102-root.md",
+    "docs/verification.md",
+    "docs/work-in-progress.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4179"
+  ],
+  "acceptance": [
+    "Pouze kanonický checkout/main; žádné nové větve, worktrees nebo source kopie. Docker8080 zachovaný.",
+    "Před implementací znovu ověřit skutečnou Edge kartu/GPU/startup, profilem doložit konkrétní náklad, porovnat varianty a vybrat jeden zásah.",
+    "Implementace i cílený refaktoring, regresní kontroly a srovnatelná praktická přejímka; oddělit CPU důkaz od FPS a otevřených omezení.",
+    "Ověřený celek commitnout přímo na main, aktualizovat Linear a předání; žádný cizí WIP."
+  ],
+  "verification": [
+    "Nový run původního frozen buildu a jeho source/test/asset/dependency revalidace, nesmazat původní run1 selhání.",
+    "Serializované buildy/testy/GPU, skutečná produkční hra a HUD, explicitní backend/rozlišení/kvalita/podmínky. STOP/cleanup pouze vlastních procesů.",
+    "Runtime writePaths koordinátor doplní až podle výzkumu a volby konkrétní optimalizace, před prvním zápisem kódu."
+  ],
+  "notes": [
+    "Nové výslovné zadání uživatele: pokračovat další optimalizací a použít @Edge. Baseline d4e8f1c24ce43eaaad1d2d9dc9c7661c6b2433ae.",
+    "Předchozí profil skončil timeoutem a blokací fyzické URL kontroly, příčina nebyla doložena. Nevydávat minulý pokus za výkonovou baseline.",
+    "Použití původní cache je navázání stejného root vlastníka; run1/build ani předchozí evidence se nepřepisují. Tři staré untracked konsolidační soubory zůstávají mimo scope.",
+    "Druhý pokus run2 skončil light-preparation timeoutem 30040,4 ms; fyzickou aktivní kartu opět nelze ověřit, Computer Use ukončilo ovládání kvůli neurčitelné URL. Žádný runtime zásah. Oba vlastní procesy ukončeny STOP, další postup a kandidáti v handoffu. Uživatel navíc výslovně požaduje po prvním zásahu další optimalizaci proti zásekům; tato navazující práce zůstává neprovedená."
+  ]
+}
