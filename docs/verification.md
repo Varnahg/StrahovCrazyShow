@@ -1,5 +1,13 @@
 # Ověření dema a známá omezení
 
+## CPU snapshoty trávy a květin · 2. listopadu 2026
+
+PhotoGrassBatch převádí pouze změněné číselné sloty a při vlastním reboundu neopakuje nativní převody. Zůstává přesná shoda všech16 hodnot matic, fade/slot/count, bounds a GPU uploadů; nová metadata mají5B/kapacitní slot zahrnutých do allocatedBytes. Refaktor oddělil malý idle guard od synchronizační práce. [Výzkum a výsledky](performance/evidence/grass-matrix-20261102/results.md), [úplná evidence](performance/evidence/grass-matrix-20261102/validation.json).
+
+CPU A/B na i7-8750H/Node24.22.1/Babylon9.30: finální sparse1/32 operace při256/2048/8192 instancích rychlejší5/5párů, mediány celkového mutate+flush času nižší o52,6–89,4%. Úplná obměna/rebound mají smíšené výsledky včetně kladných mediánů nad10%; nesplnily však předem definované kritérium stabilní regrese4/5párů. Původní neúspěšná série a následná korekce idle cesty jsou zachované. **Nejde o GPU ani FPS celé hry.**
+
+Cíleně58/58 PASS, TypeScript, `pnpm build`, SDK `pnpm test:integration` PASS; nezávislé review bez nálezu. Celé testy: první běh2858 PASS/2 FAIL/5 SKIP (RAG30ms deadline), druhý s6procesy2859 PASS/1 FAIL/5 SKIP (nespuštěný verification worker po chybě heartbeat). Oba dotčené nezměněné testy izolovaně prošly (67/67,1/1); plná sada zůstává nezelená a není přeznačena na PASS. Source/test hash `a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904`,945 vstupů. Změna se uchovává přímo na main s otevřenou celoprojektovou přejímkou.
+
 ## Úsporné stromové LOD · 2. listopadu 2026
 
 Na kanonickém `main` je implementován kandidát dřívějšího FAR pro `low` + `full-coverage`:45 normalizovaných metrů místo75. Blízký detail, Medium/High, historické profily, skutečná projekce, kamera–hráč, sezóny a kolize zůstávají zachované. [Výzkum, varianty, výsledky a meze](performance/evidence/low-tree-lod-20261102/results.md), [strojový souhrn](performance/evidence/low-tree-lod-20261102/validation.json).

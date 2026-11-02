@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "dependsOn": [],
+  "id": "grass-matrix-20261102-root",
+  "title": "Přijmout inkrementální CPU synchronizaci vegetačních matic na main",
+  "writePaths": [
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/grass-matrix-20261102/",
+    ".cache/grass-matrix-20261102/root/",
+    "docs/performance/evidence/grass-matrix-20261102/results.md",
+    "docs/performance/evidence/grass-matrix-20261102/validation.json",
+    "docs/agents/handoffs/grass-matrix-20261102-root.md",
+    "docs/verification.md",
+    "docs/work-in-progress.md",
+    "dist/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Schválený plán: omezit pouze CPU Matrix snapshot převody PhotoGrassBatch při nezměněných bounds, GPU uploadech, geometrii a vzhledu.",
+    "Pět párových CPU sérií s baseline z21d24c5f; opakovatelně rychlejší řídké změny a žádná stabilní regrese ostatních scénářů nad10%. FPS celé hry zůstává oddělený neověřený údaj.",
+    "Review, cílené i celé testy, build a izolovaná integrace; vlastní ověřený celek samostatně commitnutý na main bez přibalení tří cizích evidencí."
+  ],
+  "verification": [
+    "Regresní parita všech16 float hodnot, slotů/fade/count/bounds a původního upload pořadí.",
+    "CPU benchmark se skutečným PhotoGrassBatch/Babylon NullEngine: označený jako CPU, nikoli GPU/FPS důkaz.",
+    "Sériově pnpm test, pnpm build, pnpm test:integration; zdrojový manifest zahrnuje testy."
+  ],
+  "notes": [
+    "CPU implementace/pět párů/parita/review/58 cílených testů/build/SDK integrace přijaty. Root blocked pouze pro nezelenou celoprojektovou sadu: první RAG30ms deadline, druhý nespuštěný verification worker po heartbeat chybě; izolovaně oba procházejí. Přesné FAIL/PASS a nezměněné zdroje uvedeny v results.md/validation.json; GPU/FPS se netvrdí.",
+    "User: Implement the proposed plan. Jediný checkout C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/main, bez kopií/nových větví.",
+    "Předchozí Low tree kandidát/8080 se nemění. Spec _bmad-output/implementation-artifacts/grass-matrix-20261102/SPEC.md; parent Linear KEY-5 se neuzavírá podle CPU změny."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "id": "grass-matrix-20261102-implementation",
+  "title": "Inkrementální snapshoty matic společné trávy a květin",
+  "writePaths": [
+    "client/photo-grass-batch.ts",
+    "tests/photo-grass.test.ts",
+    ".cache/grass-matrix-20261102/implementation/",
+    "docs/agents/handoffs/grass-matrix-20261102-implementation.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Uint8 flags + Uint32 dirty slot queue, deduplikace až do úspěšného flush;5B/slot zahrnout doallocatedBytes.",
+    "Stabilní cache převádí jen změněné sloty; vlastní rebound nemá druhý převod; neočekávaná identita/délka proti poslední synchronizaci používá úplnou obnovu.",
+    "Reserve-only, compaction, poolovaný root, prázdný batch, chyby a dispose bez stale snapshotů; žádná změna bounds/GPU uploadu."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/photo-grass.test.ts tests/ground-flowers.test.ts tests/photo-grass-preparation.test.ts",
+    "Typovou platnost dotčených změn zkontrolovat; fullsuite/build/benchmark spouští pouze root."
+  ],
+  "notes": [
+    "Cílená implementace/refaktor/testy společně, po claim; žádný další BMAD, žádný commit/push/branch/copy.",
+    "Baseline zdrojem je explicitní Git commit21d24c5f1bb42c571d5c398d5e4a42aa472709b3; benchmark si jej čte bez pracovní kopie."
+  ]
+}
