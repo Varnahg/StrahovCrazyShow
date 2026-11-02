@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "dependsOn": [],
+  "id": "render-profile-20261102-root",
+  "title": "Profil celé produkční hry na main a doložený další optimalizační návrh",
+  "writePaths": [
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/render-profile-20261102/",
+    ".cache/render-profile-20261102/",
+    ".cache/game-diagnostics/",
+    "docs/performance/evidence/render-profile-20261102/report.md",
+    "docs/performance/evidence/render-profile-20261102/summary.json",
+    "docs/performance/evidence/render-profile-20261102/measurement-plan.md",
+    "docs/performance/evidence/render-profile-20261102/artifacts/",
+    "docs/agents/handoffs/render-profile-20261102-root.md",
+    "docs/work-in-progress.md",
+    "docs/verification.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4179"
+  ],
+  "acceptance": [
+    "Jediný kanonický checkout/main; neměnný produkční build jen jako .cache výstup, source/test/asset/dependency identity; původní8080 zachován.",
+    "Edge skutečné GPU, explicitní WebGPU, Medium60FPS CSS1280x720 a zaznamenané interní rozlišení; celá hra/HUD/browser+2 různé SDK avatary.",
+    "Tři nezávislé starty, startup a první použití odděleně; spawn/vegetace/B6 po3×10s, skutečný pohyb/auto/noc/svítilna, Low/High doplňkově podle schváleného plánu.",
+    "Důkazy odlišují steady/hitches, vnořené CPU časy, main-pass-only GPU a agregovanou systémovou telemetrii. Pokud podklady nestačí, konkrétní chybějící měření místo domnělé příčiny."
+  ],
+  "verification": [
+    "Lehké testy/harness syntax a skutečný isolated HTTP+SDK lifecycle před GPU okny; žádné souběžné build/test scény při měření.",
+    "Každý pokus obsahuje source/runtime/session/GPU/kameru/počasí/kvalitu/populaci a raw intervaly; chyby/skryté a nefokusované intervaly označeny, nikoli smazány.",
+    "Samostatná systémová telemetrie přes existující capture-system-gpu.ps1, raw i analýza. Dřívější fullsuite nestability se neopakují a nezavírají tímto měřením.",
+    "Výsledky a jediný konkrétní optimalizační návrh commitnout na main, bez runtime/grafických změn."
+  ],
+  "notes": [
+    "Uživatel výslovně schválil celý profilovací plán. Baseline fdc7b91911e1ef0ca655bddce7b6a8e077c907e2.",
+    "Herní soubory nejsou ve writePaths; profilovací nástroje mají vlastní disjunktní task. Root vlastní veškeré skutečné buildy/server/SDK/telemetry/GPU výstupy.",
+    "2.11.2026: uživatel po přerušení Computer Use výslovně žádá sjednocení a commit. Koordinátor přiděluje rootu artifacts/ a docs/work-in-progress.md pro zachování částečné evidence; žádné herní změny. Vlastní původní root WIP zůstává témuž ownerovi při obnovení claimu.",
+    "Profil přerušen: startup timeout a blokace Computer Use při ověření fyzického Edge okna. Žádné ready/FPS/3-player výsledky ani optimalizační doporučení. Uživatel následně žádá sjednocení a commit částečného checkpointu. Report, WIP a raw hashe zachovány; vlastní procesy/porty uklizeny."
+  ]
+}

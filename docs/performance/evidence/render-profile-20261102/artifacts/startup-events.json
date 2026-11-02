@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 1,
+  "kind": "selected-exact-records-not-full-session",
+  "original": {
+    "path": ".cache/game-diagnostics/60df969b-8a9e-4cb4-80be-e2558f17880c.jsonl",
+    "sha256": "a95d023307990c750479d51a41e4d85fc0e2dff1b155347342ea504b5c026fad"
+  },
+  "selectedKinds": [
+    "session-start",
+    "source-identity",
+    "browser-capabilities",
+    "browser-state",
+    "renderer-ready",
+    "presentation-rate",
+    "lighting-preparation",
+    "webgpu-preparation-profile",
+    "render-fault",
+    "startup-error",
+    "game-dispose",
+    "network-left"
+  ],
+  "records": [
+    {
+      "seq": 0,
+      "atMs": 734.1,
+      "kind": "session-start",
+      "data": {
+        "startedAtUTC": "2026-11-02T16:06:51.019Z",
+        "timeOrigin": 1793635610286.1,
+        "automatic": true,
+        "frameTiming": "frameMs=preceding interval; cpuMs/phases=current render",
+        "gpuTiming": "gpuMs=newly available asynchronous query; may describe an earlier frame",
+        "tailPolicy": "1s or 48KiB triggered sequential drain; bounded memory; best-effort 60KiB lifecycle tail; abrupt crashes/offline may lose unsaved records",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0",
+        "language": "cs",
+        "hardwareConcurrency": 12
+      }
+    },
+    {
+      "seq": 1,
+      "atMs": 734.8,
+      "kind": "browser-capabilities",
+      "data": {
+        "longAnimationFrame": true,
+        "longtask": true,
+        "resource": true
+      }
+    },
+    {
+      "seq": 2,
+      "atMs": 735.1,
+      "kind": "browser-state",
+      "data": {
+        "reason": "start",
+        "visibility": "visible",
+        "focused": true
+      }
+    },
+    {
+      "seq": 3,
+      "atMs": 737.5,
+      "kind": "browser-state",
+      "data": {
+        "reason": "pageshow",
+        "visibility": "visible",
+        "focused": true
+      }
+    },
+    {
+      "seq": 10,
+      "atMs": 1707.6,
+      "kind": "source-identity",
+      "data": {
+        "sourceId": "f8ff0ac7b31aa86d93d36703c27190fc41395fae3bc335e5c3c0c647f5ef21c1",
+        "source": {
+          "kind": "working-tree",
+          "gitHead": "fdc7b91911e1ef0ca655bddce7b6a8e077c907e2",
+          "contentSha256": "f8ff0ac7b31aa86d93d36703c27190fc41395fae3bc335e5c3c0c647f5ef21c1",
+          "dirty": true,
+          "buildSnapshotId": "a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904",
+          "capturedAtUTC": "2026-11-02T16:06:51.990Z",
+          "scope": "client/server/shared/scripts/tests source and project configuration; excludes binary assets, dependencies and local logs; non-atomic working-tree observation",
+          "files": 816
+        },
+        "policy": {
+          "maxBatchBytes": 131072,
+          "maxBatchRecords": 128,
+          "flushIntervalMs": 1000,
+          "flushThresholdBytes": 49152,
+          "clientBatchBytes": 61440,
+          "retentionDays": 7,
+          "maxDiskBytes": 134217728,
+          "maxFileBytes": 16777216,
+          "maxFiles": 256,
+          "omissions": "No chat, profile, credentials or multiplayer presence API. Bounded client buffers and disk retention can discard old records; sequence gaps are reported."
+        }
+      }
+    },
+    {
+      "seq": 40,
+      "atMs": 31090.9,
+      "kind": "renderer-ready",
+      "data": {
+        "durationMs": 235.5,
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "backend": "webgpu",
+        "selection": {
+          "requested": "webgpu",
+          "backend": "webgpu",
+          "automatic": false,
+          "fallbackReason": null
+        }
+      }
+    },
+    {
+      "seq": 42,
+      "atMs": 37683.7,
+      "kind": "network-left",
+      "data": {
+        "reason": "identity-change"
+      }
+    },
+    {
+      "seq": 47,
+      "atMs": 39886.1,
+      "kind": "presentation-rate",
+      "data": {
+        "observedBrowserHz": null,
+        "reliable": false,
+        "samples": 1,
+        "p10FrameMs": 1015.9000000000015,
+        "medianFrameMs": 1015.9000000000015,
+        "p95FrameMs": 1015.9000000000015,
+        "reason": "timeout",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      }
+    },
+    {
+      "seq": 95,
+      "atMs": 81322.9,
+      "kind": "lighting-preparation",
+      "data": {
+        "status": "timeout",
+        "elapsedMs": 30051.599999904633,
+        "activeElapsedMs": 30051.599999904633,
+        "pausedMs": 0,
+        "failureStep": null,
+        "stages": [
+          {
+            "stage": "vehicle-0",
+            "elapsedMs": 23936.400000095367,
+            "activeElapsedMs": 23936.400000095367,
+            "pausedMs": 0,
+            "tickCount": 24,
+            "rafGap": {
+              "count": 24,
+              "totalMs": 23923,
+              "maxMs": 1711.8999998569489
+            },
+            "cpu": {
+              "apply": {
+                "calls": 4,
+                "totalMs": 88.69999980926514,
+                "maxMs": 42.200000047683716
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 319.0999994277954,
+                "maxMs": 107.59999990463257
+              },
+              "render": {
+                "calls": 7,
+                "totalMs": 1498.2999997138977,
+                "maxMs": 877.0999999046326
+              }
+            },
+            "restartReasons": {
+              "meshes": 2,
+              "weather": 1
+            },
+            "checks": 1255,
+            "renders": 7,
+            "restarts": 3,
+            "passQuality": "low"
+          },
+          {
+            "stage": "vehicle-1",
+            "elapsedMs": 5637.699999809265,
+            "activeElapsedMs": 5637.699999809265,
+            "pausedMs": 0,
+            "tickCount": 4,
+            "rafGap": {
+              "count": 4,
+              "totalMs": 5078.799999952316,
+              "maxMs": 2031.6000001430511
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 7.5,
+                "maxMs": 7.5
+              },
+              "checkBatch": {
+                "calls": 3,
+                "totalMs": 24.899999856948853,
+                "maxMs": 11.099999904632568
+              },
+              "render": {
+                "calls": 1,
+                "totalMs": 1490.4000000953674,
+                "maxMs": 1490.4000000953674
+              }
+            },
+            "restartReasons": {},
+            "checks": 6,
+            "renders": 1,
+            "restarts": 0,
+            "passQuality": "low"
+          }
+        ],
+        "qualities": [
+          {
+            "quality": "low",
+            "finalPass": false,
+            "status": "timeout",
+            "failureStep": null,
+            "elapsedMs": 30051.599999904633,
+            "activeElapsedMs": 30051.599999904633,
+            "pausedMs": 0,
+            "stageCount": 2
+          }
+        ]
+      }
+    },
+    {
+      "seq": 96,
+      "atMs": 81323.6,
+      "kind": "webgpu-preparation-profile",
+      "data": {
+        "active": true,
+        "backend": "webgpu",
+        "generation": 1,
+        "attachedAfterDeviceCreation": true,
+        "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+        "metrics": {
+          "glslToSpirv": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "spirvToWgsl": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "compilerLoad": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderPreparation": {
+            "calls": 88,
+            "completed": 88,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 90.30000019073486,
+            "cpuMaxMs": 12.799999952316284,
+            "asyncTotalMs": 46119.80000567436,
+            "asyncMaxMs": 1463.9000000953674
+          },
+          "shaderModule": {
+            "calls": 176,
+            "completed": 176,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 37.79999876022339,
+            "cpuMaxMs": 6.599999904632568,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderValidation": {
+            "calls": 176,
+            "completed": 176,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 2.5,
+            "cpuMaxMs": 0.20000004768371582,
+            "asyncTotalMs": 135559.09999489784,
+            "asyncMaxMs": 1472.8999998569489
+          },
+          "syncPipeline": {
+            "calls": 29,
+            "completed": 29,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0.8999998569488525,
+            "cpuMaxMs": 0.2999999523162842,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "asyncPipeline": {
+            "calls": 78,
+            "completed": 78,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 3.5,
+            "cpuMaxMs": 1,
+            "asyncTotalMs": 86601.39999938011,
+            "asyncMaxMs": 1597.2000000476837
+          },
+          "submit": {
+            "calls": 70,
+            "completed": 70,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 1.9000000953674316,
+            "cpuMaxMs": 0.10000014305114746,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          }
+        },
+        "hooks": {
+          "engine._initializeLimits": "installed",
+          "engine._compileRawShaderToSpirV": "installed",
+          "engine.prepareGlslangAndTintAsync": "installed",
+          "engine._preparePipelineContextAsync": "installed",
+          "engine._createPipelineStageDescriptor": "installed",
+          "tint.convertSpirV2WGSL": "not-created",
+          "device.createShaderModule": "installed",
+          "device.createRenderPipeline": "installed",
+          "device.createRenderPipelineAsync": "installed",
+          "queue.submit": "installed",
+          "module.getCompilationInfo": "installed"
+        },
+        "observerErrors": 0,
+        "shaderInventory": null,
+        "bundleCountersLastFrame": {
+          "numEnableEffects": 0,
+          "numEnableDrawWrapper": 0,
+          "numBundleCreationNonCompatMode": 0,
+          "numBundleReuseNonCompatMode": 0
+        },
+        "sharedCacheCounters": {
+          "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+          "values": {
+            "NumCacheHitWithoutHash": 4134,
+            "NumCacheHitWithHash": 408,
+            "NumCacheMiss": 76,
+            "NumPipelineCreationLastFrame": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 97,
+      "atMs": 81324.4,
+      "kind": "render-fault",
+      "data": {
+        "channel": "pipeline",
+        "message": "Příprava světel: timeout",
+        "generation": 1,
+        "rendererId": 2,
+        "purpose": "game",
+        "count": 1
+      }
+    },
+    {
+      "seq": 98,
+      "atMs": 81763.4,
+      "kind": "startup-error",
+      "data": {
+        "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+        "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at Gm.start (http://127.0.0.1:4179/assets/game-BHQIHpDr.js:878:27124)\n    at async http://127.0.0.1:4179/assets/index-D8pFci3x.js:16:4497519"
+      }
+    },
+    {
+      "seq": 99,
+      "atMs": 81764.2,
+      "kind": "game-dispose",
+      "data": {}
+    }
+  ]
+}

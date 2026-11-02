@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "dependsOn": [],
+  "id": "render-profile-20261102-harness",
+  "title": "Měřicí harness pro neměnný main bez kopie projektu",
+  "writePaths": [
+    "docs/performance/evidence/render-profile-20261102/harness/",
+    "docs/agents/handoffs/render-profile-20261102-harness.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Reprodukovatelný build/serve/peers CLI používá stejný kanonický main, žádné source kopie, nemění produktové API ani bootstrap.",
+    "Porty2568/4179, nový .cache/render-profile-20261102 výstup, hash public/source/tests/dependencies. Bez produkčních AI/Linear credentialů.",
+    "Nové oddělené běhy, STOP soubor pro spolehlivý graceful shutdown na Windows; vlastní PIDs a celý lifecycle zdokumentovaný.",
+    "Dva skuteční SDK peers s odlišnými avatary až po browser vstupu; standardní sessions/world protokol, bez injektování pózy/teleportu lokálního hráče."
+  ],
+  "verification": [
+    "node --check všech mjs; případné lehké syntetické unit testy pouze v přiděleném harness/ bez nových serverů.",
+    "Skutečné buildy/servery/peers spouští pouze root po předání; parser/stop/hashes čtecí review."
+  ],
+  "notes": [
+    "Vyjít z ověřeného low-tree-lod harnessu, ale původní soubor neměnit (jeho hash chrání staré buildy). Reuse readReplaySourceManifest/createIsolatedIntegrationEnvironment a současný performance-network/timeline helper.",
+    "Root vlastní celou .cache/render-profile-20261102 a .cache/game-diagnostics, proto podagent do nich nepíše. Žádný browser/GPU/fullsuite/build podagentem.",
+    "Implementace a 7/7 syntetických testů převzaty přes handoff rootem; build/API/preview/STOP/revalidace skutečně prošly. Noví SDK peers kvůli neúspěšnému browser startupu nebyli spuštěni, proto praktická SDK přejímka zůstává otevřená. Root převzal vlastnictví pro konsolidaci a commit; žádné změny zmrazených harness bajtů."
+  ]
+}

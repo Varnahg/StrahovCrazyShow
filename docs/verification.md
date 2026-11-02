@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## Profil celé hry · konsolidovaný checkpoint 2. listopadu 2026
+
+Na `main` nad `fdc7b919` je zachovaný izolovaný produkční build/serve/SDK harness, manifest včetně testů a částečné důkazy prvního WebGPU startu. Harness 7/7 cílených testů PASS; neměnný Vite build a skutečný API/preview start/STOP/revalidace PASS. Hra skončila timeoutem přípravy světel po 30 051,6 ms; nedošlo k ready, SDK peers ani platným desetisekundovým FPS vzorkům. Příčina řídkých RAF callbacků není potvrzená. Computer Use při následném ověřování okna zastavilo ovládání kvůli neurčitelné URL.
+
+**FPS profil a volba další optimalizace zůstávají nedokončené.** Zdroj/test SHA `a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904`; [report, meze a pokračování](performance/evidence/render-profile-20261102/report.md), [hashe a strojový souhrn](performance/evidence/render-profile-20261102/summary.json). Vlastní procesy ukončené bez chyb, porty 2568/4179 volné, dočasný viewport resetován; Docker8080 zachovaný. Herní runtime/API se nemění. Předchozí nezelené plné testy se nepřeznačují podle úspěchu nástrojů.
+
 ## CPU snapshoty trávy a květin · 2. listopadu 2026
 
 PhotoGrassBatch převádí pouze změněné číselné sloty a při vlastním reboundu neopakuje nativní převody. Zůstává přesná shoda všech16 hodnot matic, fade/slot/count, bounds a GPU uploadů; nová metadata mají5B/kapacitní slot zahrnutých do allocatedBytes. Refaktor oddělil malý idle guard od synchronizační práce. [Výzkum a výsledky](performance/evidence/grass-matrix-20261102/results.md), [úplná evidence](performance/evidence/grass-matrix-20261102/validation.json).
