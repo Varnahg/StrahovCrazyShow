@@ -1,5 +1,7 @@
 # První přímé rozlišení CPU přípravy shaderů
 
+Navazující C6 doplnil child timings:312 WGSL dvojic13 694,4ms; initialize0,6ms, preProcess315,9ms, post257,8ms, finalize466,1ms. Zbytek zahrnuje includes/parse/walk a není automaticky parser. Low znovu timeoutoval30 390,3ms; žádné FPS. Úplný C6 log, systémové vzorky, build identita a cleanup jsou doplněné do [souhrnu](summary.json). Následný native CPU kernel a cache experiment jsou uzavřené v [C9 rozhodnutí](../../shader-syntax-cache-20261103/final-campaign.md); jednotlivé CPU etapy se nesčítají s jejich rodiči.
+
 Candidate5 doložil významný náklad synchronního WGSL zpracování: **12 227,6 ms při390 dvojicích vertex/fragment** během přípravného scope. Nejde o GPU execution time ani o samotné parsování. Celá hra stále skončila timeoutem Low po31 236,8 ms, ve12. variantě; Game.ready ani FPS přejímka nevznikly.
 
 Snapshoty jsou ze stejné generace1. Oba skutečně prošly klientským privacy filtrem i serverovým uložením. Žádný interval nepřekročil microtask hranici, nebyl nejednoznačný či vynechaný a observerErrors/invalidClocks/generationChanges byly0. Nejvýše jeden kontext byl současně rozpracovaný.

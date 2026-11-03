@@ -267,6 +267,7 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
       disposed: false,
       startupAbort: new AbortController(),
       frameLifecycleProfile: undefined,
+      syntaxCache: { dispose: () => order.push("syntax-cache") },
       renderHealth: { dispose: () => order.push("health") },
       benchmark: undefined,
       canvas: noop,
@@ -297,7 +298,7 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
   dispose.call(context);
   dispose.call(context);
   assert.equal(context.startupAbort.signal.aborted, true);
-  assert.deepEqual(order, ["health", "stop", "stable", "budget", "scene"]);
+  assert.deepEqual(order, ["health", "stop", "syntax-cache", "stable", "budget", "scene"]);
   assert.equal(panelRemovals, 1);
   assert.equal(context.skyDiagnosticPanel, undefined);
   assert.equal(context.doorStates.size, 0);

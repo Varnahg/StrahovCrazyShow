@@ -668,6 +668,45 @@ test("startup CPU profiler is constructed only for explicit loopback diagnostics
   }
 });
 
+test("syntax-cache experiment is explicit loopback opt-in with the pinned factory", () => {
+  const constructor = gameClass.members.find(ts.isConstructorDeclaration)!;
+  const statement = constructor.body!.statements.find(node => ts.isExpressionStatement(node) &&
+    ts.isBinaryExpression(node.expression) && node.expression.left.getText(source) === "this.syntaxCache");
+  assert.ok(statement);
+  const initialize = new Script(`(function(window, ShaderSyntaxCache, CreateShaderSyntaxCache) { ${statement.getText(source)} })`).runInThisContext();
+  for (const [hostname, search, enabled] of [
+    ["localhost", "?shaderSyntaxCache=1", true], ["127.0.0.1", "?shaderSyntaxCache=1", true],
+    ["[::1]", "?shaderSyntaxCache=1", true], ["strahov.example", "?shaderSyntaxCache=1", false],
+    ["localhost", "?shaderSyntaxCache=0", false], ["localhost", "", false],
+  ] as const) {
+    const engine = {}, factory = () => {}; let seen = false;
+    initialize.call({ engine }, { location: { hostname, search } }, class {
+      constructor(owner: object, options: { createCache: unknown; enabled: boolean; maxEntries: number; maxTextUnits: number; maxNodes: number; maxOperators: number }) {
+        assert.equal(owner, engine); assert.equal(options.createCache, factory); assert.equal(options.enabled, enabled); seen = true;
+        assert.deepEqual([options.maxEntries, options.maxTextUnits, options.maxNodes, options.maxOperators],
+          [32, 4_194_304, 65_536, 16_384]);
+      }
+    }, factory);
+    assert.equal(seen, true);
+  }
+});
+
+test("actual Game keeps syntax cache alive after startup and records both boundaries through privacy filters", async (t) => {
+  const f = fixture(t); let disposed = 0;
+  f.game.syntaxCache = { snapshot: () => ({ active: true, supported: true, stats: { hits: 42, promotions: 6 } }), dispose() { disposed++; } };
+  const start = f.game.start(); await settle();
+  assert.equal(f.game.ready, false); assert.equal(disposed, 0);
+  f.gate.resolve(); await start;
+  assert.equal(f.game.ready, true); assert.equal(disposed, 0, "later first-use variants retain the same cache owner");
+  const events = f.events.filter(event => event.kind === "shader-syntax-cache");
+  const batch = validateDiagnosticsBatch({ schemaVersion: 1,
+    sessionId: "11111111-1111-4111-8111-111111111111", batchId: 0,
+    records: events.map((event, seq) => ({ seq, atMs: seq, kind: event.kind, data: sanitizeDiagnosticsData(event.data) })),
+  });
+  assert.ok(batch); assert.deepEqual(batch.records.map(r => r.data.stage), ["preparation-start", "startup-end"]);
+  for (const record of batch.records) assert.equal((record.data.syntaxCache as any).stats.hits, 42);
+});
+
 test("native preparation is the default and queued QA is loopback-only with all safety gates", async (t) => {
   for (const [hostname, search, enabled] of [
     ["localhost", "?startupShaderScheduling=queued", true],

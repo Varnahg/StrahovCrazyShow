@@ -6,6 +6,8 @@ import type { FeedbackFrame } from "../shared/feedback";
 import { createEnvironmentProfile } from "./environment-profile";
 import { WebGpuFrameLifecycleProfile } from "./webgpu-frame-lifecycle-profile";
 import { WebGpuStartupCpuProfile } from "./webgpu-startup-cpu-profile";
+import { ShaderSyntaxCache } from "./shader-syntax-cache";
+import { CreateShaderSyntaxCache } from "@babylonjs/core/Engines/Processors/shaderProcessor";
 import {
   snapshotAcceptedAuthorityDiagnostics,
   snapshotTransportDiagnostics,
@@ -503,6 +505,7 @@ export class Game {
   private readonly environmentProfile: ReturnType<typeof createEnvironmentProfile>;
   private readonly frameLifecycleProfile?: WebGpuFrameLifecycleProfile;
   private readonly startupCpuProfile?: WebGpuStartupCpuProfile;
+  private readonly syntaxCache?: ShaderSyntaxCache;
   private profiledLightingInstant = 0;
   private profiledDaylight = 0;
   private profiledPreviousExposure = 1;
@@ -657,6 +660,14 @@ export class Game {
       }),
     });
     this.compilationProfile.setStage("construction");
+    this.syntaxCache = new ShaderSyntaxCache(this.engine, {
+      createCache: CreateShaderSyntaxCache,
+      // Controlled comparison first; the experimental cache is not a new preset.
+      enabled: ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname) &&
+        new URLSearchParams(window.location.search).get("shaderSyntaxCache") === "1",
+      // C7 reached the entry/text budgets repeatedly; one bounded final trial.
+      maxEntries: 32, maxTextUnits: 4_194_304, maxNodes: 65_536, maxOperators: 16_384,
+    });
     if (["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname) &&
         new URLSearchParams(window.location.search).get("profileStartupCpu") === "1") {
       this.startupCpuProfile = new WebGpuStartupCpuProfile(this.engine);
@@ -1083,6 +1094,10 @@ export class Game {
       renderedShaderCompletions = this.compilationProfile.shaderPreparationCompletions;
       const preparationReady = () => shaderPreparation!.isReady() && pipelinePreparation!.isReady();
       this.canvas.dataset.bootStage = "light-preparation";
+      if (this.syntaxCache) sessionDiagnostics.event("shader-syntax-cache", {
+        stage: "preparation-start", rendererId: this.renderHealth.rendererId,
+        syntaxCache: this.syntaxCache.snapshot(),
+      });
       if (this.startupCpuProfile) sessionDiagnostics.event("startup-cpu-profile", {
         stage: "preparation-start", rendererId: this.renderHealth.rendererId,
         timing: this.startupCpuProfile.snapshot(),
@@ -1133,6 +1148,10 @@ export class Game {
       this.assertStartupActive();
     } finally {
       try {
+        if (this.syntaxCache) sessionDiagnostics.event("shader-syntax-cache", {
+          stage: "startup-end", rendererId: this.renderHealth.rendererId,
+          syntaxCache: this.syntaxCache.snapshot(),
+        });
         if (shaderPreparation) sessionDiagnostics.event("shader-preparation-scheduling", {
           rendererId: this.renderHealth.rendererId, ...shaderPreparation.snapshot(),
         });
@@ -3546,6 +3565,7 @@ export class Game {
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
     this.startupCpuProfile?.dispose();
+    this.syntaxCache?.dispose();
     this.stableLights.dispose();
     this.gltfLightBudget.dispose();
     this.enabledMeshCandidates.dispose();

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "shader-syntax-control-20261103",
+  "title": "Scene/engine lifecycle controller pro opt-in shader syntax cache",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/shader-syntax-cache.ts",
+    "tests/shader-syntax-cache.test.ts",
+    "docs/agents/handoffs/shader-syntax-control-20261103.md",
+    ".cache/shader-syntax-control-20261103/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Controller používá injektovanou CreateShaderSyntaxCache native factory; žádné patch/package/node_modules/Game změny.",
+    "WebGL inertní; na WebGPU vybere skutečný owned WGSL processor, explicitní enabled defaultfalse, vlastnictví/cleanup bezpečné a idempotentní.",
+    "Cache životnost celé Game/engine, zachovat startup i pozdější první použití. Dispose a device retirement uvolní owned lease/reference, nepřepíší cizí vlastníka.",
+    "Snapshot pouze primitive metadata/native primitive stats, žádnétexty/AST/Scene/GPU reference. Projde existujícím privacy filtrem.",
+    "Chyby diagnostiky/optional cache startup nesmějí obcházet renderer readiness; nepodporovaná cache musí být pravdivě označená, ne vydaná za aktivní."
+  ],
+  "verification": [
+    "Lehké cílené ownership/lifecycle/factory forwarding/error/WebGL a skutečná sanitizace testy; scopedTS.",
+    "Před CPU testy koordinovat se syntax-cache autorem, nesouběžit s jeho časovanými benchmarky. Žádný build/GPU/heavy/integration/commit."
+  ],
+  "notes": [
+    "Výslovná root delegace performance_evidence, bez rekurzivníhoBMAD. Task shader-syntax-cache-20261103 vlastní canonicalnativepatch/test/CPUharness a heavy. Root vlastníGame a následnou dependency integraci.",
+    "API nativelease setEnabled/reset/snapshot/dispose, defaultoff a ploché stats; konkrétní factory declaration ověř s autorem. Controller může přijmout strukturální injekci, stávající IShaderProcessor type je dostupný. Nesmí mít nový staticnamedimport neexistujícíhoAPI předrootinstall.",
+    "3.11.2026 uzavření C9: native/controller implementace převzatá pouze jako defaultOFF opt-in. GPU přejímka nezískaná:1/2 ON ready, oba OFF timeout, jeden nestabilní preflight. Úplné důkazy a rozhodnutí docs/performance/evidence/shader-syntax-cache-20261103/final-campaign.md. Root výkonový cíl ani další optimalizace nejsou Done; žádné další zvětšení tohoto kandidáta."
+  ]
+}

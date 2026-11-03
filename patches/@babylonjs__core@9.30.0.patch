@@ -545,3 +545,313 @@ diff --git a/Materials/standardMaterial.pure.d.ts b/Materials/standardMaterial.p
      EMISSIVE: boolean;
      EMISSIVEDIRECTUV: number;
      SPECULAR: boolean;
+diff --git a/Engines/Processors/shaderProcessor.js b/Engines/Processors/shaderProcessor.js
+index 6a04f91a..66055da2 100644
+--- a/Engines/Processors/shaderProcessor.js
++++ b/Engines/Processors/shaderProcessor.js
+@@ -18,6 +18,207 @@ const RegexLightX = /light\{X\}.(\w*)/g;
+ const RegexX = /\{X\}/g;
+ const ReusableMatches = [];
+ const MoveCursorRegex = /(#ifdef)|(#else)|(#elif)|(#endif)|(#ifndef)|(#if)/;
++// Project opt-in: syntax only. No Effect, Scene, device or variant state is kept.
++const ShaderSyntaxCacheOwners = new WeakMap();
++const SyntaxCacheDefaults = { maxEntries: 16, maxTextUnits: 2097152, maxNodes: 32768, maxOperators: 8192 };
++const SyntaxCacheHardLimits = { maxEntries: 64, maxTextUnits: 8388608, maxNodes: 131072, maxOperators: 32768 };
++const SyntaxSizeKeys = ["sourceUnits", "nodeStringUnits", "textUnits", "nodes", "operators"];
++function SyntaxCacheCounters() {
++    return { requests: 0, hits: 0, misses: 0, evictions: 0, oversized: 0, unsupported: 0, parseErrors: 0,
++        deferred: 0, promotions: 0, promotionSkips: 0, bypasses: 0,
++        probationEntries: 0, residentEntries: 0, bypassEntries: 0,
++        sourceUnits: 0, nodeStringUnits: 0, textUnits: 0, nodes: 0, operators: 0,
++        peakEntries: 0, peakTextUnits: 0, peakNodes: 0, peakOperators: 0 };
++}
++function ClearSyntaxCache(state) {
++    state.entries.clear();
++    state.stats.sourceUnits = state.stats.nodeStringUnits = state.stats.textUnits = state.stats.nodes = state.stats.operators = 0;
++    state.stats.probationEntries = state.stats.residentEntries = state.stats.bypassEntries = 0;
++}
++/** @internal Bounded per-processor syntax ownership. Default off; counts are
++ * UTF-16 units/objects, never JavaScript heap bytes. Snapshots contain no trees. */
++export function CreateShaderSyntaxCache(processor, options = {}) {
++    if (!processor || (typeof processor !== "object" && typeof processor !== "function")) {
++        throw new TypeError("Shader syntax cache requires a processor object");
++    }
++    if (ShaderSyntaxCacheOwners.has(processor)) {
++        throw new Error("Shader syntax cache processor already has an owner");
++    }
++    const enabled = options.enabled;
++    if (enabled !== undefined && typeof enabled !== "boolean") {
++        throw new TypeError("Shader syntax cache enabled must be boolean");
++    }
++    const limits = {};
++    for (const key of Object.keys(SyntaxCacheDefaults)) {
++        const provided = options[key], value = provided === undefined ? SyntaxCacheDefaults[key] : provided;
++        if (!Number.isSafeInteger(value) || value < 1 || value > SyntaxCacheHardLimits[key]) {
++            throw new RangeError("Invalid shader syntax cache limit: " + key);
++        }
++        limits[key] = value;
++    }
++    if (ShaderSyntaxCacheOwners.has(processor)) throw new Error("Shader syntax cache processor already has an owner");
++    const state = { enabled: enabled ?? false, disposed: false, generation: 1,
++        limits, entries: new Map(), stats: SyntaxCacheCounters() };
++    let owner = processor;
++    ShaderSyntaxCacheOwners.set(owner, state);
++    const check = () => {
++        if (state.disposed) throw new Error("Shader syntax cache owner was disposed");
++    };
++    return Object.freeze({
++        setEnabled(enabled) {
++            check();
++            if (typeof enabled !== "boolean") throw new TypeError("Shader syntax cache enabled must be boolean");
++            if (enabled === state.enabled) return;
++            state.enabled = enabled;
++            state.generation++;
++            if (!enabled) ClearSyntaxCache(state);
++        },
++        reset() {
++            check();
++            ClearSyntaxCache(state);
++            state.stats = SyntaxCacheCounters();
++            state.generation++;
++        },
++        snapshot() {
++            return { enabled: state.enabled, disposed: state.disposed, generation: state.generation,
++                ...state.stats, entries: state.entries.size, ...state.limits };
++        },
++        dispose() {
++            if (state.disposed) return;
++            state.disposed = true;
++            state.enabled = false;
++            state.generation++;
++            ClearSyntaxCache(state);
++            if (ShaderSyntaxCacheOwners.get(owner) === state) ShaderSyntaxCacheOwners.delete(owner);
++            owner = undefined;
++        },
++    });
++}
++// One miss-only bounded traversal of the pinned data-only node shapes. A known
++// prefix may be frozen on a fallback, but native processing never mutates it.
++// Nothing is retained/evicted until the complete tree passed every limit.
++function FreezeShaderSyntax(root, sourceUnits, limits) {
++    const pendingNodes = [root], pendingOperators = [];
++    let nodes = 0, operators = 0, nodeStringUnits = 0;
++    while (pendingNodes.length) {
++        const node = pendingNodes.pop(), prototype = Object.getPrototypeOf(node);
++        if ((prototype !== ShaderCodeNode.prototype && prototype !== ShaderCodeConditionNode.prototype && prototype !== ShaderCodeTestNode.prototype) ||
++            !Array.isArray(node.children) || node.line !== undefined && typeof node.line !== "string" ||
++            node.additionalDefineKey !== undefined && typeof node.additionalDefineKey !== "string" ||
++            node.additionalDefineValue !== undefined && typeof node.additionalDefineValue !== "string") return false;
++        nodes++;
++        nodeStringUnits += (node.line?.length ?? 0) + (node.additionalDefineKey?.length ?? 0) + (node.additionalDefineValue?.length ?? 0);
++        if (nodes + pendingNodes.length + node.children.length > limits.maxNodes || sourceUnits + nodeStringUnits > limits.maxTextUnits) return null;
++        for (let i = 0; i < node.children.length; i++) pendingNodes.push(node.children[i]);
++        if (node.testExpression) pendingOperators.push(node.testExpression);
++        while (pendingOperators.length) {
++            const operator = pendingOperators.pop(), prototype = Object.getPrototypeOf(operator);
++            const logical = prototype === ShaderDefineAndOperator.prototype || prototype === ShaderDefineOrOperator.prototype;
++            if (logical) {
++                if (!operator.leftOperand || !operator.rightOperand) return false;
++                pendingOperators.push(operator.leftOperand, operator.rightOperand);
++            } else if (prototype === ShaderDefineIsDefinedOperator.prototype) {
++                if (typeof operator.define !== "string" || typeof operator.not !== "boolean") return false;
++            } else if (prototype === ShaderDefineArithmeticOperator.prototype) {
++                if (typeof operator.define !== "string" || typeof operator.operand !== "string" || typeof operator.testValue !== "string") return false;
++            } else return false;
++            operators++;
++            nodeStringUnits += (operator.define?.length ?? 0) + (operator.operand?.length ?? 0) + (operator.testValue?.length ?? 0);
++            if (operators + pendingOperators.length > limits.maxOperators || sourceUnits + nodeStringUnits > limits.maxTextUnits) return null;
++            Object.freeze(operator);
++        }
++        Object.freeze(node.children);
++        Object.freeze(node);
++    }
++    return { sourceUnits, nodeStringUnits, textUnits: sourceUnits + nodeStringUnits, nodes, operators };
++}
++function TouchShaderSyntax(state, sourceCode, entry) {
++    state.entries.delete(sourceCode);
++    state.entries.set(sourceCode, entry);
++    return entry.root;
++}
++function SyntaxEntryCounter(entry) {
++    return entry.kind === "resident" ? "residentEntries" : entry.kind === "probation" ? "probationEntries" : "bypassEntries";
++}
++function RemoveShaderSyntax(state, key, entry) {
++    state.entries.delete(key);
++    for (const field of SyntaxSizeKeys) state.stats[field] -= entry[field];
++    state.stats[SyntaxEntryCounter(entry)]--;
++}
++function StoreShaderSyntax(state, sourceCode, entry) {
++    while (state.entries.size >= state.limits.maxEntries ||
++        state.stats.textUnits + entry.textUnits > state.limits.maxTextUnits ||
++        state.stats.nodes + entry.nodes > state.limits.maxNodes ||
++        state.stats.operators + entry.operators > state.limits.maxOperators) {
++        const key = state.entries.keys().next().value;
++        RemoveShaderSyntax(state, key, state.entries.get(key));
++        state.stats.evictions++;
++    }
++    state.entries.set(sourceCode, entry);
++    for (const field of SyntaxSizeKeys) state.stats[field] += entry[field];
++    state.stats[SyntaxEntryCounter(entry)]++;
++    state.stats.peakEntries = Math.max(state.stats.peakEntries, state.entries.size);
++    state.stats.peakTextUnits = Math.max(state.stats.peakTextUnits, state.stats.textUnits);
++    state.stats.peakNodes = Math.max(state.stats.peakNodes, state.stats.nodes);
++    state.stats.peakOperators = Math.max(state.stats.peakOperators, state.stats.operators);
++}
++function ShaderSyntaxMarker(kind, sourceUnits) {
++    return { kind, root: null, sourceUnits, nodeStringUnits: 0, textUnits: sourceUnits, nodes: 0, operators: 0 };
++}
++function CachedShaderSyntax(sourceCode, preProcessorsFromCode, state) {
++    const generation = state.generation;
++    state.stats.requests++;
++    const retainable = sourceCode.length <= state.limits.maxTextUnits;
++    const observed = retainable ? state.entries.get(sourceCode) : undefined;
++    if (observed?.kind === "resident") {
++        state.stats.hits++;
++        return TouchShaderSyntax(state, sourceCode, observed);
++    }
++    state.stats.misses++;
++    let root;
++    try { root = ParseShaderSource(sourceCode, preProcessorsFromCode); }
++    catch (error) {
++        if (state.generation === generation) state.stats.parseErrors++;
++        throw error;
++    }
++    // A parser hook (for example the expression cache clock) can synchronously
++    // reset/release ownership. Never publish a stale generation afterward.
++    if (!state.enabled || state.disposed || state.generation !== generation) return root;
++    if (!retainable) { state.stats.oversized++; state.stats.bypasses++; return root; }
++    const current = state.entries.get(sourceCode);
++    if (current?.kind === "resident") return TouchShaderSyntax(state, sourceCode, current);
++    // Reentrant eviction/refill must not turn an old probation observation into
++    // a promotion. A nested completed resident can still be reused above.
++    if (current !== observed) { if (current) TouchShaderSyntax(state, sourceCode, current); return root; }
++    if (!current) {
++        // First use keeps only a bounded key, never the mutable parsed tree.
++        StoreShaderSyntax(state, sourceCode, ShaderSyntaxMarker("probation", sourceCode.length));
++        state.stats.deferred++;
++        return root;
++    }
++    if (current.kind !== "probation") {
++        TouchShaderSyntax(state, sourceCode, current);
++        state.stats.bypasses++;
++        state.stats[current.kind]++;
++        return root;
++    }
++    const measured = FreezeShaderSyntax(root, sourceCode.length, state.limits);
++    if (!state.enabled || state.disposed || state.generation !== generation) return root;
++    const afterFreeze = state.entries.get(sourceCode);
++    if (afterFreeze?.kind === "resident") return TouchShaderSyntax(state, sourceCode, afterFreeze);
++    if (afterFreeze !== observed) return root;
++    RemoveShaderSyntax(state, sourceCode, observed);
++    if (measured === null || measured === false) {
++        const kind = measured === null ? "oversized" : "unsupported";
++        state.stats[kind]++;
++        state.stats.promotionSkips++;
++        StoreShaderSyntax(state, sourceCode, ShaderSyntaxMarker(kind, sourceCode.length));
++        return root;
++    }
++    StoreShaderSyntax(state, sourceCode, { kind: "resident", root, ...measured });
++    state.stats.promotions++;
++    return root;
++}
+ /** @internal */
+ export function Initialize(options) {
+     if (options.processor && options.processor.initializeShaders) {
+@@ -220,14 +421,22 @@ function MoveCursor(cursor, rootNode, preProcessorsFromCode) {
+     }
+     return false;
+ }
+-function EvaluatePreProcessors(sourceCode, preprocessors, options, preProcessorsFromCode) {
++function ParseShaderSource(sourceCode, preProcessorsFromCode) {
+     const rootNode = new ShaderCodeNode();
+     const cursor = new ShaderCodeCursor();
+     cursor.lineIndex = -1;
+     cursor.lines = sourceCode.split("\n");
+     // Decompose (We keep it in 2 steps so it is easier to maintain and perf hit is insignificant)
+     MoveCursor(cursor, rootNode, preProcessorsFromCode);
+-    // Recompose
++    return rootNode;
++}
++function EvaluatePreProcessors(sourceCode, preprocessors, options, preProcessorsFromCode) {
++    const state = options.processor && ShaderSyntaxCacheOwners.get(options.processor);
++    const rootNode = state?.enabled && typeof sourceCode === "string"
++        ? CachedShaderSyntax(sourceCode, preProcessorsFromCode, state)
++        : ParseShaderSource(sourceCode, preProcessorsFromCode);
++    // Every variant still evaluates conditions, declarations and bindings with
++    // its own dictionaries/options/context. Only syntax is shared.
+     return rootNode.process(preprocessors, options, preProcessorsFromCode);
+ }
+ function PreparePreProcessors(options, engine) {
+@@ -407,4 +616,4 @@ export const _FunctionContainer = {
+         throw _WarnImport("FileTools");
+     },
+ };
+-//# sourceMappingURL=shaderProcessor.js.map
+\ No newline at end of file
++//# sourceMappingURL=shaderProcessor.js.map
+diff --git a/Engines/Processors/shaderProcessor.d.ts b/Engines/Processors/shaderProcessor.d.ts
+index f2075d10..f70f296d 100644
+--- a/Engines/Processors/shaderProcessor.d.ts
++++ b/Engines/Processors/shaderProcessor.d.ts
+@@ -4,6 +4,61 @@ import { type LoadFileError } from "../../Misc/fileTools.js";
+ import { type IOfflineProvider } from "../../Offline/IOfflineProvider.js";
+ import { type IFileRequest } from "../../Misc/fileRequest.js";
+ import { type AbstractEngine } from "../abstractEngine.js";
++import { type IShaderProcessor } from "./iShaderProcessor.js";
++/** @internal Syntax-only cache budgets; UTF-16 units/counts are not heap bytes. */
++export interface ShaderSyntaxCacheOptions {
++    enabled?: boolean;
++    maxEntries?: number;
++    maxTextUnits?: number;
++    maxNodes?: number;
++    maxOperators?: number;
++}
++/** @internal Primitive snapshot only; never exposes cached source or AST. */
++export interface ShaderSyntaxCacheStats {
++    enabled: boolean;
++    disposed: boolean;
++    generation: number;
++    requests: number;
++    hits: number;
++    misses: number;
++    evictions: number;
++    oversized: number;
++    unsupported: number;
++    parseErrors: number;
++    deferred: number;
++    promotions: number;
++    promotionSkips: number;
++    bypasses: number;
++    probationEntries: number;
++    residentEntries: number;
++    bypassEntries: number;
++    entries: number;
++    sourceUnits: number;
++    nodeStringUnits: number;
++    textUnits: number;
++    nodes: number;
++    operators: number;
++    peakEntries: number;
++    peakTextUnits: number;
++    peakNodes: number;
++    peakOperators: number;
++    maxEntries: number;
++    maxTextUnits: number;
++    maxNodes: number;
++    maxOperators: number;
++}
++/** @internal One owner per processor. Off by default; dispose is idempotent.
++ * reset clears entries/counters and advances generation, preserving enabled.
++ * Disabling clears entries but preserves counters. A disposed lease cannot be
++ * re-enabled/reset; its final primitive snapshot remains readable. */
++export interface ShaderSyntaxCacheLease {
++    setEnabled(enabled: boolean): void;
++    reset(): void;
++    snapshot(): ShaderSyntaxCacheStats;
++    dispose(): void;
++}
++/** @internal Keeps only immutable syntax for exact post-include prepared text. */
++export declare function CreateShaderSyntaxCache(processor: IShaderProcessor, options?: ShaderSyntaxCacheOptions): ShaderSyntaxCacheLease;
+ /** @internal */
+ export declare function Initialize(options: _IProcessingOptions): void;
+ /** @internal */

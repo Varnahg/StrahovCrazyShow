@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "shader-syntax-cache-20261103",
   "title": "Omezená cache neměnného syntaktického stromu WGSL před variantním průchodem",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "patches/@babylonjs__core@9.30.0.patch",
@@ -11,9 +11,7 @@
     ".cache/shader-syntax-cache-20261103/",
     "docs/agents/handoffs/shader-syntax-cache-20261103.md"
   ],
-  "resources": [
-    "heavy-validation"
-  ],
+  "resources": [],
   "acceptance": [
     "Pouze main a uvedené files; žádné runtime node_modules/package/lock změny před root integrací. Žádná větev/copy projektu.",
     "Klíč přesný preparedSourceCode na hranici EvaluatePreProcessors, po includes a callbacks. Znovu provést celý variantní walk a všechny processing callbacks s čerstvým kontextem/dictionaries.",
@@ -31,6 +29,8 @@
     "User authorized another complete optimization; selected after actual whole-game shaderCPU proof and native CPUkernel study. Root pipeline safety/diagnostics/QA disabled queue remain independent baseline.",
     "Před zahájením zápisu počkat na root checkpoint commit a předání heavy. Read-only design může proběhnout před claimem. Agent nesmí obcházet konflikt a nemění package.json/workspace/lock/node_modules.",
     "Kandidát může používat jednotlivé diagnostické/dependency soubory v vlastní .cache, nikoli další projektový checkout. Root použije běžný pnpm patch/lock/install postup nad main po předání.",
-    "Root vybral API CreateShaderSyntaxCache(processor, options?) v existujícím shaderProcessor.js/.d.ts, per-processor lease setEnabled/reset/snapshot/dispose, výchozíoff. Navržené limity16entries/2097152účtovanýchtextunits/32768nodes/8192operators vycházejí z prvního-sweepcensu; jejich režie a eviction se musí změřit. Runtimeinstalace a appcontrol patří rootu."
+    "Root vybral API CreateShaderSyntaxCache(processor, options?) v existujícím shaderProcessor.js/.d.ts, per-processor lease setEnabled/reset/snapshot/dispose, výchozíoff. Navržené limity16entries/2097152účtovanýchtextunits/32768nodes/8192operators vycházejí z prvního-sweepcensu; jejich režie a eviction se musí změřit. Runtimeinstalace a appcontrol patří rootu.",
+    "3.11.2026: autor předal frozenv4 po17regresích/CPU A/B a uvolnil všechny procesy/heavy. Root přebírá soubory k integraci; heavy/build/GPU/porty rezervuje přes render-next-validation-20261103. Autor už běhemrootinstalace nepíše.",
+    "3.11.2026 uzavření C9: native/controller implementace převzatá pouze jako defaultOFF opt-in. GPU přejímka nezískaná:1/2 ON ready, oba OFF timeout, jeden nestabilní preflight. Úplné důkazy a rozhodnutí docs/performance/evidence/shader-syntax-cache-20261103/final-campaign.md. Root výkonový cíl ani další optimalizace nejsou Done; žádné další zvětšení tohoto kandidáta."
   ]
 }

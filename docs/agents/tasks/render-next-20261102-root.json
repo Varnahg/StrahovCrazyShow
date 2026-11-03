@@ -23,8 +23,6 @@
     "tests/webgpu-compilation-profile.test.ts",
     "docs/performance/evidence/shader-cpu-kernel-20261103/",
     "docs/agents/handoffs/shader-cpu-kernel-20261103.md",
-    "client/shader-syntax-cache.ts",
-    "tests/shader-syntax-cache.test.ts",
     "package.json",
     "pnpm-workspace.yaml",
     "pnpm-lock.yaml",
@@ -59,6 +57,8 @@
     "3.11.2026 review nativekontroly: inertfronta musí zachovat retry once-only RTT postprocessu, který předpipelineadapteremvracíapplynull. Rootvýslovněrozšiřujescopeo compilationprofile+jehotestprolevný nativní completiongetter; Game použije stejný serial v obou větvích. Žádný nový GPUhook anivozovýtimeout.",
     "3.11.2026 poC6STOP/revalidaci: heavy-validation dočasně předán tasku shader-cpu-kernel-20261103 pro skutečný CPU profil. Root nesmí během něj spouštět build/GPU/load a zdroj musí před dalším během opět získat.",
     "3.11.2026: CPUkernel předán rootu a heavy uvolněná. Root přebírá jeho versioned evidence/handoff pro integraci, obnovuje heavy pro checkpoint SDK/commit. Na základě includes39%/parse32% a6sharedASTinputs mezi24uniqueEffecty volí boundedASTcache. Root výslovně rezervuje app control + package/lock/node_modules pro pozdější integraci připnutého patch kandidáta; verze závislostí se nezvyšují.",
-    "3.11.2026 po checkpointu5dd15e8d: souborové vlastnictví zůstává rootu, drahé zdroje jsou oddělené do opakovatelně rezervovatelného render-next-validation-20261103. Převody heavy mezi CPU/cache agentem a rootem už nevyžadují měnit tento katalog. Před build/GPU/integrací root vždy získá validační claim, ověří procesy/porty a po cleanupu ho uvolní."
+    "3.11.2026 po checkpointu5dd15e8d: souborové vlastnictví zůstává rootu, drahé zdroje jsou oddělené do opakovatelně rezervovatelného render-next-validation-20261103. Převody heavy mezi CPU/cache agentem a rootem už nevyžadují měnit tento katalog. Před build/GPU/integrací root vždy získá validační claim, ověří procesy/porty a po cleanupu ho uvolní.",
+    "3.11.2026: app cache controller a jeho test jsou delegované disjunktnímu shader-syntax-control-20261103; Game a package integration zůstávají rootu. Controller dostane native factory injekcí, aby mohl být ověřen bez předčasné změny node_modules.",
+    "3.11.2026 uzavření C9: native/controller implementace převzatá pouze jako defaultOFF opt-in. GPU přejímka nezískaná:1/2 ON ready, oba OFF timeout, jeden nestabilní preflight. Úplné důkazy a rozhodnutí docs/performance/evidence/shader-syntax-cache-20261103/final-campaign.md. Root výkonový cíl ani další optimalizace nejsou Done; žádné další zvětšení tohoto kandidáta."
   ]
 }
