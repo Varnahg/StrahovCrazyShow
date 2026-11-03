@@ -18,3 +18,5 @@
 ## Integrační doplnění
 
 Projektový build následně odhalil TS7016 u přímého importu `.mjs` v testu. Root použil stejný explicitní runtime import přes `new URL(..., import.meta.url).href` jako ostatní Node harness testy v repozitáři; žádné potlačení TypeScript diagnostiky ani změna monitoru. Opakovaných19/19 testů a následný celý `pnpm --config.verifyDepsBeforeRun=error build` včetně TypeScriptu prošly. Původní neúspěšný build je zachovaný jako `final-build.log`, opravený jako `final-build-2.log` v `.cache/shader-syntax-cache-integration-20261103/`. Tato oprava nevyžadovala opakovat celou již proběhlou sadu3029 testů; její samostatný PDF neúspěch zůstává přiznaný.
+
+Před první GPU sérií skutečné hashování C8 trvalo128154,6ms (C7 už37473,9ms). Původních30s na cleanup nestačilo na závěrečnou revalidaci. Samostatný limit úklidu je proto5min; měřený interval a herní30/90s limity se nemění. Regrese s virtuálním časem přijímá řádný128s cleanup a odmítá310s neukončený běh. Finálně20/20 testů, scoped TypeScript a diff kontrola PASS. C8 build zůstává archivovaný; měřený klient dostane nový source manifest v C9, stará identita se nepřepisuje.

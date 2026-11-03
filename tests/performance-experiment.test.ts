@@ -39,13 +39,13 @@ test("JSONL zachová rozdělené UTF-8 a neúplný řádek bez znovučtení", as
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-type Options = { records?: object[]; buildHash?: string; runtimeHash?: string; count?: number; telemetry?: boolean;
+type Options = { records?: object[]; buildHash?: string; runtimeHash?: string; count?: number; telemetry?: boolean; cleanupDelayMs?: number;
   noSample?: boolean; stopSampler?: boolean; badCleanup?: boolean; rotate?: boolean; secondClient?: boolean;
   missingCleanup?: boolean; benchmark?: boolean; oldClient?: boolean; partial?: boolean; backlog?: boolean; backlogFault?: boolean; cleanupSamplerLimit?: boolean };
 async function fixture(options: Options = {}) {
   const root = await mkdtemp(join(tmpdir(), "render-experiment-")), run = join(root, ".cache/run1");
   const diag = join(root, ".cache/game-diagnostics"), planPath = join(root, "plan.json");
-  let time = Date.parse("2026-11-03T12:00:00Z"), finishServer!: () => void, finished = false, sampler: any;
+  let time = Date.parse("2026-11-03T12:00:00Z"), finishServer!: () => void, finished = false, sampler: any, stopRequestedAt: number | undefined;
   await mkdir(diag, { recursive: true });
   await store(planPath, { ...plan, benchmarkCount: options.count ?? 0, systemTelemetry: options.telemetry ?? true });
   if (options.oldClient) await store(join(diag, id + ".jsonl"), batch(readyRecords()));
@@ -79,7 +79,7 @@ async function fixture(options: Options = {}) {
     await new Promise<void>(done => { finishServer = done; });
   };
   const runtime = {
-    now: () => time, pollMs: 1, cleanupMs: 5000, telemetryGraceMs: 2000, telemetryStaleMs: 2000,
+    now: () => time, pollMs: 1, cleanupMs: options.cleanupDelayMs === undefined ? 5000 : undefined, telemetryGraceMs: 2000, telemetryStaleMs: 2000,
     startSampler: ({ run }: { run: string }) => {
       sampler = { settled: false, error: null, code: null, pid: 123 };
       return sampler;
@@ -99,6 +99,10 @@ async function fixture(options: Options = {}) {
         await appendFile(join(diag, id + ".jsonl"), "\n"); options.partial = false;
       }
       if (!finished && await exists(join(run, "STOP"))) {
+        stopRequestedAt ??= time;
+        if (time - stopRequestedAt < (options.cleanupDelayMs ?? 0)) {
+          await new Promise<void>(done => setImmediate(done)); return;
+        }
         finished = true;
         if (!options.missingCleanup) await store(join(run, "cleanup.json"), { apiExited: true, inputsRevalidated: !options.badCleanup,
           failure: null, cleanupErrors: options.badCleanup ? ["changed input"] : [] });
@@ -185,6 +189,14 @@ test("output-limit mezi posledním vzorkem a cleanup není úspěšné ukončen�
   const result = await fixture({ cleanupSamplerLimit: true });
   assert.equal(result.decision, "inconclusive"); assert.equal(result.checks.cleanup, false);
   assert.equal(result.cleanup.system.reason, "output-limit");
+});
+
+test("úklid počká na skutečnou revalidaci assetů a zachová vlastní konečný limit", async () => {
+  const complete = await fixture({ cleanupDelayMs: 128000 });
+  assert.equal(complete.decision, "measurement-complete"); assert.equal(complete.checks.cleanup, true);
+  const hung = await fixture({ cleanupDelayMs: 310000 });
+  assert.equal(hung.decision, "inconclusive"); assert.equal(hung.checks.cleanup, false);
+  assert.ok(hung.timings.wallMs < 310000);
 });
 
 test("abort dorazí před vytvořením runu a STOP se doručí i pozdě vzniklému adresáři", async () => {

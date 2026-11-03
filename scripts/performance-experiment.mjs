@@ -197,7 +197,9 @@ export async function runExperiment({ root, run, planPath, serve, log = value =>
       }
     };
     await requestStop();
-    const cleanupLimit = now() + (runtime.cleanupMs ?? 30000);
+    // This includes a full source/asset/dependency rehash (128s observed locally),
+    // after the measured interval and STOP. It does not extend game readiness.
+    const cleanupLimit = now() + (runtime.cleanupMs ?? 300000);
     while ((!serverSettled || (sampler && !sampler.settled)) && now() < cleanupLimit) {
       await sleep(pollMs); await requestStop();
     }

@@ -19,6 +19,8 @@ Přírůstkově čtené JSONL zahrnují `.part-NNNN` soubory. Terminální chyba
 
 Vypnutí systémové telemetrie musí být výslovné a výsledek označený jako omezený. Po běhu zavři pouze vlastní kartu a ověř ukončení vlastních procesů/portů. Žádná chyba tohoto nástroje neopravňuje měnit herní readiness nebo prodlužovat její timeouty.
 
+Po ukončení měřeného intervalu má cleanup samostatný strop5min kvůli úplnému přepočtu hashů (skutečně pozorováno128s). Nejde o čas navíc pro startup hry. Překročení zůstane neúplným výsledkem a rezervace procesu se neuvolní, dokud není skutečně uklizený.
+
 ## Historie kandidátů a společné podklady
 
 Candidate7 přidává opt-in syntaktickou cache: v témže buildu `?renderBackend=webgpu&shaderSyntaxCache=0` versus `?renderBackend=webgpu&shaderSyntaxCache=1`. Zapnutí je pouze loopback; výchozí stav zůstává vypnutý do GPU přejímky. Oba režimy mají nativní přípravu bez dřívější fronty. Záznamy `shader-syntax-cache` musí potvrdit skutečné enabled/activityKnown a native počty, nikoli jen URL. Základní porovnání nepoužívá `profileStartupCpu` ani `profileEnvironment`. Instalované bytes a lock hash patche ověřuje root před novým buildem; staré buildy se nepřepisují.
