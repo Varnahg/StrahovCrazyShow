@@ -176,6 +176,38 @@ class ParserTests(unittest.TestCase):
         self.assertIsNone(rows[1]["author"])
         self.assertIn("missing-author", rows[1]["flags"])
 
+    def test_poll_only_message_retains_question_answers_and_displayed_state(self):
+        poll = ('<div class=chatlog__poll><div class=chatlog__poll-question>Tea &amp; coffee?</div>'
+                '<div class=chatlog__poll-answer><span class=chatlog__poll-answer-text>Tea</span>'
+                '<span class=chatlog__poll-answer-count>1 vote</span>'
+                '<span class=chatlog__poll-answer-percentage>25 %</span></div>'
+                '<div class="chatlog__poll-answer chatlog__poll-answer--winning">'
+                '<img class=chatlog__poll-answer-emoji alt=☕ src=https://example.invalid/emoji.svg>'
+                '<span class=chatlog__poll-answer-text>Coffee</span>'
+                '<span class=chatlog__poll-answer-count>3 votes</span>'
+                '<span class=chatlog__poll-answer-percentage>75 %</span>'
+                '<span class=chatlog__poll-answer-selected>Selected</span></div>'
+                '<span class=chatlog__poll-footer-item>4 votes</span>'
+                '<span class=chatlog__poll-footer-item>Poll closed</span></div>'
+                '<div class=chatlog__poll-result>Coffee won</div>')
+        self.write(message(text="", extra=poll), 1)
+        manifest = PARSER.extract(self.source, self.output)
+        row = self.records()[0]
+        self.assertEqual(row["text"], "")
+        self.assertEqual(manifest["counts"]["polls"], 1)
+        self.assertEqual(row["polls"][0]["question"], "Tea & coffee?")
+        self.assertEqual([a["text"] for a in row["polls"][0]["answers"]], ["Tea", "Coffee"])
+        self.assertEqual(row["polls"][0]["answers"][1]["emoji"], "☕")
+        self.assertTrue(row["polls"][0]["answers"][1]["selected"])
+        self.assertTrue(row["polls"][0]["answers"][1]["winning"])
+        self.assertEqual(row["polls"][0]["answers"][0]["countText"], "1 vote")
+        self.assertEqual(row["polls"][0]["footer"], ["4 votes", "Poll closed"])
+        self.assertEqual(row["polls"][0]["resultText"], "Coffee won")
+        transcript = next((self.output / "contexts").glob("*.md")).read_text(encoding="utf-8")
+        self.assertIn("[POLL]\nTea & coffee?", transcript)
+        self.assertIn('"text":"Coffee"', transcript)
+        self.assertEqual(self.records("audit-ledger.ndjson")[0]["status"], "pending")
+
     def test_missing_id_is_rejected_without_output(self):
         path = self.write(message(), 1)
         path.write_text(path.read_text().replace(f"data-message-id={BASE_ID}", "data-message-id=invalid"))

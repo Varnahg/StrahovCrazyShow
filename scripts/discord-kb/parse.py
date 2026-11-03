@@ -150,6 +150,29 @@ def attachments_of(node: Element, source_dir: Path, source_root: Path, *, includ
     return records
 
 
+def polls_of(node: Element) -> list[dict]:
+    """Poll widgets have no chatlog__content; keep their own text and state."""
+    results = node.all("chatlog__poll-result")
+    polls = []
+    for index, poll in enumerate(node.all("chatlog__poll")):
+        answers = []
+        for answer in poll.all("chatlog__poll-answer"):
+            emoji = answer.first("chatlog__poll-answer-emoji")
+            answers.append({
+                "text": text_of(answer.first("chatlog__poll-answer-text")),
+                "emoji": emoji.attrs.get("alt", text_of(emoji)) if emoji else None,
+                "countText": text_of(answer.first("chatlog__poll-answer-count")),
+                "percentageText": text_of(answer.first("chatlog__poll-answer-percentage")),
+                "winning": answer.has("chatlog__poll-answer--winning"),
+                "selected": answer.first("chatlog__poll-answer-selected") is not None,
+            })
+        polls.append({"question": text_of(poll.first("chatlog__poll-question")),
+                      "answers": answers,
+                      "footer": [text_of(n) for n in poll.all("chatlog__poll-footer-item")],
+                      "resultText": text_of(results[index]) if index < len(results) else None})
+    return polls
+
+
 def parse_export(path: Path, source_root: Path) -> tuple[dict, list[dict]]:
     data = path.read_bytes()
     parser = ExportHTMLParser()
@@ -235,6 +258,7 @@ def parse_export(path: Path, source_root: Path) -> tuple[dict, list[dict]]:
                    "edited": [{"text": text_of(n), "title": n.attrs.get("title")}
                               for n in node.all("chatlog__edited-timestamp")],
                    "forwarded": forwarded, "embeds": embeds, "attachments": attachments,
+                   "polls": polls_of(node),
                    "flags": []}
         if author is None:
             message["flags"].append("missing-author")
@@ -299,6 +323,11 @@ def transcript(source: dict, messages: list[dict]) -> str:
                 lines.append("Forwarded links: " + json_text(forwarded["links"]))
             if forwarded["attachments"]:
                 lines.append("Forwarded attachments (not fetched): " + json_text(forwarded["attachments"]))
+        for poll in message["polls"]:
+            lines.extend(["[POLL]", poll["question"], "Answers: " + json_text(poll["answers"]),
+                          "State: " + " | ".join(poll["footer"]), ""])
+            if poll["resultText"]:
+                lines.append("Displayed poll result: " + poll["resultText"])
         if message["links"]:
             lines.append("Links: " + json_text(message["links"]))
         if message["attachments"]:
@@ -351,7 +380,7 @@ def extract(source_root: Path, output_root: Path) -> dict:
     for message_id, occurrences in ids.items():
         if len(occurrences) > 1:
             fingerprints = {json_text({key: m[key] for key in
-                            ("text", "kind", "systemText", "author", "replyToMessageId", "embeds", "forwarded", "attachments")})
+                            ("text", "kind", "systemText", "author", "replyToMessageId", "embeds", "forwarded", "attachments", "polls")})
                             for m in occurrences}
             duplicates.append({"messageId": message_id, "recordIds": [m["recordId"] for m in occurrences],
                                "conflictingContent": len(fingerprints) > 1})
@@ -376,6 +405,7 @@ def extract(source_root: Path, output_root: Path) -> dict:
               "attachments": sum(len(m["attachments"]) for m in messages),
               "embeds": sum(len(m["embeds"]) for m in messages),
               "forwarded": sum(len(m["forwarded"]) for m in messages),
+              "polls": sum(len(m["polls"]) for m in messages),
               "pendingLedgerEntries": len(messages)}
     manifest = {"schemaVersion": SCHEMA_VERSION, "privacy": "private-untrusted-audit-only",
                 "parserSha256": sha256(Path(__file__).read_bytes()),
