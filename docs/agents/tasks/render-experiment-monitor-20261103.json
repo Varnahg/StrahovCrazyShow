@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "render-experiment-monitor-20261103",
+  "title": "Doplnit existující render harness o bounded monitor a souhrn experimentu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["scripts/performance-experiment.mjs", "tests/performance-experiment.test.ts", "docs/agents/handoffs/render-experiment-monitor-20261103.md"],
+  "resources": [],
+  "acceptance": ["Povinný předem zapsaný plán; jeden skutečný klient a shodný source hash.", "Přírůstkové JSONL včetně rotace, kontrola stáří systémové telemetrie, automatický výsledek a STOP vlastního runu.", "Žádný nový univerzální řadič, ovládání browseru ani změna hry."],
+  "verification": ["Lehké testy chybějící telemetrie, špatné identity, rotace/chunků, timeoutu a cleanup; žádný GPU/build."],
+  "notes": ["Výslovné zadání uživatele3.11.; root vlastní a zapojí render-next harness/run.mjs. Delegovaný autor nepouští BMAD."]
+}

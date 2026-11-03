@@ -44,6 +44,16 @@ Aktivní rezervace jsou lokální ve společném Git adresáři; nesdílejí se 
 - Review, staging a commit se týkají pouze doložených vlastních změn tasku. Nikdy nepoužij upstream pokyn ke stagingu celého dirty stromu. Počet review nálezů nemá minimum; čistý výsledek je platný. Autorizovaná běžná práce nevyžaduje nové potvrzení jen kvůli BMAD kroku.
 - Instalovaná verze a týmové overrides jsou verzované; aktualizace BMAD je samostatná rezervovaná údržba. Běžící starší relace musí tuto sekci výslovně znovu načíst, než BMAD použije.
 
+## Rozhodování a délka experimentů
+
+- Před změnou nebo výkonovým během zapiš do existujícího plánu šest položek: problém, doložený mechanismus/hypotézu, jedinou zkoušenou změnu, hlavní metriku, podmínky správnosti a kritérium přijetí. Rozliš startup a plynulost hraní; dílčí CPU zrychlení není FPS důkaz.
+- Po selhání nejprve vyhodnoť uložené logy. Nový běh musí zodpovědět konkrétní rozlišovací otázku nebo být předem plánovaným opakováním. Po druhém stejném neplánovaném selhání zastav opakování a uprav diagnostický postup; neprodlužuj herní timeouty a neoslabuj přejímku.
+- Před dlouhou sérií ověř identitu buildu a krátký průchod telemetrie až do uloženého výsledku. Sleduj výpadek sběru, stáří vzorků, limity a rotaci souborů. Chybějící data znamenají omezený/neplatný výsledek, nikoli úspěch. Při testování použij přímé Node CLI nebo `pnpm --config.verifyDepsBeforeRun=error`; instalace závislostí je samostatný vědomý krok.
+- Rozpracuj jeden optimalizační kandidát. Nezbytnou opravu správnosti odděl a uzavři samostatně. Výsledkem série je přijetí, zamítnutí nebo neprůkazný výsledek s přesným chybějícím měřením; další kandidát nesmí zakrýt neuzavřený předchozí.
+- Po 30 minutách bez poznatku, který mění rozhodnutí nebo vylučuje konkrétní příčinu, zvol levnější rozlišovací kontrolu, návrat k datům nebo odložení hypotézy. Jde o kontrolu účelnosti práce, nikoli automatické ukončení úkolu, zkrácení testu či nový schvalovací krok pro uživatele.
+- Opakované úkony automatizuj úzce ve stávajícím harnessu. Eviduj zvlášť build, start, měření a zbývající čas obsluhy; čekej na uložený výsledek, ne na chybovou obrazovku. Prohlížeč obsluhuj autonomně v rámci autorizace. Nevytvářej obecný řadič kvůli jedné sérii.
+- Udržuj jeden stručný aktuální stav v existujícím předání (checkpoint, závěr, další krok); historické důkazy odkazuj. Cílené kontroly průběžně, plné ověření nad stabilním checkpointem. Úspěšnou kontrolu opakuj jen po relevantní změně, selhání či nové konkrétní pochybnosti.
+
 ## Pravidla hry a ověřování
 
 - Svět používá metry, +X východ, +Z jih a pravotočivou kameru Babylon. A musí být vlevo a D vpravo na obrazovce při každém natočení kamery. Ověř skutečnou projekci a jízdu, nikoli pouze znaménka v kódu.

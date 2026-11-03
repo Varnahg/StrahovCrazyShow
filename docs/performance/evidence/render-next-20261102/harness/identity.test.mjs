@@ -4,6 +4,12 @@ import { verifyBaselineSources, verifyBaselineManifest, runDirectory, cache } fr
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
 import { gunzipSync } from "node:zlib";
+import { serve } from "./run.mjs";
+
+test("cancelled experiment cannot hash inputs or launch a late server", async () => {
+  const reason = new Error("Experiment already stopped");
+  await assert.rejects(serve("run1", AbortSignal.abort(reason)), error => error === reason);
+});
 
 test("baseline manifest is byte-pinned independently of any working report or rewritten bundle hashes", async () => {
   const bytes = gunzipSync(await readFile(new URL("../../render-profile-20261102/artifacts/build-identity.json.gz", import.meta.url)));

@@ -9,6 +9,7 @@ import { root, cache, buildDir, dist, port, apiPort, origin, apiOrigin, parseArg
   exists, delay, stopController, bindSignals, ensureStopFile } from "./common.mjs";
 
 async function build() {
+  const started = performance.now();
   await mkdir(cache, { recursive: true }); await mkdir(buildDir);
   try {
     console.log("Hashing source/tests, public assets and installed Babylon bytes before build.");
@@ -26,6 +27,7 @@ async function build() {
     console.log("Revalidating all build inputs.");
     const after = await readInputs(); assertInputIdentity(inputs, after);
     const identity = { schemaVersion: 1, createdAt: new Date().toISOString(), inputs,
+      buildElapsedMs: performance.now() - started,
       bundleFiles: await treeHashes(dist), clientBuildId: loaded.config.define?.["import.meta.env.VITE_CLIENT_BUILD_ID"] ?? null,
       hashAfterDurationMs: after.hashDurationMs, method: "Unmodified production bootstrap, canonical main, build artifacts only; public assets served read-only" };
     await saveNew(join(buildDir, "identity.json"), identity);
@@ -47,11 +49,17 @@ async function weather() {
     cloudSource: "Řízený meteorologický model · benchmark", cloudWindSource: "Řízené modelové proudění · benchmark" } };
 }
 
-async function serve(name) {
+export async function serve(name, signal) {
+  signal?.throwIfAborted();
   const identity = await verifyBuild();
+  signal?.throwIfAborted();
   const fixture = await weather(); await portFree(apiPort); await portFree(port);
+  signal?.throwIfAborted();
   await mkdir(join(cache, "runs"), { recursive: true }); const run = runDirectory(name); await mkdir(run);
   const stopFile = join(run, "STOP"), control = stopController([stopFile]), unbind = bindSignals(control);
+  const abort = () => control.stop("experiment-aborted");
+  signal?.addEventListener("abort", abort, { once: true });
+  if (signal?.aborted) abort();
   const apiLog = await open(join(run, "api.log"), "wx");
   const clean = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:STATIC_DIR$|VITE_|STRAHOV_|NODE_OPTIONS$)/i.test(key)));
   const env = { ...createIsolatedIntegrationEnvironment(clean, join(run, "feedback")),
@@ -60,9 +68,11 @@ async function serve(name) {
   let api, preview, exited = false, failure = null;
   const sockets = new Set();
   try {
+    control.signal.throwIfAborted();
     await saveNew(join(run, "start.json"), { name, startedAt: new Date().toISOString(), pid: process.pid,
       sourceHash: identity.inputs.sourceHash, weatherSha256: fixture.sha256, origin, apiOrigin, stopFile, maximumMinutes: 90 });
     await saveNew(join(run, "weather.json"), fixture.value);
+    control.signal.throwIfAborted();
     api = spawn(process.execPath, ["--import", "tsx", "server/index.ts"], { cwd: root, env,
       windowsHide: true, stdio: ["ignore", apiLog.fd, apiLog.fd] });
     api.once("error", error => { exited = true; failure = String(error); control.stop("API spawn error"); });
@@ -96,6 +106,7 @@ async function serve(name) {
     await saveNew(join(run, "runtime.json"), { name, sourceHash: identity.inputs.sourceHash, root, dist, origin, apiOrigin,
       verification: identity.verification ?? { mode: "exact-current-inputs" },
       pid: process.pid, apiPid: api.pid, startedAt: new Date().toISOString(), weatherSha256: fixture.sha256, stopFile,
+      buildElapsedMs: identity.buildElapsedMs ?? null,
       automaticSessionDiagnostics: join(root, ".cache/game-diagnostics") });
     console.log(JSON.stringify({ status: "ready", name, sourceHash: identity.inputs.sourceHash, origin, run, stopFile }));
     await control.stopped;
@@ -103,6 +114,7 @@ async function serve(name) {
     if (control.reason?.startsWith("stop-check-error:")) throw new Error(control.reason);
   } catch (error) { failure = String(error); throw error; }
   finally {
+    signal?.removeEventListener("abort", abort);
     control.dispose(); unbind(); await ensureStopFile(stopFile);
     const errors = [];
     // Independently launched peers own themselves; ask them to leave before stopping their API.
@@ -133,12 +145,19 @@ async function serve(name) {
 }
 
 async function main() {
-  const { command, name } = parseArguments(process.argv.slice(2));
-  if (command === "help") { console.log("run.mjs --build baseline | --serve run1|run2|run3 | --peers run1|run2|run3. STOP files are printed in runtime metadata."); return; }
+  const args = process.argv.slice(2);
+  const { command, name } = args[0] === "--experiment" && args.length === 2
+    ? { command: "--experiment", name: args[1] } : parseArguments(args);
+  if (command === "help") { console.log("run.mjs --build baseline | --serve run1|run2|run3 | --peers run1|run2|run3 | --experiment run1|run2|run3. Experiment requires STRAHOV_PERF_EXPERIMENT_PLAN; STOP files are printed in runtime metadata."); return; }
   assertCanonicalMain();
   if (command === "--build" && process.env.STRAHOV_SHADER_CANDIDATE === "baseline")
     throw new Error("The archived baseline can only be served, never rebuilt");
-  if (command === "--build") await build();
+  if (command === "--experiment") {
+    const { runExperiment } = await import("../../../../../scripts/performance-experiment.mjs");
+    const result = await runExperiment({ root, run: runDirectory(name),
+      planPath: process.env.STRAHOV_PERF_EXPERIMENT_PLAN, serve: signal => serve(name, signal) });
+    if (result.decision !== "measurement-complete") process.exitCode = 2;
+  } else if (command === "--build") await build();
   else if (command === "--serve") await serve(name);
   else await (await import("./peers.mjs")).runPeers(name);
 }
