@@ -1,0 +1,10 @@
+services:
+  game:
+    image: strahov-crazy-show:git-c82c6b33
+  rag-bootstrap:
+    image: strahov-rag-tools:git-d05c893e
+    environment:
+      RAG_BOOTSTRAP_MAX_INPUTS: "0"
+      RAG_BOOTSTRAP_MAX_BYTES: "0"
+  rag-secrets:
+    image: strahov-rag-tools:git-d05c893e

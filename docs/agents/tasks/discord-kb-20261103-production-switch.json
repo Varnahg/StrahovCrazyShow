@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "discord-kb-20261103-production-switch",
   "title": "KEY-72: koordinované nasazení ověřeného runtime a bootstrapu",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [
     "discord-kb-20261103-validation",
     "discord-kb-20261103-bootstrap-expiry"
@@ -28,6 +28,7 @@
   "notes": [
     "User explicitly approved entire KEY72 plan including activation after verification and coordination with active owners. Root prepared images and released heavy-validation/own test processes.",
     "Runtime image strahov-crazy-show:git-c82c6b33 IDsha256:73a983eae229181a5d42ebb632d1957b54af6a57ca0f601a2fdf559c3a442edf; tools strahov-rag-tools:git-d05c893e IDsha256:5697d2cc4ad2aa1daba16fdd3d57076d69348775377a693a07f3f3bcc5958ece.",
-    "Read docs/agents/handoffs/discord-kb-20261103-validation.md and prepared .cache/discord-kb-20261103/validation/release/compose-images.yaml. Main only; no new branches/worktrees/copies. Do not use old tools c82."
+    "Read docs/agents/handoffs/discord-kb-20261103-validation.md and prepared .cache/discord-kb-20261103/validation/release/compose-images.yaml. Main only; no new branches/worktrees/copies. Do not use old tools c82.",
+    "Final acceptance 2026-11-03: production switch commit2b11a563, verified gamec82 + toolsd05, schema3 and exact heads/sourceVersions/cache; root independently confirmed health/AI. Full-suite2setupFAIL plus exact2PASS reruns remain disclosed. Durable byte-identical override docs/rag-ingestion/20261103-discord/compose-release.yaml; no further runtime/build/test/asset changes by this task."
   ]
 }

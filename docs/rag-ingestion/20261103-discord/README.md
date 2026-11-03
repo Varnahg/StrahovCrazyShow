@@ -1,5 +1,7 @@
 # Kurátorovaná znalostní sbírka z Discordu
 
+Sbírka je od 3. 11. 2026 nasazená v Crazy Typce na běžící aplikaci. Produkční přejímka potvrdila správné verze, původní data i použití nových kurací ve skutečné odpovědi.
+
 Kanonický zdroj je [`knowledge.json`](../../../server/data/rag/community/knowledge.json). Obsahuje 141 otázek a odpovědí a 3 krátké návody: 61 oficiálně doložených jednotek a 83 datovaných komunitních zkušeností. [Čitelná tematická sbírka](knowledge.md), [publikační manifest](../../../server/data/rag/community/manifest.json) a RAG bootstrap jsou odvozené výstupy; neupravují se ručně odděleně od kanonického zdroje.
 
 ## Obsah a původ
@@ -37,6 +39,8 @@ Současně byly dvěma nezávislými průchody znovu ověřeny všechny relevant
 
 `scripts/discord-kb/compile.ts` vyžaduje kanonický JSON, soukromý review manifest, úplný audit ledger a parserové manifest/messages. Přijetí váže hashi na konkrétní obsah a všech 180 souborů / 18 465 zpráv. Změna obsahu nebo chybějící zařazení zneplatní potvrzení ještě před tokenizerem. Při obnově je nutné znovu potvrdit změněné jednotky a vytvořit nový prázdný výstupní adresář.
 
+Pole `canonicalSha256` v manifestu je hash kanonické serializace JSON. Souborový SHA finálního `knowledge.json` je `e448c54d93300805371c24b781110a0cfd3d2c5302e9778b9fa8c3e910fd9d2c`; normalizovaný hash je `6ecf1539d29797761029d01cf9e75b8231d39571d3e7b3adde4f080fdceb1c78`.
+
 Použitý profil zůstává `text-embedding-3-large`, 3072 rozměrů, `title-heading-text-v2`. Otázka, jazykové varianty, odpověď a působnost tvoří jeden úryvek. Limit je 650 tokenů; tematický přehled se znovu neembeduje. Přesný manifest: 144 vstupů, 83 587 UTF-8 bajtů, 33 581 tokenů. Read-only import preview potvrdil 144 chybějících vstupů a 56 znovupoužitých původních dokumentových vstupů. Rozpočet skutečného importu byl přesně 144 / 83 587.
 
 Izolovaný import vytvořil 144 embeddingů v 5 voláních; poskytovatel potvrdil 33 581 tokenů. Následný skutečný import stejné revize s rozpočtem 0 / 0 použil 200 uložených vstupů, bez jediného embeddingového volání. Obnova starších metadat použila dalších 45 původních vstupů, rovněž s nulovými novými voláními. Bootstrap revision 2 obsahuje 145 dokumentů / 200 úryvků a 245 schválených cache záznamů, včetně původních 101 beze změny. Historické revize databáze se nemažou.
@@ -49,4 +53,4 @@ Skutečný runtime retrieval (top 4, cosine cutoff 0,6) na výsledném stage sna
 
 Baseline bez nových canonical ID není měřením nulové znalosti původního systému: starší úryvek s jiným ID může odpověď obsahovat. Proto se jeho nulová shoda s novými ID nevydává za prokázané procentuální zlepšení. Guardy nejsou ve jmenovateli a retrieval sám není ověřením bezpečnosti generované odpovědi.
 
-[Praktická kontrola generování a skutečného klienta](generation-review.md) zahrnula 28 HTTP případů a dva klientské dotazy. Všech 20 guardů zachovalo hranice; původní technické odmítnutí jedné Wi-Fi odpovědi a omezení vysvětlení herního profilu zůstávají výslovně evidované. Konečná neměnná release přejímka a nasazení se ještě ověřují; tento průběžný záznam je neoznačuje za dokončené.
+[Praktická kontrola generování a skutečného klienta](generation-review.md) zahrnula 28 HTTP případů a dva klientské dotazy. Všech 20 guardů zachovalo hranice; původní technické odmítnutí jedné Wi-Fi odpovědi a omezení vysvětlení herního profilu zůstávají výslovně evidované. [Technická přejímka a potvrzené nasazení](release-verification.md) popisuje build, úplnou sadu včetně dvou přípravných selhání a úspěšných opakování, integraci, databázi, opravu restartu po expiraci a bezpečný příkaz pro obnovení stejného vydání.

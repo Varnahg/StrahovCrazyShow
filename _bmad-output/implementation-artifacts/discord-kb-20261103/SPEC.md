@@ -2,7 +2,7 @@
 title: 'KEY-72: Kurátorovaná Discord knowledge base Crazy Typky'
 type: 'feature'
 created: '2026-11-03'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'd124d4a360aee9b870eb0416875da17bbdc92508'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -51,7 +51,7 @@ context: ['{project-root}/AGENTS.md', '{project-root}/docs/agents/bmad-policy.md
 - [x] Kurace: poradna, bloky/B6, General a ostatní kanály v oddělených privátních partitions; každý message ID a accepted claim dohledatelný.
 - [x] Foundation: typy, validátory, migrace, import a cílené regrese.
 - [x] Root: druhá kontrola/dedup, canonical dataset, generovaný Markdown/manifest, provider/UI a 60dotazová evaluace.
-- [ ] Integrace: actual DB/cache/import, full tests/build/izolovaná integrace, praktické AI odpovědi a samostatné commity.
+- [x] Integrace: actual DB/cache/import, full tests/build/izolovaná integrace, praktické AI odpovědi a samostatné commity. Dvě infrastrukturní přípravné chyby úplné sady a přesné úspěšné reruny jsou výslovně zachované v reportu.
 
 **Acceptance Criteria:**
 - Given všechny exporty, when parser/kurace skončí, then každý zdrojový message ID má právě jedno konečné zařazení a původní bajty jsou nezměněné.
@@ -77,7 +77,7 @@ context: ['{project-root}/AGENTS.md', '{project-root}/docs/agents/bmad-policy.md
 | Auditní kategorie duplicate zahrnovala nový kontext a překonané domněnky | Nízký pro odpovědi, podstatný pro přesnost auditu | Po vzorku 40 zpráv přečteno všech 400; 127 pravých duplicit, 81 used, 130 excluded, 62 insufficient. Obsah i runtime bundles144 zcela stejné. |
 | Verifikace release artefaktu původně důvěřovala upravitelnému manifestu | Střední pro identitu testované verze | Očekávaný SHA a commit, úplný inventář, zákaz dalších zdrojů/secrets; nezávislý recheck opravy čistý. LFS hydratace je explicitní a ověřená OID. |
 
-Závěrečné obsahové review 144 jednotek a runtime/tooling review jsou čisté. Evidence skutečné generace zachovává původní `positive-07` invalid-response i úspěšnou omezenou reprodukci a klientský průchod; nejde o přepsání prvního výsledku. Guard18 pouze abstinuje, vysvětlení rozdílu herní profil/členství je neúplné. Úplná testovací sada a finální nasazení jsou ještě v přejímce.
+Závěrečné obsahové review 144 jednotek a runtime/tooling review jsou čisté. Evidence skutečné generace zachovává původní `positive-07` invalid-response i úspěšnou omezenou reprodukci a klientský průchod; nejde o přepsání prvního výsledku. Guard18 pouze abstinuje, vysvětlení rozdílu herní profil/členství je neúplné. Úplná sada měla 2896 PASS / 5 SKIP / 2 přípravné FAIL; oba přesné izolované reruny PASS beze změn aplikace/testů/timeoutů. Build, izolovaná integrace, skutečný DB a UI průchod prošly. Před nasazením byla navíc opravena reprodukovaná chyba bootstrapu po expiraci, s 22/22 unit testy ve Windows i finálním Linux tools image, skutečným PostgreSQL proof a nezávislým ACCEPT. Produkční switch c82 game + d05 tools byl potvrzen 3.11.2026; schema3, správné heady, všechny původní i nové sourceVersions/cache a skutečná odpověď byly ověřeny, importní embeddingy0.
 
 ## Design Notes
 
