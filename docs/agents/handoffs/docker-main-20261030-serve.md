@@ -6,7 +6,13 @@ Tato aktualizace nahrazuje níže uvedenou původní identitu image z30.10. Prov
 
 Game je nyní `strahov-crazy-show:git-c82c6b33`, IID `sha256:73a983eae229181a5d42ebb632d1957b54af6a57ca0f601a2fdf559c3a442edf`, kontejner `1800e89ee46596e9c338fc55a88492a1465fa22e7b8c0b1be915d58406e3f330`. Tools `strahov-rag-tools:git-d05c893e`, IID `sha256:5697d2cc4ad2aa1daba16fdd3d57076d69348775377a693a07f3f3bcc5958ece`. DB je schema3, původní DB kontejner, všechny4volumes a secret C mount zachované. Hra i DB healthy, AI enabled; skutečný syntetický dotaz se2novými kurátorovanými citacemi PASS.
 
-Budoucí `up` z kanonického checkoutu musí použít `-p strahovcrazyshow-main-20261027 --env-file .env -f compose.full.yaml -f .cache/discord-kb-20261103/validation/release/compose-images.yaml` a `up -d --no-build --pull never`. Override je nyní provozní závislost: chránit jej před úklidem a nenahrazovat starými local tagy/schema2 runtime. Bootstrap má budget0/0. Portový claim není uvolněný; po skončení deploy kontroly nezůstává rezervované heavy-validation.
+Budoucí `up` z kanonického checkoutu používá trvalý release override jako poslední `-f`:
+
+```powershell
+docker compose -p strahovcrazyshow-main-20261027 --env-file .env -f compose.full.yaml -f docs/rag-ingestion/20261103-discord/compose-release.yaml up -d --no-build --pull never
+```
+
+Koordinátor KEY-72 vytvořil trvalou kopii pro verzování; provozní vlastník dne3.11.2026 nezávisle ověřil její byteovou shodu s původním `.cache/discord-kb-20261103/validation/release/compose-images.yaml`. Oba soubory mají SHA256 `09f3076b6ca49b682f08a0f2835f41cbc3c25ce3c642c632d0bbcbba3a6aa97b`. Původní cache override zůstává zachován kvůli aktuálním Compose labels a historii; nic se nemaže. Tato změna doporučené cesty neprovedla restart, rebuild ani migraci zdravé služby. Staré local tagy/schema2 runtime se nepoužijí, bootstrap má budget0/0. Portový claim zůstává držený; heavy-validation je uvolněné.
 
 ## Historické spuštění30.10.2026
 
