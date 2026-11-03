@@ -54,7 +54,7 @@ const hit: RagSearchHit = {
   dependency: { head: "public", sourceVersionId: "b".repeat(64) },
   distance: 0.15,
 };
-const instant = Date.parse("2026-10-28T12:00:00Z");
+const instant = Date.parse("2026-11-03T12:00:00Z");
 function fixture(
   overrides: {
     store?: Partial<
