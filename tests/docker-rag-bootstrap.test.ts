@@ -5,9 +5,31 @@ import { bootstrapDecision, manageBootstrapHead, validateBootstrapCache, validat
 import { loadApprovedRagDatasets } from "../scripts/rag-import";
 import { createEmbeddingProfile, type Embedder } from "../server/rag-embeddings";
 import { prepareRagCorpus } from "../server/rag-ingest";
+import { buildCuratedKnowledgeDocumentV3 } from "../server/rag-curation-contract";
+import { documentEmbeddingInputV3, embeddingInputHash } from "../server/rag-embeddings";
 import { canonicalHash, type RagImportSession, type SqlResult, type PreparedDocumentCorpus, type RagDocumentImportSession, type RagSearchSnapshot } from "../server/rag-vector-store";
 
 const profile=createEmbeddingProfile({dimensions:3}), old="1".repeat(64), target="2".repeat(64), foreign="3".repeat(64);
+
+test("bootstrap accepts reviewed curation with the same exact input cache guard as extracted documents", async () => {
+  const bundle = buildCuratedKnowledgeDocumentV3({
+    id: "bootstrap-community", itemId: "bootstrap-community", title: "Syntetická komunitní zkušenost",
+    status: "current", verification: "community-experience", applicability: "Pouze testovací situace.",
+    reviewedAt: "2026-11-03", reviewAfter: "2027-02-01", factCheckedAt: null,
+    observedFrom: "2026-10-01", observedUntil: "2026-10-01",
+    limitations: ["Syntetický test, nejde o skutečný obsah chatu."], supportingRefs: [],
+    archiveReason: null, versionNote: "Test bootstrapu kurace.",
+  }, { text: "Otázka: Jak se domluvit? Odpověď: V testovacím případu pomohla předchozí domluva.", headingPath: ["Test"], tokenCount: 40 });
+  const bundles = validateBootstrapDocuments({schemaVersion: 1, revision: 2, bundles: [bundle]});
+  assert.equal(bundles[0].document.sourceVersionId, bundle.document.sourceVersionId);
+  assert.equal(bundles[0].document.authority, null);
+  const p = createEmbeddingProfile({dimensions: 3, inputVersion: "title-heading-text-v2"});
+  const input = documentEmbeddingInputV3(bundle.document, bundle.chunks[0], p);
+  const entry = {profile: p, input, inputHash: embeddingInputHash(input), vector: [1,0,0]};
+  const datasets = await loadApprovedRagDatasets();
+  assert.equal(validateBootstrapCache({schemaVersion: 1, entries: [entry]}, datasets, bundles).length, 1);
+  assert.throws(() => validateBootstrapCache({schemaVersion: 1, entries: [{...entry,input:"Raw private conversation",inputHash:embeddingInputHash("Raw private conversation")}]}, datasets, bundles));
+});
 function state() {
   const heads=new Map<string,string>(), markers=new Map<string,BootstrapMarker>();
   const query=async(sql:string, values:unknown[]=[]):Promise<SqlResult>=>{

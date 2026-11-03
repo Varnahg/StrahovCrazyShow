@@ -19,6 +19,7 @@ import {
   isCrazyTypkaStatus,
   type CrazyTypkaSource,
 } from "../shared/crazy-typka";
+import type { CuratedKnowledgeSource } from "../shared/knowledge-curation";
 
 type Locale = "cs" | "en";
 export type CrazyTypkaMessage = {
@@ -48,6 +49,86 @@ export function safeCitationHref(value: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+/** Only the published anonymous source contract reaches this view. */
+export function CuratedKnowledgeDetails({
+  source,
+  locale,
+}: {
+  source: CuratedKnowledgeSource;
+  locale: Locale;
+}) {
+  const cs = locale === "cs";
+  const community = source.verification === "community-experience";
+  return (
+    <>
+      <span>{source.title}</span>
+      <small>
+        <strong>
+          {community
+            ? cs
+              ? "Komunitní zkušenost — nezávisle neověřeno"
+              : "Community experience — not independently verified"
+            : cs
+              ? "Kurátorovaná odpověď doložená oficiálními zdroji"
+              : "Curated answer supported by official sources"}
+        </strong>
+        {source.status === "archived" && (
+          <strong className="crazy-archive-label">
+            {" "}
+            · {cs ? "Archiv" : "Archive"}
+          </strong>
+        )}
+        <span> · {source.applicability}</span>
+        {source.observedFrom && (
+          <span>
+            {" "}
+            · {cs ? "Období zkušeností" : "Observation period"}:{" "}
+            {source.observedFrom} – {source.observedUntil}
+          </span>
+        )}
+        <span>
+          {" "}
+          · {cs ? "Kontrola kurace" : "Curation reviewed"}:{" "}
+          <time dateTime={source.reviewedAt}>{source.reviewedAt}</time>
+        </span>
+        {source.factCheckedAt && (
+          <span>
+            {" "}
+            · {cs ? "Ověření tvrzení" : "Claims checked"}:{" "}
+            <time dateTime={source.factCheckedAt}>{source.factCheckedAt}</time>
+          </span>
+        )}
+        {source.limitations.map((limitation, index) => (
+          <span key={index}> · {limitation}</span>
+        ))}
+      </small>
+      {source.supportingRefs.length > 0 && (
+        <ul>
+          {source.supportingRefs.map((ref) => (
+            <li key={`${ref.url}:${ref.locator}`}>
+              {safeCitationHref(ref.url) ? (
+                <a
+                  href={safeCitationHref(ref.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title} ↗
+                </a>
+              ) : (
+                <span>{ref.title}</span>
+              )}
+              <small>
+                {ref.locator} · {cs ? "Ověřeno" : "Checked"}:{" "}
+                {ref.factCheckedAt}
+              </small>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
 }
 
 class ChatRequestError extends Error {}
@@ -644,78 +725,87 @@ export function CrazyTypkaChat({
                   <ul>
                     {message.sources.map((source) => (
                       <li key={source.id}>
-                        {safeCitationHref(source.url) ? (
-                          <a
-                            href={safeCitationHref(source.url)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {source.title} ↗
-                          </a>
+                        {source.adaptation === "knowledge-curation" ? (
+                          <CuratedKnowledgeDetails
+                            source={source}
+                            locale={locale}
+                          />
                         ) : (
-                          <span>{source.title}</span>
-                        )}
-                        <small>
-                          {cs ? "Kontrola zdroje" : "Source checked"}:{" "}
-                          <time dateTime={source.checkedAt}>
-                            {source.checkedAt}
-                          </time>{" "}
-                          ·{" "}
-                          {source.adaptation === "curated-paraphrase"
-                            ? cs
-                              ? "stručná parafráze"
-                              : "short paraphrase"
-                            : cs
-                              ? `extrakce dokumentu (${source.extractionMethod})`
-                              : `document extraction (${source.extractionMethod})`}
-                          {source.adaptation === "document-extraction" && (
-                            <>
-                              {source.status === "archived" && (
-                                <strong className="crazy-archive-label">
-                                  {" "}
-                                  · {cs ? "Archiv" : "Archive"}
-                                </strong>
-                              )}
-                              {source.locators.map((locator, index) => (
-                                <span
-                                  key={`${locator.text}:${locator.page ?? index}`}
-                                >
-                                  {" "}
-                                  · {locator.text}
-                                </span>
-                              ))}
-                              {(source.effectiveFrom ||
-                                source.effectiveUntil) && (
-                                <span>
-                                  {" "}
-                                  · {cs ? "Účinnost" : "Effective"}:{" "}
-                                  {source.effectiveFrom ?? "?"} –{" "}
-                                  {source.effectiveUntil ??
-                                    (cs ? "neuvedeno" : "unspecified")}
-                                </span>
-                              )}
-                            </>
-                          )}
-                          {source.author ? ` · ${source.author}` : ""}
-                          {source.license && (
-                            <>
-                              {" "}
+                          <>
+                            {safeCitationHref(source.url) ? (
+                              <a
+                                href={safeCitationHref(source.url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {source.title} ↗
+                              </a>
+                            ) : (
+                              <span>{source.title}</span>
+                            )}
+                            <small>
+                              {cs ? "Kontrola zdroje" : "Source checked"}:{" "}
+                              <time dateTime={source.checkedAt}>
+                                {source.checkedAt}
+                              </time>{" "}
                               ·{" "}
-                              {source.licenseUrl &&
-                              safeCitationHref(source.licenseUrl) ? (
-                                <a
-                                  href={safeCitationHref(source.licenseUrl)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {source.license}
-                                </a>
-                              ) : (
-                                source.license
+                              {source.adaptation === "curated-paraphrase"
+                                ? cs
+                                  ? "stručná parafráze"
+                                  : "short paraphrase"
+                                : cs
+                                  ? `extrakce dokumentu (${source.extractionMethod})`
+                                  : `document extraction (${source.extractionMethod})`}
+                              {source.adaptation === "document-extraction" && (
+                                <>
+                                  {source.status === "archived" && (
+                                    <strong className="crazy-archive-label">
+                                      {" "}
+                                      · {cs ? "Archiv" : "Archive"}
+                                    </strong>
+                                  )}
+                                  {source.locators.map((locator, index) => (
+                                    <span
+                                      key={`${locator.text}:${locator.page ?? index}`}
+                                    >
+                                      {" "}
+                                      · {locator.text}
+                                    </span>
+                                  ))}
+                                  {(source.effectiveFrom ||
+                                    source.effectiveUntil) && (
+                                    <span>
+                                      {" "}
+                                      · {cs ? "Účinnost" : "Effective"}:{" "}
+                                      {source.effectiveFrom ?? "?"} –{" "}
+                                      {source.effectiveUntil ??
+                                        (cs ? "neuvedeno" : "unspecified")}
+                                    </span>
+                                  )}
+                                </>
                               )}
-                            </>
-                          )}
-                        </small>
+                              {source.author ? ` · ${source.author}` : ""}
+                              {source.license && (
+                                <>
+                                  {" "}
+                                  ·{" "}
+                                  {source.licenseUrl &&
+                                  safeCitationHref(source.licenseUrl) ? (
+                                    <a
+                                      href={safeCitationHref(source.licenseUrl)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      {source.license}
+                                    </a>
+                                  ) : (
+                                    source.license
+                                  )}
+                                </>
+                              )}
+                            </small>
+                          </>
+                        )}
                       </li>
                     ))}
                   </ul>

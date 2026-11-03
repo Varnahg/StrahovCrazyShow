@@ -3,10 +3,10 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Client } from "pg";
 import { createEmbeddingProfile, createOpenAIEmbedder, documentEmbeddingInputV3, embeddingInputHash, validateEmbeddingProfile, type Embedder, type EmbeddingProfile } from "../server/rag-embeddings";
-import { validateKnowledgeDatasetV3 } from "../server/rag-document-contract";
+import { validateRagDocumentDatasetV3 as validateKnowledgeDatasetV3 } from "../server/rag-curation-contract";
 import { prepareRagCorpus, importPreparedCorpus, prepareDocumentChanges, importPreparedDocumentCorpus } from "../server/rag-ingest";
 import { migrateRagSchema, openRagImportSession, openRagDocumentImportSession, canonicalJson, vectorParameter, type PreparedCorpus, type RagImportSession, type RagDocumentImportSession, type SqlResult } from "../server/rag-vector-store";
-import type { KnowledgeDocumentBundleV3 } from "../server/rag-knowledge-types";
+import type { RagDocumentBundleV3 as KnowledgeDocumentBundleV3 } from "../server/rag-knowledge-types";
 import { loadApprovedRagDatasets } from "./rag-import";
 // @ts-ignore Plain Node helpers are shared with the dependency-free Docker entrypoints.
 import { credentialPaths, readCredentials, readPrivateText, ragConnection, RAG_ROLES } from "./docker-rag-secrets.mjs";

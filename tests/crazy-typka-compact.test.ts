@@ -113,8 +113,10 @@ test("the real client validates new SUZ and SHerna citations before compact rend
     assert.equal(client.getSnapshot().error, null);
     assert.deepEqual(client.getSnapshot().messages.at(-1)?.sources, sources);
     const html = render(state(client.getSnapshot()), "cs", "compact");
-    for (const item of sources)
+    for (const item of sources) {
+      assert.ok("url" in item);
       assert.ok(html.includes('href="' + item.url + '"'));
+    }
     assert.equal(chats, 1);
   } finally {
     client.dispose();

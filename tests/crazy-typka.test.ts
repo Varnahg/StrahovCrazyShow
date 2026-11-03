@@ -941,6 +941,7 @@ test("new SH and SUZ facts reach provider and compatible client citations throug
       assert.ok(isCrazyTypkaChatResponse(result.body));
       assert.ok(delivered.input.at(-1).content.includes(item.id));
       assert.ok(delivered.input.at(-1).content.includes(item.authority));
+      assert.ok("url" in result.body.sources[0]);
       assert.equal(new URL(result.body.sources[0].url).hostname, item.host);
       assert.equal(
         Object.hasOwn(result.body.sources[0], "effectiveFrom"),
@@ -2444,6 +2445,7 @@ test("history is bounded to six turns, and source links come only from curated m
     });
     assert.equal(result.status, 200);
     assert.ok(isCrazyTypkaResponse(result.body));
+    assert.ok("url" in result.body.sources[0]);
     assert.equal(
       result.body.sources[0].url,
       "https://www.siliconhill.cz/pages/clenstvi",

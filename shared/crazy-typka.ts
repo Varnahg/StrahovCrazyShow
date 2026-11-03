@@ -1,5 +1,9 @@
 import citationPolicyData from "./data/rag-citation-policy.json";
 import {
+  isCuratedKnowledgeSource,
+  type CuratedKnowledgeSource,
+} from "./knowledge-curation";
+import {
   canonicalizeCitationUrl,
   isCitationUrlAllowed,
   validateCitationPolicy,
@@ -105,7 +109,7 @@ export type ExtractedCrazyTypkaSource = Omit<
   locators: readonly CitationLocator[];
 };
 export type CrazyTypkaSource =
-  LegacyCrazyTypkaSource | ExtractedCrazyTypkaSource;
+  LegacyCrazyTypkaSource | ExtractedCrazyTypkaSource | CuratedKnowledgeSource;
 export const CRAZY_TYPKA_DOCUMENT_CITATION_POLICY =
   validateCitationPolicy(citationPolicyData);
 const citationEncoder = new TextEncoder();
@@ -341,6 +345,11 @@ export function isExtractedCrazyTypkaSource(
   );
 }
 export function isCrazyTypkaSource(value: unknown): value is CrazyTypkaSource {
+  if (isRagRecord(value) && value.adaptation === "knowledge-curation")
+    return isCuratedKnowledgeSource(
+      value,
+      CRAZY_TYPKA_DOCUMENT_CITATION_POLICY,
+    );
   return isRagRecord(value) && value.adaptation === "document-extraction"
     ? isExtractedCrazyTypkaSource(value)
     : isLegacyCrazyTypkaSource(value);

@@ -288,8 +288,8 @@ function migrationFixture(initialVersion = 1) {
 test("versioned migration adopts v1 once and never replays bootstrap after v3 schema publication", async () => {
   const f = migrationFixture();
   await migrateRagSchemaWithPool(f.pool);
-  assert.equal(f.bootstrapCalls(), 0); assert.equal(f.migrationCalls(), 1); assert.equal(f.state().version, 2);
-  assert.deepEqual(f.state().entries.map((entry) => entry.version), [1, 2]);
+  assert.equal(f.bootstrapCalls(), 0); assert.equal(f.migrationCalls(), 1); assert.equal(f.state().version, 3);
+  assert.deepEqual(f.state().entries.map((entry) => entry.version), [1, 2, 3]);
   await migrateRagSchemaWithPool(f.pool);
   assert.equal(f.bootstrapCalls(), 0); assert.equal(f.migrationCalls(), 1);
   assert.ok(!f.calls.some((call) => /^GRANT /m.test(call.sql)), "no guessed role or PUBLIC grants");
@@ -319,7 +319,7 @@ test("empty schemas bootstrap once while missing migration evidence and unknown 
   empty.removeLedger();
   await assert.rejects(migrateRagSchemaWithPool(empty.pool), (error: any) => error.code === "invalid-schema");
   assert.equal(empty.bootstrapCalls(), 1);
-  const future = migrationFixture(3);
+  const future = migrationFixture(4);
   await assert.rejects(migrateRagSchemaWithPool(future.pool), (error: any) => error.code === "invalid-schema");
   assert.equal(future.bootstrapCalls(), 0); assert.equal(future.migrationCalls(), 0);
 });
