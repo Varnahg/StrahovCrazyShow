@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import { appendFile, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { IncrementalJsonl, runExperiment, validateExperimentPlan } from "../scripts/performance-experiment.mjs";
+// Runtime Node helper, matching the other .mjs harness tests in this repository.
+const { IncrementalJsonl, runExperiment, validateExperimentPlan } =
+  await import(new URL("../scripts/performance-experiment.mjs", import.meta.url).href);
 
 const hash = "a".repeat(64), id = "11111111-1111-4111-8111-111111111111";
 const plan = { problem: "Start čeká", hypothesis: "Cache zkrátí parsing", change: "Cache on", metric: "Startup ms",

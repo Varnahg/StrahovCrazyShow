@@ -14,3 +14,7 @@
 - Žádný skutečný API server, sampler, browser ani GPU běh nespouštěn. Praktický root průchod a finální review/commit jsou navazující kroky. TestRuntime je pouze injekce hodin/sampleru pro lehké deterministické regrese.
 - Finální SHA256: modul `696973e9b2fbaed7e961c5bdf1a27b68f20f811773db4608d7b27125374dc76b`; test `7f4b77d670816dd355637ef88fc1a5a53a437cd8421745074960bcbf4e8a26bf`. Závěrečný běh 19/19 trval 1,60 s.
 - Rezervaci po posledním ověření uvolňuje autor; root přebírá soubory podle tohoto předání. `release` není přijetí optimalizace.
+
+## Integrační doplnění
+
+Projektový build následně odhalil TS7016 u přímého importu `.mjs` v testu. Root použil stejný explicitní runtime import přes `new URL(..., import.meta.url).href` jako ostatní Node harness testy v repozitáři; žádné potlačení TypeScript diagnostiky ani změna monitoru. Opakovaných19/19 testů a následný celý `pnpm --config.verifyDepsBeforeRun=error build` včetně TypeScriptu prošly. Původní neúspěšný build je zachovaný jako `final-build.log`, opravený jako `final-build-2.log` v `.cache/shader-syntax-cache-integration-20261103/`. Tato oprava nevyžadovala opakovat celou již proběhlou sadu3029 testů; její samostatný PDF neúspěch zůstává přiznaný.
