@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "discord-kb-20261103-bootstrap-expiry",
+  "title": "KEY-72: restart bootstrapu po expiraci kurátorovaných znalostí",
+  "status": "done",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": [
+    "scripts/docker-rag-bootstrap.ts",
+    "tests/docker-rag-bootstrap.test.ts",
+    ".cache/discord-kb-20261103/bootstrap-expiry/",
+    "docs/agents/handoffs/discord-kb-20261103-bootstrap-expiry.md"
+  ],
+  "acceptance": [
+    "Validate every seed bundle before filtering; malformed expired data and future-reviewed data remain rejected.",
+    "Skip only expired current curated upserts at one captured UTC instant; preserve context and revision identity on ordinary restart.",
+    "Fresh bootstrap after expiry publishes only eligible curated units; explicit importer/store/runtime guards remain unchanged.",
+    "Pending-cross-expiry conflicts preserve original head and checkpoint; no implicit retry or cleanup.",
+    "Implement, refactor, targeted tests and handoff together; no paid API/DB or heavy validation in agent task."
+  ],
+  "verification": [
+    "Targeted docker-rag-bootstrap tests, including expiration boundary/repeat/fresh/future/malformed/pending cases.",
+    "Integrator performs actual staged PostgreSQL and new rag-tools image checks later."
+  ],
+  "notes": [
+    "User-approved KEY-72 implementation and expiry regressions. Work directly on main only. Root delegated exact two source/test paths after read-only reproduction confirmed restart failure at2026-11-10. Read AGENTS.md and bmad-policy; no recursive BMAD workflow.",
+    "Runtimegame c82 remains unchanged. This is bootstrap-only correction before first production activation. No changes to corpus, embeddings, schema, source dates or ownership of other files.",
+    "Integrator accepted checkpoint 2026-11-03; actual evidence and limitations in matching handoff. Own processes stopped and claim released; production activation is separate."
+  ]
+}
