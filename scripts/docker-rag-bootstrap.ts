@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Client } from "pg";
 import { createEmbeddingProfile, createOpenAIEmbedder, documentEmbeddingInputV3, embeddingInputHash, validateEmbeddingProfile, type Embedder, type EmbeddingProfile } from "../server/rag-embeddings";
-import { validateRagDocumentDatasetV3 as validateKnowledgeDatasetV3 } from "../server/rag-curation-contract";
+import { isCuratedKnowledgeDocument, validateRagDocumentDatasetV3 as validateKnowledgeDatasetV3 } from "../server/rag-curation-contract";
 import { prepareRagCorpus, importPreparedCorpus, prepareDocumentChanges, importPreparedDocumentCorpus } from "../server/rag-ingest";
 import { migrateRagSchema, openRagImportSession, openRagDocumentImportSession, canonicalJson, vectorParameter, type PreparedCorpus, type RagImportSession, type RagDocumentImportSession, type SqlResult } from "../server/rag-vector-store";
 import type { RagDocumentBundleV3 as KnowledgeDocumentBundleV3 } from "../server/rag-knowledge-types";
@@ -155,6 +155,8 @@ export async function assertBootstrapProfile(query:Query,profile:EmbeddingProfil
 }
 export async function importBootstrap(datasets: Datasets, bundles: readonly KnowledgeDocumentBundleV3[], profile: EmbeddingProfile,
   dependencies: BootstrapDependencies, limits: { maxEmbeddingInputs:number; maxEmbeddingBytes:number }, signal?: AbortSignal, seedRevision=1) {
+  const validatedBundles = validateBootstrapDocuments({ schemaVersion: 1, revision: seedRevision, bundles });
+  const now = Date.now();
   await dependencies.migrate();
   const remaining = { ...limits };
   const options = () => ({ ...remaining, retryUncertain:false, signal });
@@ -169,13 +171,17 @@ export async function importBootstrap(datasets: Datasets, bundles: readonly Know
   finally { await legacy.close(); }
   const documentProfile = createEmbeddingProfile({model:profile.model,dimensions:profile.dimensions,inputVersion:"title-heading-text-v2"});
   for (const collection of ["current","archive"] as const) {
-    const selected=bundles.filter(bundle=>bundle.document.status===(collection==="current"?"current":"archived"));
+    const selected=validatedBundles.filter(bundle=>bundle.document.status===(collection==="current"?"current":"archived"));
     if (!selected.length) continue;
     const session=await dependencies.documents();
     try {
       await assertBootstrapProfile(dependencies.query,profile);
       const context=await session.context(collection), head=collection==="current"?"public-documents":"public-archive";
-      const plan=prepareDocumentChanges(context,{collection,expectedSnapshotId:context.snapshot?.id??null,upserts:selected},documentProfile);
+      // Expired current seeds stay in retained context, but are not newly admitted as upserts.
+      // Even an empty upsert set must reach the unchanged pending/revision checkpoint guards.
+      const upserts=selected.filter(({document})=>!(collection==="current" && isCuratedKnowledgeDocument(document)
+        && Date.parse(document.reviewAfter+"T00:00:00Z")<=now));
+      const plan=prepareDocumentChanges(context,{collection,expectedSnapshotId:context.snapshot?.id??null,upserts},documentProfile,now);
       outcomes.push(await manageBootstrapHead(dependencies.query,head,plan.revisionId,
         async()=>account(await importPreparedDocumentCorpus(plan,session,{...options(),embedder:dependencies.embedder(documentProfile)})),seedRevision));
     } finally { await session.close(); }
