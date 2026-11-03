@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "discord-kb-20261103-consolidation",
+  "title": "KEY-72: sjednocení přijatých kandidátů, deduplikace a úplný final ledger",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/discord-kb-20261103/consolidation/",
+    "docs/agents/handoffs/discord-kb-20261103-consolidation.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Všech177 kandidátů má doložené rozhodnutí podle nezávislých review a cross-partition dedup, bez ztráty působnosti/časových podmínek.",
+    "Vznikne canonical-proposal.json bez osobních údajů ve formátu compileru, úplný final ledger180/18465, auditní lineage a reviewmanifest vázaný na přesné veřejné znění.",
+    "Zpracovat přijaté review opravy, reject/publishhold bez vydávání chybějícího důkazu za schválení; externím zdrojům nepřiřazovat falešné vydavatele.",
+    "Porovnat proti existující KB a popsat překryvy; původní primární dokumenty zůstávají zachované. Sémanticky shodná nová FAQ sloučit, rozdílné bloky/podmínky zachovat."
+  ],
+  "verification": [
+    "Vlastní strukturální/coverage/PII kontroly nad raw/corpus-v2 a explicitními reviewreports.",
+    "Použít skutečné exportované hash/receipt helpery compileru a ověřit proof bez placených embeddingů.",
+    "Root přijme konečný návrh a provede tokenizaci, import a evaluaci; agent nesmí předstírat tyto kroky."
+  ],
+  "notes": [
+    "Root přiděluje konkrétní navazující implementaci schváleného KEY-72 plánu. Vstup pět curation partitions a .cache/discord-kb-20261103/root/reviews.json. Žádné mutace vstupních partition ani veřejných serverových dat mimo scope.",
+    "Všechny změny/proposals/refaktoring a cílené ověření předat spolu. Nespouštět další BMAD, další agenty, fulltests, build, DB ani API import.",
+    "Integrator acceptance 2026-11-03: own implementation/content verified and handed off. Commits b1ea7317 runtime, 9292f891 tooling, c82c6b33 reviewed144 units+cache. Whole KEY-72 release validation/deployment remains root+validation task, not implied by this subtask status."
+  ]
+}

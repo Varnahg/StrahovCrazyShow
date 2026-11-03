@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "discord-kb-20261103-publication-gates",
+  "title": "KEY-72: vázat publikaci na dokončený audit a přesný přijatý obsah",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/discord-kb/compile.ts",
+    "scripts/discord-kb/audit.py",
+    "tests/discord-kb.test.ts",
+    "tests/discord-kb-audit.py",
+    ".cache/discord-kb-20261103/publication-gates/",
+    "docs/agents/handoffs/discord-kb-20261103-publication-gates.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Compiler vytvoří importovatelné bundles pouze při úplném konkrétním final ledgeru odpovídajícím raw corpus manifestu a skutečným normalized message IDs/souborům.",
+    "Review manifest a receipt se vážou na přesný aktuální canonical obsah, zdrojový inventář a hash uzavřeného ledgeru; změna odpovědi po review selže před tokenizací/embeddingy.",
+    "Coverage podporuje platné prázdné exporty a kontroluje sourceFile/messageID/canonical reference; všechny zařazené zprávy mají důvod.",
+    "Původní kanonický tvar FAQ zůstane co nejvíce kompatibilní, root dostane přesný nový review API/CLI kontrakt. Reálné soukromé zprávy nepatří do testů ani veřejných artefaktů."
+  ],
+  "verification": [
+    "Cílené testy compileru pro pozměněný text, chybějící review, nesoulad inventáře/ledgeru, neúplný audit a validní import.",
+    "Syntetické Python testy coverage pro prázdný export, nesprávný sourceFile, duplicity a neexistující canonical target.",
+    "TypeScript kontrola vlastního kódu; plná sada/build/DB pouze koordinovaným rootem."
+  ],
+  "notes": [
+    "Root výslovně předává rozpracované vlastní compile.ts, audit.py a tests/discord-kb.test.ts pod agentovi chat_corpus_audit po release/reclaim root scope; použít adopt-dirty pouze pro toto konkrétní předání.",
+    "Opravuje dva doložené review nálezy KEY-72. Třetí provider label bypass opravuje root ve svých souborech. Žádné vlastní BMAD ani náročné procesy.",
+    "Integrator acceptance 2026-11-03: own implementation/content verified and handed off. Commits b1ea7317 runtime, 9292f891 tooling, c82c6b33 reviewed144 units+cache. Whole KEY-72 release validation/deployment remains root+validation task, not implied by this subtask status."
+  ]
+}

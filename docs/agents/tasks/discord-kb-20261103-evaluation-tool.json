@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "discord-kb-20261103-evaluation-tool",
+  "title": "KEY-72: reprodukovatelná top4 evaluace s explicitním embedding rozpočtem",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/discord-kb/evaluate.ts",
+    "tests/discord-kb-evaluation.test.ts",
+    ".cache/discord-kb-20261103/evaluation-tool/",
+    "docs/agents/handoffs/discord-kb-20261103-evaluation-tool.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Vyhodnotit pevný holdout proti skutečnému snapshotu přes stejný evidence backend, top4 a cutoff jako runtime, bez změn DB.",
+    "Žádný paid call bez explicitního max-inputs/max-bytes; opakování se stejným dotazovým profilem používá vlastní lokální eval cache. Query cache není runtime user cache a neobsahuje raw chat.",
+    "Report obsahuje snapshot/model/source identity, přesné hity a score pouze u answerable případů. Guard dotazy mají oddělené nehodnocené retrieval výsledky, nikoli předstíraný test bezpečnosti generace.",
+    "Neúplné běhy či chybějící mapování gold IDs jsou chyba, ne úspěšná evaluace. Zachovat známý paid-attempt stav při chybě bez automatických retry."
+  ],
+  "verification": [
+    "Cílené syntetické testy relevance score, budgetů, cache identity, invalid/partial map a chybových cest.",
+    "Žádné skutečné API, DB, build ani celá sada v podagentovi; skutečnou evaluaci spustí root ve validačním okně."
+  ],
+  "notes": [
+    "Pevný holdout je server/data/rag/community/evaluation-questions.json (72 případů vytvořených před prvním embeddingem). Agent jej nemění.",
+    "Read-only import/query přístup poskytují existující rag backend/store/embedder. Explicitní RAG_EVAL_DATABASE_URL, žádný dump secrets. Root připraví final map canonical IDs před měřením.",
+    "Pouze main a přidělené soubory. Žádné další workflow nebo subagenti. Předat implementaci, refaktoring a ověření společně.",
+    "Integrator acceptance 2026-11-03: own implementation/content verified and handed off. Commits b1ea7317 runtime, 9292f891 tooling, c82c6b33 reviewed144 units+cache. Whole KEY-72 release validation/deployment remains root+validation task, not implied by this subtask status."
+  ]
+}
