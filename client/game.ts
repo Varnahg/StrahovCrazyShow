@@ -321,6 +321,7 @@ export class Game {
   adaptive = new AdaptiveQualityController();
   appliedQualityRevision = -1;
   lastCpuFrameMs: number | undefined;
+  private completedDiagnosticCallback?: { frameStartedAtMs: number; cpuMs: number };
   lastGpuFrameMs: number | undefined;
   lastGpuCounterCount = 0;
   private lastMainPassCounterCount = 0;
@@ -677,10 +678,21 @@ export class Game {
         rendererId: this.renderHealth.rendererId,
         scope: this.environmentProfile.scope,
       });
+    }
+    const lifecycleRequests = new URLSearchParams(window.location.search).getAll("profileFrameLifecycle");
+    const lifecycleOnly = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(window.location.hostname.toLowerCase()) &&
+      lifecycleRequests.length === 1 && lifecycleRequests[0] === "1";
+    if (this.environmentProfile || lifecycleOnly) {
+      let slowWindowAt = -Infinity, slowEvents = 0;
       this.frameLifecycleProfile = new WebGpuFrameLifecycleProfile(this.engine, {
-        onSlowCall: (sample) => sessionDiagnostics.event("engine-frame-work", {
-          ...sample, rendererId: this.renderHealth.rendererId,
-        }),
+        onSlowCall: (sample) => {
+          const now = performance.now();
+          if (now - slowWindowAt >= 1000) { slowWindowAt = now; slowEvents = 0; }
+          // Helper counters remain complete; only verbose event delivery is capped.
+          if (slowEvents++ < 8) sessionDiagnostics.event("engine-frame-work", {
+            ...sample, rendererId: this.renderHealth.rendererId,
+          });
+        },
       });
     }
     this.applyAdaptiveQuality(this.adaptive.state);
@@ -1909,6 +1921,11 @@ export class Game {
     // Faulted renderers retain automatic diagnostic records, but cannot start
     // another performance sample until a fresh Game has completed preparation.
     this.benchmark?.profile.dispose();
+    if (this.frameLifecycleProfile) sessionDiagnostics.event("engine-frame-profile", {
+      stage: "benchmark-start", rendererId: this.renderHealth.rendererId,
+      slowEventLimitPerSecond: 8,
+      timing: this.frameLifecycleProfile.snapshot(),
+    });
     sessionDiagnostics.event("benchmark-start", {
       rendererId: this.renderHealth.rendererId,
       avatars: this.avatars.size,
@@ -2571,6 +2588,7 @@ export class Game {
 
   /** Diagnostic lifetime is a connection, independently of prediction identity. */
   resetDiagnosticContext(): void {
+    this.completedDiagnosticCallback = undefined;
     this.lastAuthorityNetwork = null;
     this.lastAuthorityAtMs = null;
     Object.assign(this.diagnosticNetwork, {
@@ -3350,6 +3368,7 @@ export class Game {
           cpuMs: frameCpuEnded - frameStarted,
           gpuMs: freshGpuSample ? (this.lastGpuFrameMs ?? null) : null,
           phases: breakdown,
+          previousCallback: this.completedDiagnosticCallback,
         }, this.diagnosticContext);
       if (this.benchmark)
         for (const [key, milliseconds] of Object.entries(breakdown))
@@ -3368,6 +3387,11 @@ export class Game {
         // Release before the callback: it may immediately start another run.
         this.benchmark = undefined;
         b.profile.dispose();
+        if (this.frameLifecycleProfile) sessionDiagnostics.event("engine-frame-profile", {
+          stage: "benchmark-end", rendererId: this.renderHealth.rendererId,
+          slowEventLimitPerSecond: 8,
+          timing: this.frameLifecycleProfile.snapshot(),
+        });
         const durationSeconds = Number(
           ((performance.now() - b.start) / 1000).toFixed(2),
         );
@@ -3533,6 +3557,13 @@ export class Game {
       });
     }
     this.lastCpuFrameMs = performance.now() - frameStarted;
+    if (sessionDiagnostics.isRecording && !this.disposed) {
+      // The next frame can pair this endpoint with its preceding interval.
+      // Reuse one record; SessionDiagnostics copies only validated primitives.
+      const completed = this.completedDiagnosticCallback ??= { frameStartedAtMs: frameStarted, cpuMs: this.lastCpuFrameMs };
+      completed.frameStartedAtMs = frameStarted;
+      completed.cpuMs = this.lastCpuFrameMs;
+    } else this.completedDiagnosticCallback = undefined;
   }
   dispose() {
     if (this.disposed) return;

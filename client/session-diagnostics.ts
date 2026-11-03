@@ -60,6 +60,8 @@ export interface DiagnosticFrame {
   gpuMs: number | null;
   phases: Record<string, number>;
   renderWork?: RenderIncidentSnapshot;
+  /** Completed previous Game callback, through recorder/HUD; never current work. */
+  previousCallback?: Readonly<{ frameStartedAtMs: number; cpuMs: number }>;
 }
 
 /** Injectable clock/transport keeps retry and lifecycle tests deterministic. */
@@ -95,6 +97,9 @@ interface FrameWindow {
   frameMs: number[];
   cpuMs: number[];
   gpuMs: (number | null)[];
+  /** Aligned with frameMs; null when the previous callback cannot be paired. */
+  previousCallbackCpuMs: (number | null)[];
+  previousCallbackTailMs: (number | null)[];
   phaseTotals: Record<string, number>;
   phaseMax: Record<string, number>;
   enginePhaseTotals: Record<string, number>;
@@ -191,6 +196,7 @@ export class SessionDiagnostics {
   private sampledContext: DiagnosticsData = {};
   private contextAt = -Infinity;
   private previousFrame: DiagnosticFrame | null = null;
+  private previousFrameCpuMs: number | null = null;
   private afterVisibilityChange = false;
   private eventWindowAt = 0;
   private eventsInWindow = 0;
@@ -231,7 +237,9 @@ export class SessionDiagnostics {
       startedAtUTC: new Date(this.environment.wallNow()).toISOString(),
       timeOrigin: this.environment.wallNow() - now,
       automatic: true,
-      frameTiming: "frameMs=preceding interval; cpuMs/phases=current render",
+      frameTiming: "frameMs=preceding interval; cpuMs/phases=current Game callback through labels",
+      callbackTiming:
+        "previousCallbackCpuMs/TailMs align with frameMs; prior Game callback through recorder/HUD, excluding caller engine work, asynchronous work and presentation; null=unpaired",
       gpuTiming:
         "gpuMs=newly available asynchronous query; may describe an earlier frame",
       tailPolicy:
@@ -296,6 +304,21 @@ export class SessionDiagnostics {
     this.sampledContext = {};
     this.contextAt = -Infinity;
     this.previousFrame = null;
+    this.previousFrameCpuMs = null;
+  }
+
+  private completedCallbackCpu(frame: DiagnosticFrame): number | null {
+    const previous = this.previousFrame;
+    const completed = frame.previousCallback;
+    const currentStart = frame.frameStartedAtMs;
+    if (!previous || !completed || this.previousFrameCpuMs === null ||
+        !Number.isFinite(currentStart) || !Number.isFinite(previous.frameStartedAtMs) ||
+        !Number.isFinite(completed.frameStartedAtMs) || completed.frameStartedAtMs < 0 ||
+        completed.frameStartedAtMs !== previous.frameStartedAtMs ||
+        currentStart! <= completed.frameStartedAtMs ||
+        !Number.isFinite(completed.cpuMs) || completed.cpuMs < this.previousFrameCpuMs ||
+        completed.cpuMs > currentStart! - completed.frameStartedAtMs) return null;
+    return completed.cpuMs;
   }
 
   recordFrame(frame: DiagnosticFrame, contextFactory: () => unknown): void {
@@ -320,6 +343,11 @@ export class SessionDiagnostics {
         this.contextAt = now;
       }
     }
+    // Context capture may cross a lifecycle boundary; pair only with the still
+    // current preceding record. Copy values, never retain the caller's object.
+    const callbackRawCpuMs = this.completedCallbackCpu(frame);
+    const callbackCpuMs = safeDuration(callbackRawCpuMs);
+    const callbackTailMs = callbackRawCpuMs === null ? null : round(callbackRawCpuMs - this.previousFrameCpuMs!);
     if (
       this.windowFrames &&
       (intervalEndMs - this.windowFrames.fromMs >= 1000 ||
@@ -333,6 +361,8 @@ export class SessionDiagnostics {
       frameMs: [],
       cpuMs: [],
       gpuMs: [],
+      previousCallbackCpuMs: [],
+      previousCallbackTailMs: [],
       phaseTotals: {},
       phaseMax: {},
       enginePhaseTotals: {},
@@ -349,6 +379,8 @@ export class SessionDiagnostics {
     windowFrames.frameMs.push(round(frame.frameMs));
     windowFrames.cpuMs.push(safeDuration(frame.cpuMs) ?? 0);
     windowFrames.gpuMs.push(safeDuration(frame.gpuMs));
+    windowFrames.previousCallbackCpuMs.push(callbackCpuMs);
+    windowFrames.previousCallbackTailMs.push(callbackTailMs);
     const phases: Record<string, number> = {};
     for (const [name, value] of Object.entries(frame.phases).slice(0, 32)) {
       if (!/^[a-zA-Z][a-zA-Z0-9_]{0,40}$/.test(name)) continue;
@@ -389,7 +421,9 @@ export class SessionDiagnostics {
         intervalEndMs,
         recordedAtMs: now,
         currentCpuStartMs: frame.frameStartedAtMs ?? null,
-        previousFrame: this.previousFrame,
+        previousFrame: this.previousFrame && frame.previousCallback
+          ? { ...this.previousFrame, callbackCpuMs, callbackTailMs }
+          : this.previousFrame,
         previousContext,
         previousContextAgeMs: Number.isFinite(previousContextAt)
           ? now - previousContextAt
@@ -411,6 +445,7 @@ export class SessionDiagnostics {
       phases,
       renderWork: frame.renderWork,
     };
+    this.previousFrameCpuMs = Number.isFinite(frame.cpuMs) && frame.cpuMs >= 0 ? frame.cpuMs : null;
     const recorderMs = Math.max(0, this.environment.now() - now);
     windowFrames.recorderCpuMs += recorderMs;
     windowFrames.recorderMaxMs = Math.max(
@@ -467,6 +502,14 @@ export class SessionDiagnostics {
     const sorted = [...frames.frameMs].sort((a, b) => a - b);
     const sum = frames.frameMs.reduce((total, value) => total + value, 0);
     const gpu = frames.gpuMs.filter((value): value is number => value !== null);
+    let callbackSamples = 0, callbackTotal = 0, tailTotal = 0;
+    for (let index = 0; index < frames.previousCallbackCpuMs.length; index++) {
+      const cpu = frames.previousCallbackCpuMs[index];
+      if (cpu === null) continue;
+      callbackSamples++;
+      callbackTotal += cpu;
+      tailTotal += frames.previousCallbackTailMs[index]!;
+    }
     this.enqueue("frame-window", {
       ...frames,
       summary: {
@@ -484,6 +527,9 @@ export class SessionDiagnostics {
           ? round(gpu.reduce((total, value) => total + value, 0) / gpu.length)
           : null,
         gpuSamples: gpu.length,
+        previousCallbackSamples: callbackSamples,
+        previousCallbackCpuMeanMs: callbackSamples ? round(callbackTotal / callbackSamples) : null,
+        previousCallbackTailMeanMs: callbackSamples ? round(tailTotal / callbackSamples) : null,
         hitches50: frames.frameMs.filter((value) => value >= 50).length,
       },
     });
@@ -737,6 +783,7 @@ export class SessionDiagnostics {
       this.finishWindow();
       this.afterVisibilityChange = reason !== "start";
       this.previousFrame = null;
+      this.previousFrameCpuMs = null;
       this.event("browser-state", {
         reason,
         visibility: this.visibility(),

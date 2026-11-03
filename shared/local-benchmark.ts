@@ -37,6 +37,32 @@ const fields = (value: unknown, keys: readonly string[], nullable = false) => {
       result[key] = nullable && raw[key] === null ? null : number(raw[key]);
   return result;
 };
+// A 10s HUD sample fits even at high refresh rates, with room for metadata
+// under the collector's independent 256 KiB body limit. Never truncate evidence.
+export const MAX_LOCAL_BENCHMARK_FRAME_INTERVALS = 8192;
+function projectFrameIntervals(value: unknown, frames: number) {
+  if (!Array.isArray(value) || value.length !== frames ||
+      value.length > MAX_LOCAL_BENCHMARK_FRAME_INTERVALS)
+    throw new Error("frame intervals");
+  const result: number[] = [];
+  // Explicit indices reject sparse arrays; only detached primitive values leave.
+  for (let i = 0; i < value.length; i++) result.push(number(value[i], 0, 1200000));
+  return result;
+}
+function projectFrameWork(value: unknown) {
+  const raw = object(value);
+  const result: Record<string, number | string | null> = fields(raw, ["cpuMs", "gpuMs"], true);
+  if (raw.webgpuMainPassMs !== undefined || raw.webgpuMainPassScope !== undefined) {
+    choice(raw.webgpuMainPassScope, ["main-render-pass-only"]);
+    if (raw.webgpuMainPassMs !== undefined) {
+      // The native reader treats missing/zero/stale samples as unknown, not free.
+      const ms = raw.webgpuMainPassMs === null ? null : number(raw.webgpuMainPassMs, 0, 1200000);
+      result.webgpuMainPassMs = ms === 0 ? null : ms;
+    }
+    result.webgpuMainPassScope = "main-render-pass-only";
+  }
+  return result;
+}
 const triple = (value: unknown) => {
   if (!Array.isArray(value) || value.length !== 3) throw new Error("triple");
   return value.map((v) => number(v));
@@ -291,8 +317,7 @@ export function projectLocalBenchmark(value: unknown) {
   if (raw.ambient)
     result.ambient = fields(raw.ambient, ["buses", "passengers", "cars"]);
   if (raw.sceneView) result.sceneView = projectSceneView(raw.sceneView);
-  if (raw.frameWork)
-    result.frameWork = fields(raw.frameWork, ["cpuMs", "gpuMs"], true);
+  if (raw.frameWork) result.frameWork = projectFrameWork(raw.frameWork);
   // Exact numeric whitelist; no renderer names, paths or arbitrary stage keys.
   if (raw.engineCpuBreakdownMs)
     result.engineCpuBreakdownMs = fields(raw.engineCpuBreakdownMs, [
@@ -388,5 +413,7 @@ export function projectLocalBenchmark(value: unknown) {
     result.treePilot = choice(raw.treePilot, ["own", "mtree"]);
     if (!result.terrainReview) throw new Error("tree pilot requires static review");
   }
+  if (raw.frameIntervalsMs !== undefined)
+    result.frameIntervalsMs = projectFrameIntervals(raw.frameIntervalsMs, frames);
   return result;
 }

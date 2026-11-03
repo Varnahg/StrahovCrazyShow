@@ -5,7 +5,7 @@ import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { createLocalBenchmarkHandler } from "../server/local-benchmarks";
-import { projectLocalBenchmark } from "../shared/local-benchmark";
+import { MAX_LOCAL_BENCHMARK_FRAME_INTERVALS, projectLocalBenchmark } from "../shared/local-benchmark";
 import { terrainReviewIdentity, TERRAIN_REVIEW_PRESETS } from "../client/terrain-review";
 const origin = "http://127.0.0.1:4179",
   snapshot = "a".repeat(64);
@@ -62,6 +62,57 @@ function sample() {
     },
   };
 }
+
+test("complete frame intervals and explicitly scoped main-pass GPU timing survive both privacy projections", () => {
+  const intervals: number[] = Array.from({ length: 600 }, (_, i) => i === 321 ? 1329.6 : 16.7);
+  const raw = {
+    ...sample(), frameIntervalsMs: intervals,
+    frameWork: { cpuMs: 8.555, gpuMs: null, webgpuMainPassMs: 4.25,
+      webgpuMainPassScope: "main-render-pass-only", private: "drop" },
+  };
+  const browser = projectLocalBenchmark(raw), server = projectLocalBenchmark(browser);
+  assert.deepEqual(browser.frameIntervalsMs, intervals);
+  assert.deepEqual(server, browser);
+  assert.deepEqual(server.frameWork, { cpuMs: 8.555, gpuMs: null,
+    webgpuMainPassMs: 4.25, webgpuMainPassScope: "main-render-pass-only" });
+  assert.ok(!JSON.stringify(server).includes("private"));
+  intervals[321] = 0;
+  browser.frameIntervalsMs[321] = 1;
+  assert.equal(server.frameIntervalsMs[321], 1329.6, "stored values detach from both incoming arrays");
+  const legacy = projectLocalBenchmark(sample());
+  assert.equal(Object.hasOwn(legacy, "frameIntervalsMs"), false);
+  assert.deepEqual(legacy.frameWork, { cpuMs: 8.555, gpuMs: null });
+});
+
+test("frame interval evidence is bounded, finite, dense and exactly matches the recorded frame count", () => {
+  for (const frameIntervalsMs of [null, {}, "16", [], [16], new Float64Array(600),
+    new Array(600), ...[NaN, Infinity, -1, 1200000.1, "16", null, undefined, {}].map(value =>
+      Array.from({ length: 600 }, (_, i) => i === 32 ? value : 16))])
+    assert.throws(() => projectLocalBenchmark({ ...sample(), frameIntervalsMs }));
+  assert.throws(() => projectLocalBenchmark({ ...sample(), frames: 8193,
+    frameIntervalsMs: Array(8193).fill(16) }));
+  const edge = projectLocalBenchmark({ ...sample(), frames: 2, frameIntervalsMs: [0, 1200000] });
+  assert.deepEqual(edge.frameIntervalsMs, [0, 1200000]);
+});
+
+test("main-pass timing remains unknown for zero/null and never survives without its exact scope", () => {
+  for (const webgpuMainPassMs of [0, null]) {
+    const result = projectLocalBenchmark({ ...sample(), frameWork: {
+      webgpuMainPassMs, webgpuMainPassScope: "main-render-pass-only" } });
+    assert.deepEqual(result.frameWork, { webgpuMainPassMs: null, webgpuMainPassScope: "main-render-pass-only" });
+    assert.deepEqual(projectLocalBenchmark(result), result);
+  }
+  for (const frameWork of [
+    { webgpuMainPassMs: 4 }, { webgpuMainPassMs: null },
+    { webgpuMainPassMs: 4, webgpuMainPassScope: "whole-frame" },
+    { webgpuMainPassMs: 4, webgpuMainPassScope: null },
+    ...[-1, NaN, Infinity, 1200000.1, "4", {}, false].map(webgpuMainPassMs =>
+      ({ webgpuMainPassMs, webgpuMainPassScope: "main-render-pass-only" })),
+  ]) assert.throws(() => projectLocalBenchmark({ ...sample(), frameWork }));
+  const scopeOnly = projectLocalBenchmark({ ...sample(), frameWork: { webgpuMainPassScope: "main-render-pass-only" } });
+  assert.deepEqual(scopeOnly.frameWork, { webgpuMainPassScope: "main-render-pass-only" });
+  assert.deepEqual(projectLocalBenchmark(scopeOnly), scopeOnly);
+});
 
 test("projection retains exact bounded terrain review evidence across both UI and server passes, never source prose", () => {
   for (const preset of Object.values(TERRAIN_REVIEW_PRESETS)) {
@@ -772,5 +823,41 @@ test("256 KiB limit covers declared and chunked bodies without creating files", 
     r.end();
   });
   assert.equal(status, 413);
+  assert.deepEqual(await f.files(), []);
+});
+
+test("full capped intervals fit the existing HTTP limit and are persisted with main-pass scope", async (t) => {
+  const f = await fixture(t);
+  // Long shortest-decimal numbers plus maximal permitted multibyte GPU text.
+  const intervals = Array(MAX_LOCAL_BENCHMARK_FRAME_INTERVALS).fill(0.0000010000000000000002);
+  intervals[4111] = 1329.6;
+  const projected = projectLocalBenchmark({ ...sample(), frames: intervals.length, frameIntervalsMs: intervals,
+    gpu: { ...sample().gpu, renderer: "\u0800".repeat(512), vendor: "\u0800".repeat(512), version: "\u0800".repeat(512) },
+    frameWork: { cpuMs: 66, gpuMs: null, webgpuMainPassMs: 4.25, webgpuMainPassScope: "main-render-pass-only" },
+  });
+  const bytes = Buffer.byteLength(JSON.stringify(projected));
+  assert.ok(bytes < 256 * 1024, "complete capped evidence must leave space for projected metadata");
+  t.diagnostic(`Capped projected payload: ${bytes} bytes of ${256 * 1024}`);
+  assert.equal((await f.post(projected)).status, 201);
+  const saved = await f.files(); assert.equal(saved.length, 1);
+  const stored = JSON.parse(await readFile(join(f.directory, "records", saved[0]), "utf8"));
+  assert.deepEqual(stored.benchmark, projected);
+  assert.equal(stored.benchmark.frameIntervalsMs.length, MAX_LOCAL_BENCHMARK_FRAME_INTERVALS);
+  assert.equal(stored.benchmark.frameIntervalsMs[4111], 1329.6);
+  assert.deepEqual(stored.benchmark.frameWork, projected.frameWork);
+});
+
+test("malformed interval or GPU evidence cannot create an HTTP record", async (t) => {
+  const f = await fixture(t);
+  for (const changes of [
+    { frameIntervalsMs: [16] },
+    { frameIntervalsMs: Array(600).fill(null) },
+    { frameIntervalsMs: Array(600).fill(-1) },
+    { frames: MAX_LOCAL_BENCHMARK_FRAME_INTERVALS + 1, frameIntervalsMs: Array(MAX_LOCAL_BENCHMARK_FRAME_INTERVALS + 1).fill(16) },
+    { frameWork: { webgpuMainPassMs: 4 } },
+    { frameWork: { webgpuMainPassMs: 4, webgpuMainPassScope: "whole-frame" } },
+  ]) {
+    f.advance(); assert.equal((await f.post({ ...sample(), ...changes })).status, 400);
+  }
   assert.deepEqual(await f.files(), []);
 });

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "gameplay-callback-timing-20261103",
+  "title": "Spárovat úplný Game callback s následujícím snímkovým intervalem",
+  "status": "done",
+  "dependsOn": ["gameplay-smoothness-research-20261103"],
+  "writePaths": ["client/game.ts", "client/session-diagnostics.ts", "tests/session-diagnostics.test.ts", "tests/game-diagnostics.test.ts", "tests/game-diagnostics-projection.test.ts", "docs/agents/handoffs/gameplay-callback-timing-20261103.md", ".cache/gameplay-callback-timing-20261103/"],
+  "resources": [],
+  "acceptance": ["Zachovat význam dosavadního cpuMs/phases; doplnit čas celého předchozího Game callbacku včetně recorder/HUD, přesně spárovaný timestampem.", "Žádné tvrzení CPU/GPU execution, žádné nové rendererhooks ani změna hry; bounded číselná data a lifecycle/visibility/generation invalidace.", "Implementace, cílený refaktoring a skutečné regresní testy společně, bez commitu autora."],
+  "verification": ["Lehké přímé Node cílené testy správného/nesprávného párování, tail, recorder self-cost a boundary resetů; skutečné Game wiring fixture a privacy roundtrip.", "Žádný build/GPU/server nebo pnpm auto-install; root integruje společný checkpoint."],
+  "notes": ["Konkrétní delegace dle výzkumu C9. Čas do labels není celýcallback; lastCpuFrameMs na konci už existuje. Nejmenší doplněk existujícího recordFrame řetězce, bez nového profilerframeworku.", "Root po frozenhandoff50/50 převzal Game/recorder. Přidělen navazující malý Game wiring: samostatný strictloopback profileFrameLifecycle=1 pro již existujícíhelper, bounded sloweventreporting a benchmarkstart/end snapshoty. Žádné nové hookmetody ani shaderinventory; defaultOFF. Důvod: profileEnvironment současně aktivuje drahýinventář, nevhodný pro cílené rozlišení engine tailu."]
+}
