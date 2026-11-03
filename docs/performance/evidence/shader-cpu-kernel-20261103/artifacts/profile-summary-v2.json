@@ -1,0 +1,184 @@
+{
+  "scope": "Statistical Node CPU samples for entire process including imports/fixture/warmup and hashing. Categories are disjoint by deepest relevant phase; callback nesting excluded from includes. Not exact wall-clock phase timing.",
+  "samples": 6384,
+  "totalSampledMs": 10341.934,
+  "categories": [
+    {
+      "category": "includes",
+      "ms": 3698.247,
+      "percent": 35.759723471451274
+    },
+    {
+      "category": "parse-tree+expressions",
+      "ms": 1995.537,
+      "percent": 19.295588233303366
+    },
+    {
+      "category": "other",
+      "ms": 1352.479,
+      "percent": 13.077621651810967
+    },
+    {
+      "category": "walk+callbacks",
+      "ms": 1030.433,
+      "percent": 9.963639296092975
+    },
+    {
+      "category": "preProcess",
+      "ms": 570.733,
+      "percent": 5.518629300863842
+    },
+    {
+      "category": "cursor",
+      "ms": 487.68,
+      "percent": 4.7155590047277425
+    },
+    {
+      "category": "generic-residual",
+      "ms": 439.716,
+      "percent": 4.251777278795243
+    },
+    {
+      "category": "finalize",
+      "ms": 380.822,
+      "percent": 3.6823093243488114
+    },
+    {
+      "category": "gc",
+      "ms": 208.614,
+      "percent": 2.0171662282896023
+    },
+    {
+      "category": "post",
+      "ms": 170.394,
+      "percent": 1.6476028564869973
+    },
+    {
+      "category": "after-includes-callback",
+      "ms": 7.279,
+      "percent": 0.0703833538291774
+    }
+  ],
+  "topSelf": [
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:308:ProcessIncludes",
+      "ms": 3470.845
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:167:MoveCursor",
+      "ms": 735.573
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:103:BuildSubExpression",
+      "ms": 540.753
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Misc/codeStringParsingTools.js:95:RemoveComments",
+      "ms": 523.208
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderCodeCursor.js:12:set lines",
+      "ms": 487.68
+    },
+    {
+      "location": ":0:RegExp: (flat|linear|perspective)?\\s*(center|centroid|sample)?\\s*\\bvarying\\b",
+      "ms": 468.187
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:223:EvaluatePreProcessors",
+      "ms": 348.97
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderCodeNode.js:12:process",
+      "ms": 240.944
+    },
+    {
+      "location": ":0:RegExp: #include\\s?<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
+      "ms": 217.299
+    },
+    {
+      "location": ":0:(garbage collector)",
+      "ms": 208.614
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/Expressions/shaderDefineExpression.js:41:infixToPostfix",
+      "ms": 180.759
+    },
+    {
+      "location": ":0:internalModuleStat",
+      "ms": 160.037
+    },
+    {
+      "location": "node:internal/child_process:1176:spawnSync",
+      "ms": 145.703
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/WebGPU/webgpuShaderProcessorsWGSL.pure.js:231:postProcessor",
+      "ms": 141.84
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:133:BuildExpression",
+      "ms": 134.061
+    },
+    {
+      "location": "node:internal/crypto/hash:186:update",
+      "ms": 130.175
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:149:MoveCursorWithinIf",
+      "ms": 125.111
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/WebGPU/webgpuShaderProcessorsWGSL.pure.js:285:finalizeShaders",
+      "ms": 117.908
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/docs/performance/evidence/shader-cpu-kernel-20261103/kernel.mjs:87:run",
+      "ms": 114.888
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:81:ExtractOperation",
+      "ms": 99.948
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js:233:PreparePreProcessors",
+      "ms": 90.746
+    },
+    {
+      "location": "node:internal/modules/esm/utils:317:compileSourceTextModule",
+      "ms": 84.943
+    },
+    {
+      "location": ":0:lstat",
+      "ms": 84.936
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/Processors/Expressions/Operators/shaderDefineIsDefinedOperator.js:9:isTrue",
+      "ms": 83.453
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/docs/performance/evidence/shader-cpu-kernel-20261103/kernel.mjs:113:outputIdentity",
+      "ms": 80.815
+    },
+    {
+      "location": ":0:RegExp: (#ifdef)|(#else)|(#elif)|(#endif)|(#ifndef)|(#if)",
+      "ms": 78.885
+    },
+    {
+      "location": ":0:RegExp: var\\s+(\\w+Sampler)\\s*:\\s*(sampler|sampler_comparison)\\s*;",
+      "ms": 52.305
+    },
+    {
+      "location": ":0:RegExp: var\\s+(\\w+)\\s*:\\s*((array<\\s*)?(texture_\\w+)\\s*(<\\s*(.+)\\s*>)?\\s*(,\\s*\\w+\\s*>\\s*)?);",
+      "ms": 47.645
+    },
+    {
+      "location": "file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/node_modules/.pnpm/@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d/node_modules/@babylonjs/core/Engines/WebGPU/webgpuShaderProcessorsWGSL.pure.js:69:preProcessShaderCode",
+      "ms": 47.525
+    },
+    {
+      "location": ":0:RegExp: uniform\\s+(\\w+)\\s*:\\s*(.+)\\s*;",
+      "ms": 47.316
+    }
+  ]
+}

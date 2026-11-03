@@ -219,17 +219,25 @@ test("actual preload callback does no controller work or render after cancellati
   game.scene.render = () => {
     draws++;
   };
-  const render = compile(`let pipelinePreparation;
+  const probe = { material: 0, shader: 0, targets: 0 };
+  Object.assign(game, { compilationProfile: { get shaderPreparationCompletions() { probe.shader++; return 1; } } });
+  const render = compile(`let pipelinePreparation, renderedShaderCompletions = 0;
+    const probe = arguments[0];
+    const materialPreparation = { prepareFrame: () => probe.material++ };
+    const shaderPreparation = { snapshot: () => { probe.shader++; return { completed: 1 }; } };
+    const retryPreparationTargets = () => probe.targets++;
     const renderPreloadScene = ${drawScene.initializer.getText(source)};
     return ${preload.initializer.getText(source)};`).call(
-    game,
+    game, probe,
   );
   render();
   const stats = { ...game.stableLights.stats };
+  assert.deepEqual(probe, { material: 1, shader: 1, targets: 1 });
   game.disposed = true;
   render();
   assert.equal(draws, 1);
   assert.deepEqual(game.stableLights.stats, stats);
+  assert.deepEqual(probe, { material: 1, shader: 1, targets: 1 });
 });
 
 test("actual Game disposal detaches controllers before scene teardown and is idempotent", (t) => {

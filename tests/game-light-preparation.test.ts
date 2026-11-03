@@ -290,6 +290,34 @@ test("actual Game light stages wait for pipeline and complete-frame readiness", 
   assert.ok(result.stages.every((stage: { renders: number }) => stage.renders >= 3));
 });
 
+test("local multiplayer records the actual last readiness gate without extra probes", async (t) => {
+  const f = fixture(t); f.game.localPreparationDiagnostics = true; f.game.network = true;
+  let calls = 0;
+  const preparation = f.start({ isReady: () => { calls++; return false; } });
+  for (let i = 0; i < 12; i++) f.tick();
+  assert.equal(f.game.lightingReadiness.lastGate, "pipeline");
+  assert.equal(f.game.lightingReadiness.waits.pipeline, calls);
+  assert.equal(f.game.lightingReadiness.mesh, null);
+  f.timeout();
+  assert.equal((await preparation).status, "timeout");
+});
+
+test("local multiplayer readiness retains technical tags without avatar identity", async (t) => {
+  const f = fixture(t); f.game.localPreparationDiagnostics = true; f.game.network = true;
+  const playerId = "12345678-abcd-4567-89ab-123456789abc";
+  const mesh = f.scene.getActiveMeshes().data[0];
+  mesh.name = `avatar ${playerId} clothed torso`;
+  assert.ok(mesh.material); mesh.material.name = `avatar ${playerId} garment`;
+  mesh.isReady = () => false;
+  const preparation = f.start();
+  for (let i = 0; i < 5; i++) f.tick();
+  assert.equal(f.game.lightingReadiness.lastGate, "mesh");
+  assert.match(f.game.lightingReadiness.mesh, /^mesh#\d+$/);
+  assert.match(f.game.lightingReadiness.material, /^material#\d+$/);
+  assert.equal(JSON.stringify(f.game.lightingReadiness).includes(playerId), false);
+  f.timeout(); await preparation;
+});
+
 test("clear-weather preparation waits for the disabled precipitation shader before advancing", async (t) => {
   const f = fixture(t);
   let ready = false, checks = 0;
@@ -579,7 +607,7 @@ test("production startup awaits preparation before ready and records its outcome
   const start = declaration.members
     .find((node) => node.name?.getText(source) === "start")!
     .getText(source);
-  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender, pipelinePreparation\)/);
+  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender,/);
   assert.ok(prepare > start.indexOf("this.updatePlayers([this.localPlayer])"));
   assert.ok(
     prepare > start.indexOf("this.engine.stopRenderLoop(preloadRender)"),

@@ -1,0 +1,3198 @@
+{
+  "schemaVersion": 1,
+  "sourceHash": "a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904",
+  "sourceCommit": "fdc7b91911e1ef0ca655bddce7b6a8e077c907e2",
+  "note": "All attempts preserved; nested CPU and overlapping async timings cannot be summed. Inactive diagnostic is not gameplay FPS. Foreground-normal is the primary in-code stall evidence.",
+  "sessions": [
+    {
+      "id": "d0e08c1e-330d-4128-864b-00724f274822",
+      "role": "inactive-cadence-diagnostic",
+      "path": ".cache/game-diagnostics/d0e08c1e-330d-4128-864b-00724f274822.jsonl",
+      "sha256": "fca970aadbe4d926e9cfdcc349c669ec4d10b63b306ed381b56ec63158ea6dd4",
+      "bytes": 126986,
+      "recordCount": 202,
+      "presentation": {
+        "observedBrowserHz": null,
+        "reliable": false,
+        "samples": 1,
+        "p10FrameMs": 1015.5,
+        "medianFrameMs": 1015.5,
+        "p95FrameMs": 1015.5,
+        "reason": "timeout",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "lighting": {
+        "status": "timeout",
+        "elapsedMs": 30043.700000047684,
+        "activeElapsedMs": 30043.700000047684,
+        "pausedMs": 0,
+        "failureStep": null,
+        "stages": [
+          {
+            "stage": "vehicle-0",
+            "elapsedMs": 15293.800000190735,
+            "activeElapsedMs": 15293.800000190735,
+            "pausedMs": 0,
+            "tickCount": 16,
+            "rafGap": {
+              "count": 16,
+              "totalMs": 15283.700000047684,
+              "maxMs": 1060
+            },
+            "cpu": {
+              "apply": {
+                "calls": 3,
+                "totalMs": 63.00000023841858,
+                "maxMs": 31.800000190734863
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 133,
+                "maxMs": 23.899999856948853
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 1161.7999999523163,
+                "maxMs": 486.80000019073486
+              }
+            },
+            "restartReasons": {
+              "meshes": 2
+            },
+            "checks": 696,
+            "renders": 6,
+            "restarts": 2,
+            "passQuality": "low"
+          },
+          {
+            "stage": "vehicle-1",
+            "elapsedMs": 13743.899999856949,
+            "activeElapsedMs": 13743.899999856949,
+            "pausedMs": 0,
+            "tickCount": 14,
+            "rafGap": {
+              "count": 14,
+              "totalMs": 13471.5,
+              "maxMs": 1016
+            },
+            "cpu": {
+              "apply": {
+                "calls": 2,
+                "totalMs": 12.600000143051147,
+                "maxMs": 8.800000190734863
+              },
+              "checkBatch": {
+                "calls": 12,
+                "totalMs": 131.59999990463257,
+                "maxMs": 27.90000009536743
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 695.4999997615814,
+                "maxMs": 616.6999998092651
+              }
+            },
+            "restartReasons": {
+              "weather": 1
+            },
+            "checks": 913,
+            "renders": 4,
+            "restarts": 1,
+            "passQuality": "low"
+          }
+        ],
+        "qualities": [
+          {
+            "quality": "low",
+            "finalPass": false,
+            "status": "timeout",
+            "failureStep": null,
+            "elapsedMs": 30043.60000014305,
+            "activeElapsedMs": 30043.60000014305,
+            "pausedMs": 0,
+            "stageCount": 2
+          }
+        ]
+      },
+      "compilation": {
+        "glslToSpirv": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "spirvToWgsl": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "compilerLoad": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderPreparation": {
+          "calls": 92,
+          "completed": 92,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 459,
+          "cpuMaxMs": 12.5,
+          "asyncTotalMs": 17093.80000257492,
+          "asyncMaxMs": 593.7000000476837
+        },
+        "shaderModule": {
+          "calls": 184,
+          "completed": 184,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 23.79999852180481,
+          "cpuMaxMs": 0.5999999046325684,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderValidation": {
+          "calls": 184,
+          "completed": 184,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 2.6000006198883057,
+          "cpuMaxMs": 0.20000004768371582,
+          "asyncTotalMs": 47347.300005197525,
+          "asyncMaxMs": 615.5999999046326
+        },
+        "syncPipeline": {
+          "calls": 29,
+          "completed": 29,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0.7999997138977051,
+          "cpuMaxMs": 0.10000014305114746,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "asyncPipeline": {
+          "calls": 78,
+          "completed": 78,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 2.700000047683716,
+          "cpuMaxMs": 0.20000004768371582,
+          "asyncTotalMs": 26581.900002241135,
+          "asyncMaxMs": 593.2000000476837
+        },
+        "submit": {
+          "calls": 74,
+          "completed": 74,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 2.400001049041748,
+          "cpuMaxMs": 0.20000004768371582,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        }
+      },
+      "slowShaderModule": [],
+      "frameProfiles": [
+        {
+          "stage": "preparation-start",
+          "rawRaf": {
+            "availability": "observing",
+            "epoch": 1,
+            "source": "engine-host",
+            "deliveryClock": "same-window-or-explicit-injection",
+            "callbacks": 10,
+            "intervals": {
+              "count": 9,
+              "totalMs": 10490.599999999977,
+              "maxMs": 2031.5,
+              "recentSamples": 9,
+              "recentP50Ms": 1015.7999999999884,
+              "recentP95Ms": 2031.5
+            },
+            "deliveryDelay": {
+              "count": 10,
+              "totalMs": 2941.100000858307,
+              "maxMs": 1251.9000000953674,
+              "recentSamples": 10,
+              "recentP50Ms": 5.200000047683716,
+              "recentP95Ms": 1079.3000001430628
+            }
+          },
+          "engineCadence": {
+            "processIntervals": {
+              "count": 7,
+              "totalMs": 7770.299999952316,
+              "maxMs": 2093.4000000953674,
+              "recentSamples": 7,
+              "recentP50Ms": 1007.8000001907349,
+              "recentP95Ms": 1515.2999999523163
+            },
+            "renderCallbackIntervals": {
+              "count": 7,
+              "totalMs": 7770,
+              "maxMs": 2093.4000000953674,
+              "recentSamples": 7,
+              "recentP50Ms": 1007.6000001430511,
+              "recentP95Ms": 1515.3999998569489
+            },
+            "timestampIntervals": {
+              "count": 7,
+              "totalMs": 8459.299999999988,
+              "maxMs": 2031.5,
+              "recentSamples": 7,
+              "recentP50Ms": 1015.7999999999884,
+              "recentP95Ms": 2031.5
+            },
+            "queueToProcess": {
+              "count": 8,
+              "totalMs": 7075.700000524521,
+              "maxMs": 2067.600000143051,
+              "recentSamples": 8,
+              "recentP50Ms": 895.6000001430511,
+              "recentP95Ms": 1339.1000001430511
+            },
+            "skippedByMaxFPS": 0
+          }
+        },
+        {
+          "stage": "preparation-end",
+          "rawRaf": {
+            "availability": "observing",
+            "epoch": 1,
+            "source": "engine-host",
+            "deliveryClock": "same-window-or-explicit-injection",
+            "callbacks": 40,
+            "intervals": {
+              "count": 39,
+              "totalMs": 46309.29999999999,
+              "maxMs": 7110.399999999994,
+              "recentSamples": 39,
+              "recentP50Ms": 1015.7999999999884,
+              "recentP95Ms": 2031.5
+            },
+            "deliveryDelay": {
+              "count": 40,
+              "totalMs": 9032.100003099418,
+              "maxMs": 6057.399999999994,
+              "recentSamples": 40,
+              "recentP50Ms": 1.0000001430453267,
+              "recentP95Ms": 1079.3000001430628
+            }
+          },
+          "engineCadence": {
+            "processIntervals": {
+              "count": 37,
+              "totalMs": 43027,
+              "maxMs": 6510.200000047684,
+              "recentSamples": 37,
+              "recentP50Ms": 1015.7000000476837,
+              "recentP95Ms": 1515.2999999523163
+            },
+            "renderCallbackIntervals": {
+              "count": 37,
+              "totalMs": 43026.700000047684,
+              "maxMs": 6510.100000143051,
+              "recentSamples": 37,
+              "recentP50Ms": 1015.7999999523163,
+              "recentP95Ms": 1515.3999998569489
+            },
+            "timestampIntervals": {
+              "count": 37,
+              "totalMs": 44278,
+              "maxMs": 7110.399999999994,
+              "recentSamples": 37,
+              "recentP50Ms": 1015.7999999999884,
+              "recentP95Ms": 2031.5
+            },
+            "queueToProcess": {
+              "count": 38,
+              "totalMs": 33626.200001716614,
+              "maxMs": 2067.600000143051,
+              "recentSamples": 38,
+              "recentP50Ms": 993.4000000953674,
+              "recentP95Ms": 1012.5
+            },
+            "skippedByMaxFPS": 0
+          }
+        },
+        {
+          "stage": "engine-disposed",
+          "rawRaf": {
+            "availability": "stopped",
+            "epoch": 2,
+            "source": "engine-host",
+            "deliveryClock": "same-window-or-explicit-injection",
+            "callbacks": 40,
+            "intervals": {
+              "count": 39,
+              "totalMs": 46309.29999999999,
+              "maxMs": 7110.399999999994,
+              "recentSamples": 39,
+              "recentP50Ms": 1015.7999999999884,
+              "recentP95Ms": 2031.5
+            },
+            "deliveryDelay": {
+              "count": 40,
+              "totalMs": 9032.100003099418,
+              "maxMs": 6057.399999999994,
+              "recentSamples": 40,
+              "recentP50Ms": 1.0000001430453267,
+              "recentP95Ms": 1079.3000001430628
+            }
+          },
+          "engineCadence": {
+            "processIntervals": {
+              "count": 37,
+              "totalMs": 43027,
+              "maxMs": 6510.200000047684,
+              "recentSamples": 37,
+              "recentP50Ms": 1015.7000000476837,
+              "recentP95Ms": 1515.2999999523163
+            },
+            "renderCallbackIntervals": {
+              "count": 37,
+              "totalMs": 43026.700000047684,
+              "maxMs": 6510.100000143051,
+              "recentSamples": 37,
+              "recentP50Ms": 1015.7999999523163,
+              "recentP95Ms": 1515.3999998569489
+            },
+            "timestampIntervals": {
+              "count": 37,
+              "totalMs": 44278,
+              "maxMs": 7110.399999999994,
+              "recentSamples": 37,
+              "recentP50Ms": 1015.7999999999884,
+              "recentP95Ms": 2031.5
+            },
+            "queueToProcess": {
+              "count": 38,
+              "totalMs": 33626.200001716614,
+              "maxMs": 2067.600000143051,
+              "recentSamples": 38,
+              "recentP50Ms": 993.4000000953674,
+              "recentP95Ms": 1012.5
+            },
+            "skippedByMaxFPS": 0
+          }
+        }
+      ],
+      "ready": false
+    },
+    {
+      "id": "e675bb96-8f7a-4311-808c-2a37eea3152f",
+      "role": "foreground-instrumented",
+      "path": ".cache/game-diagnostics/e675bb96-8f7a-4311-808c-2a37eea3152f.jsonl",
+      "sha256": "5e6b4a10256179af20a33b18c2b15c6b5752f34b80aa2d9db958de7c6f4b8966",
+      "bytes": 316001,
+      "recordCount": 1047,
+      "presentation": {
+        "observedBrowserHz": 59.9,
+        "reliable": true,
+        "samples": 86,
+        "p10FrameMs": 16.5,
+        "medianFrameMs": 16.69999999999709,
+        "p95FrameMs": 16.80000000000291,
+        "reason": "ok",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "lighting": {
+        "status": "timeout",
+        "elapsedMs": 55689,
+        "activeElapsedMs": 55689,
+        "pausedMs": 0,
+        "failureStep": null,
+        "stages": [
+          {
+            "stage": "vehicle-0",
+            "elapsedMs": 2342.5,
+            "activeElapsedMs": 2342.5,
+            "pausedMs": 0,
+            "tickCount": 23,
+            "rafGap": {
+              "count": 23,
+              "totalMs": 2333.800000190735,
+              "maxMs": 707.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 3,
+                "totalMs": 62.89999985694885,
+                "maxMs": 34.39999985694885
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 315.599999666214,
+                "maxMs": 63.90000009536743
+              },
+              "render": {
+                "calls": 9,
+                "totalMs": 1187.5999994277954,
+                "maxMs": 617.7999999523163
+              }
+            },
+            "restartReasons": {
+              "meshes": 2
+            },
+            "checks": 913,
+            "renders": 9,
+            "restarts": 2,
+            "passQuality": "low"
+          },
+          {
+            "stage": "vehicle-1",
+            "elapsedMs": 803.1000001430511,
+            "activeElapsedMs": 803.1000001430511,
+            "pausedMs": 0,
+            "tickCount": 13,
+            "rafGap": {
+              "count": 13,
+              "totalMs": 798.8999998569489,
+              "maxMs": 585.3000001907349
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 6.599999904632568,
+                "maxMs": 6.599999904632568
+              },
+              "checkBatch": {
+                "calls": 12,
+                "totalMs": 114.90000033378601,
+                "maxMs": 21.100000143051147
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 637.8999998569489,
+                "maxMs": 577.2000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 696,
+            "renders": 4,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-off",
+            "elapsedMs": 2570.2999999523163,
+            "activeElapsedMs": 2570.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 29,
+            "rafGap": {
+              "count": 29,
+              "totalMs": 2564.2999999523163,
+              "maxMs": 1118.7999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 9.600000143051147,
+                "maxMs": 9.600000143051147
+              },
+              "checkBatch": {
+                "calls": 28,
+                "totalMs": 244.599999666214,
+                "maxMs": 42.5
+              },
+              "render": {
+                "calls": 13,
+                "totalMs": 1485.2000000476837,
+                "maxMs": 1060.0999999046326
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 13,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-on",
+            "elapsedMs": 1859.9000000953674,
+            "activeElapsedMs": 1859.9000000953674,
+            "pausedMs": 0,
+            "tickCount": 28,
+            "rafGap": {
+              "count": 28,
+              "totalMs": 1865,
+              "maxMs": 794.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 51.90000009536743,
+                "maxMs": 51.90000009536743
+              },
+              "checkBatch": {
+                "calls": 27,
+                "totalMs": 93.69999980926514,
+                "maxMs": 10.200000047683716
+              },
+              "render": {
+                "calls": 12,
+                "totalMs": 1107.7999999523163,
+                "maxMs": 740.2999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 12,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-0-off",
+            "elapsedMs": 2233.4000000953674,
+            "activeElapsedMs": 2233.4000000953674,
+            "pausedMs": 0,
+            "tickCount": 28,
+            "rafGap": {
+              "count": 28,
+              "totalMs": 2231.600000143051,
+              "maxMs": 994.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 9.700000047683716,
+                "maxMs": 9.700000047683716
+              },
+              "checkBatch": {
+                "calls": 27,
+                "totalMs": 237.5999994277954,
+                "maxMs": 43.59999990463257
+              },
+              "render": {
+                "calls": 14,
+                "totalMs": 1333.3000001907349,
+                "maxMs": 921.2999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 14,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-0-on",
+            "elapsedMs": 1663,
+            "activeElapsedMs": 1663,
+            "pausedMs": 0,
+            "tickCount": 23,
+            "rafGap": {
+              "count": 23,
+              "totalMs": 1665.2000000476837,
+              "maxMs": 572.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 37.30000019073486,
+                "maxMs": 37.30000019073486
+              },
+              "checkBatch": {
+                "calls": 22,
+                "totalMs": 67.2000002861023,
+                "maxMs": 10.200000047683716
+              },
+              "render": {
+                "calls": 13,
+                "totalMs": 747.3999996185303,
+                "maxMs": 468.7000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 13,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-1-off",
+            "elapsedMs": 214.39999985694885,
+            "activeElapsedMs": 214.39999985694885,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 216.5,
+              "maxMs": 67.09999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 9,
+                "maxMs": 9
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 35.99999976158142,
+                "maxMs": 5.700000047683716
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 94,
+                "maxMs": 56.799999952316284
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-1-on",
+            "elapsedMs": 233.70000004768372,
+            "activeElapsedMs": 233.70000004768372,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 233.19999980926514,
+              "maxMs": 85.89999985694885
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 21.299999952316284,
+                "maxMs": 21.299999952316284
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 37.200000286102295,
+                "maxMs": 5.6000001430511475
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 102,
+                "maxMs": 63.59999990463257
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-2-off",
+            "elapsedMs": 197.90000009536743,
+            "activeElapsedMs": 197.90000009536743,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 199.60000014305115,
+              "maxMs": 52.700000047683716
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 4.6000001430511475,
+                "maxMs": 4.6000001430511475
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 35.69999957084656,
+                "maxMs": 6.200000047683716
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 82.2999997138977,
+                "maxMs": 47.39999985694885
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-2-on",
+            "elapsedMs": 219.29999995231628,
+            "activeElapsedMs": 219.29999995231628,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 216.59999990463257,
+              "maxMs": 74.70000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 18.300000190734863,
+                "maxMs": 18.300000190734863
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 35.60000038146973,
+                "maxMs": 5.400000095367432
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 93.70000004768372,
+                "maxMs": 55.19999980926514
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-0-off",
+            "elapsedMs": 2553.2999999523163,
+            "activeElapsedMs": 2553.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 20,
+            "rafGap": {
+              "count": 20,
+              "totalMs": 2550,
+              "maxMs": 1202.4000000953674
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 26.799999952316284,
+                "maxMs": 26.799999952316284
+              },
+              "checkBatch": {
+                "calls": 19,
+                "totalMs": 269.10000014305115,
+                "maxMs": 51.59999990463257
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 1176.0999999046326,
+                "maxMs": 1045.9000000953674
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 6,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-0-on",
+            "elapsedMs": 3450.7000000476837,
+            "activeElapsedMs": 3450.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 29,
+            "rafGap": {
+              "count": 29,
+              "totalMs": 3444.600000143051,
+              "maxMs": 1632.8999998569489
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 10.899999856948853,
+                "maxMs": 10.899999856948853
+              },
+              "checkBatch": {
+                "calls": 28,
+                "totalMs": 278.69999980926514,
+                "maxMs": 53.5
+              },
+              "render": {
+                "calls": 15,
+                "totalMs": 2145.9000000953674,
+                "maxMs": 1571.6000001430511
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 15,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-1-off",
+            "elapsedMs": 2973.2999999523163,
+            "activeElapsedMs": 2973.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 27,
+            "rafGap": {
+              "count": 27,
+              "totalMs": 2980.7999999523163,
+              "maxMs": 1368.5
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 12.299999952316284,
+                "maxMs": 12.299999952316284
+              },
+              "checkBatch": {
+                "calls": 26,
+                "totalMs": 269.400000333786,
+                "maxMs": 50.59999990463257
+              },
+              "render": {
+                "calls": 13,
+                "totalMs": 1604.8999998569489,
+                "maxMs": 1231.7999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 13,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-1-on",
+            "elapsedMs": 3267.9000000953674,
+            "activeElapsedMs": 3267.9000000953674,
+            "pausedMs": 0,
+            "tickCount": 33,
+            "rafGap": {
+              "count": 33,
+              "totalMs": 3263.899999856949,
+              "maxMs": 1324.6000001430511
+            },
+            "cpu": {
+              "apply": {
+                "calls": 2,
+                "totalMs": 44.09999990463257,
+                "maxMs": 26.399999856948853
+              },
+              "checkBatch": {
+                "calls": 31,
+                "totalMs": 309.39999985694885,
+                "maxMs": 54
+              },
+              "render": {
+                "calls": 16,
+                "totalMs": 1895.5,
+                "maxMs": 1249.5
+              }
+            },
+            "restartReasons": {
+              "weather": 1
+            },
+            "checks": 886,
+            "renders": 16,
+            "restarts": 1,
+            "passQuality": "low"
+          },
+          {
+            "stage": "restore",
+            "elapsedMs": 275.7999999523163,
+            "activeElapsedMs": 275.7999999523163,
+            "pausedMs": 0,
+            "tickCount": 13,
+            "rafGap": {
+              "count": 13,
+              "totalMs": 282.90000009536743,
+              "maxMs": 67.60000014305115
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 10.900000095367432,
+                "maxMs": 10.900000095367432
+              },
+              "checkBatch": {
+                "calls": 12,
+                "totalMs": 55.50000023841858,
+                "maxMs": 9.100000143051147
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 109.20000004768372,
+                "maxMs": 55.799999952316284
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-off",
+            "elapsedMs": 2351.4000000953674,
+            "activeElapsedMs": 2351.4000000953674,
+            "pausedMs": 0,
+            "tickCount": 42,
+            "rafGap": {
+              "count": 42,
+              "totalMs": 2326.2999999523163,
+              "maxMs": 563.1000001430511
+            },
+            "cpu": {
+              "apply": {
+                "calls": 3,
+                "totalMs": 447.40000009536743,
+                "maxMs": 436.80000019073486
+              },
+              "checkBatch": {
+                "calls": 39,
+                "totalMs": 106.70000004768372,
+                "maxMs": 13.5
+              },
+              "render": {
+                "calls": 26,
+                "totalMs": 1145.5999994277954,
+                "maxMs": 122.89999985694885
+              }
+            },
+            "restartReasons": {
+              "meshes": 2
+            },
+            "checks": 2032,
+            "renders": 26,
+            "restarts": 2,
+            "passQuality": "high"
+          },
+          {
+            "stage": "current-on",
+            "elapsedMs": 2984.9000000953674,
+            "activeElapsedMs": 2984.9000000953674,
+            "pausedMs": 0,
+            "tickCount": 29,
+            "rafGap": {
+              "count": 29,
+              "totalMs": 2982.5,
+              "maxMs": 1958.3999998569489
+            },
+            "cpu": {
+              "apply": {
+                "calls": 2,
+                "totalMs": 49.59999990463257,
+                "maxMs": 32.59999990463257
+              },
+              "checkBatch": {
+                "calls": 27,
+                "totalMs": 325.2000002861023,
+                "maxMs": 62.39999985694885
+              },
+              "render": {
+                "calls": 14,
+                "totalMs": 1464.9999997615814,
+                "maxMs": 962
+              }
+            },
+            "restartReasons": {
+              "meshes": 1
+            },
+            "checks": 1020,
+            "renders": 14,
+            "restarts": 1,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-0-off",
+            "elapsedMs": 1499.9000000953674,
+            "activeElapsedMs": 1499.9000000953674,
+            "pausedMs": 0,
+            "tickCount": 40,
+            "rafGap": {
+              "count": 40,
+              "totalMs": 1495.2000000476837,
+              "maxMs": 175.10000014305115
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 12.200000047683716,
+                "maxMs": 12.200000047683716
+              },
+              "checkBatch": {
+                "calls": 39,
+                "totalMs": 81.2999997138977,
+                "maxMs": 12.599999904632568
+              },
+              "render": {
+                "calls": 28,
+                "totalMs": 1231.8999996185303,
+                "maxMs": 160.70000004768372
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 28,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-0-on",
+            "elapsedMs": 2793.199999809265,
+            "activeElapsedMs": 2793.199999809265,
+            "pausedMs": 0,
+            "tickCount": 28,
+            "rafGap": {
+              "count": 28,
+              "totalMs": 2797.5999999046326,
+              "maxMs": 1117.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 30.200000047683716,
+                "maxMs": 30.200000047683716
+              },
+              "checkBatch": {
+                "calls": 27,
+                "totalMs": 281.40000009536743,
+                "maxMs": 52
+              },
+              "render": {
+                "calls": 13,
+                "totalMs": 1525.9000000953674,
+                "maxMs": 1084.1999998092651
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 13,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-1-off",
+            "elapsedMs": 314.60000014305115,
+            "activeElapsedMs": 314.60000014305115,
+            "pausedMs": 0,
+            "tickCount": 13,
+            "rafGap": {
+              "count": 13,
+              "totalMs": 316.2999999523163,
+              "maxMs": 116.30000019073486
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 13.400000095367432,
+                "maxMs": 13.400000095367432
+              },
+              "checkBatch": {
+                "calls": 12,
+                "totalMs": 58.30000042915344,
+                "maxMs": 9.5
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 148.29999995231628,
+                "maxMs": 101.20000004768372
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-1-on",
+            "elapsedMs": 334.39999985694885,
+            "activeElapsedMs": 334.39999985694885,
+            "pausedMs": 0,
+            "tickCount": 12,
+            "rafGap": {
+              "count": 12,
+              "totalMs": 316.60000014305115,
+              "maxMs": 130.59999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 15.900000095367432,
+                "maxMs": 15.900000095367432
+              },
+              "checkBatch": {
+                "calls": 11,
+                "totalMs": 53.799999713897705,
+                "maxMs": 7.700000047683716
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 175.19999980926514,
+                "maxMs": 113.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-2-off",
+            "elapsedMs": 2825.5,
+            "activeElapsedMs": 2825.5,
+            "pausedMs": 0,
+            "tickCount": 38,
+            "rafGap": {
+              "count": 38,
+              "totalMs": 2847.2999999523163,
+              "maxMs": 1089.7000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 18.700000047683716,
+                "maxMs": 18.700000047683716
+              },
+              "checkBatch": {
+                "calls": 37,
+                "totalMs": 213,
+                "maxMs": 35
+              },
+              "render": {
+                "calls": 22,
+                "totalMs": 1711.8999996185303,
+                "maxMs": 968.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 22,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-2-on",
+            "elapsedMs": 3322.4000000953674,
+            "activeElapsedMs": 3322.4000000953674,
+            "pausedMs": 0,
+            "tickCount": 35,
+            "rafGap": {
+              "count": 35,
+              "totalMs": 3313.899999856949,
+              "maxMs": 1125.7999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 22.200000047683716,
+                "maxMs": 22.200000047683716
+              },
+              "checkBatch": {
+                "calls": 34,
+                "totalMs": 300.2000000476837,
+                "maxMs": 48.10000014305115
+              },
+              "render": {
+                "calls": 12,
+                "totalMs": 1621.5999994277954,
+                "maxMs": 1028.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 12,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-0-off",
+            "elapsedMs": 3273.5999999046326,
+            "activeElapsedMs": 3273.5999999046326,
+            "pausedMs": 0,
+            "tickCount": 27,
+            "rafGap": {
+              "count": 27,
+              "totalMs": 3263.800000190735,
+              "maxMs": 1484.3000001907349
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 43.80000019073486,
+                "maxMs": 43.80000019073486
+              },
+              "checkBatch": {
+                "calls": 26,
+                "totalMs": 227.599999666214,
+                "maxMs": 37.89999985694885
+              },
+              "render": {
+                "calls": 10,
+                "totalMs": 1724.6999990940094,
+                "maxMs": 1298.6999998092651
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 10,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-0-on",
+            "elapsedMs": 3450.4000000953674,
+            "activeElapsedMs": 3450.4000000953674,
+            "pausedMs": 0,
+            "tickCount": 33,
+            "rafGap": {
+              "count": 33,
+              "totalMs": 3447,
+              "maxMs": 1372.7000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 17,
+                "maxMs": 17
+              },
+              "checkBatch": {
+                "calls": 32,
+                "totalMs": 237,
+                "maxMs": 36.700000047683716
+              },
+              "render": {
+                "calls": 14,
+                "totalMs": 1925.3999996185303,
+                "maxMs": 1279.4000000953674
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 14,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-1-off",
+            "elapsedMs": 3495.600000143051,
+            "activeElapsedMs": 3495.600000143051,
+            "pausedMs": 0,
+            "tickCount": 29,
+            "rafGap": {
+              "count": 29,
+              "totalMs": 3501,
+              "maxMs": 1671.4000000953674
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 11.600000143051147,
+                "maxMs": 11.600000143051147
+              },
+              "checkBatch": {
+                "calls": 28,
+                "totalMs": 214.89999985694885,
+                "maxMs": 36.39999985694885
+              },
+              "render": {
+                "calls": 14,
+                "totalMs": 2080.2000002861023,
+                "maxMs": 1586.7999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 14,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-1-on",
+            "elapsedMs": 3379.7000000476837,
+            "activeElapsedMs": 3379.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 29,
+            "rafGap": {
+              "count": 29,
+              "totalMs": 3369.399999856949,
+              "maxMs": 1288.6000001430511
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 32.30000019073486,
+                "maxMs": 32.30000019073486
+              },
+              "checkBatch": {
+                "calls": 28,
+                "totalMs": 442.09999990463257,
+                "maxMs": 221.79999995231628
+              },
+              "render": {
+                "calls": 13,
+                "totalMs": 1794.9000000953674,
+                "maxMs": 1138.2999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 510,
+            "renders": 13,
+            "restarts": 0,
+            "passQuality": "high"
+          }
+        ],
+        "qualities": [
+          {
+            "quality": "low",
+            "finalPass": false,
+            "status": "complete",
+            "failureStep": null,
+            "elapsedMs": 25638.700000047684,
+            "activeElapsedMs": 25638.700000047684,
+            "pausedMs": 0,
+            "stageCount": 15
+          },
+          {
+            "quality": "high",
+            "finalPass": false,
+            "status": "timeout",
+            "failureStep": null,
+            "elapsedMs": 30050.200000047684,
+            "activeElapsedMs": 30050.200000047684,
+            "pausedMs": 0,
+            "stageCount": 12
+          }
+        ]
+      },
+      "compilation": {
+        "glslToSpirv": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "spirvToWgsl": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "compilerLoad": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderPreparation": {
+          "calls": 700,
+          "completed": 700,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 5038.399997711182,
+          "cpuMaxMs": 32.59999990463257,
+          "asyncTotalMs": 368012.8999929428,
+          "asyncMaxMs": 1555.2000000476837
+        },
+        "shaderModule": {
+          "calls": 1400,
+          "completed": 1400,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 375.9000053405762,
+          "cpuMaxMs": 9.200000047683716,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderValidation": {
+          "calls": 1400,
+          "completed": 1400,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 30.89999771118164,
+          "cpuMaxMs": 5,
+          "asyncTotalMs": 1048739.6999959946,
+          "asyncMaxMs": 1755.6000001430511
+        },
+        "syncPipeline": {
+          "calls": 29,
+          "completed": 29,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 1.0000004768371582,
+          "cpuMaxMs": 0.10000014305114746,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "asyncPipeline": {
+          "calls": 931,
+          "completed": 924,
+          "failures": 0,
+          "pending": 7,
+          "cpuTotalMs": 50.30000066757202,
+          "cpuMaxMs": 0.20000004768371582,
+          "asyncTotalMs": 1080337.7000041008,
+          "asyncMaxMs": 2625.4000000953674
+        },
+        "submit": {
+          "calls": 2892,
+          "completed": 2892,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 91.30000185966492,
+          "cpuMaxMs": 0.2999999523162842,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        }
+      },
+      "slowShaderModule": [],
+      "frameProfiles": [
+        {
+          "stage": "preparation-start",
+          "rawRaf": {
+            "availability": "observing",
+            "epoch": 1,
+            "source": "engine-host",
+            "deliveryClock": "same-window-or-explicit-injection",
+            "callbacks": 379,
+            "intervals": {
+              "count": 378,
+              "totalMs": 11889.599999999999,
+              "maxMs": 1798.4999999999964,
+              "recentSamples": 128,
+              "recentP50Ms": 16.69999999999709,
+              "recentP95Ms": 50
+            },
+            "deliveryDelay": {
+              "count": 379,
+              "totalMs": 8017.699964094179,
+              "maxMs": 1673.1999998569481,
+              "recentSamples": 128,
+              "recentP50Ms": 9.899999809265864,
+              "recentP95Ms": 42.9999998569474
+            }
+          },
+          "engineCadence": {
+            "processIntervals": {
+              "count": 282,
+              "totalMs": 8994.199999809265,
+              "maxMs": 1685.5,
+              "recentSamples": 128,
+              "recentP50Ms": 16.600000143051147,
+              "recentP95Ms": 49.10000014305115
+            },
+            "renderCallbackIntervals": {
+              "count": 282,
+              "totalMs": 8993.899999856949,
+              "maxMs": 1685.5,
+              "recentSamples": 128,
+              "recentP50Ms": 16.59999990463257,
+              "recentP95Ms": 49.09999990463257
+            },
+            "timestampIntervals": {
+              "count": 282,
+              "totalMs": 10257.599999999999,
+              "maxMs": 1798.4999999999964,
+              "recentSamples": 128,
+              "recentP50Ms": 16.69999999999709,
+              "recentP95Ms": 50
+            },
+            "queueToProcess": {
+              "count": 283,
+              "totalMs": 5974.499999523163,
+              "maxMs": 1677.6000001430511,
+              "recentSamples": 128,
+              "recentP50Ms": 6.3999998569488525,
+              "recentP95Ms": 35.5
+            },
+            "skippedByMaxFPS": 0
+          }
+        },
+        {
+          "stage": "preparation-end",
+          "rawRaf": {
+            "availability": "observing",
+            "epoch": 1,
+            "source": "engine-host",
+            "deliveryClock": "same-window-or-explicit-injection",
+            "callbacks": 1040,
+            "intervals": {
+              "count": 1039,
+              "totalMs": 71354.3,
+              "maxMs": 5262,
+              "recentSamples": 128,
+              "recentP50Ms": 49.89999999999418,
+              "recentP95Ms": 249.90000000000873
+            },
+            "deliveryDelay": {
+              "count": 1040,
+              "totalMs": 18768.19989767085,
+              "maxMs": 4619.29999990463,
+              "recentSamples": 128,
+              "recentP50Ms": 6.199999856951763,
+              "recentP95Ms": 15.499999809268047
+            }
+          },
+          "engineCadence": {
+            "processIntervals": {
+              "count": 943,
+              "totalMs": 68456.39999985695,
+              "maxMs": 4623.400000095367,
+              "recentSamples": 128,
+              "recentP50Ms": 48.799999952316284,
+              "recentP95Ms": 244.29999995231628
+            },
+            "renderCallbackIntervals": {
+              "count": 943,
+              "totalMs": 68456.09999990463,
+              "maxMs": 4623.5,
+              "recentSamples": 128,
+              "recentP50Ms": 48.799999952316284,
+              "recentP95Ms": 244.40000009536743
+            },
+            "timestampIntervals": {
+              "count": 943,
+              "totalMs": 69722.3,
+              "maxMs": 5262,
+              "recentSamples": 128,
+              "recentP50Ms": 49.89999999999418,
+              "recentP95Ms": 249.90000000000873
+            },
+            "queueToProcess": {
+              "count": 944,
+              "totalMs": 24298.099996566772,
+              "maxMs": 1677.6000001430511,
+              "recentSamples": 128,
+              "recentP50Ms": 6.5,
+              "recentP95Ms": 208.19999980926514
+            },
+            "skippedByMaxFPS": 0
+          }
+        },
+        {
+          "stage": "engine-disposed",
+          "rawRaf": {
+            "availability": "stopped",
+            "epoch": 2,
+            "source": "engine-host",
+            "deliveryClock": "same-window-or-explicit-injection",
+            "callbacks": 1040,
+            "intervals": {
+              "count": 1039,
+              "totalMs": 71354.3,
+              "maxMs": 5262,
+              "recentSamples": 128,
+              "recentP50Ms": 49.89999999999418,
+              "recentP95Ms": 249.90000000000873
+            },
+            "deliveryDelay": {
+              "count": 1040,
+              "totalMs": 18768.19989767085,
+              "maxMs": 4619.29999990463,
+              "recentSamples": 128,
+              "recentP50Ms": 6.199999856951763,
+              "recentP95Ms": 15.499999809268047
+            }
+          },
+          "engineCadence": {
+            "processIntervals": {
+              "count": 943,
+              "totalMs": 68456.39999985695,
+              "maxMs": 4623.400000095367,
+              "recentSamples": 128,
+              "recentP50Ms": 48.799999952316284,
+              "recentP95Ms": 244.29999995231628
+            },
+            "renderCallbackIntervals": {
+              "count": 943,
+              "totalMs": 68456.09999990463,
+              "maxMs": 4623.5,
+              "recentSamples": 128,
+              "recentP50Ms": 48.799999952316284,
+              "recentP95Ms": 244.40000009536743
+            },
+            "timestampIntervals": {
+              "count": 943,
+              "totalMs": 69722.3,
+              "maxMs": 5262,
+              "recentSamples": 128,
+              "recentP50Ms": 49.89999999999418,
+              "recentP95Ms": 249.90000000000873
+            },
+            "queueToProcess": {
+              "count": 944,
+              "totalMs": 24298.099996566772,
+              "maxMs": 1677.6000001430511,
+              "recentSamples": 128,
+              "recentP50Ms": 6.5,
+              "recentP95Ms": 208.19999980926514
+            },
+            "skippedByMaxFPS": 0
+          }
+        }
+      ],
+      "ready": false
+    },
+    {
+      "id": "9acaaaad-5f3a-4d03-ae88-b519303d6b1b",
+      "role": "foreground-normal",
+      "path": ".cache/game-diagnostics/9acaaaad-5f3a-4d03-ae88-b519303d6b1b.jsonl",
+      "sha256": "af70244e312a5234c18cc9eceab416d70a308f8d0a29b7047c70b7441c52ae4f",
+      "bytes": 305199,
+      "recordCount": 962,
+      "presentation": {
+        "observedBrowserHz": 60.2,
+        "reliable": true,
+        "samples": 85,
+        "p10FrameMs": 16.599999999998545,
+        "medianFrameMs": 16.60000000000582,
+        "p95FrameMs": 16.80000000000291,
+        "reason": "ok",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "lighting": {
+        "status": "timeout",
+        "elapsedMs": 71186.79999995232,
+        "activeElapsedMs": 71186.79999995232,
+        "pausedMs": 0,
+        "failureStep": null,
+        "stages": [
+          {
+            "stage": "vehicle-0",
+            "elapsedMs": 2293.300000190735,
+            "activeElapsedMs": 2293.300000190735,
+            "pausedMs": 0,
+            "tickCount": 18,
+            "rafGap": {
+              "count": 18,
+              "totalMs": 2274.2000000476837,
+              "maxMs": 491.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 3,
+                "totalMs": 78.70000004768372,
+                "maxMs": 29
+              },
+              "checkBatch": {
+                "calls": 15,
+                "totalMs": 216.2000002861023,
+                "maxMs": 46
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 1030.3999998569489,
+                "maxMs": 437.2999999523163
+              }
+            },
+            "restartReasons": {
+              "meshes": 2
+            },
+            "checks": 910,
+            "renders": 6,
+            "restarts": 2,
+            "passQuality": "low"
+          },
+          {
+            "stage": "vehicle-1",
+            "elapsedMs": 1668.2000000476837,
+            "activeElapsedMs": 1668.2000000476837,
+            "pausedMs": 0,
+            "tickCount": 21,
+            "rafGap": {
+              "count": 21,
+              "totalMs": 1671.5,
+              "maxMs": 761
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 8.5,
+                "maxMs": 8.5
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 239.89999961853027,
+                "maxMs": 44
+              },
+              "render": {
+                "calls": 8,
+                "totalMs": 919.7000002861023,
+                "maxMs": 733.2999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 696,
+            "renders": 8,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-off",
+            "elapsedMs": 1910.7999999523163,
+            "activeElapsedMs": 1910.7999999523163,
+            "pausedMs": 0,
+            "tickCount": 18,
+            "rafGap": {
+              "count": 18,
+              "totalMs": 1908.6999998092651,
+              "maxMs": 929.4000000953674
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 10.900000095367432,
+                "maxMs": 10.900000095367432
+              },
+              "checkBatch": {
+                "calls": 17,
+                "totalMs": 217.599999666214,
+                "maxMs": 42.39999985694885
+              },
+              "render": {
+                "calls": 5,
+                "totalMs": 1016.2999999523163,
+                "maxMs": 917.0999999046326
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 5,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-on",
+            "elapsedMs": 1519.5999999046326,
+            "activeElapsedMs": 1519.5999999046326,
+            "pausedMs": 0,
+            "tickCount": 23,
+            "rafGap": {
+              "count": 23,
+              "totalMs": 1515.3000001907349,
+              "maxMs": 545.3000001907349
+            },
+            "cpu": {
+              "apply": {
+                "calls": 2,
+                "totalMs": 82.40000009536743,
+                "maxMs": 42.59999990463257
+              },
+              "checkBatch": {
+                "calls": 21,
+                "totalMs": 76.79999995231628,
+                "maxMs": 11.700000047683716
+              },
+              "render": {
+                "calls": 10,
+                "totalMs": 719.5999999046326,
+                "maxMs": 456.2999999523163
+              }
+            },
+            "restartReasons": {
+              "weather": 1
+            },
+            "checks": 886,
+            "renders": 10,
+            "restarts": 1,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-0-off",
+            "elapsedMs": 1812.8999998569489,
+            "activeElapsedMs": 1812.8999998569489,
+            "pausedMs": 0,
+            "tickCount": 20,
+            "rafGap": {
+              "count": 20,
+              "totalMs": 1815.1999998092651,
+              "maxMs": 857.7000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 16.299999952316284,
+                "maxMs": 16.299999952316284
+              },
+              "checkBatch": {
+                "calls": 19,
+                "totalMs": 225.60000038146973,
+                "maxMs": 42.40000009536743
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 954.5999999046326,
+                "maxMs": 838.2000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 6,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-0-on",
+            "elapsedMs": 1600.7000000476837,
+            "activeElapsedMs": 1600.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 23,
+            "rafGap": {
+              "count": 23,
+              "totalMs": 1582,
+              "maxMs": 483.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 37.09999990463257,
+                "maxMs": 37.09999990463257
+              },
+              "checkBatch": {
+                "calls": 22,
+                "totalMs": 82.69999980926514,
+                "maxMs": 11.5
+              },
+              "render": {
+                "calls": 10,
+                "totalMs": 758.699999332428,
+                "maxMs": 444.2000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 10,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-1-off",
+            "elapsedMs": 353.09999990463257,
+            "activeElapsedMs": 353.09999990463257,
+            "pausedMs": 0,
+            "tickCount": 13,
+            "rafGap": {
+              "count": 13,
+              "totalMs": 349.60000014305115,
+              "maxMs": 116.20000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 16,
+                "maxMs": 16
+              },
+              "checkBatch": {
+                "calls": 12,
+                "totalMs": 68.09999966621399,
+                "maxMs": 9.699999809265137
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 175.70000004768372,
+                "maxMs": 98.70000004768372
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-1-on",
+            "elapsedMs": 300.2999999523163,
+            "activeElapsedMs": 300.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 11,
+            "rafGap": {
+              "count": 11,
+              "totalMs": 318.09999990463257,
+              "maxMs": 124.90000009536743
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 31.200000047683716,
+                "maxMs": 31.200000047683716
+              },
+              "checkBatch": {
+                "calls": 10,
+                "totalMs": 45.80000042915344,
+                "maxMs": 7.6000001430511475
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 146.29999995231628,
+                "maxMs": 92.59999990463257
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-2-off",
+            "elapsedMs": 303,
+            "activeElapsedMs": 303,
+            "pausedMs": 0,
+            "tickCount": 14,
+            "rafGap": {
+              "count": 14,
+              "totalMs": 298,
+              "maxMs": 80.70000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 8.900000095367432,
+                "maxMs": 8.900000095367432
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 64.2999997138977,
+                "maxMs": 9.5
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 125.29999995231628,
+                "maxMs": 70.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-2-on",
+            "elapsedMs": 278.7999999523163,
+            "activeElapsedMs": 278.7999999523163,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 283.10000014305115,
+              "maxMs": 130.90000009536743
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 28.799999952316284,
+                "maxMs": 28.799999952316284
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 42.799999713897705,
+                "maxMs": 6.799999952316284
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 149.40000009536743,
+                "maxMs": 100.90000009536743
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-0-off",
+            "elapsedMs": 2647.7000000476837,
+            "activeElapsedMs": 2647.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 16,
+            "rafGap": {
+              "count": 16,
+              "totalMs": 2647.7999999523163,
+              "maxMs": 1284.4000000953674
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 46.5,
+                "maxMs": 46.5
+              },
+              "checkBatch": {
+                "calls": 15,
+                "totalMs": 195.39999985694885,
+                "maxMs": 39.799999952316284
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1271.7000000476837,
+                "maxMs": 1188.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 4,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-0-on",
+            "elapsedMs": 2782,
+            "activeElapsedMs": 2782,
+            "pausedMs": 0,
+            "tickCount": 20,
+            "rafGap": {
+              "count": 20,
+              "totalMs": 2780.899999856949,
+              "maxMs": 1308.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 12.600000143051147,
+                "maxMs": 12.600000143051147
+              },
+              "checkBatch": {
+                "calls": 19,
+                "totalMs": 249,
+                "maxMs": 44.700000047683716
+              },
+              "render": {
+                "calls": 5,
+                "totalMs": 1244.1999998092651,
+                "maxMs": 1122.7999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 5,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-1-off",
+            "elapsedMs": 3219.7000000476837,
+            "activeElapsedMs": 3219.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 21,
+            "rafGap": {
+              "count": 21,
+              "totalMs": 3213.800000190735,
+              "maxMs": 1725.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 14.5,
+                "maxMs": 14.5
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 253.49999976158142,
+                "maxMs": 45.799999952316284
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 1765.599999666214,
+                "maxMs": 1574.8999998569489
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 6,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-1-on",
+            "elapsedMs": 2882.2000000476837,
+            "activeElapsedMs": 2882.2000000476837,
+            "pausedMs": 0,
+            "tickCount": 21,
+            "rafGap": {
+              "count": 21,
+              "totalMs": 2880.699999809265,
+              "maxMs": 1295.5
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 39,
+                "maxMs": 39
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 270,
+                "maxMs": 44.59999990463257
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 1322.5999999046326,
+                "maxMs": 1164.9000000953674
+              }
+            },
+            "restartReasons": {},
+            "checks": 886,
+            "renders": 6,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "restore",
+            "elapsedMs": 291.2999999523163,
+            "activeElapsedMs": 291.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 12,
+            "rafGap": {
+              "count": 12,
+              "totalMs": 283.30000019073486,
+              "maxMs": 86.59999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 19.700000047683716,
+                "maxMs": 19.700000047683716
+              },
+              "checkBatch": {
+                "calls": 11,
+                "totalMs": 66.29999995231628,
+                "maxMs": 12.799999952316284
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 134.29999995231628,
+                "maxMs": 65.79999995231628
+              }
+            },
+            "restartReasons": {},
+            "checks": 882,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-off",
+            "elapsedMs": 2683.5999999046326,
+            "activeElapsedMs": 2683.5999999046326,
+            "pausedMs": 0,
+            "tickCount": 31,
+            "rafGap": {
+              "count": 31,
+              "totalMs": 2664.5999999046326,
+              "maxMs": 834.4000000953674
+            },
+            "cpu": {
+              "apply": {
+                "calls": 4,
+                "totalMs": 746.4000000953674,
+                "maxMs": 734
+              },
+              "checkBatch": {
+                "calls": 27,
+                "totalMs": 99.50000023841858,
+                "maxMs": 13.799999952316284
+              },
+              "render": {
+                "calls": 17,
+                "totalMs": 759.3000001907349,
+                "maxMs": 97.40000009536743
+              }
+            },
+            "restartReasons": {
+              "meshes": 3
+            },
+            "checks": 1533,
+            "renders": 17,
+            "restarts": 3,
+            "passQuality": "high"
+          },
+          {
+            "stage": "current-on",
+            "elapsedMs": 2428,
+            "activeElapsedMs": 2428,
+            "pausedMs": 0,
+            "tickCount": 25,
+            "rafGap": {
+              "count": 25,
+              "totalMs": 2414.5999999046326,
+              "maxMs": 849.6000001430511
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 30.200000047683716,
+                "maxMs": 30.200000047683716
+              },
+              "checkBatch": {
+                "calls": 24,
+                "totalMs": 252.2999997138977,
+                "maxMs": 45.40000009536743
+              },
+              "render": {
+                "calls": 10,
+                "totalMs": 1176.9999997615814,
+                "maxMs": 817.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 10,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-0-off",
+            "elapsedMs": 1368.5999999046326,
+            "activeElapsedMs": 1368.5999999046326,
+            "pausedMs": 0,
+            "tickCount": 39,
+            "rafGap": {
+              "count": 39,
+              "totalMs": 1384.2000000476837,
+              "maxMs": 124.10000014305115
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 23,
+                "maxMs": 23
+              },
+              "checkBatch": {
+                "calls": 38,
+                "totalMs": 87,
+                "maxMs": 22.299999952316284
+              },
+              "render": {
+                "calls": 28,
+                "totalMs": 1105.5999999046326,
+                "maxMs": 99.60000014305115
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 28,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-0-on",
+            "elapsedMs": 2001,
+            "activeElapsedMs": 2001,
+            "pausedMs": 0,
+            "tickCount": 20,
+            "rafGap": {
+              "count": 20,
+              "totalMs": 1996.2000000476837,
+              "maxMs": 696.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 21.899999856948853,
+                "maxMs": 21.899999856948853
+              },
+              "checkBatch": {
+                "calls": 19,
+                "totalMs": 237.89999985694885,
+                "maxMs": 43.39999985694885
+              },
+              "render": {
+                "calls": 7,
+                "totalMs": 811.4000000953674,
+                "maxMs": 663.2000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 7,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-1-off",
+            "elapsedMs": 228.29999995231628,
+            "activeElapsedMs": 228.29999995231628,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 233.29999995231628,
+              "maxMs": 83
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 14.299999952316284,
+                "maxMs": 14.299999952316284
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 37,
+                "maxMs": 6.199999809265137
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 103.59999990463257,
+                "maxMs": 68
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-1-on",
+            "elapsedMs": 237.79999995231628,
+            "activeElapsedMs": 237.79999995231628,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 232.90000009536743,
+              "maxMs": 85.39999985694885
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 11,
+                "maxMs": 11
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 45.59999966621399,
+                "maxMs": 9.899999856948853
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 115,
+                "maxMs": 73.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 3,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-2-off",
+            "elapsedMs": 2121.2000000476837,
+            "activeElapsedMs": 2121.2000000476837,
+            "pausedMs": 0,
+            "tickCount": 23,
+            "rafGap": {
+              "count": 23,
+              "totalMs": 2114.7999999523163,
+              "maxMs": 940.8999998569489
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 13.799999952316284,
+                "maxMs": 13.799999952316284
+              },
+              "checkBatch": {
+                "calls": 22,
+                "totalMs": 241.400000333786,
+                "maxMs": 43.09999990463257
+              },
+              "render": {
+                "calls": 10,
+                "totalMs": 1212.2000005245209,
+                "maxMs": 924.6000001430511
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 10,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-2-on",
+            "elapsedMs": 2940.4000000953674,
+            "activeElapsedMs": 2940.4000000953674,
+            "pausedMs": 0,
+            "tickCount": 20,
+            "rafGap": {
+              "count": 20,
+              "totalMs": 2947.2999999523163,
+              "maxMs": 1673.3000001907349
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 40,
+                "maxMs": 40
+              },
+              "checkBatch": {
+                "calls": 19,
+                "totalMs": 234.20000004768372,
+                "maxMs": 44.799999952316284
+              },
+              "render": {
+                "calls": 7,
+                "totalMs": 1756.5,
+                "maxMs": 1630.7000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 7,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-0-off",
+            "elapsedMs": 2658.7999999523163,
+            "activeElapsedMs": 2658.7999999523163,
+            "pausedMs": 0,
+            "tickCount": 22,
+            "rafGap": {
+              "count": 22,
+              "totalMs": 2647.9000000953674,
+              "maxMs": 1247.7999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 36.09999990463257,
+                "maxMs": 36.09999990463257
+              },
+              "checkBatch": {
+                "calls": 21,
+                "totalMs": 255.30000019073486,
+                "maxMs": 43.90000009536743
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 1272.599999666214,
+                "maxMs": 1095.2000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 6,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-0-on",
+            "elapsedMs": 3915.9000000953674,
+            "activeElapsedMs": 3915.9000000953674,
+            "pausedMs": 0,
+            "tickCount": 31,
+            "rafGap": {
+              "count": 31,
+              "totalMs": 3765.399999856949,
+              "maxMs": 1931.5
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 18,
+                "maxMs": 18
+              },
+              "checkBatch": {
+                "calls": 30,
+                "totalMs": 321.9000005722046,
+                "maxMs": 46.799999952316284
+              },
+              "render": {
+                "calls": 6,
+                "totalMs": 2184.699999809265,
+                "maxMs": 1858.7999999523163
+              }
+            },
+            "restartReasons": {},
+            "checks": 1020,
+            "renders": 6,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-1-off",
+            "elapsedMs": 5339.700000047684,
+            "activeElapsedMs": 5339.700000047684,
+            "pausedMs": 0,
+            "tickCount": 26,
+            "rafGap": {
+              "count": 26,
+              "totalMs": 5459.900000095367,
+              "maxMs": 2738.9000000953674
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 106.70000004768372,
+                "maxMs": 106.70000004768372
+              },
+              "checkBatch": {
+                "calls": 25,
+                "totalMs": 1403.0999999046326,
+                "maxMs": 449.89999985694885
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 2694.4000000953674,
+                "maxMs": 2491
+              }
+            },
+            "restartReasons": {},
+            "checks": 1016,
+            "renders": 4,
+            "restarts": 0,
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-1-on",
+            "elapsedMs": 20924.5,
+            "activeElapsedMs": 20924.5,
+            "pausedMs": 0,
+            "tickCount": 1,
+            "rafGap": {
+              "count": 1,
+              "totalMs": 65.70000004768372,
+              "maxMs": 65.70000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 96.70000004768372,
+                "maxMs": 96.70000004768372
+              },
+              "checkBatch": {
+                "calls": 0,
+                "totalMs": 0,
+                "maxMs": 0
+              },
+              "render": {
+                "calls": 1,
+                "totalMs": 20826.5,
+                "maxMs": 20826.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 0,
+            "renders": 1,
+            "restarts": 0,
+            "passQuality": "high"
+          }
+        ],
+        "qualities": [
+          {
+            "quality": "low",
+            "finalPass": false,
+            "status": "complete",
+            "failureStep": null,
+            "elapsedMs": 24313.5,
+            "activeElapsedMs": 24313.5,
+            "pausedMs": 0,
+            "stageCount": 15
+          },
+          {
+            "quality": "high",
+            "finalPass": false,
+            "status": "timeout",
+            "failureStep": null,
+            "elapsedMs": 46873.299999952316,
+            "activeElapsedMs": 46873.299999952316,
+            "pausedMs": 0,
+            "stageCount": 12
+          }
+        ]
+      },
+      "compilation": {
+        "glslToSpirv": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "spirvToWgsl": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "compilerLoad": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderPreparation": {
+          "calls": 696,
+          "completed": 696,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 19111.900000572205,
+          "cpuMaxMs": 852,
+          "asyncTotalMs": 864328.9000051022,
+          "asyncMaxMs": 20669.60000014305
+        },
+        "shaderModule": {
+          "calls": 1392,
+          "completed": 1392,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 18605.299995422363,
+          "cpuMaxMs": 850.2999999523163,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderValidation": {
+          "calls": 1392,
+          "completed": 1306,
+          "failures": 0,
+          "pending": 86,
+          "cpuTotalMs": 23.300001621246338,
+          "cpuMaxMs": 0.3000001907348633,
+          "asyncTotalMs": 1050087.3000075817,
+          "asyncMaxMs": 2475.7000000476837
+        },
+        "syncPipeline": {
+          "calls": 29,
+          "completed": 29,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 1.1999998092651367,
+          "cpuMaxMs": 0.10000014305114746,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "asyncPipeline": {
+          "calls": 931,
+          "completed": 879,
+          "failures": 0,
+          "pending": 52,
+          "cpuTotalMs": 50.40000104904175,
+          "cpuMaxMs": 5.099999904632568,
+          "asyncTotalMs": 1016377.7999911308,
+          "asyncMaxMs": 3147.5999999046326
+        },
+        "submit": {
+          "calls": 1912,
+          "completed": 1912,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 52.499998569488525,
+          "cpuMaxMs": 0.20000004768371582,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        }
+      },
+      "slowShaderModule": [
+        {
+          "seq": 302,
+          "atMs": 103055.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 119,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 315,
+          "atMs": 104404.8,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 59,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 317,
+          "atMs": 105532,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "vertex",
+            "cpuMs": 580.8999998569489,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 319,
+          "atMs": 106101.9,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "vertex",
+            "cpuMs": 539.2000000476837,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 321,
+          "atMs": 106650.7,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 518.1000001430511,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 323,
+          "atMs": 107273.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "vertex",
+            "cpuMs": 570.0999999046326,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 325,
+          "atMs": 107846.2,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 547.0999999046326,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 327,
+          "atMs": 108401.1,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 517.7000000476837,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 329,
+          "atMs": 108968.2,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 524.5999999046326,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 331,
+          "atMs": 109515.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 498.7000000476837,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 333,
+          "atMs": 110060,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "vertex",
+            "cpuMs": 485,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 335,
+          "atMs": 110604.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "vertex",
+            "cpuMs": 507.59999990463257,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 337,
+          "atMs": 111771.6,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 542.0999999046326,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 339,
+          "atMs": 112352,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 539.5,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 341,
+          "atMs": 112875.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 474.59999990463257,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 343,
+          "atMs": 113724.2,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 799.5,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 345,
+          "atMs": 114354,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 572.2999999523163,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 347,
+          "atMs": 114852.9,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 466.2999999523163,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 349,
+          "atMs": 115355.6,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 462.2000000476837,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 351,
+          "atMs": 115853.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 455.2000000476837,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 353,
+          "atMs": 116356.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 466.5,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 355,
+          "atMs": 116853.9,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 444.7999999523163,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 357,
+          "atMs": 117360.6,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 477.2000000476837,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 359,
+          "atMs": 117852.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 460,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 361,
+          "atMs": 118362.6,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 476,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 363,
+          "atMs": 118854.5,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 456.7000000476837,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 365,
+          "atMs": 119425.2,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 543.8999998569489,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 367,
+          "atMs": 119970.6,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "vertex",
+            "cpuMs": 484,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 369,
+          "atMs": 120537.9,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "vertex",
+            "cpuMs": 542.5,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 371,
+          "atMs": 121104.3,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 519.2999999523163,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 373,
+          "atMs": 121828.7,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 677.4000000953674,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 375,
+          "atMs": 122733.8,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 850.2999999523163,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 377,
+          "atMs": 123383,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 594.5999999046326,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 379,
+          "atMs": 123910.5,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 490.7999999523163,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 381,
+          "atMs": 124446.7,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 503.7999999523163,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        },
+        {
+          "seq": 383,
+          "atMs": 124939.4,
+          "kind": "webgpu-work",
+          "data": {
+            "phase": "shaderModule",
+            "label": "fragment",
+            "cpuMs": 461,
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game"
+          }
+        }
+      ],
+      "frameProfiles": [],
+      "ready": false,
+      "capturedPrefix": {
+        "bytes": 158447,
+        "sha256": "a0dd4945f2509e077c6a309a7544eb4c89563e27650343cecb2bed23ae4b8ac5",
+        "recordCount": 404,
+        "note": "Selected metrics were captured from this verified prefix before later lifecycle/page records arrived."
+      }
+    }
+  ]
+}

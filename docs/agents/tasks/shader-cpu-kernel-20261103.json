@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "shader-cpu-kernel-20261103",
+  "title": "CPU profil nativní generic WGSL cesty pro výběr skutečné optimalizace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/evidence/shader-cpu-kernel-20261103/",
+    ".cache/shader-cpu-kernel-20261103/",
+    "docs/agents/handoffs/shader-cpu-kernel-20261103.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Pouze kanonický main; žádný checkout/copy/branch a žádné změny klienta či závislostí.",
+    "Reprodukovat skutečnou pinovanou WGSL cestu na reprezentativních Standard/PBR/shadow vstupech, ověřit skutečný pureMode/indexParameters/defines kontrakt a uvést meze proti plné hře.",
+    "Oddělit CPU cost includes, parse/cursor/expression construction, variantní walk/processor callbacks pomocí Node CPU profilu nebo přesných lokálních diagnostických bracketů nad stejnými zdroji.",
+    "Zachovat reálné výstupní WGSL a binding context parity; nesimulovat GPU přijetí.",
+    "Porovnat rozumné optimalizační varianty bez implementace produkční cache naslepo. Předej reprodukovatelný harness, profil a přesné závěry."
+  ],
+  "verification": [
+    "Lehká nativní fixture/parity kontrola před CPU profilováním.",
+    "Náročné CPU ověření jen po úspěšném claimu heavy-validation; žádné GPU/server/Blender/build/fullsuite.",
+    "CPU profil není FPS důkaz. Chybějící reprezentativnost či neznámý podíl explicitně uvést."
+  ],
+  "notes": [
+    "Root potvrzuje C6STOP/revalidaci14:33:28.597UTC; všechny jeho servery/samplery/karty skončily. Převádí heavy-validation tomuto tasku, sám do jeho release nespouští build/GPU/test load.",
+    "C5 WGSL390pairs12.2276s. C6 delta312pairs13.6944s, child init0.0006s/preProcess0.3159s/post0.2578s/finalize0.4661s, beznested/outside/observer error. Residual ještě není parser: obsahuje generic includes/evaluation/walk.",
+    "Výslovná delegace cpu_memory_research: implementace harnessu, cílený refaktoring a relevantní CPU ověření společně; bez rekurzivního BMAD. Produkční runtime ani dependency patch nepřidávat bez root rozhodnutí."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-startup-cpu-profile-20261103",
+  "title": "Oddělený profil CPU tvorby Effect a WGSL processing před nativním GPU API",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/webgpu-startup-cpu-profile.ts",
+    "tests/webgpu-startup-cpu-profile.test.ts",
+    "docs/agents/handoffs/webgpu-startup-cpu-profile-20261103.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Engine-owned opt-in diagnostika bezzměn návratů, callbacků, shaderů či readiness.",
+    "createEffect synchronní caller wall a WGSL initialize/finalize pair se stejným contextem/generací; přechod přes microtask se nepočítá jako CPU.",
+    "Omezená metadata bez textů/hashováníshaderů, explicitnípokrytí a lifecycle/ownershipcleanup.",
+    "Cílené nativníkontraktníregrese a předání; žádný vlastníGPU/build/commit."
+  ],
+  "verification": [
+    "Real pinned loader/processor/callback integration where available, sync/async/reentrancy/exception/device loss tests.",
+    "Targeted tests and scopedTypeScript; GPU společněvýhradněroot."
+  ],
+  "notes": [
+    "Rootběžína main df62bd4d s vlastnímrenderWIP; poSTOPcandidate3aověřenéinputsRevalidatedtruerozšiřujeprofilování. ABBAfrontazhoršilaprůchod, žádnýreadyFPS. Instr.native513e ukazuje20.1225s CPUdelta renderFrame a44.8msendFrame; shaderInventory3.5765s musíbytoddělen.",
+    "Rootexplicitnědelegujeimplementaci/refaktoring/regreseperformance_evidence pojehodokončenéanalýze. Scopepouze3uvedenénovésoubory.ŽádnýrekurzivníBMAD."
+  ]
+}

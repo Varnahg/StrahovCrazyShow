@@ -1,5 +1,13 @@
 # Ověření dema a známá omezení
 
+## Ochrana startup shaderů a přímý CPU profil · 3. listopadu 2026
+
+Koherentní renderovací checkpoint obsahuje ochranu proti starému hot-swapped Standard/PBR shaderu, retry jednorázových RTT i bez fronty a lokální CPU diagnostiku. Fronta je výchozí vypnutá a dostupná jen jako výslovný loopback experiment. Poslední společná sada **190/190 cílených testů PASS**, produkční build a izolovaný `pnpm test:integration` PASS; nezávislá review bez blockerů. To nenahrazuje plnou testovací sadu ani úspěšný GPU start. Dřívější nezelené fullsuite výsledky zůstávají níže zachované.
+
+[Přímý CPU profil](performance/evidence/render-next-20261102/startup-cpu-first/report.md) zaznamenal v candidate5 synchronní WGSL delta12 227,6ms/390 dvojic; nové čítače skutečně prošly privacy filtrem a uložením. Původní candidate4 ztratil pole `profile` při sanitizaci a zůstává označený jako neúspěšná diagnostika. Oprava používá `timing` a zachovává ochranu soukromí. Následující child profiler v candidate6 odlišil malé náklady pojmenovaných metod od dominantní generic cesty.
+
+[Izolovaný CPU kernel](performance/evidence/shader-cpu-kernel-20261103/README.md) má plnou WGSL/binding-context paritu32 případů a oddělené includes39,38%, parse32,23%, walk14,12% instrumentovaného kernelu. Po odstranění duplicitních Effectů sdílí48 evaluací24 různých Effectů šest přesných vstupů parseru. Jde o reprezentativní syntetické nativní kontrakty, nikoli celý herní shaderový inventář či FPS. Vybraná další optimalizace je omezená cache parsovaného stromu; **dosud není implementovaná**. Všechny dosavadní browser pokusy stále skončily timeoutem přípravy Low.
+
 ## Kontrolované startup A/B na stejném buildu · 3. listopadu 2026
 
 Candidate3 source/test`a55cd239d0884f86ccdeff4a1e997b6443d11fa75f0508a968a3f4adaf0aaaac` porovnal native/queued/queued/native se stejnou ochranou materiálů a pomocných renderů. **Všechny čtyři starty skončily timeoutem Low.** Ve shodných prvních sedmi dokončených variantách měla fronta v této sérii průměrně o25,7% delší čas, o89,8% více renderů a o51,2% více kontrol objektů; maxima jednotlivých renderů naopak klesla. Tato podoba fronty se nepřijímá jako dokončená optimalizace. Počty aktivních objektů byly v odpovídajících fázích shodné; dřívější candidate2 s924–928 objekty není tento A/B pár.

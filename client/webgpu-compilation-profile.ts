@@ -1267,6 +1267,12 @@ export class WebGpuCompilationProfile {
     } catch { this.hooks[hook] = "unavailable"; }
   }
 
+  /** Native preparation settlements in this engine generation, including
+   * failures. Allocation-free retry signal, never a readiness/validation gate. */
+  get shaderPreparationCompletions(): number {
+    return this.metrics.shaderPreparation.completed;
+  }
+
   snapshot() {
     const finite = (value: unknown) =>
       typeof value === "number" && Number.isFinite(value) ? value : null;

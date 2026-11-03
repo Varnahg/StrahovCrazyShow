@@ -1,11 +1,10 @@
 {
   "schemaVersion": 1,
-  "status": "blocked",
+  "status": "ready",
   "dependsOn": [],
   "id": "render-next-20261102-root",
   "title": "Další měřená grafická optimalizace na main s Edge",
   "writePaths": [
-    "_bmad/render/bmad-build/",
     "_bmad-output/implementation-artifacts/render-next-20261102/",
     ".cache/render-profile-20261102/",
     ".cache/render-next-20261102/",
@@ -13,14 +12,31 @@
     "docs/performance/evidence/render-next-20261102/",
     "docs/agents/handoffs/render-next-20261102-root.md",
     "docs/verification.md",
-    "docs/work-in-progress.md"
+    "docs/work-in-progress.md",
+    "client/game.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "client/light-preparation.ts",
+    "tests/light-preparation.test.ts",
+    "tests/game-light-lifecycle.test.ts",
+    "client/webgpu-compilation-profile.ts",
+    "tests/webgpu-compilation-profile.test.ts",
+    "docs/performance/evidence/shader-cpu-kernel-20261103/",
+    "docs/agents/handoffs/shader-cpu-kernel-20261103.md",
+    "client/shader-syntax-cache.ts",
+    "tests/shader-syntax-cache.test.ts",
+    "package.json",
+    "pnpm-workspace.yaml",
+    "pnpm-lock.yaml",
+    "node_modules/",
+    ".cache/shader-syntax-cache-integration-20261103/"
   ],
   "resources": [
-    "heavy-validation",
     "gpu",
     "workspace-build",
     "port:2568",
-    "port:4179"
+    "port:4179",
+    "heavy-validation"
   ],
   "acceptance": [
     "Pouze kanonický checkout/main; žádné nové větve, worktrees nebo source kopie. Docker8080 zachovaný.",
@@ -37,6 +53,17 @@
     "Nové výslovné zadání uživatele: pokračovat další optimalizací a použít @Edge. Baseline d4e8f1c24ce43eaaad1d2d9dc9c7661c6b2433ae.",
     "Předchozí profil skončil timeoutem a blokací fyzické URL kontroly, příčina nebyla doložena. Nevydávat minulý pokus za výkonovou baseline.",
     "Použití původní cache je navázání stejného root vlastníka; run1/build ani předchozí evidence se nepřepisují. Tři staré untracked konsolidační soubory zůstávají mimo scope.",
-    "Druhý pokus run2 skončil light-preparation timeoutem 30040,4 ms; fyzickou aktivní kartu opět nelze ověřit, Computer Use ukončilo ovládání kvůli neurčitelné URL. Žádný runtime zásah. Oba vlastní procesy ukončeny STOP, další postup a kandidáti v handoffu. Uživatel navíc výslovně požaduje po prvním zásahu další optimalizaci proti zásekům; tato navazující práce zůstává neprovedená."
+    "Druhý pokus run2 skončil light-preparation timeoutem 30040,4 ms; fyzickou aktivní kartu opět nelze ověřit, Computer Use ukončilo ovládání kvůli neurčitelné URL. Žádný runtime zásah. Oba vlastní procesy ukončeny STOP, další postup a kandidáti v handoffu. Uživatel navíc výslovně požaduje po prvním zásahu další optimalizaci proti zásekům; tato navazující práce zůstává neprovedená.",
+    "Uživatel nyní potvrdil, že testovací karta je viditelná v popředí. Navázání stejného úkolu na main56940276, nový run3 původního buildu; nepoužívat znovu blokovanou kontrolu fyzického okna, kartu ovládat přes explicitně povolený Edge connector a zaznamenat uživatelské potvrzení.",
+    "Koordinátor po potvrzeném foreground profilu vybírá rozpočtovanou startup shader preparation: skutečný normální high/day-1-on render20.8265s zahrnuje35slow createShaderModule callů18.1085s. Přesná cache má8/884knownhitů, volena fronta před nativním _preparePipelineContextAsync, jen během přípravy; readiness/limitykvalit beze změny. Helper+testy má vlastní disjunktní task.",
+    "Targeted188 testů:187PASS/1FAIL pouze přesný starý source-string prepareLighting(pipelinePreparation), který nová kombinovaná readiness změnila. Koordinátor přiděluje související fixture test pro zachování časového kontraktu; skutečné runtime readinesstesty24PASS již pokrývají novou hranici.",
+    "User požaduje úplnou forenzní kontrolu logů. Nalezena skutečná candidate81768 validation80B sun proti96Bpipeline; guardstartup-material-readiness mádisjunktnítask. Root přidává pouze boundedlast-operation/queue/readinesslokálnídiagnostiku pro dalšíprůchody, bezzměnyreadiness/timeoutů a bezdalšíhoGPUdotazování.",
+    "Související actualpreload fixture potřebuje novélexikálnívlastníky material/shader preparation; přidělena rootu, abyseověřilojejichnulovévolánípo cancellation, nikoliosekaltest.",
+    "3.11.2026: koordinace s uživatelem schváleným Discord KB vláknem01a19e0f-821c-7d01-b0dd-9dbcd006444f. BMAD snapshot užnačten, cache scope uvolněn. Po dokončenémcandidate2STOP/revalidaci se uvolňujeadmin; další společnýfreeze vstupů předGPU se musí dohodnout, protože RAG/UI/server/test změny mění měřicí identitu.",
+    "3.11.2026 po přerušení a koordinaci KEY-72: vlastní API/preview/sampler skončily, 2568/4179 ověřeny volné. Uvolněny nevyužívané heavy-validation/gpu/workspace-build/port zdroje; souborové rezervace render WIP zůstávají. Před dalším náročným ověřením je nutná nová rezervace a domluvený freeze s Discord KB vlastníkem.",
+    "3.11.2026 po dokončeném KEY-72 df62bd4d: root KEY-72 výslovně potvrdil stabilní runtime/build/test/assets a uvolněné zdroje/index. Obnovena root rezervace pro candidate3, tentýž neměnný build s loopback native/queued kontrolou a materiálovou ochranou. Původní8080 gamec82/toolsd05 zachovány. Admin převzal pouze původní tři vlastní render task JSON podle dokumentovaného root vlastnictví.",
+    "3.11.2026 review nativekontroly: inertfronta musí zachovat retry once-only RTT postprocessu, který předpipelineadapteremvracíapplynull. Rootvýslovněrozšiřujescopeo compilationprofile+jehotestprolevný nativní completiongetter; Game použije stejný serial v obou větvích. Žádný nový GPUhook anivozovýtimeout.",
+    "3.11.2026 poC6STOP/revalidaci: heavy-validation dočasně předán tasku shader-cpu-kernel-20261103 pro skutečný CPU profil. Root nesmí během něj spouštět build/GPU/load a zdroj musí před dalším během opět získat.",
+    "3.11.2026: CPUkernel předán rootu a heavy uvolněná. Root přebírá jeho versioned evidence/handoff pro integraci, obnovuje heavy pro checkpoint SDK/commit. Na základě includes39%/parse32% a6sharedASTinputs mezi24uniqueEffecty volí boundedASTcache. Root výslovně rezervuje app control + package/lock/node_modules pro pozdější integraci připnutého patch kandidáta; verze závislostí se nezvyšují."
   ]
 }

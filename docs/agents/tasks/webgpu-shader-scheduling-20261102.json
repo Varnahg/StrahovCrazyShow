@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "id": "webgpu-shader-scheduling-20261102",
+  "title": "Omezené dávky WebGPU shader preparation při startupu",
+  "writePaths": [
+    "client/webgpu-shader-preparation.ts",
+    "tests/webgpu-shader-preparation.test.ts",
+    "docs/agents/handoffs/webgpu-shader-scheduling-20261102.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Fronta odkládá skutečný pinned _preparePipelineContextAsync, bez změny shaderů, onReady či readiness; WebGL inertní.",
+    "Omezené FIFO dávky podle CPU budgetu a maxpočtu, správný engine receiver, device/generation ownership, abort/dispose/retired context cleanup, žádné neobsloužené rejections.",
+    "Cílený refaktoring, deterministické meaningful testy běhu, limitu, abortu a skutečného Babylon async callback kontraktu; handoff předaný rootu."
+  ],
+  "verification": [
+    "Pouze lehké CPU testy/syntax pod vlastní rezervací; skutečný build/GPU/fullsuite dělároot.",
+    "Primární podklady jsou instalovaný Babylon9.30 engine/effect.functions a stávající compilation/health/pipelinepreparation adaptéry."
+  ],
+  "notes": [
+    "Výslovná delegace rootu po doloženém foreground CPU hotspotu; žádný další BMAD workflow.",
+    "Game a integračnítest vlastníroot; helpernavrhne API a oznámí je předrootintegrací. Původníbaselinea run1/2/3 se nemění."
+  ]
+}

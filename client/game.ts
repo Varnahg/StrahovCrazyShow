@@ -5,6 +5,7 @@ import { RenderedFrameCapture } from "./rendered-frame-capture";
 import type { FeedbackFrame } from "../shared/feedback";
 import { createEnvironmentProfile } from "./environment-profile";
 import { WebGpuFrameLifecycleProfile } from "./webgpu-frame-lifecycle-profile";
+import { WebGpuStartupCpuProfile } from "./webgpu-startup-cpu-profile";
 import {
   snapshotAcceptedAuthorityDiagnostics,
   snapshotTransportDiagnostics,
@@ -19,6 +20,8 @@ import { GltfLightBudget } from "./gltf-light-budget";
 import { prepareLightVariants } from "./light-preparation";
 import { prepareRenderQualities } from "./render-quality-preparation";
 import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
+import { WebGpuShaderPreparation } from "./webgpu-shader-preparation";
+import { StartupMaterialReadiness } from "./startup-material-readiness";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
 import { getTreeSeasonState } from "../shared/tree-season";
@@ -338,6 +341,7 @@ export class Game {
   onRendererFailure?: (message: string) => void;
   onNotice?: (message: string) => void;
   onBenchmark?: (result: Benchmark) => void;
+  private localPreparationDiagnostics = false;
   private lightingReadiness?: {
     quality: string; stage: string; lastGate: string | null;
     mesh: string | null; material: string | null;
@@ -498,6 +502,7 @@ export class Game {
   private readonly compilationProfile: WebGpuCompilationProfile;
   private readonly environmentProfile: ReturnType<typeof createEnvironmentProfile>;
   private readonly frameLifecycleProfile?: WebGpuFrameLifecycleProfile;
+  private readonly startupCpuProfile?: WebGpuStartupCpuProfile;
   private profiledLightingInstant = 0;
   private profiledDaylight = 0;
   private profiledPreviousExposure = 1;
@@ -652,6 +657,10 @@ export class Game {
       }),
     });
     this.compilationProfile.setStage("construction");
+    if (["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname) &&
+        new URLSearchParams(window.location.search).get("profileStartupCpu") === "1") {
+      this.startupCpuProfile = new WebGpuStartupCpuProfile(this.engine);
+    }
     if (this.environmentProfile) {
       sessionDiagnostics.event("environment-profiling", {
         rendererId: this.renderHealth.rendererId,
@@ -886,6 +895,7 @@ export class Game {
   }
   async start() {
     this.assertStartupActive();
+    this.localPreparationDiagnostics = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
     this.canvas.dataset.bootStage = "presentation";
     this.presentationRate = await this.renderHealth.guard(measurePresentationRate());
     this.assertStartupActive();
@@ -920,6 +930,12 @@ export class Game {
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
     let pipelinePreparation: WebGpuPipelinePreparation | undefined;
+    let shaderPreparation: WebGpuShaderPreparation | undefined;
+    let materialPreparation: StartupMaterialReadiness | undefined;
+    let renderedShaderCompletions = 0;
+    const retryPreparationTargets = () => {
+      for (const renderer of this.scene.objectRenderers) renderer.resetRefreshCounter();
+    };
     const renderPreloadScene = () => {
       if (!this.disposed) {
         this.gltfLightBudget.prepareFrame();
@@ -927,9 +943,18 @@ export class Game {
         this.scene.render();
       }
     };
-    const preloadRender = () => pipelinePreparation
-      ? pipelinePreparation.render(renderPreloadScene)
-      : renderPreloadScene();
+    const preloadRender = () => {
+      if (this.disposed) return;
+      materialPreparation?.prepareFrame();
+      const completed = shaderPreparation ? this.compilationProfile.shaderPreparationCompletions : 0;
+      if (completed !== renderedShaderCompletions) {
+        renderedShaderCompletions = completed;
+        // A shader-pending material may skip an RTT before the pipeline
+        // adapter sees a draw. Retry once-only targets after real completion.
+        retryPreparationTargets();
+      }
+      return pipelinePreparation ? pipelinePreparation.render(renderPreloadScene) : renderPreloadScene();
+    };
     this.engine.runRenderLoop(preloadRender);
     try {
       const [
@@ -1034,27 +1059,46 @@ export class Game {
     // Keep the scope through restore and the final submitted-frame gate.
     pipelinePreparation = new WebGpuPipelinePreparation(this.engine, {
       signal: this.startupAbort.signal,
-      diagnostics: !!this.terrainReview && !this.network,
+      diagnostics: this.localPreparationDiagnostics,
       retryIncompleteFrame: () => {
         // A skipped once-only/periodic target must receive a real retry. This
         // registry also covers shared/standalone ObjectRenderer owners; normal
         // postprocess scratch targets are redrawn on every scene pass already.
-        for (const renderer of this.scene.objectRenderers)
-          renderer.resetRefreshCounter();
+        retryPreparationTargets();
       },
     });
     try {
+      materialPreparation = new StartupMaterialReadiness(this.scene, { signal: this.startupAbort.signal });
+      shaderPreparation = new WebGpuShaderPreparation(this.engine, {
+        signal: this.startupAbort.signal,
+        // Blanket admission regressed startup in the controlled comparison.
+        // Retain it only as an explicit local experiment with all gates intact.
+        enabled: this.localPreparationDiagnostics &&
+          new URLSearchParams(window.location.search).get("startupShaderScheduling") === "queued",
+        onError: (error) => {
+          if (!this.disposed && !this.startupAbort.signal.aborted && this.renderHealth.snapshot().errorCount === 0)
+            this.renderHealth.report("shader", error);
+        },
+      });
+      renderedShaderCompletions = this.compilationProfile.shaderPreparationCompletions;
+      const preparationReady = () => shaderPreparation!.isReady() && pipelinePreparation!.isReady();
       this.canvas.dataset.bootStage = "light-preparation";
+      if (this.startupCpuProfile) sessionDiagnostics.event("startup-cpu-profile", {
+        stage: "preparation-start", rendererId: this.renderHealth.rendererId,
+        timing: this.startupCpuProfile.snapshot(),
+      });
       if (this.frameLifecycleProfile)
         sessionDiagnostics.event("engine-frame-profile", {
           stage: "preparation-start", rendererId: this.renderHealth.rendererId,
           timing: this.frameLifecycleProfile.snapshot(),
         });
       const preparation = {
-        ...(await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation))),
+        ...(await this.renderHealth.guard(this.prepareLighting(preloadRender, { isReady: preparationReady }))),
+        shaderScheduling: shaderPreparation.snapshot(),
         ...(this.lightingReadiness ? {
           readiness: this.lightingReadiness,
           pipeline: pipelinePreparation.snapshot(),
+          pipelineScope: "Snapshot after restoration; readiness and lastState describe the last attempted stage.",
         } : {}),
       };
       this.assertStartupActive();
@@ -1078,7 +1122,7 @@ export class Game {
         render: preloadRender,
         isReady: () => {
           if (this.precipitation && !this.precipitation.prepare()) return false;
-          if (!pipelinePreparation!.isReady()) return false;
+          if (!preparationReady()) return false;
           const meshes = this.scene.getActiveMeshes();
           for (let index = 0; index < meshes.length; index++)
             if (!this.isMeshReadyForCamera(meshes.data[index])) return false;
@@ -1088,9 +1132,32 @@ export class Game {
       });
       this.assertStartupActive();
     } finally {
-      pipelinePreparation.dispose();
-      pipelinePreparation = undefined;
+      try {
+        if (shaderPreparation) sessionDiagnostics.event("shader-preparation-scheduling", {
+          rendererId: this.renderHealth.rendererId, ...shaderPreparation.snapshot(),
+        });
+      } finally {
+        try {
+          this.startupCpuProfile?.dispose();
+          if (this.startupCpuProfile) sessionDiagnostics.event("startup-cpu-profile", {
+            stage: "startup-end", rendererId: this.renderHealth.rendererId,
+            timing: this.startupCpuProfile.snapshot(),
+          });
+        }
+        finally {
+          try { shaderPreparation?.dispose(); }
+          finally {
+            try { materialPreparation?.dispose(); materialPreparation?.assertHealthy(); }
+            finally {
+              pipelinePreparation.dispose();
+              pipelinePreparation = undefined;
+            }
+          }
+        }
+      }
     }
+    // Restoring an owned scheduling hook can itself retire the renderer.
+    this.assertStartupActive();
     this.canvas.dataset.renderHealth = "ready";
     this.compilationProfile.setStage("ready");
     this.ready = true;
@@ -2713,9 +2780,9 @@ export class Game {
     pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
     options?: { timeoutMs: number; restoreQuality?: () => void },
   ) {
-    // Local fixed guest QA only. Reuse the actual gate results; no extra mesh,
+    // Local diagnostics, including multiplayer. Reuse actual results; no extra mesh,
     // Effect or pipeline probes and no retained renderer object references.
-    const readiness = this.terrainReview && !this.network ? {
+    const readiness = this.localPreparationDiagnostics || this.terrainReview && !this.network ? {
       quality: this.quality, stage: "initial", lastGate: null as string | null,
       mesh: null as string | null, material: null as string | null,
       waits: { mesh: 0, precipitation: 0, pipeline: 0, health: 0, effects: 0 },
@@ -2725,9 +2792,14 @@ export class Game {
       if (!ready && readiness) {
         readiness.lastGate = name; readiness.waits[name]++;
         if (name === "mesh") {
-          const m = mesh as { name?: unknown; material?: { name?: unknown } | null } | undefined;
-          readiness.mesh = typeof m?.name === "string" ? m.name.slice(0, 120) : null;
-          readiness.material = typeof m?.material?.name === "string" ? m.material.name.slice(0, 120) : null;
+          const m = mesh as { name?: unknown; uniqueId?: unknown; material?: { name?: unknown; uniqueId?: unknown } | null } | undefined;
+          // Avatar names embed multiplayer identity. Numeric scene-local tags
+          // identify technical objects without retaining those instance names.
+          const tag = (kind: string, value: unknown) => typeof value === "number" && Number.isSafeInteger(value) && value >= 0 ? `${kind}#${value}` : null;
+          readiness.mesh = this.network ? tag("mesh", m?.uniqueId)
+            : typeof m?.name === "string" ? m.name.slice(0, 120) : null;
+          readiness.material = this.network ? tag("material", m?.material?.uniqueId)
+            : typeof m?.material?.name === "string" ? m.material.name.slice(0, 120) : null;
         } else {
           readiness.mesh = readiness.material = null;
         }
@@ -3473,6 +3545,7 @@ export class Game {
     window.removeEventListener("resize", this.resize);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
+    this.startupCpuProfile?.dispose();
     this.stableLights.dispose();
     this.gltfLightBudget.dispose();
     this.enabledMeshCandidates.dispose();

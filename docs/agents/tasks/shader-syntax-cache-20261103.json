@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "shader-syntax-cache-20261103",
+  "title": "Omezená cache neměnného syntaktického stromu WGSL před variantním průchodem",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "tests/shader-syntax-cache-native.test.ts",
+    "docs/performance/evidence/shader-syntax-cache-20261103/",
+    ".cache/shader-syntax-cache-20261103/",
+    "docs/agents/handoffs/shader-syntax-cache-20261103.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Pouze main a uvedené files; žádné runtime node_modules/package/lock změny před root integrací. Žádná větev/copy projektu.",
+    "Klíč přesný preparedSourceCode na hranici EvaluatePreProcessors, po includes a callbacks. Znovu provést celý variantní walk a všechny processing callbacks s čerstvým kontextem/dictionaries.",
+    "Opt-in vlastnictví podle konkrétního processoru, explicitní reset/release a počty; výchozí vypnuto do přijetí. Bez Effect/Scene/GPU referencí v cache.",
+    "Limity entries/textUTF16/nodes/operators, eviction a oversized fallback. Paměťové počty neprezentovat jako skutečnou JS heap velikost.",
+    "Diferenciální shoda WGSL i binding contextu, včetně změn defines/indexParameters/includes/afterIncludes/nonfloat a life-cycle. Zachovat výjimky a všechny existující patch části.",
+    "CPU srovnání zahrne lookup/eviction/režii i první sweep různých Effectů, ne pouze opakování identického Effectu. GPU/FPS přijetí provede root až nad aktuálním buildem."
+  ],
+  "verification": [
+    "Nejprve cílené native parity/regrese a kontrola patch preimage.",
+    "CPU A/B ve vlastních rezervovaných výstupech po claimu heavy; žádné build/fullsuite/GPU/server.",
+    "Nativní patch + testy + výzkum/varianty + cílený refaktoring + handoff jako jeden integrovatelný celek; žádný commit."
+  ],
+  "notes": [
+    "User authorized another complete optimization; selected after actual whole-game shaderCPU proof and native CPUkernel study. Root pipeline safety/diagnostics/QA disabled queue remain independent baseline.",
+    "Před zahájením zápisu počkat na root checkpoint commit a předání heavy. Read-only design může proběhnout před claimem. Agent nesmí obcházet konflikt a nemění package.json/workspace/lock/node_modules.",
+    "Kandidát může používat jednotlivé diagnostické/dependency soubory v vlastní .cache, nikoli další projektový checkout. Root použije běžný pnpm patch/lock/install postup nad main po předání."
+  ]
+}
