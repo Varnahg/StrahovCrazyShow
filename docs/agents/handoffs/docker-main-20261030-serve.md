@@ -1,5 +1,15 @@
 # Předání: docker-main-20261030-serve
 
+## Aktuální služba po KEY-72 dne3.11.2026
+
+Tato aktualizace nahrazuje níže uvedenou původní identitu image z30.10. Provozní vlastník i port8080 zůstávají stejné. Přijatý koordinovaný switch je doložen v [produkčním předání KEY-72](discord-kb-20261103-production-switch.md).
+
+Game je nyní `strahov-crazy-show:git-c82c6b33`, IID `sha256:73a983eae229181a5d42ebb632d1957b54af6a57ca0f601a2fdf559c3a442edf`, kontejner `1800e89ee46596e9c338fc55a88492a1465fa22e7b8c0b1be915d58406e3f330`. Tools `strahov-rag-tools:git-d05c893e`, IID `sha256:5697d2cc4ad2aa1daba16fdd3d57076d69348775377a693a07f3f3bcc5958ece`. DB je schema3, původní DB kontejner, všechny4volumes a secret C mount zachované. Hra i DB healthy, AI enabled; skutečný syntetický dotaz se2novými kurátorovanými citacemi PASS.
+
+Budoucí `up` z kanonického checkoutu musí použít `-p strahovcrazyshow-main-20261027 --env-file .env -f compose.full.yaml -f .cache/discord-kb-20261103/validation/release/compose-images.yaml` a `up -d --no-build --pull never`. Override je nyní provozní závislost: chránit jej před úklidem a nenahrazovat starými local tagy/schema2 runtime. Bootstrap má budget0/0. Portový claim není uvolněný; po skončení deploy kontroly nezůstává rezervované heavy-validation.
+
+## Historické spuštění30.10.2026
+
 - Vlastník/integrátor `docker-main-01a189a0-serve`, kanonický C checkout na `main`. Přímé zadání30.10.2026: zapnout hlavní main přes Docker.
 - Docker Desktop byl vypnutý. `docker desktop start --detach` obnovil existující projekt; následný kompletní Compose build/start použil aktuální zdroj `1b7d2413bc4d1a32b14f593f3d67543340fa2204` a skončil0. Hra běží na `http://localhost:8080/`, mapování pouze `127.0.0.1:8080 -> 2567`.
 - Název Compose projektu `strahovcrazyshow-main-20261027` je zachován kvůli identitě dat. Game a bootstrap nyní používají kanonický C checkout; secret bind je `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/secrets/openai_api_key.txt`. Obsah klíče nebyl vypsán. DB kontejner zůstal původní, jeho historický working-directory label není závislost na staré kopii; používá named volumes.
