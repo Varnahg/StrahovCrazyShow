@@ -47,10 +47,10 @@ context: ['{project-root}/AGENTS.md', '{project-root}/docs/agents/bmad-policy.md
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Parser: syntetické testy a přesná inventura celého korpusu.
-- [ ] Kurace: poradna, bloky/B6, General a ostatní kanály v oddělených privátních partitions; každý message ID a accepted claim dohledatelný.
-- [ ] Foundation: typy, validátory, migrace, import a cílené regrese.
-- [ ] Root: druhá kontrola/dedup, canonical dataset, generovaný Markdown/manifest, provider/UI a 60dotazová evaluace.
+- [x] Parser: syntetické testy a přesná inventura celého korpusu.
+- [x] Kurace: poradna, bloky/B6, General a ostatní kanály v oddělených privátních partitions; každý message ID a accepted claim dohledatelný.
+- [x] Foundation: typy, validátory, migrace, import a cílené regrese.
+- [x] Root: druhá kontrola/dedup, canonical dataset, generovaný Markdown/manifest, provider/UI a 60dotazová evaluace.
 - [ ] Integrace: actual DB/cache/import, full tests/build/izolovaná integrace, praktické AI odpovědi a samostatné commity.
 
 **Acceptance Criteria:**
@@ -68,6 +68,16 @@ context: ['{project-root}/AGENTS.md', '{project-root}/docs/agents/bmad-policy.md
 ## Spec Change Log
 
 ## Review Triage Log
+
+| Nález | Dopad a přijetí | Oprava a důkaz |
+|---|---|---|
+| Potvrzení kurace nebylo původně dostatečně vázané na konkrétní obsah a celý ledger | Střední: změněný obsah mohl přežít staré schválení | Receipt nyní váže content hash, inventory i ledger; gate kontroluje přesně všech 180 souborů a 18 465 ID. Tamper/coverage regrese PASS. |
+| Generovaný gap mohl obejít zdrojové označení | Střední: nepodložená část by se mohla zobrazit bez ID | Gap přijímá jen prázdný text/IDs; lokalizované odmítnutí vytvoří server. Supported vyžaduje platná IDs a homogenní druh podpory. Provider regrese a live guardy PASS. |
+| Docker bootstrap používal pouze extraction validator | Střední: nový seed by neprošel skutečným startem | Union dispatcher se zachovanými cache kontrolami; syntetické testy i skutečný fresh/upgrade/repeat PostgreSQL bootstrap PASS, 0 API volání. |
+| Auditní kategorie duplicate zahrnovala nový kontext a překonané domněnky | Nízký pro odpovědi, podstatný pro přesnost auditu | Po vzorku 40 zpráv přečteno všech 400; 127 pravých duplicit, 81 used, 130 excluded, 62 insufficient. Obsah i runtime bundles144 zcela stejné. |
+| Verifikace release artefaktu původně důvěřovala upravitelnému manifestu | Střední pro identitu testované verze | Očekávaný SHA a commit, úplný inventář, zákaz dalších zdrojů/secrets; nezávislý recheck opravy čistý. LFS hydratace je explicitní a ověřená OID. |
+
+Závěrečné obsahové review 144 jednotek a runtime/tooling review jsou čisté. Evidence skutečné generace zachovává původní `positive-07` invalid-response i úspěšnou omezenou reprodukci a klientský průchod; nejde o přepsání prvního výsledku. Guard18 pouze abstinuje, vysvětlení rozdílu herní profil/členství je neúplné. Úplná testovací sada a finální nasazení jsou ještě v přejímce.
 
 ## Design Notes
 

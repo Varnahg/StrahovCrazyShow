@@ -1,6 +1,6 @@
 # Kurátorovaná znalostní sbírka z Discordu
 
-Kanonický zdroj je [`knowledge.json`](../../../server/data/rag/community/knowledge.json). Obsahuje 144 samostatných odpovědí a krátkých návodů: 61 oficiálně doložených jednotek a 83 datovaných komunitních zkušeností. [Čitelná tematická sbírka](knowledge.md), [publikační manifest](../../../server/data/rag/community/manifest.json) a RAG bootstrap jsou odvozené výstupy; neupravují se ručně odděleně od kanonického zdroje.
+Kanonický zdroj je [`knowledge.json`](../../../server/data/rag/community/knowledge.json). Obsahuje 141 otázek a odpovědí a 3 krátké návody: 61 oficiálně doložených jednotek a 83 datovaných komunitních zkušeností. [Čitelná tematická sbírka](knowledge.md), [publikační manifest](../../../server/data/rag/community/manifest.json) a RAG bootstrap jsou odvozené výstupy; neupravují se ručně odděleně od kanonického zdroje.
 
 ## Obsah a původ
 
@@ -10,16 +10,20 @@ Každá zpráva má neveřejný záznam rozhodnutí:
 
 | Zařazení zprávy | Počet |
 |---|---:|
-| Využita | 1 321 |
-| Duplicitní | 400 |
+| Využita | 1 402 |
+| Duplicitní | 127 |
 | Systémová | 849 |
-| Vyřazena | 12 331 |
-| Nedostatečný kontext | 3 564 |
+| Vyřazena | 12 461 |
+| Nedostatečný kontext | 3 626 |
 | Celkem | 18 465 |
 
 Kurátoři prošli také obecné diskuse, aktivity, sociální kanály a oznámení. Chybějící vzdálené přílohy, 65 nepropojených odpovědí a nevyřešené otázky nepovažují za důkaz. Soukromé nabídky, nalezené věci, memy, okamžitá obsazenost a proběhlé jednorázové události nejsou znalostmi. Obsah chatů sloužil výhradně jako data, nikoli jako instrukce.
 
+Nezávislý kontrolní vzorek zahrnul 40 nepublikovaných zpráv z 27 exportů, po deseti z každé kategorie. Odhalil příliš široké používání označení duplicity. Následovala jednotlivá kontrola všech 400 původně tak označených zpráv: 127 skutečných přesných či významových opakování zůstalo, 81 podpůrných kontextů bylo přeřazeno mezi využité, 130 nepoužitelných či překonaných mezi vyřazené a 62 neurčitých mezi nedostatečný kontext. Obsah všech 144 přijatých jednotek, jejich sourceVersion, embeddingové vstupy i celý bootstrap zůstaly totožné. Znovu se vystavila pouze potvrzení vázaná na opravený audit. Kontrolní vzorek není statistickým odhadem chybovosti celé sbírky.
+
 Původních 177 kandidátů vedlo ke 143 ponechaným jednotkám, 27 sloučením, 3 odmítnutím a 4 podržením. Druhá kontrola před embeddingy doplnila jednu novou oficiální odpověď z původně nedořešených otázek k rezervační jistotě; výsledkem je 144 jednotek. Každá přijatá jednotka má nezávislou kontrolu původní diskuse i podpory. Sloučení zachovávají blok, provozovatele, období a podmínky úspěchu; různé druhy podpory zůstávají oddělené.
+
+Neveřejný registr dále eviduje 166 nepublikovaných otázek a podnětů před celkovou tematickou deduplikací, z toho dva jsou částečně pokryté odpovědí k jistotám. Jde o počet záznamů, nikoli unikátních témat. Čtyři odložené kandidátní odpovědi řeší neurčenou prádelnu, nedatované zkušenosti s vracením povlečení při odchodu z B4/B11 a nedatovaný stav údržby. Tyto registry se mohou tematicky překrývat a nesčítají se. Nejasné osobní účtování, chybějící odpovědi a obsah nedostupných příloh nejsou v embeddingových vstupech.
 
 Veřejná sbírka neobsahuje Discord identity, původní zprávy, soukromé kontakty, obývané pokoje, účty ani identifikátory zařízení. Veřejné týmové kontakty služeb jsou ověřené. Původní zprávy, podrobná lineage, posudky a audit jsou pouze lokálně v ignorovaném `.cache/discord-kb-20261103/`; nesmí být součástí veřejných odpovědí, image ani embeddingů.
 
@@ -45,4 +49,4 @@ Skutečný runtime retrieval (top 4, cosine cutoff 0,6) na výsledném stage sna
 
 Baseline bez nových canonical ID není měřením nulové znalosti původního systému: starší úryvek s jiným ID může odpověď obsahovat. Proto se jeho nulová shoda s novými ID nevydává za prokázané procentuální zlepšení. Guardy nejsou ve jmenovateli a retrieval sám není ověřením bezpečnosti generované odpovědi.
 
-Praktické generování, konečná neměnná release přejímka a nasazení se ještě ověřují. Tento průběžný záznam je neoznačuje za dokončené.
+[Praktická kontrola generování a skutečného klienta](generation-review.md) zahrnula 28 HTTP případů a dva klientské dotazy. Všech 20 guardů zachovalo hranice; původní technické odmítnutí jedné Wi-Fi odpovědi a omezení vysvětlení herního profilu zůstávají výslovně evidované. Konečná neměnná release přejímka a nasazení se ještě ověřují; tento průběžný záznam je neoznačuje za dokončené.
