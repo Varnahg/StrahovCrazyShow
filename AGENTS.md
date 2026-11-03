@@ -55,6 +55,14 @@ Aktivní rezervace jsou lokální ve společném Git adresáři; nesdílejí se 
 - Opakované úkony automatizuj úzce ve stávajícím harnessu. Eviduj zvlášť build, start, měření a zbývající čas obsluhy; čekej na uložený výsledek, ne na chybovou obrazovku. Prohlížeč obsluhuj autonomně v rámci autorizace. Nevytvářej obecný řadič kvůli jedné sérii.
 - Udržuj jeden stručný aktuální stav v existujícím předání (checkpoint, závěr, další krok); historické důkazy odkazuj. Cílené kontroly průběžně, plné ověření nad stabilním checkpointem. Úspěšnou kontrolu opakuj jen po relevantní změně, selhání či nové konkrétní pochybnosti.
 
+## Samostatné ovládání Edge při testování — zadání 4. 11. 2026
+
+- Uživatel výslovně autorizoval převzetí ovládání počítače pro testování hry: sám otevři nainstalovaný Edge, vlastní testovací kartu/okno, přepni je do popředí a proveď test. Nežádej znovu o otevření prohlížeče, přepnutí karty ani potvrzení, že je v popředí. Rozsah platí pro testování tohoto projektu; nové oprávnění řeš jen tam, kde je skutečně vyžaduje nástroj nebo bezpečnostní pravidla.
+- Nejprve použij dostupné browser API pro Edge a jeho aktuální dokumentaci. Vytvoř vlastní označenou testovací kartu; při potřebě nativního okna použij Computer Use a skutečné ID z čerstvého inventáře. Browser tab/window ID není Windows window ID. Nativní výběr okna nepoužívej jako povinný mezikrok, pokud browser API úkon zvládá.
+- Před měřením sám ověř přesnou URL, identitu buildu/relace, aktivní a viditelnou kartu, viewport a průchod diagnostiky do uloženého výsledku. Přípravu ovládání dokonči před časově omezenou sérií; během snímkového intervalu nečti DOM a nepořizuj screenshoty. Nepovažuj název okna ani otevření URL za důkaz správné hry či GPU.
+- Běžně zaniklou kartu nebo zastaralý handle obnov podle čerstvého inventáře ve stejném vybraném Edge; po chybě nejprve přečti stav a logy, opakuj jen konkrétní obnovovací krok. Bezpečnostní odmítnutí, neověřená URL nebo výslovný STOP nejsou tento případ: nepřecházej na jiný kanál, shell/CDP ani reset k obejití ochrany. Respektuj rozsah zastavení; dovoluje-li nástroj pokračovat mimo UI, zpracuj uložené logy a nezávislou práci. Vyžaduje-li ukončení tahu, uveď přesnou překážku a zachovej stav pro navázání.
+- Používej [praktický postup ve výkonovém návodu](docs/performance/README.md#samostatna-obsluha-edge). Zachovej uživatelské karty a server na 8080; uklízej pouze vlastní testovací prostředky. Zamčená plocha či výslovně požadovaný lidský zásah jsou skutečné překážky, běžná obsluha Edge nikoli.
+
 ## Pravidla hry a ověřování
 
 - Svět používá metry, +X východ, +Z jih a pravotočivou kameru Babylon. A musí být vlevo a D vpravo na obrazovce při každém natočení kamery. Ověř skutečnou projekci a jízdu, nikoli pouze znaménka v kódu.

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "edge-test-autonomy-20261104",
+  "title": "Zapsat autonomní přípravu Edge a obnovu ovládání při testování",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["docs/performance/README.md", "docs/agents/handoffs/edge-test-autonomy-20261104.md"],
+  "resources": [],
+  "acceptance": [
+    "Agent sám otevře a aktivuje vlastní testovací Edge podle aktuálně dostupného API, bez opakovaného souhlasu uživatele.",
+    "Postup rozlišuje zaniklou kartu, selhání hry a bezpečnostní odmítnutí nástroje; neobchází odmítnutí ani cizí relace.",
+    "Měření čeká na ověřenou identitu, viditelnost a sběr; příprava prohlížeče nezkrátí čas na naplánované vzorky."
+  ],
+  "verification": ["Kontrola aktuální dokumentace nástrojů, místních odkazů, git diff --check a katalogu.", "Praktická kontrola otevření vlastní prázdné Edge karty, pokud je browser nástroj dostupný; bez hry a GPU benchmarku."],
+  "notes": ["Výslovné zadání uživatele 4.11.2026. AGENTS.md mění stejný root pod drženou administrativní rezervací. Dokumentační upřesnění stávající autorizace, bez změny hry nebo bezpečnostních nastavení."]
+}
