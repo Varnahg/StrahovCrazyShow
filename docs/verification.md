@@ -1,5 +1,13 @@
 # Ověření dema a známá omezení
 
+## Neúspěšné WebGPU starty · rozbor logů 3. listopadu 2026
+
+[Forenzní rozbor](performance/evidence/render-next-20261102/startup-forensics.md) a [vybrané původní záznamy s hashi celých logů](performance/evidence/render-next-20261102/forensics.json) oddělují dvě příčiny ukončení. Candidate1 skutečně selhal na validační chybě světelného bufferu80B proti shaderu očekávajícímu96B. Candidate2 s materiálovou ochranou v jednom pokusu tuto chybu nezopakoval, ale Low příprava skončila timeoutem30 466,8ms. Přímá tvorba shaderových modulů zde trvala152,6ms; přípravné renderovací volání13 117,2ms a kontroly objektů4 514,9ms. Neatributovaný zbytek není označený za GPU čekání.
+
+Materiálová ochrana a související startup/lifecycle regrese114/114 PASS; následný build PASS. Starší úplná sada2877 PASS/1 FAIL/5 SKIP, přičemž nezměněný řadičový případ timeoutoval i izolovaně. Shaderová fronta i ochrana jsou rozpracované na main, **bez praktického přijetí, úspěšného Game.ready a FPS důkazu**. Tyto výsledky nenahrazují dokončení výkonové optimalizace. Produkční switch KEY-72 zajišťuje jiný vlastník z vlastního neměnného Git artefaktu, bez tohoto render WIP.
+
+Neaktivní původní Edge karta byla později prokázaná přes browser management. Přesun vlastní karty do aktivního okna obnovil předherní cadence59,9–60,2Hz. Dřívější neaktivní pokusy zůstávají neplatné pro FPS srovnání. Před dalším GPU během je nutná koordinace stabilních vstupů po produkčním switchi; dnešní rozbor pouze přečetl existující logy.
+
 ## Profil celé hry · konsolidovaný checkpoint 2. listopadu 2026
 
 Na `main` nad `fdc7b919` je zachovaný izolovaný produkční build/serve/SDK harness, manifest včetně testů a částečné důkazy prvního WebGPU startu. Harness 7/7 cílených testů PASS; neměnný Vite build a skutečný API/preview start/STOP/revalidace PASS. Hra skončila timeoutem přípravy světel po 30 051,6 ms; nedošlo k ready, SDK peers ani platným desetisekundovým FPS vzorkům. Příčina řídkých RAF callbacků není potvrzená. Computer Use při následném ověřování okna zastavilo ovládání kvůli neurčitelné URL.
