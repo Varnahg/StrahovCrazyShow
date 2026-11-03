@@ -1,5 +1,17 @@
 # Ověření dema a známá omezení
 
+## Kontrolované startup A/B na stejném buildu · 3. listopadu 2026
+
+Candidate3 source/test`a55cd239d0884f86ccdeff4a1e997b6443d11fa75f0508a968a3f4adaf0aaaac` porovnal native/queued/queued/native se stejnou ochranou materiálů a pomocných renderů. **Všechny čtyři starty skončily timeoutem Low.** Ve shodných prvních sedmi dokončených variantách měla fronta v této sérii průměrně o25,7% delší čas, o89,8% více renderů a o51,2% více kontrol objektů; maxima jednotlivých renderů naopak klesla. Tato podoba fronty se nepřijímá jako dokončená optimalizace. Počty aktivních objektů byly v odpovídajících fázích shodné; dřívější candidate2 s924–928 objekty není tento A/B pár.
+
+[Report, výsledky a meze](performance/evidence/render-next-20261102/candidate3/report.md) a [souhrn s úplnými gzip logy, systémovou telemetrií a hashi](performance/evidence/render-next-20261102/candidate3/summary.json) oddělují čtyři běžné pokusy od pátého instrumentovaného. Všechny měly předherní cadence59,9Hz, bez dalšího vlastního3D běhu; žádný Game.ready nebo FPS/SDK přejímka nevznikl. Takty a cache nebyly řízené, jen2+2 pokusy nejsou obecný statistický závěr. Sampler/API/karta ukončené, viewport resetovaný, inputsRevalidated=true. Následuje užší profil synchronní tvorby shaderů před nativním API.
+
+## Produkční znalostní báze KEY-72 · 3. listopadu 2026
+
+Původní provozní vlastník dokončil přepnutí8080 na ověřený game image z`c82c6b33` a bootstrap tools z`d05c893e`; přepnutí dokládá`2b11a563`. [Závěrečný report vydání](rag-ingestion/20261103-discord/release-verification.md) uvádí skutečnou DB migraci, zachování původních dat/cache, HTTP health a produkční AI dotaz s novými citacemi. Renderovací WIP tohoto výkonového úkolu nebyl součástí image. Nebyla tím ověřena3D hra ani FPS.
+
+Původní úplná sada tohoto samostatného artefaktu zůstává **2 896 PASS / 2 FAIL / 5 SKIP**. Přesné izolované opakování obou setup selhání prošlo2/2 na stejném artefaktu, bez změny aplikace nebo timeoutů; není to zpětně zelený fullsuite. Podrobnosti a rozdíl mezi runtime a tools artefaktem zachovává uvedený report.
+
 ## Neúspěšné WebGPU starty · rozbor logů 3. listopadu 2026
 
 [Forenzní rozbor](performance/evidence/render-next-20261102/startup-forensics.md) a [vybrané původní záznamy s hashi celých logů](performance/evidence/render-next-20261102/forensics.json) oddělují dvě příčiny ukončení. Candidate1 skutečně selhal na validační chybě světelného bufferu80B proti shaderu očekávajícímu96B. Candidate2 s materiálovou ochranou v jednom pokusu tuto chybu nezopakoval, ale Low příprava skončila timeoutem30 466,8ms. Přímá tvorba shaderových modulů zde trvala152,6ms; přípravné renderovací volání13 117,2ms a kontroly objektů4 514,9ms. Neatributovaný zbytek není označený za GPU čekání.
