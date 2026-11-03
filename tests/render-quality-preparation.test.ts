@@ -104,7 +104,7 @@ for (const initial of ["low", "medium", "high"] as const)
     );
     assert.deepEqual(
       f.passes.map((p) => p.timeoutMs),
-      [29995, 29995, 29995],
+      [59995, 59995, 59995],
     );
     assert.equal(outcome.status, "complete");
     assert.equal(outcome.elapsedMs, 322);
@@ -169,7 +169,7 @@ test("only reported hidden pause is deducted; apply and final restore remain act
   );
   assert.deepEqual(
     f.passes.map((p) => p.timeoutMs),
-    [29995, 29995, 29995],
+    [59995, 59995, 59995],
   );
 });
 
@@ -200,12 +200,12 @@ test("synchronous apply overrun stops before invoking preparation and still rest
   const f = fixture({
     applyQuality(quality) {
       f.applied.push(quality);
-      f.advance(30000);
+      f.advance(60000);
     },
   });
   const outcome = await f.run();
   assert.equal(outcome.status, "timeout");
-  assert.equal(outcome.activeElapsedMs, 30007);
+  assert.equal(outcome.activeElapsedMs, 60007);
   assert.deepEqual(f.applied, ["low"]);
   assert.equal(f.passes.length, 0);
   assert.equal(outcome.qualities[0].status, "timeout");
@@ -216,14 +216,14 @@ test("a complete callback cannot hide a synchronous per-pass overrun", async () 
   const f = fixture({
     async prepare(pass) {
       f.passes.push(pass);
-      f.advance(30000);
+      f.advance(60000);
       return result();
     },
   });
   const outcome = await f.run();
   assert.equal(outcome.status, "timeout");
   assert.equal(f.applied.length, 1);
-  assert.equal(outcome.activeElapsedMs, 30012);
+  assert.equal(outcome.activeElapsedMs, 60012);
   assert.equal(outcome.stages.length, 1);
 });
 
@@ -233,7 +233,7 @@ test("the total budget includes time between passes and reduces the next timeout
     isDisposed() {
       if (between) {
         between = false;
-        f.advance(50000);
+        f.advance(140000);
       }
       return false;
     },
@@ -245,11 +245,11 @@ test("the total budget includes time between passes and reduces the next timeout
     },
   });
   // isDisposed after the first completed pass is still charged to the global
-  // clock; it must not reset the next pass to a fresh unrestricted30 seconds.
+  // clock; it must not reset the next pass to a fresh unrestricted60 seconds.
   const outcome = await f.run();
   assert.equal(outcome.status, "complete");
-  assert.equal(outcome.activeElapsedMs, 80022);
-  assert.ok(f.passes[2].timeoutMs < 30000);
+  assert.equal(outcome.activeElapsedMs, 170022);
+  assert.ok(f.passes[2].timeoutMs < 60000);
   assert.equal(f.passes[2].timeoutMs, 19985);
 });
 
@@ -257,7 +257,7 @@ test("restoration cost can turn apparent completion into timeout", async () => {
   const f = fixture({
     async prepare(pass) {
       f.passes.push(pass);
-      f.advance(29990);
+      f.advance(59990);
       return result();
     },
     restore() {
@@ -267,9 +267,25 @@ test("restoration cost can turn apparent completion into timeout", async () => {
   });
   const outcome = await f.run();
   assert.equal(outcome.status, "timeout");
-  assert.equal(outcome.activeElapsedMs, 90005);
+  assert.equal(outcome.activeElapsedMs, 180005);
   assert.equal(outcome.qualities.at(-1)!.status, "timeout");
-  assert.equal(outcome.qualities.at(-1)!.activeElapsedMs, 30015);
+  assert.equal(outcome.qualities.at(-1)!.activeElapsedMs, 60015);
+});
+
+test("WebGPU can finish all qualities after the old thirty-second per-pass limit", async () => {
+  const f = fixture({
+    async prepare(pass) {
+      f.passes.push(pass);
+      f.advance(35000);
+      return result();
+    },
+  });
+  const outcome = await f.run();
+  assert.equal(outcome.status, "complete");
+  assert.deepEqual(f.passes.map(p => p.quality), ["low", "high", "medium"]);
+  assert.equal(outcome.activeElapsedMs, 105022);
+  assert.deepEqual(outcome.qualities.map(p => p.activeElapsedMs), [35005, 35005, 35012]);
+  assert.equal(f.restored.length, 1);
 });
 
 for (const status of ["failed", "timeout", "disposed"] as const)

@@ -1,5 +1,7 @@
 # Další rozlišení nákladu hraní
 
+**Nové výslovné zadání poC10:** zvýšitWebGPU limit na60s prokvalitu/180s celkem a zprovoznit běžnýWebGPU. C10CMtimeout30,0287s a úspěšnýNCM jsou původní důkazy; následujícíC11 má novýhash a novýrozpočet. Všechny readiness/health/submission podmínky zůstávají. Zvýšení timeoutu neníFPSoptimalizace. Níže uložený původní C10 plán se retrospektivně neupravuje.
+
 Výchozí maincdb3b8f7 + ověřený diagnostický celek. Závěry výzkumu jsou v `_bmad-output/planning-artifacts/research/technical-gameplay-smoothness-2026-11-03/research.md`. Žádný dosavadnícounter sám neprokázalCPU/GPUbound.
 
 1. Problém: pravidelnýrender scope32–38ms a jednotlivý1329,6ms interval, který původnínarrow66ms nevysvětluje.
