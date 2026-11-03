@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "render-next-validation-20261103",
+  "title": "Serializované ověřování root renderovacího úkolu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/render-next-validation-20261103/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4179"
+  ],
+  "acceptance": [
+    "Zdrojový root současně drží rezervace konkrétních vstupů a výstupů; tento úkol rezervuje serializované validační prostředky.",
+    "Před každým startem ověřit skutečné vlastní procesy/porty/3D scény;8080 zachovat.",
+    "Neměnné buildy a revalidace všech vstupů, doložený STOP/cleanup vlastních procesů a pravdivé výsledky."
+  ],
+  "verification": [
+    "Příslušné targeted/full/build/SDK/GPU podle skutečného checkpointu; logy zůstávají v rezervovaných root výstupech.",
+    "Nevykonávat souběžně s CPU benchmarky jiného tasku; release teprve po cleanupu."
+  ],
+  "notes": [
+    "Opakovaný validační slot aktivního uživatelského render zadání, nikoli nový backlog ani tvrzení dokončené optimalizace.",
+    "Výslovná koordinátorská změna po5dd15e8d; zdrojové writePaths dále vlastní render-next-20261102-root a převzaté helper tasks."
+  ]
+}

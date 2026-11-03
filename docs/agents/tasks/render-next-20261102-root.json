@@ -31,13 +31,7 @@
     "node_modules/",
     ".cache/shader-syntax-cache-integration-20261103/"
   ],
-  "resources": [
-    "gpu",
-    "workspace-build",
-    "port:2568",
-    "port:4179",
-    "heavy-validation"
-  ],
+  "resources": [],
   "acceptance": [
     "Pouze kanonický checkout/main; žádné nové větve, worktrees nebo source kopie. Docker8080 zachovaný.",
     "Před implementací znovu ověřit skutečnou Edge kartu/GPU/startup, profilem doložit konkrétní náklad, porovnat varianty a vybrat jeden zásah.",
@@ -64,6 +58,7 @@
     "3.11.2026 po dokončeném KEY-72 df62bd4d: root KEY-72 výslovně potvrdil stabilní runtime/build/test/assets a uvolněné zdroje/index. Obnovena root rezervace pro candidate3, tentýž neměnný build s loopback native/queued kontrolou a materiálovou ochranou. Původní8080 gamec82/toolsd05 zachovány. Admin převzal pouze původní tři vlastní render task JSON podle dokumentovaného root vlastnictví.",
     "3.11.2026 review nativekontroly: inertfronta musí zachovat retry once-only RTT postprocessu, který předpipelineadapteremvracíapplynull. Rootvýslovněrozšiřujescopeo compilationprofile+jehotestprolevný nativní completiongetter; Game použije stejný serial v obou větvích. Žádný nový GPUhook anivozovýtimeout.",
     "3.11.2026 poC6STOP/revalidaci: heavy-validation dočasně předán tasku shader-cpu-kernel-20261103 pro skutečný CPU profil. Root nesmí během něj spouštět build/GPU/load a zdroj musí před dalším během opět získat.",
-    "3.11.2026: CPUkernel předán rootu a heavy uvolněná. Root přebírá jeho versioned evidence/handoff pro integraci, obnovuje heavy pro checkpoint SDK/commit. Na základě includes39%/parse32% a6sharedASTinputs mezi24uniqueEffecty volí boundedASTcache. Root výslovně rezervuje app control + package/lock/node_modules pro pozdější integraci připnutého patch kandidáta; verze závislostí se nezvyšují."
+    "3.11.2026: CPUkernel předán rootu a heavy uvolněná. Root přebírá jeho versioned evidence/handoff pro integraci, obnovuje heavy pro checkpoint SDK/commit. Na základě includes39%/parse32% a6sharedASTinputs mezi24uniqueEffecty volí boundedASTcache. Root výslovně rezervuje app control + package/lock/node_modules pro pozdější integraci připnutého patch kandidáta; verze závislostí se nezvyšují.",
+    "3.11.2026 po checkpointu5dd15e8d: souborové vlastnictví zůstává rootu, drahé zdroje jsou oddělené do opakovatelně rezervovatelného render-next-validation-20261103. Převody heavy mezi CPU/cache agentem a rootem už nevyžadují měnit tento katalog. Před build/GPU/integrací root vždy získá validační claim, ověří procesy/porty a po cleanupu ho uvolní."
   ]
 }
