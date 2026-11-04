@@ -24,9 +24,11 @@ Stav: plán před prvním výkonovým během; žádné výsledky nejsou dosazen�
 | G | Vlastní, Low | Efekty obrazu zapnuté. Low je standardně vypíná, proto se zde měří cena jejich přidání. |
 | H | Ultra | Souhrnné nastavení podle schváleného plánu; neslouží k připsání výsledku jediné příčině. |
 
-Každá varianta má tři desetisekundové vzorky pro pohled dolů a tři pro scenérii: celkem 48 intervalů. Předem zvolené prokládání rozdělí práci do tří samostatných startů, každý po 16 intervalech (oba pohledy pro každou z osmi variant). Pořadí variant: první start A–B–C–D–E–F–G–H, druhý H–G–F–E–D–C–B–A, třetí A–H–D–E–B–F–C–G. V druhém startu obrátit i pořadí dvou pohledů. Mezi uloženými benchmarky respektovat limit collector 3/min; po Apply nejdříve dokončit přípravu a ustálit scénu.
+Každá varianta má tři desetisekundové vzorky pro pohled dolů a tři pro scenérii: celkem 48 intervalů. Prokládání má tři bloky po 16 intervalech (oba pohledy pro každou z osmi variant). Pořadí variant: první blok A–B–C–D–E–F–G–H, druhý H–G–F–E–D–C–B–A, třetí A–H–D–E–B–F–C–G. V druhém bloku obrátit i pořadí dvou pohledů. Mezi uloženými benchmarky respektovat limit collector 3/min; po Apply nejdříve dokončit přípravu a ustálit scénu.
 
-V prvním startu navíc ověřit studený Ultra bez vypnutých prostředků, poté nastavit referenční Low. Přípravu a první použití vykazovat mimo výkonové intervaly. Po změně render scale zaznamenat LOD; změnu výsledku nepřipisovat automaticky pouze pixelům.
+Před prvním vzorkem je protokol upřesněný na tři časově oddělené bloky v jedné ustálené herní relaci. To zachová přesnou pozici i populaci a odstraní opakovanou několikaminutovou revalidaci stejného serveru; nemění počet ani prokládání intervalů. Nejde o tři nezávislé studené starty a tento limit zůstane v závěru. Studený Ultra start a následný WebGL2 smoke se vykazují samostatně. Použije se dokumentované ruční `--serve` a stávající systémový sampler s operátorským oknem 45 minut, aby bylo možné po posledním intervalu uložit úplný UI download a dokončit pohybový scénář před cleanupem. Žádný herní timeout se tím nemění.
+
+Nejprve ověřit studený Ultra bez vypnutých prostředků, poté nastavit referenční Low. Přípravu a první použití vykazovat mimo výkonové intervaly. Po změně render scale zaznamenat LOD; změnu výsledku nepřipisovat automaticky pouze pixelům. Po každém intervalu mimo jeho trvání uložit také úplný UI download: HTTP projekce záměrně neuchovává compilation start/end, renderHealth a start/end počasí. Kvantily reportovat shodně s aktuálním HUD; medián ze seřazených intervalů je u sudého počtu průměr obou prostředních hodnot. Nezaměňovat jiné historické nearest-rank helpery za publikované HUD kvantily.
 
 ## Funkční kontrola a sběr
 
