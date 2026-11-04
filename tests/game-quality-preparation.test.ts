@@ -1,3 +1,4 @@
+import { graphicsLifecycleFixture, graphicsFixtureEnvironment, graphicsFixtureMembers } from "./helpers/weather-door-render-fixture";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { Script } from "node:vm";
@@ -9,6 +10,10 @@ import {
   MANUAL_HARDWARE_SCALING,
   isRenderQualityMode,
   isRenderTargetFps,
+  createRenderPreferences,
+  resolveVisualSettings,
+  toCustomRenderPreferences,
+  type RenderPreferences,
   type RenderQualityMode,
 } from "../shared/render-quality";
 import type { LightPreparationResult } from "../client/light-preparation";
@@ -17,6 +22,7 @@ const { source, gameClass: declaration, selectMembers } = readGameSource(
   process.env.GAME_QUALITY_SOURCE,
 );
 const names = [
+  ...graphicsFixtureMembers,
   "prepareLighting",
   "applyAdaptiveQuality",
   "applyRenderQuality",
@@ -29,7 +35,7 @@ const compiled = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(`(function(environment) {
-  const { prepareRenderQualities, MANUAL_HARDWARE_SCALING, isRenderQualityMode, isRenderTargetFps, performance, prepareLightVariants, PlayerFlashlight, selectLightingPreview } = environment;
+  const { createRenderPreferences, resolveVisualSettings, renderBudget, prepareRenderQualities, MANUAL_HARDWARE_SCALING, isRenderQualityMode, isRenderTargetFps, performance, prepareLightVariants, PlayerFlashlight, selectLightingPreview } = environment;
   ${compiled}; return QualityGame;
 })`).runInThisContext();
 const complete = (): LightPreparationResult => ({
@@ -41,7 +47,7 @@ const complete = (): LightPreparationResult => ({
   stages: [],
 });
 
-function fixture(mode: RenderQualityMode = "auto") {
+function fixture(mode: RenderQualityMode | RenderPreferences = "auto") {
   let now = 0,
     scaling = 1,
     lightPasses = 0;
@@ -51,8 +57,9 @@ function fixture(mode: RenderQualityMode = "auto") {
     finalRestore: boolean;
   }[] = [];
   const applied: string[] = [];
-  const adaptive = new AdaptiveQualityController({ mode });
+  const adaptive = new AdaptiveQualityController(typeof mode === "string" ? { mode } : { preferences: mode });
   const Game = make({
+    ...graphicsFixtureEnvironment,
     prepareRenderQualities,
     MANUAL_HARDWARE_SCALING,
     isRenderQualityMode,
@@ -72,6 +79,7 @@ function fixture(mode: RenderQualityMode = "auto") {
   const render = () => {},
     pipelines = { isReady: () => true };
   const game = Object.assign(new Game(), {
+    ...graphicsLifecycleFixture(),
     adaptive,
     appliedQualityRevision: -1,
     preparingRenderQuality: false,
@@ -183,17 +191,33 @@ test("actual Game prepares three render qualities without changing requested aut
   assert.equal(f.game.ready, false);
 });
 
-test("actual Game puts each manual requested quality last and restores its scaling", async () => {
+test("actual Game prepares only the selected manual quality and restores its scaling", async () => {
   for (const mode of ["low", "medium", "high"] as const) {
     const f = fixture(mode),
       requested = f.adaptive.state;
     assert.equal((await f.start()).status, "complete");
-    assert.equal(f.passes.length, 3);
-    assert.equal(new Set(f.passes.map((p) => p.quality)).size, 3);
+    assert.equal(f.passes.length, 1);
+    assert.equal(f.passes[0].timeoutMs, 60_000);
+    assert.equal(f.passes[0].finalRestore, true);
     assert.equal(f.passes.at(-1)!.quality, mode);
     assert.equal(f.adaptive.state, requested);
     assert.equal(f.game.quality, mode);
     assert.equal(f.scaling, MANUAL_HARDWARE_SCALING[mode]);
+  }
+});
+
+test("Ultra and Custom startup prepare their selected scale and features only", async () => {
+  const ultra = createRenderPreferences("ultra");
+  const custom = { ...toCustomRenderPreferences(resolveVisualSettings(createRenderPreferences("high"))), renderScale: .5 };
+  for (const preferences of [ultra, custom]) {
+    const f = fixture(preferences), requested = f.adaptive.preferences;
+    const expected = resolveVisualSettings(preferences);
+    f.onPass(() => assert.deepEqual(f.game.getEffectiveVisualSettings(), expected));
+    assert.equal((await f.start()).status, "complete");
+    assert.deepEqual(f.passes, [{ quality: expected.quality, timeoutMs: 60_000, finalRestore: true }]);
+    assert.equal(f.adaptive.preferences, requested);
+    assert.equal(f.scaling, 2);
+    assert.equal(f.game.ready, false);
   }
 });
 

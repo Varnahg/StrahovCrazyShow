@@ -79,6 +79,7 @@ export type WelcomeScreenProps = {
   editor: ReactNode;
   language: ReactNode;
   feedback: ReactNode;
+  graphics?: ReactNode;
   assistant?: ReactNode;
   /** Optional externally supplied snapshot, also useful for static rendering. */
   presence?: PublicPresenceState;
@@ -133,6 +134,7 @@ export function WelcomeScreen({
   editor,
   language,
   feedback,
+  graphics,
   assistant,
   presence,
 }: WelcomeScreenProps) {
@@ -251,6 +253,7 @@ export function WelcomeScreen({
         )}
         <div className="home-nav-actions">
           {language}
+          {graphics}
           {feedback}
         </div>
       </header>

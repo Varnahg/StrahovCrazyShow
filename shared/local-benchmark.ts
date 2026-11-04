@@ -351,16 +351,35 @@ export function projectLocalBenchmark(value: unknown) {
         "hardwareScaling",
         "renderScale",
         "revision",
+        "settingsRevision",
       ],
       true,
     );
     if (rendering.mode !== undefined)
       result.rendering.mode = choice(rendering.mode, [
         "auto",
+        "ultra",
+        "custom",
         "low",
         "medium",
         "high",
       ]);
+    if (rendering.features !== undefined) {
+      const features = object(rendering.features);
+      const projected: Record<string, boolean | string> = {};
+      for (const key of ["shadows", "clouds", "groundVegetation", "postProcesses"]) {
+        if (typeof features[key] !== "boolean") throw new Error("visual feature");
+        projected[key] = features[key];
+      }
+      projected.trees = choice(features.trees, ["normal", "far-only"]) as "normal" | "far-only";
+      result.rendering.features = projected;
+    }
+    if (rendering.graphicsApplying !== undefined) {
+      if (typeof rendering.graphicsApplying !== "boolean") throw new Error("graphicsApplying");
+      result.rendering.graphicsApplying = rendering.graphicsApplying;
+    }
+    if (rendering.transitionPhase !== undefined)
+      result.rendering.transitionPhase = rendering.transitionPhase === null ? null : choice(rendering.transitionPhase, ["preparing", "restoring"]);
     if (rendering.quality !== undefined)
       result.rendering.quality = choice(rendering.quality, [
         "low",

@@ -1,0 +1,15 @@
+.graphics-settings { min-width: 0; }
+.graphics-settings fieldset { display: grid; gap: 12px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.graphics-settings legend { font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; }
+.graphics-settings label { display: grid; gap: 6px; }
+.graphics-settings input[type="range"] { width: 100%; min-width: 0; padding: 0; accent-color: #d6f26b; }
+.graphics-settings .graphics-switch { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.graphics-settings .graphics-switch input { width: 18px; height: 18px; margin: 0; padding: 0; flex: 0 0 auto; accent-color: #d6f26b; }
+.graphics-switches { display: grid; grid-template-columns: 1fr; }
+.graphics-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.graphics-actions button { flex: 1 1 120px; }
+.graphics-dialog-overlay, .graphics-applying-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(8, 20, 27, .92); display: grid; place-items: center; padding: 20px; }
+.graphics-dialog { position: relative; width: min(100%, 520px); max-height: calc(100dvh - 40px); overflow: auto; overscroll-behavior: contain; border: 1px solid #485a64; border-radius: 18px; background: #152e3b; color: #f4f5e9; padding: 24px; box-shadow: 0 24px 80px #0009; }
+.graphics-dialog-close { position: sticky; top: 0; float: right; z-index: 1; }
+.graphics-applying-overlay > section { max-width: 440px; text-align: center; padding: 24px; }
+@media (max-width: 480px) { .graphics-dialog-overlay { padding: 10px; } .graphics-dialog { padding: 18px; max-height: calc(100dvh - 20px); } }

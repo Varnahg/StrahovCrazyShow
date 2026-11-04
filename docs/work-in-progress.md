@@ -2,6 +2,8 @@
 
 ## Aktuální grafická větev na D · 4.11.2026
 
+Ultra 50 % a vlastní grafické volby jsou implementované v téže větvi, ale dosud nejsou finálně přijaté. [Aktuální předání](agents/handoffs/ultra-graphics-20261104-root.md) uvádí konkrétní cílené testy, review a zbývající plnou/Edge přejímku. Původní uživatelský test je bezpečně archivovaný v `f32e274c`. Výkonové pořadí efektů a požadované zlepšení mediánu snímku zatím nebyly změřené; nejde o tvrzení, že zmizely několikasekundové prodlevy. Po dokončení uživatel výslovně požaduje PR a merge do main.
+
 CPU decoder celek je uzavřený na codex/graphics-smoothness-20261104 v D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104; [důkazy](performance/evidence/graphics-smoothness-20261104/README.md). Přijaté byteparita, CPU zrychlení,3085testů/build/SDK a úzkáEdgefunkčnost nejsou dokončením celkovéplynulosti. Zbývá přesněpřiřadit několikasekundovéGPU-process mezery; aktuální6,08s interval leží před oběma walking-compilation snapshoty. Navíc recorder vykazuje1,2ms překryv a dva durationnesoulady, proto celkovápřejímka správněneníPASS. Další práce má vyjít z uloženéhozáznamu a specifickéčasovéstopy, ne zopakovat obecnéFPS série.
 
 Konsolidace na přímé zadání uživatele 29. 10. 2026. Jedinou pracovní větví je `main` a jediným pracovním checkoutem `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`. Nepokračovat ve starých worktrees a nevytvářet náhradní větve.

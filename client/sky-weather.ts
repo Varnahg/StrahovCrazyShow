@@ -155,8 +155,8 @@ export class SkyWeatherController {
     instant: Date.now(),
   };
 
-  constructor(private readonly scene: Scene) {
-    this.atmosphere = createAtmosphereSky(scene, "medium");
+  constructor(private readonly scene: Scene, options: { cloudsEnabled?: boolean } = {}) {
+    this.atmosphere = createAtmosphereSky(scene, "medium", options);
     const shaderLanguage = scene.getEngine().isWebGPU
       ? ShaderLanguage.WGSL
       : ShaderLanguage.GLSL;
@@ -229,6 +229,8 @@ export class SkyWeatherController {
     this.sunDisc = this.createDisc("astronomical sun", this.sunMaterial);
     this.moonDisc = this.createDisc("astronomical moon", this.moonMaterial);
   }
+
+  setCloudsEnabled(enabled: boolean) { this.atmosphere.setCloudsEnabled(enabled); }
 
   private createDisc(name: string, material: ShaderMaterial) {
     const disc = MeshBuilder.CreatePlane(name, { size: 2 }, this.scene);

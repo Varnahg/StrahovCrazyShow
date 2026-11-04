@@ -389,6 +389,52 @@ test("a pending submission cannot hide the visible deadline and late success can
   }
 });
 
+test("live settings deadline rejects without poisoning the previous renderer and permits a new proven frame", async () => {
+  const f = fixture();
+  try {
+    assert.equal(f.health.markReady(), true);
+    const ready = waitForRenderStartup({ ...f, isReady: () => false, recoverableTimeout: true }, f.host);
+    const rejected = assert.rejects(ready, { name: "RenderStartupTimeoutError" });
+    await f.frame(); f.advance(30_000); await rejected;
+    assert.equal(f.health.snapshot().valid, true);
+    assert.equal(f.health.snapshot().errorCount, 0); f.idle();
+    const restored = waitForRenderStartup({ ...f, isReady: () => true, recoverableTimeout: true }, f.host);
+    await f.frame(); await restored; f.idle();
+    assert.equal(f.health.snapshot().valid, true);
+  } finally { f.dispose(); }
+});
+
+for (const channel of ["validation", "submission"] as const)
+  test(`a real late ${channel} fault remains fatal after a recoverable live settings deadline`, async () => {
+    const f = fixture(), pending = deferred<any>();
+    try {
+      assert.equal(f.health.markReady(), true);
+      if (channel === "validation") f.setValidation(pending.promise); else f.setQueue(pending.promise);
+      const ready = waitForRenderStartup({ ...f, isReady: () => true, recoverableTimeout: true }, f.host);
+      const rejected = assert.rejects(ready, { name: "RenderStartupTimeoutError" });
+      await f.frame(); f.advance(30_000); await rejected;
+      assert.equal(f.health.snapshot().valid, true); f.idle();
+      if (channel === "validation") pending.resolve({ message: "late invalid GPU command" });
+      else pending.reject(new Error("late queue failure"));
+      await flush();
+      assert.equal(f.health.snapshot().valid, false);
+      assert.equal(f.health.snapshot().errorCount, 1);
+    } finally { f.dispose(); }
+  });
+
+test("live settings recoverable deadline still rejects synchronous overruns before the timer runs", async () => {
+  const f = fixture();
+  try {
+    assert.equal(f.health.markReady(), true);
+    const ready = waitForRenderStartup({ ...f, recoverableTimeout: true, isReady: () => true,
+      render() { f.render(); f.advance(31_000, false); } }, f.host);
+    const rejected = assert.rejects(ready, { name: "RenderStartupTimeoutError" });
+    await f.frame(); await rejected; f.idle();
+    assert.equal(f.health.snapshot().valid, true);
+    assert.equal(f.counts().submissions, 0);
+  } finally { f.dispose(); }
+});
+
 test("a synchronous render stall loses to the deadline before the overdue timer task runs", async () => {
   const f = fixture();
   try {

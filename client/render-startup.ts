@@ -19,6 +19,9 @@ export type RenderStartupOptions = {
   isReady(): boolean;
   signal?: AbortSignal;
   timeoutMs?: number;
+  /** A live settings transaction can restore its previous proven configuration.
+   * The deadline still rejects; device, validation and render errors remain fatal. */
+  recoverableTimeout?: boolean;
 };
 type SubmissionDevice = {
   pushErrorScope(filter: "validation"): void;
@@ -96,10 +99,12 @@ export function waitForRenderStartup(
     if (finished) return;
     finished = true;
     const state = health.snapshot();
-    // Cancellation is an ownership change, not a broken shader or submission.
+    // Cancellation and an opted-in live-Apply deadline are ownership changes,
+    // not evidence of a broken shader or submission. Startup stays fail-closed.
     try {
       if (
         !(error instanceof Error && error.name === "AbortError") &&
+        !(options.recoverableTimeout && error instanceof Error && error.name === "RenderStartupTimeoutError") &&
         state.errorCount === 0 &&
         (state.phase === "preparing" || state.phase === "ready")
       )
@@ -108,6 +113,13 @@ export function waitForRenderStartup(
       // Diagnostic observers cannot replace the frame's original failure.
     } finally {
       reject(error);
+    }
+  };
+  const reportLateFault = (channel: "render" | "validation", error: unknown) => {
+    if (!options.recoverableTimeout) return;
+    const state = health.snapshot();
+    if (state.errorCount === 0 && (state.phase === "preparing" || state.phase === "ready")) {
+      try { health.report(channel, error); } catch { /* Keep the original IO rejection. */ }
     }
   };
   const armTimer = () => {
@@ -196,7 +208,9 @@ export function waitForRenderStartup(
         throw failure;
       }
     });
-    void checked.catch(() => {});
+    // Recovery may outlive this gate. A real fault in its submitted GPU work
+    // must still invalidate the same device, even after the deadline rejected.
+    void checked.catch(error => reportLateFault("validation", error));
     if (hasError) {
       // The scope is now closed and consumed. Settle the first synchronous
       // failure before an already fulfilled validation result gets a microtask.
@@ -208,7 +222,9 @@ export function waitForRenderStartup(
     ensureActive();
     // The outer guard rejects the whole gate on a renderer fault. Keeping a
     // second long-lived guard here would retain a waiter after caller abort.
-    await Promise.all([checked, device?.queue.onSubmittedWorkDone()]);
+    const submitted = device?.queue.onSubmittedWorkDone();
+    void submitted?.catch(error => reportLateFault("render", error));
+    await Promise.all([checked, submitted]);
     // A synchronous render stall can exceed the deadline before the timer task
     // gets a turn. Promise completion must never win that race and report ready.
     ensureActive();
@@ -218,7 +234,9 @@ export function waitForRenderStartup(
     const state = health.snapshot();
     if (!beforeReady || !afterReady || state.pendingOperations !== 0)
       return true;
-    if (!health.markReady())
+    // A live settings transaction reuses an already-ready renderer. The actual
+    // frame and readiness checks above still have to pass on every invocation.
+    if (!state.valid && !health.markReady())
       throw new Error("Renderer cannot enter ready state");
     finished = true;
     resolve();

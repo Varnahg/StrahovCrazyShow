@@ -77,6 +77,7 @@ export class TreeLitter {
   private preparationActive = false;
   private used = 0;
   private disposed = false;
+  private enabled = true;
   constructor(private readonly scene: Scene, sources: { leafMaterial: PBRMaterial; twigMaterial?: PBRMaterial }) {
     this.stats = { ready: false, preparing: false, activePatches: 0, activeItems: 0, triangles: 0,
       cachedPatches: 0, cacheBytes: 0, generatedPatches: 0, pendingPatches: 0, supportsTwigs: !!sources.twigMaterial };
@@ -93,7 +94,17 @@ export class TreeLitter {
       this.stats.ready = this.mapsReady();
     } catch (error) { this.dispose(); throw error; }
   }
-  get preparationRevision(): object | undefined { return this.disposed ? undefined : this.token; }
+  get preparationRevision(): object | undefined { return this.disposed || !this.enabled ? undefined : this.token; }
+  setEnabled(enabled: boolean) {
+    if (this.disposed || this.enabled === enabled) return;
+    this.enabled = enabled; this.generation++; this.preparationActive = false;
+    for (const helper of this.helpers) helper.setEnabled(false);
+    this.selectedRevision = -1; this.lastSelection = -Infinity;
+    if (!enabled) {
+      for (const patch of this.cache.values()) { patch.wanted = 0; patch.mesh.setEnabled(false); }
+      this.refreshStats(); this.stats.pendingPatches = 0; this.stats.preparing = false;
+    }
+  }
   private material(source: PBRMaterial, kind: Kind) {
     if (source.getScene() !== this.scene || !this.scene.materials.includes(source) || !source.albedoTexture || (!source.opacityTexture && !source.albedoTexture.hasAlpha))
       throw Error("Tree litter requires a live same-scene source with albedo/opacity");
@@ -201,7 +212,7 @@ export class TreeLitter {
     } catch (error) { mesh.dispose(false, false); throw error; }
   }
   update(input: TreeLitterInput) {
-    if (this.disposed || this.scene.isDisposed) return;
+    if (this.disposed || !this.enabled || this.scene.isDisposed) return;
     this.anchorPreparation();
     const camera = this.scene.activeCamera; camera?.getViewMatrix();
     const eye = camera?.globalPosition ?? input.player;
@@ -262,7 +273,7 @@ export class TreeLitter {
     this.stats.cachedPatches = this.cache.size;
   }
   beginPreparation(): () => void {
-    if (this.disposed) return noop;
+    if (this.disposed || !this.enabled) return noop;
     const generation = ++this.generation; this.preparationActive = true;
     this.anchorPreparation();
     for (const helper of this.helpers) helper.setEnabled(true);

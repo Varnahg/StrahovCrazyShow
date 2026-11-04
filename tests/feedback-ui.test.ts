@@ -116,3 +116,79 @@ test("native feedback focus captures the trigger before opening and restores it 
   detachedCleanup();
   assert.equal(calls.includes("trigger"), false);
 });
+
+
+test("actual central feedback opener retires pre-entry graphics and preserves an in-flight Apply owner", () => {
+  const source = ts.createSourceFile("ui.tsx", readFileSync(new URL("../client/ui.tsx", import.meta.url), "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let callback: ts.ArrowFunction | undefined;
+  const visit = (node: ts.Node) => {
+    if (ts.isVariableDeclaration(node) && node.name.getText(source) === "openFeedback" && node.initializer && ts.isCallExpression(node.initializer))
+      callback = node.initializer.arguments[0] as ts.ArrowFunction;
+    ts.forEachChild(node, visit);
+  };
+  visit(source); assert.ok(callback);
+  for (const applying of [false, true]) {
+    const state = { graphicsOpen: true, feedbackOpen: false, panel: "settings", cancelled: 0, modal: false };
+    const events: string[] = [];
+    const open = new Script(ts.transpileModule("(" + callback.getText(source) + ")", { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText).runInNewContext({
+      setGraphicsOpen(value: boolean) { state.graphicsOpen = value; events.push("graphics:" + value); },
+      setFeedbackOpen(value: boolean) { state.feedbackOpen = value; events.push("feedback:" + value); },
+      setJournalOpen() {}, setEmotesOpen() {}, setShowForm() {},
+      setPanel(value: string) { state.panel = value; if (applying && !value) state.cancelled++; },
+      graphicsStateRef: { current: { applying } },
+      game: { current: { setUiModal(value: boolean) { state.modal = value; } } },
+      document: { pointerLockElement: null },
+    }) as () => void;
+    open();
+    assert.equal(state.graphicsOpen, false);
+    assert.equal(state.feedbackOpen, true);
+    assert.equal(state.modal, true);
+    assert.deepEqual(events, ["graphics:false", "feedback:true"]);
+    assert.equal(state.panel, applying ? "settings" : "");
+    assert.equal(state.cancelled, 0, "feedback must not unmount/cancel a pending graphics Apply");
+  }
+});
+
+test("feedback is the sole modal focus owner and current Apply state controls restoration", () => {
+  const source = ts.createSourceFile("ui.tsx", readFileSync(new URL("../client/ui.tsx", import.meta.url), "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let condition: ts.Expression | undefined;
+  const visit = (node: ts.Node) => {
+    if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(source) === "GraphicsApplyingOverlay") {
+      assert.ok(ts.isBinaryExpression(node.parent));
+      condition = node.parent.left;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source); assert.ok(condition);
+  const shown = (applying: boolean, feedbackOpen: boolean) => new Script(condition!.getText(source)).runInNewContext({ graphicsState: { applying }, feedbackOpen });
+  assert.equal(shown(true, false), true, "Apply owns focus before feedback opens");
+  assert.equal(shown(true, true), false, "native feedback dialog is the only focus owner");
+  assert.equal(shown(true, false), true, "closing feedback restores a still-active Apply overlay");
+  assert.equal(shown(false, true), false);
+  assert.equal(shown(false, false), false, "a completed Apply must not regain an old overlay after feedback closes");
+});
+
+
+test("actual map, journal and emote shortcuts cannot replace the graphics Apply owner", () => {
+  const source = ts.createSourceFile("ui.tsx", readFileSync(new URL("../client/ui.tsx", import.meta.url), "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let effect: ts.ArrowFunction | undefined;
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node) && node.expression.getText(source) === "useEffect" && ts.isArrowFunction(node.arguments[0]) && node.arguments[0].getText(source).includes('window.addEventListener("toggle-map"')) effect = node.arguments[0];
+    ts.forEachChild(node, visit);
+  };
+  visit(source); assert.ok(effect);
+  for (const applying of [false, true]) {
+    const listeners = new Map<string, () => void>(), changes: string[] = [];
+    const graphicsStateRef = { current: { applying } };
+    const cleanup = new Script(ts.transpileModule('const effect=' + effect.getText(source) + '; effect();', { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText).runInNewContext({
+      graphicsStateRef, graphicsApplyOwner: { current: { cancelGraphicsApply() { changes.push("cancel"); } } },
+      window: { addEventListener: (name: string, fn: () => void) => listeners.set(name, fn), removeEventListener: (name: string) => listeners.delete(name) },
+      setPanel: () => changes.push("panel"), setJournalOpen: () => changes.push("journal"), setEmotesOpen: () => changes.push("emotes"),
+      setFeedbackOpen: () => changes.push("feedback"), setShowForm: () => changes.push("form"),
+    }) as () => void;
+    for (const name of ["toggle-map", "toggle-journal", "toggle-emotes"]) listeners.get(name)!();
+    if (applying) assert.deepEqual(changes, []);
+    else { assert.ok(changes.includes("panel")); assert.ok(changes.includes("journal")); assert.ok(changes.includes("emotes")); }
+    cleanup(); assert.equal(listeners.size, 0);
+  }
+});

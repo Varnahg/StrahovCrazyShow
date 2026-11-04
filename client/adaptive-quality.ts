@@ -1,6 +1,11 @@
 import {
-  MANUAL_HARDWARE_SCALING,
-  RENDER_BUDGETS,
+  createRenderPreferences,
+  parseRenderPreferences,
+  resolveVisualSettings,
+  sameRenderPreferences,
+  toCustomRenderPreferences,
+  type RenderPreferences,
+  type VisualFeatures,
   type RenderBudget,
   type RenderQuality,
   type RenderQualityMode,
@@ -41,12 +46,14 @@ export type AdaptiveQualitySnapshot = Readonly<{
   hardwareScaling: number;
   renderScale: number;
   budgets: RenderBudget;
+  features: VisualFeatures;
   reason: AdaptiveQualityReason;
   revision: number;
   statistics: AdaptiveFrameStatistics | null;
 }>;
 
 export type AdaptiveQualityOptions = {
+  preferences?: RenderPreferences;
   mode?: RenderQualityMode;
   targetFps?: RenderTargetFps;
   initialQuality?: RenderQuality;
@@ -85,6 +92,7 @@ const finitePositive = (value: number | undefined): value is number =>
  * FPS goals affect quality selection, never requestAnimationFrame scheduling.
  */
 export class AdaptiveQualityController {
+  private preferencesValue: RenderPreferences;
   private mode: RenderQualityMode;
   private targetFps: RenderTargetFps;
   private quality: RenderQuality;
@@ -115,10 +123,12 @@ export class AdaptiveQualityController {
   private upgradeProbe?: { at: number; quality: RenderQuality; scaling: number };
 
   constructor(options: AdaptiveQualityOptions = {}) {
-    this.mode = options.mode ?? "auto";
-    this.targetFps = options.targetFps ?? 60;
-    this.quality = this.mode === "auto" ? options.initialQuality ?? "medium" : this.mode;
-    this.scaling = this.mode === "auto" ? 1 : MANUAL_HARDWARE_SCALING[this.quality];
+    this.preferencesValue = options.preferences ? parseRenderPreferences(options.preferences) : createRenderPreferences(options.mode, options.targetFps);
+    this.mode = this.preferencesValue.mode;
+    this.targetFps = this.preferencesValue.targetFps;
+    const initial = resolveVisualSettings(this.preferencesValue, { quality: options.initialQuality ?? "medium", hardwareScaling: 1 });
+    this.quality = initial.quality;
+    this.scaling = initial.hardwareScaling;
     this.presentationHz = finitePositive(options.presentationHz ?? undefined)
       ? options.presentationHz!
       : null;
@@ -132,7 +142,10 @@ export class AdaptiveQualityController {
     return this.snapshot;
   }
 
+  get preferences(): RenderPreferences { return this.preferencesValue; }
+
   private makeSnapshot(): AdaptiveQualitySnapshot {
+    const visual = resolveVisualSettings(this.preferencesValue, { quality: this.quality, hardwareScaling: this.scaling });
     return Object.freeze({
       mode: this.mode,
       quality: this.quality,
@@ -141,7 +154,8 @@ export class AdaptiveQualityController {
       presentationHz: this.presentationHz,
       hardwareScaling: this.scaling,
       renderScale: 1 / this.scaling,
-      budgets: RENDER_BUDGETS[this.quality],
+      budgets: visual.budgets,
+      features: visual.features,
       reason: this.reason,
       revision: this.revision,
       statistics: this.statistics,
@@ -169,24 +183,34 @@ export class AdaptiveQualityController {
     this.warmUntil = nowMs + warmupMs;
   }
 
-  setMode(mode: RenderQualityMode): AdaptiveQualitySnapshot {
-    if (mode === this.mode) return this.snapshot;
-    this.mode = mode;
-    if (mode !== "auto") {
-      this.quality = mode;
-      this.scaling = MANUAL_HARDWARE_SCALING[mode];
-    } else {
+  setPreferences(preferences: RenderPreferences): AdaptiveQualitySnapshot {
+    const next = parseRenderPreferences(preferences);
+    if (sameRenderPreferences(next, this.preferencesValue)) return this.snapshot;
+    this.preferencesValue = next;
+    this.mode = next.mode;
+    this.targetFps = next.targetFps;
+    if (next.mode === "auto") {
       this.scaling = Math.max(1, Math.min(this.scales[this.scales.length - 1], this.scaling));
+    } else {
+      const visual = resolveVisualSettings(next);
+      this.quality = visual.quality;
+      this.scaling = visual.hardwareScaling;
     }
     this.restart(this.lastNow ?? 0);
-    return this.publish(mode === "auto" ? "warmup" : "manual", true);
+    return this.publish(this.mode === "auto" ? "warmup" : "manual", true);
+  }
+
+  setMode(mode: RenderQualityMode): AdaptiveQualitySnapshot {
+    if (mode === this.mode) return this.snapshot;
+    const preferences = mode === "custom"
+      ? toCustomRenderPreferences(resolveVisualSettings(this.preferencesValue, { quality: this.quality, hardwareScaling: this.scaling }))
+      : createRenderPreferences(mode, this.targetFps);
+    return this.setPreferences(preferences);
   }
 
   setTargetFps(targetFps: RenderTargetFps): AdaptiveQualitySnapshot {
     if (targetFps === this.targetFps) return this.snapshot;
-    this.targetFps = targetFps;
-    this.restart(this.lastNow ?? 0);
-    return this.publish(this.mode === "auto" ? "warmup" : "manual", true);
+    return this.setPreferences({ ...this.preferencesValue, targetFps });
   }
 
   setPresentationHz(presentationHz: number | null): AdaptiveQualitySnapshot {

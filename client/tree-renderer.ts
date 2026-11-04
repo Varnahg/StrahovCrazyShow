@@ -88,6 +88,9 @@ export class TreeRenderer {
   readonly stats: TreeRenderStats;
   private readonly loader = new TreeAssetLoader();
   private treeContainer?: AssetContainer;
+  private detailMode: "normal" | "far-only";
+  private baseLoadError?: string;
+  private detailLoadError?: string;
   private treeRuntime?: LegacyTreeManifest;
   private treeGroups: TreeGroup[] = [];
   private trees: Mesh[] = [];
@@ -118,11 +121,24 @@ export class TreeRenderer {
   private loaded?: Promise<void>;
   private selections: Readonly<Record<string, string>>;
   private disposed = false;
-  constructor(private readonly scene: Scene, private readonly options: { treePilot?: TreePilotOptions; treeCatalog?: TreeAssetFile; stats?: TreeRenderStats } = {}) {
+  constructor(private readonly scene: Scene, private readonly options: { treePilot?: TreePilotOptions; treeCatalog?: TreeAssetFile; stats?: TreeRenderStats; detailMode?: "normal" | "far-only" } = {}) {
+    this.detailMode = options.detailMode ?? "normal";
     this.stats = options.stats ?? { treeInstances: 0 };
     this.selections = Object.freeze({ ...options.treePilot?.selections });
   }
   load() { return this.loaded ??= this.loadAll(); }
+  setDetailMode(mode: "normal" | "far-only") {
+    if (!this.alive() || mode === this.detailMode) return;
+    this.detailMode = mode;
+    if (this.stats.loadError === this.detailLoadError) this.stats.loadError = this.baseLoadError;
+    if (mode === "normal") { this.failedTrees.clear(); this.detailLoadError = undefined; }
+    this.lastSelection = -Infinity;
+    if (mode === "far-only") {
+      for (const tree of this.treeGroups) tree.desired = 2;
+      this.applyVisibility();
+      this.metrics();
+    }
+  }
   /** Borrowed immutable texture owners. The caller must dispose its derived
    * materials before this renderer; merely reading never initiates new IO. */
   get litterMaterials() {
@@ -139,7 +155,7 @@ export class TreeRenderer {
     });
   }
   private alive() { return !this.disposed && !this.scene.isDisposed; }
-  private error(error: unknown) { if (this.alive()) this.stats.loadError = error instanceof Error ? error.message : String(error); }
+  private error(error: unknown) { if (this.alive()) this.stats.loadError = this.baseLoadError = error instanceof Error ? error.message : String(error); }
   private createGroup(id: string): TreeGroup {
     const tree = TREES.find(t => t.osmId === id)!;
     const root = new TransformNode("Native source tree " + id, this.scene);
@@ -546,7 +562,7 @@ export class TreeRenderer {
       : Math.hypot(tree.x - this.player.x, tree.z - this.player.z);
   }
   private startDetailLoads() {
-    if (!this.alive()) return;
+    if (!this.alive() || this.detailMode === "far-only") return;
     const candidates = this.treeGroups.filter(t => !this.loadingPilots.has(t.id) && (!t.pilot || t.stream) && t.desired < 2 && !t.lods[t.desired].length)
       .sort((a, b) => a.desired - b.desired || this.detailDistance(a) - this.detailDistance(b));
     for (const tree of candidates) {
@@ -565,7 +581,11 @@ export class TreeRenderer {
         if (this.detailCache.size + this.reservations.size >= TREE_DETAIL_CACHE_LIMIT || this.bytes() + this.reservedBytes() + reservation > TREE_DETAIL_BYTES_LIMIT) continue;
         this.loadingTrees.add(key); this.reservations.set(key, reservation);
         void this.loadDetail(tree, lod, asset, stream).catch(error => {
-          if (this.currentDetail(tree, stream)) { this.failedTrees.add(key); this.error(error); }
+          if (this.currentDetail(tree, stream) && this.detailMode === "normal") {
+            this.failedTrees.add(key);
+            this.detailLoadError = error instanceof Error ? error.message : String(error);
+            this.stats.loadError = this.baseLoadError ?? this.detailLoadError;
+          }
         }).finally(() => {
           this.loadingTrees.delete(key); this.reservations.delete(key);
           this.metrics(); this.startDetailLoads();
@@ -580,7 +600,7 @@ export class TreeRenderer {
   }
   private async loadDetail(tree: TreeGroup, lod: TreeLod, asset: TreeAssetFile, stream: TreeGroup["stream"]) {
     const buffer = await this.loader.asset(asset), key = tree.id + ":" + lod;
-    if (!this.currentDetail(tree, stream)) return;
+    if (!this.currentDetail(tree, stream) || this.detailMode === "far-only") return;
     let meshes: Mesh[], retainedBytes: number;
     if (stream) {
       const parts = decodeTreePrototype(buffer, stream.id, stream.prototype, lod);
@@ -648,7 +668,7 @@ export class TreeRenderer {
       for (const tree of this.treeGroups) {
         // The same horizontal camera/player segment as grass protects third-
         // person close views. Ignoring height conservatively keeps more detail.
-        tree.desired = treeDetailForProjection(this.detailDistance(tree), input.quality, tree.lodProfile, scale);
+        tree.desired = this.detailMode === "far-only" ? 2 : treeDetailForProjection(this.detailDistance(tree), input.quality, tree.lodProfile, scale);
       }
     }
     if (selection || seasonChanged) this.applyVisibility();
