@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "graphics-d-validation-20261104",
+  "title": "Serializované CPU/build/SDK/GPU ověření nové grafické větve",
+  "status": "ready",
+  "dependsOn": [
+    "graphics-d-workspace-20261104"
+  ],
+  "writePaths": [
+    "dist/",
+    ".cache/game-diagnostics/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4179"
+  ],
+  "acceptance": [
+    "Pouze vlastní procesy a výstupy D checkoutu; source/test/asset identity a poctivé rozlišení CPUkernel/GPUgameplay.",
+    "Původní C8080 a cizí scény beze změny. Před každým během pevný plán, po chybě nejprve uloženélogy; neřízenépeers nesmějí zaměnit avatarLOD zátěž vA/B."
+  ],
+  "verification": [
+    "Úzký produkční asset CPU profil před volbou jediné změny.",
+    "Cílené regrese, stabilní build/fulltest/SDK a skutečný Edge jen podle vybraného zásahu.",
+    "STOP/cleanup/inputrevalidace skutečných vlastních prostředků."
+  ],
+  "notes": [
+    "Root vlastní .cache/graphics-smoothness-20261104 a evidence/spec/handoff; tento druhý disjunktní claim přiděluje procesní zdroje a pevnou serverdiagnostickou cestu."
+  ]
+}

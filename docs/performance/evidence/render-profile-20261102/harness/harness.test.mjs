@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseArguments, runDirectory, stopController, assertInputIdentity } from "./common.mjs";
+import { parseArguments, runDirectory, stopController, assertInputIdentity, isAllowedPerformanceCheckout } from "./common.mjs";
 import { joinWithDeadline } from "./join.mjs";
 
 test("CLI only accepts declared build and bounded run identities", () => {
@@ -67,4 +67,14 @@ test("handshake is owned before connect, bounded, and late join success is close
   assert.ok(closes > 0); assert.equal(room.reconnection.enabled, false);
   const before = closes; finishJoin(room); await Promise.resolve(); await Promise.resolve();
   assert.ok(closes > before, "late joined connection receives cleanup too");
+});
+
+test("graphics checkout exception requires the exact authorized branch and D path", () => {
+  const root = "D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104", branch = "codex/graphics-smoothness-20261104";
+  assert.equal(isAllowedPerformanceCheckout(root, branch), true);
+  assert.equal(isAllowedPerformanceCheckout(root.toLowerCase()+"/", branch), true);
+  assert.equal(isAllowedPerformanceCheckout(root.replaceAll("/", "\\"), branch), true);
+  assert.equal(isAllowedPerformanceCheckout(root, "main"), true);
+  for (const [path, name] of [[root, "feature/other"], [root, branch+"-other"], [root+"-other", branch], [root.replace("D:", "C:"), branch]])
+    assert.equal(isAllowedPerformanceCheckout(path, name), false);
 });

@@ -1,5 +1,11 @@
 # Práce na StrahovCrazyShow
 
+## Výslovná grafická větev na D — zadání 4. 11. 2026
+
+Pro tuto práci uživatel výslovně mění starší pravidlo main-only: grafická vylepšení a navazující opravy záseků probíhají v D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104 na větvi codex/graphics-smoothness-20261104, založené z6805bcd4396eeb6abd17f724914a054b06fa86bc. Tato konkrétní výjimka má přednost před níže zachovanými historickými pravidly main-only. Další kopie se nezakládají. C checkout/main, cizí WIP a produkční8080 se nemění.
+
+Koordinační registr zůstává společný v Git common directory původního repozitáře. Zdrojové rezervace, heavy-validation/GPU/porty a pravidla praktického měření platí nadále; worktree není náhradou koordinace. Všechny příkazy používej s výslovnou pracovní cestou naD, protože ručně vytvořený worktree není připojen jako spravovaný checkout aplikace.
+
 Před implementací ověř očekávané chování, existující kód a vhodné primární podklady. Uživatel výslovně požaduje průzkum před změnami a praktické ověření výsledku.
 
 ## Jediná pracovní větev a kopie — výslovné zadání 29. 10. 2026
