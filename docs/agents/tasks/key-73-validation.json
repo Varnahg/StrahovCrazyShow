@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4180",
+    "port:2571"
+    ,"port:5439"
+  ],
+  "acceptance": [
+    "Implementovat schválený plán KEY-73 pouze v přidělených writePaths, zachovat soukromí, limity a lifecycle; provést cílený refaktoring.",
+    "Předat skutečné výsledky cílených testů, seznam souborů, podklady a omezení v přiděleném handoffu; necommitovat cizí WIP."
+  ],
+  "verification": [
+    "Přímé node --import tsx --test nad přidělenými testy. Žádné heavy/GPU/build/integration bez samostatné rezervace.",
+    "Před zápisem ověřit skutečný checkout, větev codex/crazy-typka-scope-ui-20261104 a vlastní claim; heartbeat nejpozději15min."
+  ],
+  "notes": [
+    "Výslovně schválený plán uživatele4.11.2026, KEY-73. Cwd C:/Users/rezac/Documents/GitHub/StrahovCrazyShow; jediná nová větev v existujícím checkoutu, žádný nový worktree.",
+    "Root koordinátor crazy-typka-01a1a80f-root integruje pouze vlastní změny. Podagent nespouští další BMAD workflow.",
+    "Rezervovat až po graphics ověřovacím okně; žádné ukončování cizích procesů nebo změna služby8080."
+  ],
+  "id": "key-73-validation",
+  "title": "KEY-73: serializovaná plná pipeline, immutable preview a Edge/DB přejímka",
+  "writePaths": [
+    ".cache/key-73-validation/",
+    "docs/agents/handoffs/key-73-validation.md",
+    "docs/verification-evidence/key-73-validation/"
+  ]
+}
+

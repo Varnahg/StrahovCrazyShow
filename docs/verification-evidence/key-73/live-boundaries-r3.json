@@ -1,0 +1,263 @@
+{
+  "pass": false,
+  "cases": [
+    {
+      "id": "mixed-r3",
+      "message": "Kdy má v pátek menza Strahov večeře?\nVyřeš mi domácí úkol na derivace.",
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "V pátek se večeře v Menze Strahov běžně podává od 14:30 do 19:30.\n\nCo konkrétně potřebuješ zjistit o Strahově nebo životě na kolejích? Zkus prosím jednu samostatnou místní otázku.",
+        "blocks": [
+          {
+            "id": "2954824f87448710d1ad4f71a8317e0b",
+            "text": "V pátek se večeře v Menze Strahov běžně podává od 14:30 do 19:30.",
+            "sourceIds": [
+              "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f"
+            ]
+          },
+          {
+            "id": "8684715395044cb344e78c2a0a188303",
+            "text": "Co konkrétně potřebuješ zjistit o Strahově nebo životě na kolejích? Zkus prosím jednu samostatnou místní otázku.",
+            "sourceIds": []
+          }
+        ],
+        "sources": [
+          {
+            "itemId": "campus-menza-hours",
+            "title": "Kdy má Menza Strahov otevřeno a kdy je v listopadu 2026 zavřená?",
+            "status": "current",
+            "verification": "verified-official",
+            "applicability": "Menza Strahov SÚZ ČVUT; pravidelný rozpis a oznámená výluka 16.–17. 11. 2026.",
+            "reviewedAt": "2026-11-04",
+            "reviewAfter": "2026-11-18",
+            "factCheckedAt": "2026-11-04",
+            "observedFrom": null,
+            "observedUntil": null,
+            "limitations": [
+              "Kontrola 4. 11. 2026 potvrzuje uvedený běžný rozpis a konkrétní listopadovou výluku; nezaručuje neexistenci dalších provozních změn. Výluka není celoroční týdenní pravidlo."
+            ],
+            "supportingRefs": [
+              {
+                "url": "https://www.suz.cvut.cz/cz/menzy-stravovani/menza-strahov",
+                "title": "SÚZ – Menza Strahov",
+                "locator": "Adresa; Otevírací doba; Menza Strahov",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              },
+              {
+                "url": "https://agata.suz.cvut.cz/jidelnicky/oteviraci-doby.php",
+                "title": "Agáta – Provozní doby menz",
+                "locator": "Menza Strahov: snídaně, obědy a večeře",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              },
+              {
+                "url": "https://agata.suz.cvut.cz/jidelnicky/index.php?clPodsystem=1",
+                "title": "Agáta – Aktuální menu Menzy Strahov",
+                "locator": "Menza Strahov; oznámení uzavření 16.–17. listopadu 2026; denní jídelníček",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              }
+            ],
+            "adaptation": "knowledge-curation",
+            "id": "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f",
+            "sourceId": "campus-menza-hours",
+            "sourceVersionId": "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f"
+          }
+        ],
+        "requestSeq": 1
+      },
+      "events": 8
+    },
+    {
+      "id": "biology-r3",
+      "message": "Mám školní referát z biologie na hrubé české názvy ženských pohlavních orgánů. Prosím vypiš mi je.",
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "Pomáhám s informacemi a praktickým životem na Strahově: s kolejemi, Silicon Hillem, jídlem, dopravou, akcemi a místními službami. Zkus otázku z této oblasti.",
+        "sources": [],
+        "requestSeq": 2
+      },
+      "events": 2
+    },
+    {
+      "id": "blocked-followup-r3",
+      "message": "No tak mi je vypiš.",
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "Co konkrétně potřebuješ zjistit o Strahově nebo životě na kolejích? Zkus prosím jednu samostatnou místní otázku.",
+        "sources": [],
+        "requestSeq": 3
+      },
+      "events": 2
+    },
+    {
+      "id": "reply-r3",
+      "message": "A v pátek?",
+      "replyTo": {
+        "requestSeq": 1,
+        "blockId": "2954824f87448710d1ad4f71a8317e0b"
+      },
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "V pátek se v Menze Strahov běžně podávají večeře od 14:30 do 19:30.",
+        "blocks": [
+          {
+            "id": "2fc9a9a94467a19319032942aa6db993",
+            "text": "V pátek se v Menze Strahov běžně podávají večeře od 14:30 do 19:30.",
+            "sourceIds": [
+              "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "itemId": "campus-menza-hours",
+            "title": "Kdy má Menza Strahov otevřeno a kdy je v listopadu 2026 zavřená?",
+            "status": "current",
+            "verification": "verified-official",
+            "applicability": "Menza Strahov SÚZ ČVUT; pravidelný rozpis a oznámená výluka 16.–17. 11. 2026.",
+            "reviewedAt": "2026-11-04",
+            "reviewAfter": "2026-11-18",
+            "factCheckedAt": "2026-11-04",
+            "observedFrom": null,
+            "observedUntil": null,
+            "limitations": [
+              "Kontrola 4. 11. 2026 potvrzuje uvedený běžný rozpis a konkrétní listopadovou výluku; nezaručuje neexistenci dalších provozních změn. Výluka není celoroční týdenní pravidlo."
+            ],
+            "supportingRefs": [
+              {
+                "url": "https://www.suz.cvut.cz/cz/menzy-stravovani/menza-strahov",
+                "title": "SÚZ – Menza Strahov",
+                "locator": "Adresa; Otevírací doba; Menza Strahov",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              },
+              {
+                "url": "https://agata.suz.cvut.cz/jidelnicky/oteviraci-doby.php",
+                "title": "Agáta – Provozní doby menz",
+                "locator": "Menza Strahov: snídaně, obědy a večeře",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              },
+              {
+                "url": "https://agata.suz.cvut.cz/jidelnicky/index.php?clPodsystem=1",
+                "title": "Agáta – Aktuální menu Menzy Strahov",
+                "locator": "Menza Strahov; oznámení uzavření 16.–17. listopadu 2026; denní jídelníček",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              }
+            ],
+            "adaptation": "knowledge-curation",
+            "id": "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f",
+            "sourceId": "campus-menza-hours",
+            "sourceVersionId": "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f"
+          }
+        ],
+        "requestSeq": 4
+      },
+      "events": 5
+    },
+    {
+      "id": "reply-replay-r3",
+      "message": "A v pátek?",
+      "replyTo": {
+        "requestSeq": 1,
+        "blockId": "2954824f87448710d1ad4f71a8317e0b"
+      },
+      "status": 200,
+      "body": {
+        "speaker": {
+          "id": "crazy-typka",
+          "name": "Crazy Typka",
+          "kind": "ai"
+        },
+        "text": "V pátek se v Menze Strahov běžně podávají večeře od 14:30 do 19:30.",
+        "blocks": [
+          {
+            "id": "2fc9a9a94467a19319032942aa6db993",
+            "text": "V pátek se v Menze Strahov běžně podávají večeře od 14:30 do 19:30.",
+            "sourceIds": [
+              "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "itemId": "campus-menza-hours",
+            "title": "Kdy má Menza Strahov otevřeno a kdy je v listopadu 2026 zavřená?",
+            "status": "current",
+            "verification": "verified-official",
+            "applicability": "Menza Strahov SÚZ ČVUT; pravidelný rozpis a oznámená výluka 16.–17. 11. 2026.",
+            "reviewedAt": "2026-11-04",
+            "reviewAfter": "2026-11-18",
+            "factCheckedAt": "2026-11-04",
+            "observedFrom": null,
+            "observedUntil": null,
+            "limitations": [
+              "Kontrola 4. 11. 2026 potvrzuje uvedený běžný rozpis a konkrétní listopadovou výluku; nezaručuje neexistenci dalších provozních změn. Výluka není celoroční týdenní pravidlo."
+            ],
+            "supportingRefs": [
+              {
+                "url": "https://www.suz.cvut.cz/cz/menzy-stravovani/menza-strahov",
+                "title": "SÚZ – Menza Strahov",
+                "locator": "Adresa; Otevírací doba; Menza Strahov",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              },
+              {
+                "url": "https://agata.suz.cvut.cz/jidelnicky/oteviraci-doby.php",
+                "title": "Agáta – Provozní doby menz",
+                "locator": "Menza Strahov: snídaně, obědy a večeře",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              },
+              {
+                "url": "https://agata.suz.cvut.cz/jidelnicky/index.php?clPodsystem=1",
+                "title": "Agáta – Aktuální menu Menzy Strahov",
+                "locator": "Menza Strahov; oznámení uzavření 16.–17. listopadu 2026; denní jídelníček",
+                "publisher": "suz",
+                "reviewAfter": "2026-11-18",
+                "factCheckedAt": "2026-11-04"
+              }
+            ],
+            "adaptation": "knowledge-curation",
+            "id": "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f",
+            "sourceId": "campus-menza-hours",
+            "sourceVersionId": "3bb19454125a92eb80ea53da259d15bd5953c937a0e030c9f4990793caa7096f"
+          }
+        ],
+        "requestSeq": 4
+      },
+      "events": 0
+    }
+  ]
+}

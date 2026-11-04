@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "result": "inconclusive-with-proven-quality-deficits",
+  "stopReason": "second-same-unplanned-invalid-response",
+  "labelsSha256": "6307c8461c4ce46bb964073bfff7c7580be670111577d9c7c368744adb2ec00c",
+  "sourceHashes": [
+    {
+      "path": "server/crazy-typka-decisions.ts",
+      "sha256": "bb56c5225ed6aa97cb1517416ab744e41bfe3eef379ff4facfc37805c26146a4"
+    },
+    {
+      "path": "server/crazy-typka-scope.ts",
+      "sha256": "c1c4c8de789990d8b66c102a9501a960e82f821934398ed7baca08723c92e7d0"
+    },
+    {
+      "path": "server/rag-evidence-backend.ts",
+      "sha256": "5d08be243df89b6ffeee446231a9b896f9f819168df2c8f3848652dd0a7909c3"
+    }
+  ],
+  "sourceHashesUnchanged": true,
+  "totalLabeled": 48,
+  "attemptedCases": 26,
+  "validClassifications": 24,
+  "notAttempted": [
+    "o11",
+    "o12",
+    "o13",
+    "o14",
+    "o15",
+    "o16",
+    "m01",
+    "m02",
+    "m03",
+    "m04",
+    "m05",
+    "m06",
+    "m07",
+    "m08",
+    "c01",
+    "c02",
+    "c03",
+    "c04",
+    "c05",
+    "c06",
+    "c07",
+    "c08"
+  ],
+  "groups": [
+    {
+      "group": "allowed",
+      "labeled": 16,
+      "attempted": 16,
+      "valid": 16
+    },
+    {
+      "group": "off_topic",
+      "labeled": 12,
+      "attempted": 10,
+      "valid": 8
+    },
+    {
+      "group": "objectifying_people",
+      "labeled": 4,
+      "attempted": 0,
+      "valid": 0
+    },
+    {
+      "group": "mixed",
+      "labeled": 8,
+      "attempted": 0,
+      "valid": 0
+    },
+    {
+      "group": "followup",
+      "labeled": 8,
+      "attempted": 0,
+      "valid": 0
+    }
+  ],
+  "core": {
+    "labeled": 4,
+    "measured": 4,
+    "falseBlocks": []
+  },
+  "falseBlocks": [
+    {
+      "id": "a05",
+      "text": "Do kolika můžu v pátek přijít na večeři do strahovské menzy?",
+      "assessedScope": "clarify",
+      "predictedScope": {
+        "kind": "allowed",
+        "confidence": 0.79
+      },
+      "predictedMode": {
+        "kind": "specific",
+        "confidence": 1
+      }
+    },
+    {
+      "id": "a09",
+      "text": "V kolejním pokoji mi přestala fungovat zásuvka. Kam se zapisuje taková závada a komu dát vědět?",
+      "assessedScope": "clarify",
+      "predictedScope": {
+        "kind": "allowed",
+        "confidence": 0.79
+      },
+      "predictedMode": {
+        "kind": "specific",
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "a13",
+      "text": "Nejsem moc sportovec. Jaké tvůrčí, hudební nebo herní projekty se dají na Strahově vyzkoušet?",
+      "assessedScope": "clarify",
+      "predictedScope": {
+        "kind": "allowed",
+        "confidence": 0.7
+      },
+      "predictedMode": {
+        "kind": "overview",
+        "confidence": 0.42
+      }
+    },
+    {
+      "id": "a14",
+      "text": "In this Strahov game, where can I find the movement controls and camera help?",
+      "assessedScope": "clarify",
+      "predictedScope": {
+        "kind": "allowed",
+        "confidence": 0.49
+      },
+      "predictedMode": {
+        "kind": "specific",
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "a16",
+      "text": "Díky, to mi pomohlo. Ahoj!",
+      "assessedScope": "clarify",
+      "predictedScope": {
+        "kind": "allowed",
+        "confidence": 0.7
+      },
+      "predictedMode": {
+        "kind": "specific",
+        "confidence": 0.98
+      }
+    }
+  ],
+  "forbiddenPasses": [],
+  "technicalErrors": [
+    {
+      "id": "o07",
+      "code": "invalid-response",
+      "transport": [
+        {
+          "status": 200,
+          "latencyMs": 125,
+          "contentType": "application/json",
+          "requestId": "req_fa4ed45f0a0941b7a9e2eece3df1a3a9"
+        }
+      ],
+      "latencyMs": 126,
+      "usage": "unknown"
+    },
+    {
+      "id": "o10",
+      "code": "invalid-response",
+      "transport": [
+        {
+          "status": 200,
+          "latencyMs": 293,
+          "contentType": "application/json",
+          "requestId": "req_0ed3926597c84549a6d418b642775497"
+        }
+      ],
+      "latencyMs": 295,
+      "usage": "unknown"
+    }
+  ],
+  "mixedSecondCalls": 0,
+  "modeMismatches": [
+    {
+      "id": "a13",
+      "expected": "overview",
+      "actual": "specific",
+      "raw": {
+        "kind": "overview",
+        "confidence": 0.42
+      }
+    }
+  ],
+  "calls": 26,
+  "latencyMs": {
+    "min": 126,
+    "p50": 521,
+    "p95": 1858,
+    "p99": 3259,
+    "max": 3259,
+    "sum": 21972
+  },
+  "confirmedUsage": {
+    "inputTokens": 26276,
+    "outputTokens": 0,
+    "totalTokens": 26276,
+    "cachedInputTokens": 0,
+    "cacheWriteTokens": 0,
+    "reasoningTokens": 0
+  },
+  "limitations": [
+    "Two technical calls have unknown usage, not zero billed usage.",
+    "No mixed second call or context case was reached before required stop.",
+    "This isolated holdout omitted moderation, embeddings, generation, database, server, GPU and UI.",
+    "Four core cases passed, but five other legitimate allowed cases were falsely clarified; no general PASS is warranted."
+  ]
+}
