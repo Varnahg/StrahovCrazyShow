@@ -4,6 +4,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Game } from "../client/game";
+import { AdaptiveQualityController } from "../client/adaptive-quality";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
@@ -89,6 +90,7 @@ function fixture(
   const game = Object.assign(Object.create(Game.prototype), {
     localId: "local",
     quality: "low",
+    adaptive: new AdaptiveQualityController({ mode: "low" }),
     flashlightOn: false,
     camera: { position: new Vector3() },
     actor: { grounded: true },

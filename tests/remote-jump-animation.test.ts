@@ -5,6 +5,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { Game } from "../client/game";
+import { AdaptiveQualityController } from "../client/adaptive-quality";
 import { AvatarAnimator, type AvatarAnimationState } from "../client/animation";
 import { AvatarLodController } from "../client/avatar-lod";
 import {
@@ -110,6 +111,7 @@ test("real 20Hz jump snapshots drive near/medium animation and shadows through d
     const game = Object.assign(Object.create(Game.prototype), {
       localId: "local",
       quality: "low",
+      adaptive: new AdaptiveQualityController({ mode: "low" }),
       flashlightOn: false,
       camera: { position: Vector3.Zero() },
       actor: { grounded: true },
@@ -313,6 +315,7 @@ test("missing contacts retain the height-following fallback and far proxies add 
       const game = Object.assign(Object.create(Game.prototype), {
         localId: "local",
         quality: "low",
+        adaptive: new AdaptiveQualityController({ mode: "low" }),
         flashlightOn: false,
         camera: { position: Vector3.Zero() },
         actor: { grounded: true },

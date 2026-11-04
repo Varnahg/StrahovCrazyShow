@@ -230,11 +230,14 @@ function innerLifecycle(t: import("node:test").TestContext, webgpu = true,
   car.setEnabled(false);
   let now = 0, callback: (() => void) | undefined, stage = "", failEnvironment = false, healthError = false;
   const draws: { stage: string; flags: boolean[] }[] = [];
-  const Game = make({AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,
+  const graphics = graphicsLifecycleFixture();
+  graphics.adaptive.state.quality = "low";
+  graphics.adaptive.state.hardwareScaling = MANUAL_HARDWARE_SCALING.low;
+  const Game = make({...graphicsFixtureEnvironment,AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,
     MANUAL_HARDWARE_SCALING,arePreparationEffectsReady:()=>true,selectLightingPreview:select,getTreeSeasonState,applyArtLighting,clampOrbitPitch,
     performance:{now:()=>now},window:{setTimeout:()=>1,clearTimeout(){}},
     document:{hidden:false,addEventListener(){},removeEventListener(){}}});
-  const game:any=Object.assign(new Game(),{
+  const game:any=Object.assign(new Game(),{...graphics,
     engine:{isWebGPU:webgpu,runRenderLoop(next:()=>void){callback=next;},stopRenderLoop(next:()=>void){if(callback===next)callback=undefined;}},
     scene,camera,quality:"low",car,parkedCar:parked,actor:{position:{x:0,y:0,z:0},vehicle:false},avatars:new Map(),
     localId:"local",lights:[],flashlight:{},timeOverride:select("night").instant,flashlightOn:false,
