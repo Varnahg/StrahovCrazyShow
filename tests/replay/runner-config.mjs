@@ -97,6 +97,9 @@ export async function readReplaySourceManifest(root) {
       "vite.config.ts",
       "index.html",
       "docs/reality-pack/landmarks/geometry-source.json",
+      // Regression evidence consumed by gameplay-acceptance.test.ts is an
+      // actual test input, even though it lives beside the performance report.
+      "docs/performance/evidence/gameplay-frame-cost-20261103/user-playtest-20261104/recording.jsonl.gz",
     ],
     { cwd: root, encoding: "utf8" },
   )

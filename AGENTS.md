@@ -54,6 +54,8 @@ Aktivní rezervace jsou lokální ve společném Git adresáři; nesdílejí se 
 - Po 30 minutách bez poznatku, který mění rozhodnutí nebo vylučuje konkrétní příčinu, zvol levnější rozlišovací kontrolu, návrat k datům nebo odložení hypotézy. Jde o kontrolu účelnosti práce, nikoli automatické ukončení úkolu, zkrácení testu či nový schvalovací krok pro uživatele.
 - Opakované úkony automatizuj úzce ve stávajícím harnessu. Eviduj zvlášť build, start, měření a zbývající čas obsluhy; čekej na uložený výsledek, ne na chybovou obrazovku. Prohlížeč obsluhuj autonomně v rámci autorizace. Nevytvářej obecný řadič kvůli jedné sérii.
 - Udržuj jeden stručný aktuální stav v existujícím předání (checkpoint, závěr, další krok); historické důkazy odkazuj. Cílené kontroly průběžně, plné ověření nad stabilním checkpointem. Úspěšnou kontrolu opakuj jen po relevantní změně, selhání či nové konkrétní pochybnosti.
+- Dokončený sběr dat ani `renderHealth.valid` nepotvrzuje hratelnost. Před přejímkou použij strukturované číselné meze pro snímky, dlouhé záseky a síťové korekce/resynchronizace; samotný text `acceptance` v plánu nestačí. Chybějící nebo nesouvislá data nesmějí vyjít jako úspěch.
+- Krátké stání na spawnu slouží k izolaci nákladu. Plynulost ověř také delším skutečným pohybem s nezávislým sběrem síťových událostí; neutrální SDK spoluhráči nenahrazují pohyb hráče. Pokud už existuje nevyhovující hráčský log, nejdřív jej vyhodnoť a časově přiřaď konkrétní zásek. Další běh musí ověřovat zvolenou příčinu nebo opravu; neopakuj obecnou stacionární sérii.
 
 ## Samostatné ovládání Edge při testování — zadání 4. 11. 2026
 

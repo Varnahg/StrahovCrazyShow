@@ -55,9 +55,13 @@ test("report save rechecks actual checkout sources and public assets, rejecting 
   const asset = resolve(root, "public/fixture.txt"), source = resolve(root, "client/fixture.ts");
   await writeFile(asset, "original public bytes\n");
   await writeFile(source, "export const fixture = 1;\n");
+  const recordingPath = "docs/performance/evidence/gameplay-frame-cost-20261103/user-playtest-20261104/recording.jsonl.gz";
+  await mkdir(resolve(root, recordingPath, ".."), { recursive: true });
+  const recording = resolve(root, recordingPath);
+  await writeFile(recording, "original external test evidence\n");
   await writeFile(resolve(root, ".gitignore"), "public/ignored.txt\n");
   git("init", "--initial-branch=main");
-  git("add", "--", "public/fixture.txt", "client/fixture.ts", ".gitignore");
+  git("add", "--", "public/fixture.txt", "client/fixture.ts", ".gitignore", recordingPath);
   git("commit", "-m", "Fixture source");
   const expected = await readReplaySourceManifest(root), report = { sourceHash: expected.sourceHash, status: "complete" };
   const accepted = resolve(root, "accepted.json");
@@ -68,6 +72,10 @@ test("report save rechecks actual checkout sources and public assets, rejecting 
   await assert.rejects(saveVerifiedReplayReport(root, expected, report, rejected), /changed/);
   assert.equal(existsSync(rejected), false);
   await writeFile(source, "export const fixture = 1;\n");
+  await writeFile(recording, "changed external test evidence\n");
+  await assert.rejects(saveVerifiedReplayReport(root, expected, report, rejected), /changed/);
+  assert.equal(existsSync(rejected), false);
+  await writeFile(recording, "original external test evidence\n");
   await writeFile(asset, "changed public bytes\n");
   await assert.rejects(saveVerifiedReplayReport(root, expected, report, rejected), /Public assets differ/);
   assert.equal(existsSync(rejected), false);

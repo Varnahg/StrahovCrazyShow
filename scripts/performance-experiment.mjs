@@ -2,6 +2,8 @@ import { open, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import { spawn } from "node:child_process";
+import { gameplayAcceptancePolicy } from "../shared/gameplay-acceptance.ts";
+import { GameplayAcceptanceCollector } from "./gameplay-acceptance.mjs";
 
 const delay = ms => new Promise(done => setTimeout(done, ms));
 const optional = async (fn, fallback) => { try { return await fn(); } catch (e) { if (e.code === "ENOENT") return fallback; throw e; } };
@@ -29,6 +31,7 @@ export function validateExperimentPlan(value) {
   if (!Number.isInteger(value.benchmarkCount) || value.benchmarkCount < 0 || value.benchmarkCount > 30) throw new Error("Invalid benchmarkCount");
   if (!Number.isInteger(value.timeoutSeconds) || value.timeoutSeconds < 30 || value.timeoutSeconds > 1800) throw new Error("Invalid timeoutSeconds");
   if (value.systemTelemetry !== undefined && typeof value.systemTelemetry !== "boolean") throw new Error("Invalid systemTelemetry");
+  if (value.gameplayAcceptance !== undefined) value = { ...value, gameplayAcceptance: gameplayAcceptancePolicy(value.gameplayAcceptance) };
   return { ...value, systemTelemetry: value.systemTelemetry ?? true };
 }
 
@@ -92,12 +95,14 @@ export async function runExperiment({ root, run, planPath, serve, log = value =>
   const started = now(), deadline = started + plan.timeoutSeconds * 1000;
   const diagnosticDir = join(root, ".cache/game-diagnostics"), oldSessions = new Set((await files(diagnosticDir)).map(sessionId));
   const readers = new Map(), matched = new Set(), benchmarkFiles = new Set(), diagnostics = new Map();
-  const summary = { schemaVersion: 1, decision: "inconclusive", optimizationAccepted: false, sourceHash: plan.sourceHash,
+  const gameplay = plan.gameplayAcceptance ? new GameplayAcceptanceCollector({ sourceHash: plan.sourceHash, policy: plan.gameplayAcceptance }) : null;
+  const summary = { schemaVersion: 1, decision: "inconclusive", optimizationAccepted: false, gameplayAccepted: false, gameplay: null, sourceHash: plan.sourceHash,
     startedAtUTC: new Date(started).toISOString(), checks: { runtimeIdentity: false, clientIdentity: false, presentation: false,
       systemTelemetry: plan.systemTelemetry ? "pending" : "unavailable-by-plan", startupReady: false, cleanup: false },
     reasons: [], events: [], diagnosticFiles: [], benchmarks: [], telemetrySamples: 0, eventOmissions: 0 };
   let serverSettled = false, serverError = null, sampler, runtimeAt, readyAt, firstClientAt, lastTelemetryAt, savedPlan = false;
   let stopping = false, lastProgress = started, lastSeq = -1, clientStartupAt, clientReadyAt;
+  let gameplayEnded = false, lastGameplayEvaluationMs = -Infinity;
   const cancellation = new AbortController();
   const onSignal = () => { stopping = true; cancellation.abort(); };
   process.once("SIGINT", onSignal); process.once("SIGTERM", onSignal);
@@ -141,10 +146,14 @@ export async function runExperiment({ root, run, planPath, serve, log = value =>
         const id = sessionId(name), file = join(diagnosticDir, name);
         for (const row of await readRows(file)) {
           const hash = row.source?.buildSnapshotId ?? row.records?.find(r => r.kind === "source-identity")?.data?.source?.buildSnapshotId;
-          if (hash && hash !== plan.sourceHash) { diagnostics.set(id, false); continue; }
+          if (hash && hash !== plan.sourceHash) {
+            if (gameplay && matched.has(id)) { gameplay.issue("source-identity", "Zdrojová identita relace se během měření změnila."); throw new Error("Gameplay source identity changed"); }
+            diagnostics.set(id, false); continue;
+          }
           if (hash === plan.sourceHash) { diagnostics.set(id, true); matched.add(id); }
           if (matched.size > 1) throw new Error("Multiple new matching clients; interval is ambiguous");
           if (!diagnostics.get(id)) continue;
+          gameplay?.addBatch(row, id);
           summary.checks.clientIdentity = true; firstClientAt ??= now();
           if (!summary.diagnosticFiles.includes(file)) summary.diagnosticFiles.push(file);
           for (const record of row.records ?? []) {
@@ -157,7 +166,8 @@ export async function runExperiment({ root, run, planPath, serve, log = value =>
             }
             if (record.kind === "presentation-rate") summary.checks.presentation = record.data?.reliable === true && record.data?.observedBrowserHz >= 20;
             if (record.kind === "mode-change" && record.data?.mode === "multi" && Number.isFinite(record.atMs)) clientStartupAt = record.atMs;
-            if (["startup-error", "render-fault", "game-dispose"].includes(record.kind)) {
+            if (record.kind === "game-dispose" && gameplay) gameplayEnded = true;
+            else if (["startup-error", "render-fault", "game-dispose"].includes(record.kind)) {
               summary.decision = summary.checks.startupReady ? "inconclusive" : "startup-failed";
               throw new Error("Client terminal event: " + record.kind);
             }
@@ -182,12 +192,25 @@ export async function runExperiment({ root, run, planPath, serve, log = value =>
       if (summary.checks.runtimeIdentity && summary.checks.clientIdentity && summary.checks.presentation && summary.checks.startupReady &&
           diagnosticsDrained && telemetryDrained && (!plan.systemTelemetry || summary.checks.systemTelemetry === "observed") &&
           summary.benchmarks.length >= plan.benchmarkCount) {
-        summary.decision = "measurement-complete"; break;
+        if (!gameplay) { summary.decision = "measurement-complete"; break; }
+        if (gameplayEnded || (gameplay.visibleMs >= plan.gameplayAcceptance.minVisibleSeconds * 1000 &&
+            gameplay.visibleMs - lastGameplayEvaluationMs >= 5000)) {
+          lastGameplayEvaluationMs = gameplay.visibleMs;
+          summary.gameplay = gameplay.assessment();
+          if (summary.gameplay.status === "failed") {
+            summary.decision = "gameplay-failed";
+            summary.reasons.push(...summary.gameplay.reasons.map(reason => "Gameplay: " + reason.code));
+            break;
+          }
+          if (summary.gameplay.status === "passed") { summary.decision = "measurement-complete"; break; }
+          if (gameplayEnded) { summary.reasons.push("Gameplay ended without sufficient valid evidence"); break; }
+        }
       }
       if (now() - lastProgress >= 10000) { log({ phase: "waiting", checks: summary.checks, benchmarks: summary.benchmarks.length }); lastProgress = now(); }
       await sleep(pollMs);
     }
-    if (summary.decision === "inconclusive") summary.reasons.push(stopping ? "Interrupted" : "Experiment deadline reached; no success inferred");
+    if (summary.decision === "inconclusive" && (stopping || now() >= deadline))
+      summary.reasons.push(stopping ? "Interrupted" : "Experiment deadline reached; no success inferred");
   } catch (error) { summary.reasons.push(String(error)); }
   finally {
     cancellation.abort();
@@ -213,9 +236,13 @@ export async function runExperiment({ root, run, planPath, serve, log = value =>
         Array.isArray(systemCleanup.cleanupErrors) && systemCleanup.cleanupErrors.length === 0));
     if (!summary.checks.cleanup) {
       summary.reasons.push("Cleanup incomplete or input revalidation failed" + (serverError ? ": " + serverError : ""));
-      if (summary.decision === "measurement-complete") summary.decision = "inconclusive";
+      if (["measurement-complete", "gameplay-failed"].includes(summary.decision)) summary.decision = "inconclusive";
     }
     summary.cleanup = { serverSettled, serverError, server: cleanup, system: systemCleanup, samplerPid: sampler?.pid ?? null };
+    if (gameplay) {
+      summary.gameplay = gameplay.assessment();
+      summary.gameplayAccepted = summary.decision === "measurement-complete" && summary.checks.cleanup && summary.gameplay.status === "passed";
+    }
     const wallMs = now() - started, startupObservedMs = readyAt === undefined ? null : readyAt - firstClientAt;
     const measuredMs = summary.benchmarks.reduce((sum, b) => sum + b.durationSeconds * 1000, 0);
     summary.timings = { wallMs, serverPreparationObservedMs: runtimeAt === undefined ? null : runtimeAt - started,

@@ -20,6 +20,7 @@ import type { NetworkProbeReply } from "../shared/network-diagnostics";
 
 import {
   benchmarkPresentation,
+  assessBenchmarkFrames,
   createBenchmarkDownloads,
 } from "./benchmark-presentation";
 import { WorldDock } from "./world-dock";
@@ -2856,6 +2857,10 @@ function BenchmarkControls({
   const [running, setRunning] = useState(false);
   const [downloadError, setDownloadError] = useState(false);
   const downloads = useMemo(() => createBenchmarkDownloads(), []);
+  const frameAssessment = useMemo(
+    () => result ? assessBenchmarkFrames(result) : null,
+    [result],
+  );
   const resultJSON = useMemo(
     () =>
       result ? JSON.stringify(benchmarkPresentation(result), null, 2) : "",
@@ -2912,6 +2917,29 @@ function BenchmarkControls({
               )}
             </p>
           )}
+          {frameAssessment && (
+            <>
+              <p role={frameAssessment.status === "failed" ? "alert" : "status"}>
+                <strong>{t(frameAssessment.status === "failed"
+                  ? "Plynulost vzorku nevyhovuje."
+                  : frameAssessment.status === "passed"
+                    ? "Krátký snímkový vzorek splnil limity."
+                    : "Plynulost vzorku nelze spolehlivě vyhodnotit.")}</strong>
+              </p>
+              <p className="small muted">
+                {t("Krátké měření samo neověřuje plynulost chůze ani stabilitu připojení.")}
+              </p>
+              {frameAssessment.metrics && (
+                <p className="small muted">
+                  {t("Nejdelší snímek: {duration} ms · snímky od {threshold} ms: {count}.", {
+                    duration: formatNumber(frameAssessment.metrics.maxMs, { maximumFractionDigits: 1 }),
+                    threshold: formatNumber(frameAssessment.policy.hitchThresholdMs),
+                    count: formatNumber(frameAssessment.metrics.hitches),
+                  })}
+                </p>
+              )}
+            </>
+          )}
           <p>
             <strong>{formatNumber(result.averageFps)} FPS</strong> ·{" "}
             {t(
@@ -2924,6 +2952,11 @@ function BenchmarkControls({
             )}{" "}
             · p95{" "}
             {formatNumber(result.p95FrameMs, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            })}{" "}
+            ms · p99{" "}
+            {formatNumber(result.p99FrameMs, {
               minimumFractionDigits: 1,
               maximumFractionDigits: 1,
             })}{" "}

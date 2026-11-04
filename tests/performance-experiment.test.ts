@@ -16,7 +16,7 @@ const exists = async (file: string) => { try { await stat(file); return true; } 
 const event = (seq: number, kind: string, data: object = {}) => ({ seq, atMs: seq * 10, kind, data });
 const readyRecords = () => [event(0, "session-start"), event(1, "mode-change", { mode: "multi" }),
   event(2, "presentation-rate", { reliable: true, observedBrowserHz: 60 }), event(3, "game-ready")];
-const batch = (records: unknown[], buildSnapshotId = hash) => ({ source: { buildSnapshotId }, records });
+const batch = (records: unknown[], buildSnapshotId = hash) => ({ type: "batch", schemaVersion: 1, sessionId: id, batchId: 0, source: { buildSnapshotId }, records });
 
 test("plán vyžaduje hypotézu, korektnost, hash a omezenou délku před startem", () => {
   assert.equal(validateExperimentPlan({ ...plan, systemTelemetry: undefined }).systemTelemetry, true);
@@ -41,13 +41,15 @@ test("JSONL zachová rozdělené UTF-8 a neúplný řádek bez znovučtení", as
 
 type Options = { records?: object[]; buildHash?: string; runtimeHash?: string; count?: number; telemetry?: boolean; cleanupDelayMs?: number;
   noSample?: boolean; stopSampler?: boolean; badCleanup?: boolean; rotate?: boolean; secondClient?: boolean;
-  missingCleanup?: boolean; benchmark?: boolean; oldClient?: boolean; partial?: boolean; backlog?: boolean; backlogFault?: boolean; cleanupSamplerLimit?: boolean };
+  missingCleanup?: boolean; benchmark?: boolean; oldClient?: boolean; partial?: boolean; backlog?: boolean; backlogFault?: boolean; cleanupSamplerLimit?: boolean;
+  gameplayAcceptance?: object };
 async function fixture(options: Options = {}) {
   const root = await mkdtemp(join(tmpdir(), "render-experiment-")), run = join(root, ".cache/run1");
   const diag = join(root, ".cache/game-diagnostics"), planPath = join(root, "plan.json");
   let time = Date.parse("2026-11-03T12:00:00Z"), finishServer!: () => void, finished = false, sampler: any, stopRequestedAt: number | undefined;
   await mkdir(diag, { recursive: true });
-  await store(planPath, { ...plan, benchmarkCount: options.count ?? 0, systemTelemetry: options.telemetry ?? true });
+  await store(planPath, { ...plan, benchmarkCount: options.count ?? 0, systemTelemetry: options.telemetry ?? true,
+    ...(options.gameplayAcceptance ? { gameplayAcceptance: options.gameplayAcceptance } : {}) });
   if (options.oldClient) await store(join(diag, id + ".jsonl"), batch(readyRecords()));
   const serve = async () => {
     await mkdir(run);
@@ -215,4 +217,48 @@ test("abort dorazí před vytvořením runu a STOP se doručí i pozdě vzniklé
     assert.equal(observedAbort, true); assert.equal(result.decision, "inconclusive"); assert.equal(result.checks.cleanup, true);
     assert.equal(await exists(join(run, "STOP")), true);
   } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+function gameplayRecords({ moving = true, slow = false, seconds = 70 }: { moving?: boolean; slow?: boolean; seconds?: number } = {}) {
+  const rows = [event(0, "session-start"), event(1, "browser-state", { visibility: "visible", focused: true }),
+    event(2, "mode-change", { mode: "multi" }), event(3, "presentation-rate", { reliable: true, observedBrowserHz: 60 }), event(4, "game-ready")];
+  for (let index = 0; index < seconds; index++) {
+    const fromMs = 40 + index * 1000, toMs = fromMs + 1000;
+    rows.push({ seq: rows.length, atMs: toMs + 1, kind: "frame-window", data: {
+      fromMs, toMs, frameMs: Array(slow ? 20 : 60).fill(slow ? 50 : 1000 / 60), summary: { frames: slow ? 20 : 60 },
+      visibility: "visible", afterVisibilityChange: false, contextAtMs: toMs,
+      context: { mode: "multiplayer", connection: "connected", position: { x: moving ? index * 4 : 0, y: 0, z: 0 },
+        speed: moving ? 4 : 0, rendering: { quality: "medium" }, network: { corrections: 0, resyncs: 0, authorityAgeMs: 10, timeline: { inputEpoch: 1 } } },
+    } });
+  }
+  rows.push({ seq: rows.length, atMs: 42 + seconds * 1000, kind: "game-dispose", data: {} });
+  return rows;
+}
+
+test("strukturovaná přejímka přijme jen pohybové herní okno a zachová samostatný A/B závěr", async () => {
+  const result = await fixture({ records: gameplayRecords(), gameplayAcceptance: {}, telemetry: false });
+  assert.equal(result.decision, "measurement-complete", result.reasons.join());
+  assert.equal(result.gameplay.status, "passed"); assert.equal(result.gameplayAccepted, true);
+  assert.equal(result.optimizationAccepted, false); assert.equal(result.checks.cleanup, true);
+});
+
+test("dokončený sběr nepropustí pomalé hraní, samotné stání ani krátkou trasu", async () => {
+  const slow = await fixture({ records: gameplayRecords({ slow: true }), gameplayAcceptance: {}, telemetry: false });
+  assert.equal(slow.decision, "gameplay-failed"); assert.equal(slow.gameplayAccepted, false);
+  assert.ok(slow.reasons.some((reason: string) => reason.includes("average-fps")));
+  const idle = await fixture({ records: gameplayRecords({ moving: false }), gameplayAcceptance: {}, telemetry: false });
+  assert.equal(idle.decision, "inconclusive"); assert.equal(idle.gameplayAccepted, false);
+  assert.ok(idle.gameplay.reasons.some((reason: any) => reason.code === "missing-movement"));
+  const short = await fixture({ records: gameplayRecords({ seconds: 10 }), gameplayAcceptance: {}, telemetry: false });
+  assert.equal(short.decision, "inconclusive"); assert.equal(short.gameplayAccepted, false);
+  assert.ok(!short.reasons.some((reason: string) => reason.includes("deadline")), "předčasné opuštění není timeout");
+});
+
+test("chybějící raw data a chyba cleanupu zneplatní herní přijetí", async () => {
+  const missing = await fixture({ count: 1, benchmark: true, gameplayAcceptance: {}, telemetry: false });
+  assert.equal(missing.decision, "inconclusive"); assert.equal(missing.gameplayAccepted, false);
+  const dirty = await fixture({ records: gameplayRecords(), gameplayAcceptance: {}, telemetry: false, badCleanup: true });
+  assert.equal(dirty.decision, "inconclusive"); assert.equal(dirty.gameplayAccepted, false);
+  assert.throws(() => validateExperimentPlan({ ...plan, gameplayAcceptance: { targetFps: 0 } }));
+  assert.throws(() => validateExperimentPlan({ ...plan, gameplayAcceptance: "accept" }));
 });

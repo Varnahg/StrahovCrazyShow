@@ -34,6 +34,24 @@ Uživatel 4. 11. 2026 výslovně potvrdil, že agent má při testování sám p
 
 Tento postup odstraňuje zbytečné čekání na uživatele; nemění oprávnění samotného nástroje a nezaručuje dostupnost jeho Windows integrace. Pro práci s herní stránkou preferuje browser API, takže nativní výběr Edge okna není zbytečnou podmínkou každého testu.
 
+## Přejímka plynulosti a pohybu
+
+`measurement-complete` potvrzuje dokončený sběr. `renderHealth.valid` potvrzuje stav rendereru a assetů. Výkonovou a síťovou přejímku vyhodnocuj samostatně podle strukturovaných číselných mezí; ne podle volného textu `acceptance`. Výsledek je `passed`, `failed` nebo `inconclusive` s uvedenými důvody. Chybějící, neplatné či nesouvislé vzorky se nesmějí změnit v zelený výsledek.
+
+Krátký herní benchmark hodnotí pouze svůj snímkový vzorek. V HUD ukáže nevyhovující plynulost, maximum intervalu a počet dlouhých snímků; nepřijímá chůzi ani připojení. Jeden sekundový zásek musí nevyhovět i tehdy, když jej p95/p99 nezahrnou. Delší scénář navíc potřebuje doložený pohyb a síťové korekce/resynchronizace ze stávajícího automatického recorderu. Nulové vstupy SDK peers nejsou pohybový scénář.
+
+Výchozí projektová politika pro cíl60FPS toleruje minimum54FPS, p95 do33,33ms, p99 do50ms, maximum250ms a nejvýše1% intervalů od50ms. Pro označený gameplay úsek požaduje alespoň60s viditelného hraní,20s pohybu a20m trasy; síťové meze jsou nejvýše1 resync/min, korekce do1m, stáří autority do250ms a nejvýše1 čekání timeline/min. Ztracené připojení neprojde a chybějící stáří autority není důkaz zdravé sítě. Jsou to konfigurovatelné inženýrské limity projektu, nikoli oborová norma či záruka pro všechny scény. Po zjištění FAIL je nezměkčuj jen kvůli dosažení zelené. Výsledek s chybějícím pohybem nepotvrdí celou hratelnost. Startup a přechody viditelnosti označ odděleně; zásek při přepnutí kvality nezahazuj potichu.
+
+Při hlášení konkrétního hráčského problému začni jeho uloženým JSONL/gzip logem. Známý [test ze4.11.2026](evidence/gameplay-frame-cost-20261103/user-playtest-20261104/README.md) je regresní záporný případ: dlouhé záseky a opakované resynchronizace musejí vyjít `failed`. Vyhodnocení tohoto archivu nevyžaduje znovu spouštět GPU hru. Samotný počet korekčních eventů není počet všech korekcí: recorder malé běžné korekce filtruje; zachovej rozdíl vůči kumulativním counterům.
+
+```powershell
+node scripts/gameplay-acceptance.mjs docs/performance/evidence/gameplay-frame-cost-20261103/user-playtest-20261104/recording.jsonl.gz --source 2cdef569736faa5d3af601db33363b4f2430d2f80937e8cf15c1e67ec912c144
+```
+
+CLI vrací0 pro `passed`,2 pro doložené `failed`,3 pro `inconclusive`; `--policy` načte explicitní JSON meze a `--output` zapíše nový soubor bez přepsání původního. Offline přejímka čistého prefixu bez ukončení hry nesmí potvrdit celou relaci. Známá porušení mezí zůstávají nevyhovující i při zvlášť uvedené neúplnosti časového pokrytí; mezery ani neplatná identita nesmějí vytvořit PASS. Souvislá čísla záznamů nejsou totéž jako pokrytí všech časových intervalů.
+
+Pro nový živý pohybový experiment přidej do existujícího plánu `gameplayAcceptance` s číselnými mezemi (např. `{"targetFps":60,"minVisibleSeconds":60,"minMovementSeconds":20,"minTravelMetres":20,"maxResyncsPerMinute":1,"maxCorrectionMetres":1}`). Monitor vyhodnotí pouze tento označený nasbíraný úsek a uloží `gameplay.status` a `gameplayAccepted`; překročení mezí má rozhodnutí `gameplay-failed`. Staré plány bez tohoto objektu nadále potvrzují jen sběr dat. Ani `gameplayAccepted: true` samo nedokazuje relativní zisk optimalizace: `optimizationAccepted` zůstává false do srovnatelného A/B a funkčního ověření.
+
 ## Jeden checkout, neměnný build
 
 Podle [koordinace](../agents/README.md) rezervuj soubory/výstupy a `heavy-validation`, pro GPU také `gpu`, pro tento harness porty `2568`/`4179` a diagnostiky `.cache/game-diagnostics/`. `workspace-build` potřebuje build do pracovního stromu. Ověř skutečné procesy i aktivní 3D scény; cizí proces podle portu neukončuj. Uživatelský tab a hranou verzi neměň.
