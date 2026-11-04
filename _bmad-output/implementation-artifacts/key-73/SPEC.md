@@ -2,7 +2,7 @@
 title: 'KEY-73: praktický strahovský AI chat'
 type: 'feature'
 created: '2026-11-04'
-status: 'in-review'
+status: 'done'
 baseline_commit: '6805bcd4396eeb6abd17f724914a054b06fa86bc'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -23,7 +23,7 @@ Nová větev codex/crazy-typka-scope-ui-20261104 v kanonickém C checkoutu je v�
 
 | Vstup/stav | Výsledek |
 |---|---|
-| Místní praktický dotaz | Decisions scope>=.80, podklady, přímá doložená odpověď |
+| Místní praktický dotaz | Raw scope allowed a admissionProbability>=.80, podklady, přímá doložená odpověď |
 | Co podniknout / kdy otevřeno | overview: možnosti; specific: údaj/první krok |
 | Matematika, sexuální tužby, vulgarismy | Pevné odmítnutí před embeddingem/generací |
 | Oddělitelný mixed | Druhé Decisions nad max6 přesnými segmenty; pouze povolená část dále |
@@ -37,7 +37,7 @@ Nová větev codex/crazy-typka-scope-ui-20261104 v kanonickém C checkoutu je v�
 
 ## Code Map
 
-- server/crazy-typka-decisions.ts: nyní jen complexity/local predicates; přidat scope/mode a bounded segment classify.
+- server/crazy-typka-decisions.ts a crazy-typka-scope.ts: pět nezávislých Decisions otázek, pevná tematická politika a bounded segment classify.
 - server/crazy-typka.ts: session, limity, sekvence, replay; zde gate, reply buffer a publikace bloků.
 - server/crazy-typka-provider.ts: parts už existují pro kuraci, nyní se slévají; zachovat provenance a vystavit bloky.
 - shared/crazy-typka.ts: zpětně kompatibilní blocks a replyTo, reply-unavailable.
@@ -50,8 +50,8 @@ Nová větev codex/crazy-typka-scope-ui-20261104 v kanonickém C checkoutu je v�
 - [x] key-73-scope: pět nezávislých otázek v jednom Decisions: binary admission, scope reason, answer mode, complexity a local evidence. Optional druhý call pouze mixed. Split Intl.Segmenter(cs/en,sentence)+newline/odrážka/středník; žádné spojkové heuristiky. Přímé schválení vyžaduje raw allowed i admissionProbability>=.80; agregace admission MIN, complexity/local MAX. Pevné CZ/EN odpovědi.
 - [x] key-73-root: fail-closed gate, exact input moderation, bezpečná projekce mixed, provider mode a parts, server reply, všechny související regrese. Známý named API refusal znamená pouze denial, ne permission; malformed/missing stále error. Dangling follow-up bez kontextu vrací místní clarification bez placeného API.
 - [x] key-73-kb: hostel červenec–srpen blok3/8; registrátoři jako první krok; role SH/SÚZ; přehled aktivit včetně potravin; přesné menza hodiny/menu a výluka16.–17.11.2026, provenance a expirace.
-- [x] key-73-ui/shell: Enter/Shift/IME guard, autoheight bez resize, info-trash-close, privacy pod info, bez archive select, typing tečky/reduced-motion, klidný pointer focus a viditelný Tab. Úvod/CZ/EN/citovaná reakce a320/360px skutečně ověřeny vEdge; herní HUD patří finální přejímce níže.
-- [ ] key-73-validation: skutečná DB/model holdout, browser, plná pipeline a nezávislé review, oddělené commity.
+- [x] key-73-ui/shell: Enter/Shift/IME guard, autoheight bez resize, info-trash-close, privacy pod info, bez archive select, typing tečky/reduced-motion, klidný pointer focus a viditelný Tab. Úvod/CZ/EN/citovaná reakce a320/360px i skutečný herní HUD ověřeny vEdge; podrobnosti přejímky níže.
+- [x] key-73-validation: skutečná DB/model holdout, browser včetně běžícího herního HUD, plná pipeline a nezávislé review, oddělené commity. Runtime head d885fc4f: CI 3168 testů, 3166 PASS, 0 FAIL, 2 SKIP; build a integrace PASS. Dokumentační dokončení ještě projde kontrolami PR před merge.
 
 Given nový mimooborový požadavek, when citace/old context existuje, then staré téma jej nepovolí.
 Given odmítnutí, when další dotaz nemá referenci, then implicitní starý kontext je prázdný; explicitní vlastní reply jej může obnovit.
@@ -87,3 +87,5 @@ Porovnáno: blacklist a moderace nenahrazují doménový gate; další běžné 
 ## Verification
 
 Cíleně node --import tsx --test nad přidělenými regresními soubory. Na stabilním checkpointu pnpm --config.verifyDepsBeforeRun=error test/build/test:integration se zdroji. Holdout: nula průchodů zakázaných úkolů a nula blokací hlavních místních scénářů. Reálný DB retrieval pro příklady, build/revision/chunk distance/usage/latency do evidence. Edge CZ/EN desktop/mobile, úvod/hra, klávesy/IME/reply/reset/focus. Chybějící runtime evidence není PASS.
+
+R4 ve vlastním aktivním Edge okně dosáhl WebGPU game-ready na automatickém Medium. Materiálová příprava complete 79.312 s, všechny tři kvality v původních rozpočtech. HUD: Enter, Shift+Enter, podložené bloky, reply na registraci bloku 3, zachování draftu/citace při zavření, info a reset PASS. OS IME nebylo ručně skládáno; guard kryjí testy. FPS ani celková hratelnost nejsou předmětem této přejímky. PR41 není závislost. Viz docs/verification-evidence/key-73/README.md.
