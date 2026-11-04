@@ -1,0 +1,100 @@
+✖ actual handlers reset once and retain new inputs: resync/resync (5.8944ms)
+ℹ epoch=9; forcedAuthorities=2; queued=0
+✖ actual handlers reset once and retain new inputs: doorResync/doorResync (1.1577ms)
+ℹ epoch=9; forcedAuthorities=2; queued=0
+✖ actual handlers reset once and retain new inputs: resync/doorResync (0.9079ms)
+ℹ epoch=9; forcedAuthorities=2; queued=0
+✖ actual handlers reset once and retain new inputs: doorResync/resync (0.7992ms)
+ℹ epoch=9; forcedAuthorities=2; queued=0
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1178.5471
+
+✖ failing tests:
+
+test at tests\resync-epoch.test.ts:4:1508
+✖ actual handlers reset once and retain new inputs: resync/resync (5.8944ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  9 !== 8
+  
+      at TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\tests\resync-epoch.test.ts:75:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 9,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\resync-epoch.test.ts:4:1508
+✖ actual handlers reset once and retain new inputs: doorResync/doorResync (1.1577ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  9 !== 8
+  
+      at TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\tests\resync-epoch.test.ts:75:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 9,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\resync-epoch.test.ts:4:1508
+✖ actual handlers reset once and retain new inputs: resync/doorResync (0.9079ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  9 !== 8
+  
+      at TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\tests\resync-epoch.test.ts:75:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 9,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\resync-epoch.test.ts:4:1508
+✖ actual handlers reset once and retain new inputs: doorResync/resync (0.7992ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  9 !== 8
+  
+      at TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\tests\resync-epoch.test.ts:75:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 9,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

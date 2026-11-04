@@ -1,5 +1,16 @@
 # Aktuální práce: plynulost hry
 
+## Současný checkpoint · 4. 11. 2026
+
+- Uživatel zadal opravit vyhodnocení testu a potom konkrétní optimalizaci podle svého logu. Testgate je přijatý jako **77b44742**, percentilová konzistence s Game jako **36255bdf**. Původní archiv dává FAILED s konkrétními mezemi; částečné časové pokrytí je označené. [Specifikace](../../../_bmad-output/implementation-artifacts/gameplay-frame-cost-20261103/ACCEPTANCE.md).
+- Přijatý konkrétní fix tohoto checkpointu: [V15 resync spec](../../../_bmad-output/implementation-artifacts/gameplay-frame-cost-20261103/RESYNC.md), [předání](resync-epoch-20261104.md), [úplná evidence](../../performance/evidence/gameplay-frame-cost-20261103/resync-epoch-20261104/README.md). Dva opožděné požadavky stejné epochy původně způsobily2forcedresets a ztrátu nového vstupu; nyní1reset a zachování vstupu.107 cílených testů a finální review PASS. Runtime/test/CLI manifest16souborů zůstal během validace shodný.
+- Plná sada běžela jednou:3082celkem,3074PASS,3FAIL,5SKIP. Dvě opomenuté30s aserce opravené samostatně v **7c82be41**,35cílenýchPASS; nezměněný řadičový timeout následně izolovaně1/1PASS. Celá sada se znovu nespouštěla. `pnpm build` včetně TypeScriptu, úplná izolovaná SDK integrace a neměnný C14 build PASS. Logy v `.cache/gameplay-frame-cost-20261103/` zůstávají.
+- C14 source/test **31a14cdda855eef4486ac82c63778db13d2f614676c88bb22dbd104d6da99827**. První startup timeoutoval; jediný opravný start v ověřeném vlastním okně dokončil WebGPU přípravu. Následně3relace/HUD/Medium2040×986, skutečná chůze, přibližně26,9s/127,6m konzervativně doloženého pohybu. Krátký vzorek31,9FPS/p9546,2ms/p9968,4ms dostal správné HUD varování. Celkový gameplay výsledek je stále FAILED a žádný obecný FPS zisk se netvrdí.
+- Peers ukončeni před odchodem hráče; Game opuštěna přes UI, viewport override resetován, vlastní karta/okno zavřeny. C14 API/peers cleanup a revalidace vstupů PASS, porty2568/4179 volné. Integrační root po commitu uvolňuje vlastní dokončené rezervace. Žádné vlastní 3D/test/build procesy nezůstávají.
+- Uživatelský archiv **cadc09c9** zůstává podkladem pro další renderovou práci. Oprava redundantních epoch neřeší všechny dlouhé mezery mimo callback ani60FPS cíl; NCM zůstává nepřijatý experiment. Cizí8080 a tři konsolidační soubory zůstaly nedotčené. Žádný push této etapy.
+
+## Historický průběh před současným checkpointem
+
 - Research je commitnutý na maincdb3b8f7. Uživatel výslovně zadal pokračovat implementací nejlepšího zásahu; samotný research ani diagnostika neuzavírá výkonový cíl.
 - První úzký celek je ověřený: export21/21, callback50/50, společně s nezávislým lifecycle QA73/73 a celýTypeScript PASS. [Specifikace](../../../_bmad-output/implementation-artifacts/gameplay-frame-cost-20261103/DIAGNOSTICS.md). Root převzal oběfrozen delegace podlehandoff a drží jejichclaims; nezávisléreview [] bezminima. Původnípříjemci užnepíší. DiagnostikaneníFPSzisk.
 - Root drží render-next-validation-20261103 (heavy/GPU/workspacebuild/2568/4179). Žádný vlastní server/GPU/build nyní neběží; následuje nový immutableC10 a [kontrolní plán](../../performance/evidence/gameplay-frame-cost-20261103/plan.md). C10/C11/C12 jsou rezervované výstupy, nikoli kopieprojektu. Během jeho runtimefreeze neměnit zdroje/testy/assets/deps ani harness.

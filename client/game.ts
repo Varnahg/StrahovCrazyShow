@@ -2063,7 +2063,10 @@ export class Game {
   blur = () => this.clearHeldInput();
   visibility = () => {
     this.blur();
-    if (!document.hidden && this.network) this.onAction?.("resync");
+    if (!document.hidden && this.network) {
+      const inputEpoch = this.networkTimeline.snapshot().inputEpoch;
+      if (inputEpoch !== null) this.onAction?.("resync", { inputEpoch });
+    }
   };
   pointerChanged = () => {
     this.canvas.dataset.pointerMode =
@@ -2519,7 +2522,10 @@ export class Game {
             reason: result.reason,
             recoveryRequested,
           });
-          if (recoveryRequested) this.onAction?.("resync");
+          if (recoveryRequested) {
+            const inputEpoch = this.networkTimeline.snapshot().inputEpoch;
+            if (inputEpoch !== null) this.onAction?.("resync", { inputEpoch });
+          }
         }
       }
     } else {

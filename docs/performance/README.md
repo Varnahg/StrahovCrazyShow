@@ -83,7 +83,7 @@ $env:STRAHOV_SHADER_CANDIDATE = 'candidate8'
 node docs/performance/evidence/render-next-20261102/harness/run.mjs --peers run1
 ```
 
-Peer helper importuje aktuální [PROTOCOL_VERSION = 14](../../shared/netcode.ts), vytvoří dva různé avatary a posílá neutrální vstupy. `peers-ready.json` musí potvrdit populaci 3 a autentizovaná motion data; neprokazuje viditelnost avatarů ani GPU readiness. Tento scénář nenahrazuje dav 30/100 hráčů nebo pohybovou trasu. Pro další starty použij `run2`/`run3`, pro odůvodněné opakování např. `run1-attempt2`; stejnou hodnotu `STRAHOV_SHADER_CANDIDATE` nastav v každém terminálu.
+Peer helper importuje aktuální [PROTOCOL_VERSION = 15](../../shared/netcode.ts), vytvoří dva různé avatary a posílá neutrální vstupy. `peers-ready.json` musí potvrdit populaci 3 a autentizovaná motion data; neprokazuje viditelnost avatarů ani GPU readiness. Tento scénář nenahrazuje dav 30/100 hráčů nebo pohybovou trasu. Pro další starty použij `run2`/`run3`, pro odůvodněné opakování např. `run1-attempt2`; stejnou hodnotu `STRAHOV_SHADER_CANDIDATE` nastav v každém terminálu. Historický klient V14 (například C11) se nesmí připojovat k novému serveru V15; každý test používá odpovídající neměnný klient a server.
 
 ## Sběr, rozhodnutí a úklid
 

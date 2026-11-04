@@ -395,7 +395,9 @@ export function App() {
           droppedInputs: snapshot.queued,
         });
         try {
-          room.current?.send("resync");
+          const inputEpoch = authorityBufferRef.current?.inputEpoch;
+          if (inputEpoch != null && connectedRef.current && modeRef.current === "multi")
+            room.current?.send("resync", { inputEpoch });
         } catch (error) {
           sessionDiagnostics.event("network-send-error", {
             message: String(error),
@@ -846,6 +848,7 @@ export function App() {
     connectedRef.current = true;
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
+    let deferredDoorResync = false;
     const doors: DoorConnection = new DoorConnection({
       definitions: CAD_DOOR_DEFINITIONS,
       definitionHash: CAD_DOOR_DEFINITION_HASH,
@@ -854,7 +857,17 @@ export function App() {
         if (doorConnectionRef.current === doors && game.current?.network)
           game.current.attachDoorTimeline(timeline);
       },
-      requestResync: () => r.send("doorResync"),
+      requestResync: () => {
+        if (room.current !== r || doorConnectionRef.current !== doors) return false;
+        const inputEpoch = authorityBufferRef.current?.inputEpoch;
+        if (inputEpoch == null) {
+          deferredDoorResync = true;
+          return false;
+        }
+        deferredDoorResync = false;
+        r.send("doorResync", { inputEpoch });
+        return true;
+      },
       onNotice: message => notice(t(message)),
     });
     doorConnectionRef.current = doors;
@@ -926,7 +939,12 @@ export function App() {
     });
     callbacks.onMessage("authoritative", (data: Authority) => {
       const result = authorityBufferRef.current?.offer(data, performance.now());
-      if (result?.kind !== "barrier") return;
+      if (!result || result.kind === "rejected") return;
+      if (deferredDoorResync) {
+        deferredDoorResync = false;
+        doors.requestResync();
+      }
+      if (result.kind !== "barrier") return;
       if (
         modeRef.current === "multi" &&
         game.current?.network &&

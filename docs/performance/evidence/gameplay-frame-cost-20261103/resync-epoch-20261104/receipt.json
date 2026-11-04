@@ -1,0 +1,69 @@
+{
+  "capturedAtUTC": "2026-11-04T10:44:18.349Z",
+  "records": [
+    {
+      "label": "startup-timeout",
+      "id": "aed4ebf3-2a8d-47b6-896a-1c4751ae734a",
+      "rawBytes": 114200,
+      "rawSha256": "533bd3999345052de8519fabc234a72cbeda61b23b17543ade72dcb07cb7d415",
+      "gzipBytes": 15445,
+      "gzipSha256": "58e5413b5545d682987717a8fedf1854230ed6ae8707da9cbc027935b5d6f666",
+      "records": 236,
+      "gaps": 0,
+      "lastReceivedAtUTC": "2026-11-04T10:24:32.977Z",
+      "ready": false,
+      "disposed": true,
+      "faults": [
+        {
+          "seq": 218,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 221,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at Eh.start (http://127.0.0.1:4179/assets/game-DqoD86_E.js:878:29190)\n    at async http://127.0.0.1:4179/assets/index-PawDHDeR.js:16:4498188"
+          }
+        }
+      ]
+    },
+    {
+      "label": "foreground-walk",
+      "id": "4c67532c-7bca-4ed6-b710-359db3d70aab",
+      "rawBytes": 11809719,
+      "rawSha256": "9e097edf0a4847bd523f2df9cf00d6f898b53aabceeb1c44288ae27315fab777",
+      "gzipBytes": 952010,
+      "gzipSha256": "2c4ccacb2ce9da329eab15b111a843465c5fd5810bfe99ab0f8ac573854059d2",
+      "records": 7738,
+      "gaps": 0,
+      "lastReceivedAtUTC": "2026-11-04T10:35:39.868Z",
+      "ready": true,
+      "disposed": true,
+      "faults": []
+    }
+  ],
+  "files": {
+    "benchmark-8254b06f-eb23-4721-a86e-405be35ab175.json": "5de4d72c6ca01356d29880aaa558d6ca94cc98248435cd99661538daf22a1ef2",
+    "benchmark.png": "384d89576aadb8638e84ea70cdd680079536813ef4d8d627ca859f2994888803",
+    "build-identity.json": "1cdd49e40032451a4a8dcefbd598ffd6578ad5775d629b90db359eaea478e665",
+    "cleanup.json": "ed18dd975292a03b56de7455d250e6fd6074323d010c37a587c65325f21dba07",
+    "foreground-walk.jsonl.gz": "2c4ccacb2ce9da329eab15b111a843465c5fd5810bfe99ab0f8ac573854059d2",
+    "gameplay-assessment.json": "4a781c2a19b45b0cee3f36b788bc062be8d8788833fc7d86b12d18b6a2358752",
+    "peers-cleanup.json": "bbb5de0138111f51f513986965c559e4d59698585413b124998d1cc2d1028d2d",
+    "peers-ready.json": "d52e79912edcf809cc9d0a338263ec06d76f8446f4e6c374187a8c0d98ba3710",
+    "plan.json": "e3ed45837beef47f64c8d3e7105a47ab6558203e59e861695780861b0e76c57f",
+    "server-green.log": "49ccf58e447222ac8f8f8d73b32060bcebf8f9216caa8ff008a177a095e06dcd",
+    "server-red.log": "688f7b141e2910341b1eeb68ea445066de570c83ab7d9e73f15ccc35a76132d2",
+    "source-manifest.json": "0a9915ce8b6a0ba6286a343046a5b332e2aaee7019d8090216bef95c8b34f1de",
+    "startup-timeout.jsonl.gz": "58e5413b5545d682987717a8fedf1854230ed6ae8707da9cbc027935b5d6f666"
+  }
+}

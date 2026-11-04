@@ -11,7 +11,21 @@ export type { Input } from "./types";
 // V10 command-count acknowledgements cannot predict this timeline safely.
 // V14 includes authoritative, closed-by-default B6 doors and collision history.
 // Older clients predict against different collision meshes and must reconnect.
-export const PROTOCOL_VERSION = 14;
+// V15 recovery requests identify the accepted input epoch they intend to reset.
+export const PROTOCOL_VERSION = 15;
+export type ResyncRequest = { inputEpoch: number };
+
+export function resyncRequestMatchesEpoch(
+  raw: unknown,
+  inputEpoch: number,
+): raw is ResyncRequest {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return false;
+  const epoch = (raw as Partial<ResyncRequest>).inputEpoch;
+  return (
+    typeof epoch === "number" && Number.isSafeInteger(epoch) &&
+    epoch >= 0 && epoch === inputEpoch
+  );
+}
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;
