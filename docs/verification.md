@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## Ultra grafika a WebGL2 příprava · rozpracovaná přejímka 4. listopadu 2026
+
+Implementace Ultra 50 % a vlastních voleb je v [PR41](https://github.com/Varnahg/StrahovCrazyShow/pull/41), zatím draft. [Aktuální předání](agents/handoffs/ultra-graphics-20261104-root.md) a [předem určené měření](performance/evidence/ultra-graphics-20261104/MEASUREMENT.md) oddělují funkční stav od dosud neprokázaného FPS přínosu. První CI chyby jsou archivované; po opravě testových fixtures prošla celá sada na c3854084: 3187 PASS, 0 FAIL, 2 SKIP. Následných pět chybějících typových anotací v testech je opravených v 93f32787. Nejde o zelenou finální přejímku buildu/SDK/GPU.
+
+Na nové výslovné zadání uživatele má také WebGL2 Game startup 60 s pro svou jedinou vybranou kvalitu. Obecné helper limity a finální submission gate se nemění, timeout nadále nepovolí hraní. Cílená quality sada 11/11 PASS pokrývá šest režimů, zachování nastavení a propagaci všech neúplných stavů/chyby. Celý projekt prošel skutečným `tsc --noEmit`; [záznam s hashi vstupů](performance/evidence/ultra-graphics-20261104/webgl60-types.json). Změna rozpočtu není zrychlením ani důkazem úspěšného WebGL2 prvního snímku. Následuje neměnný produkční build a Edge ověření ve výslovně předaném validačním okně.
+
 ## Grafická větev D: stromový decoder · 4. listopadu 2026
 
 Výslovně povolený checkoutD:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104, codex/graphics-smoothness-20261104. [Dokončený CPU zásah a praktická evidence](performance/evidence/graphics-smoothness-20261104/README.md): privátní per-decode reuse ověřenýchaccessorů, zachované veřejné/invalid-data guardy.6 skutečnýchGLB/12částí byte-identické; na dvouMID Node CPU decode−54% a celáCPU příprava−39–45%. Nejde oFPS zisk.

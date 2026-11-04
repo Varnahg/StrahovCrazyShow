@@ -2994,7 +2994,7 @@ export class Game {
     return lighting;
   }
   private prepareLighting(render: () => void, pipelines?: Pick<WebGpuPipelinePreparation, "isReady">) {
-    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines);
+    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines, { timeoutMs: 60_000 });
     // Manual modes prepare only their selected state, including Ultra's 50%.
     if (this.adaptive.preferences && this.adaptive.preferences.mode !== "auto") {
       this.preparingRenderQuality = true;

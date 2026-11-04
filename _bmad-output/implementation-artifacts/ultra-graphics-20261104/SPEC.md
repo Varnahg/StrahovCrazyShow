@@ -69,3 +69,9 @@ Před implementací ověřený clean STOP run2: APIexited,inputrevalidated=true,
 | R15 / finální rollback review | low: vlastník mohl výslovně zapnout grading i u předchozí High; návrat kvality by snapshot znovu přepsal. | patch: znovu prosadit snapshot po environment setup před vykreslením; parametrizované Low i High rollback případy 2/2 PASS včetně skutečného obnoveného snímku. |
 
 Žádný nález nemění schválený záměr, limit 60/180 s ani fyziku/protokol. Všechny opravy jsou součástí téhož kontraktu a vyžadují následné review a stabilní celkové ověření. Dosavadní cílené testy nejsou výkonovou přejímkou.
+
+## Výslovné rozšíření zadání: WebGL2 příprava
+
+Uživatel následně požádal „webgl2 timeouty increasni taky“. Problém: WebGL2 Game startup na rozdíl od WebGPU stále dědil výchozích 30 s z prepareLightVariants; souběžné R3 ověření skončilo current-off timeoutem při rozpracované frontě. Mechanismus je doložen přímým WebGL early return v Game.prepareLighting bez timeoutMs.
+
+Jediná změna: předat WebGL2 vybrané kvalitě stejných 60 000 ms jako manuálnímu WebGPU. Metrika: skutečný caller předává 60 s a zachovává jediný průchod/požadovanou kvalitu; pozdější start v Edge zvlášť prokáže či vyvrátí dokončení. Správnost: žádné další kvality, readiness, shader/health, timeout rejection a potvrzený snímek zůstávají. Přijetí: cílené Game regrese a typová kontrola, praktický smoke v rámci rezervovaného okna. Obecný třicetisekundový helper default pro jiné vlastníky a finální submission gate zůstávají stejné jako u WebGPU. Zamítnuto plošné prodloužení všech časovačů a změna timeoutu na úspěch. Tato výslovně povolená změna rozpočtu není zrychlením hry.

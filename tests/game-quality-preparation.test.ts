@@ -283,20 +283,49 @@ test("retired Game does not mutate render resources during quality cleanup", asy
   assert.equal(f.game.ready, false);
 });
 
-test("WebGL keeps one original light preparation without quality overrides", async () => {
-  const f = fixture();
+const webGlPreferences: RenderPreferences[] = [
+  ...(["auto", "low", "medium", "high", "ultra"] as const).map(mode => createRenderPreferences(mode)),
+  { ...toCustomRenderPreferences(resolveVisualSettings(createRenderPreferences("high"))), renderScale: .5 },
+];
+
+test("WebGL gives every selected mode one 60s preparation without temporary quality overrides", async () => {
+  for (const preferences of webGlPreferences) {
+    const f = fixture(preferences);
+    f.game.engine.isWebGPU = false;
+    const requested = f.adaptive.state, effective = f.game.getEffectiveVisualSettings();
+    assert.equal((await f.start()).status, "complete");
+    assert.equal(f.lightPasses, 1);
+    assert.deepEqual(f.passes, [{ quality: requested.quality, timeoutMs: 60_000, finalRestore: false }]);
+    assert.deepEqual(f.applied, []);
+    assert.equal(f.adaptive.state, requested);
+    assert.equal(f.game.getEffectiveVisualSettings(), effective);
+    assert.equal(f.scaling, requested.hardwareScaling);
+    assert.equal(f.game.ready, false);
+  }
+});
+
+test("WebGL propagates timeout and incomplete preparation unchanged without releasing gameplay", async () => {
+  for (const preferences of webGlPreferences) for (const status of ["timeout", "failed", "disposed"] as const) {
+    const f = fixture(preferences), result = { ...complete(), status, failureStep: "render" as const };
+    f.game.engine.isWebGPU = false;
+    const requested = f.adaptive.state;
+    f.result(result);
+    assert.equal(await f.start(), result, `${preferences.mode}/${status} is not replaced by a successful result`);
+    assert.equal(f.lightPasses, 1);
+    assert.equal(f.passes[0].timeoutMs, 60_000);
+    assert.deepEqual(f.applied, []);
+    assert.equal(f.adaptive.state, requested);
+    assert.equal(f.game.ready, false);
+  }
+});
+
+test("WebGL preserves the original preparation rejection with its explicit 60s budget", async () => {
+  const f = fixture("ultra"), failure = new Error("WebGL preparation failure");
   f.game.engine.isWebGPU = false;
-  const requested = f.adaptive.state;
-  assert.equal((await f.start()).status, "complete");
+  f.onPass(() => { throw failure; });
+  await assert.rejects(f.start(), error => error === failure);
   assert.equal(f.lightPasses, 1);
-  assert.ok(
-    f.passes.every(
-      (pass) =>
-        pass.quality === "medium" &&
-        pass.timeoutMs === undefined &&
-        !pass.finalRestore,
-    ),
-  );
+  assert.equal(f.passes[0].timeoutMs, 60_000);
   assert.deepEqual(f.applied, []);
-  assert.equal(f.adaptive.state, requested);
+  assert.equal(f.game.ready, false);
 });

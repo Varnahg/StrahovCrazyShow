@@ -24,4 +24,8 @@ Uživatel ve 21:53 UTC výslovně povolil koordinaci s chatem „Uprav chat a od
 
 ## Rozsah a předání
 
+Nové uživatelské zadání „webgl2 timeouty increasni taky“ je provedeno jako samostatná změna: WebGL2 Game předává své jediné vybrané kvalitě 60 s místo zděděných 30 s. Všech šest režimů a propagace timeout/failed/disposed/rejection mají 11/11 cílených regresí PASS; quality/scale/features/ready se předáním limitu nemění. Obecný helper a finální submission gate zůstávají stejné jako u WebGPU. Průzkum, varianty a šest přejímkových položek jsou ve SPEC. Není to tvrzení o zrychlení či dokončeném startupu.
+
+KEY-73 skutečně uklidil a uvolnil zdroje. Root má nyní Ultra validation (heavy/GPU/workspace-build/2568/4179) i Ultra record (docs/verification.md); porty 2568/4179 byly volné. Dalším krokem je celkový TypeScript a neměnný build, potom vyhrazené Edge okno. Produkční 8080 zůstává nedotčené.
+
 Autoritativní scope je v task JSON a živém registru. Převzaté výsledky: [UI](ultra-graphics-20261104-ui.md), [vegetace](ultra-graphics-20261104-vegetation.md), [světla](ultra-graphics-20261104-lighting.md), [Game testy](ultra-graphics-20261104-game-tests.md). Nesouvisející C změny a server 8080 zůstávají zachované. Linear KEY-5 aktualizován komentářem `1cc36abf-4f59-44fc-b306-7128809fcfae`.
