@@ -1,0 +1,17 @@
+{
+  "sourceHash": "28641aff1da225430e1fed6e2821783941cc1d229ba7ea7109578289dc3b7a31",
+  "treeRendererSha256": "6033ae2870a3c1f4772266e2b5f7efa358cc90f95ea423ef31e0c5188ab1e979",
+  "treeTestsSha256": "aefefb6adfcf9019e3e473f815a586de7d6cf828beca53b337467d1bfe0a49a7",
+  "runtimeVersusMeasuredBaseline": "Only explanatory comment; executable source equals measured A75",
+  "targeted": {
+    "command": "node --import tsx --test tests/tree-streaming.test.ts tests/tree-cluster-streaming.test.ts tests/tree-catalog-loading.test.ts",
+    "passed": 36,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "handoff": "../../../../agents/handoffs/low-tree-lod-pr40-default-tests.md"
+  },
+  "ci": "Await current PR head after commit; do not reuse old-head result",
+  "candidateAccepted": false,
+  "defaultFarDistance": 75
+}

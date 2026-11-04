@@ -22,6 +22,7 @@ import { WebGPUCacheBindGroups } from "@babylonjs/core/Engines/WebGPU/webgpuCach
 import { WebGPUShaderProcessor } from "@babylonjs/core/Engines/WebGPU/webgpuShaderProcessor";
 import { Logger } from "@babylonjs/core/Misc/logger";
 import { createWebGpuShadowDepthWrapper } from "../client/webgpu-shadow-readiness";
+import { StartupMaterialReadiness } from "../client/startup-material-readiness";
 
 /** Actual light layouts and wrapper state machine; only GPU effect creation and
  * the terminal GPUDevice are substituted. This is not graphical acceptance. */
@@ -310,6 +311,20 @@ for (const kind of ["standard", "pbr"] as const) {
       resolve(); await f.settleReady(9);
       assert.match(f.depth(9).defines, /#define DIRLIGHT0/);
     } finally { resolve(); f.engine.createEffect = originalCreate; f.dispose(); }
+  });
+  test(`startup main readiness guard also preserves actual ${kind} shadow freshness`, async () => {
+    const f = await actualMaterialFixture(kind);
+    (f.engine as unknown as { _isWebGPU: boolean })._isWebGPU = true;
+    const startup = new StartupMaterialReadiness(f.scene);
+    (f.engine as unknown as { _isWebGPU: boolean })._isWebGPU = false;
+    try {
+      await f.settleReady(9); await f.settleReady(10);
+      f.material.freeze(); f.hemi.setEnabled(false); f.sun.setEnabled(true);
+      await f.settleReady(9); await f.settleReady(10);
+      assert.match(f.depth(9).defines, /#define DIRLIGHT0/);
+      assert.match(f.depth(10).defines, /#define DIRLIGHT0/);
+      assert.equal(f.material.isFrozen, true); assert.equal(f.material.allowShaderHotSwapping, true);
+    } finally { startup.dispose(); f.dispose(); }
   });
 }
 

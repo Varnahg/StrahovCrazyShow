@@ -118,6 +118,27 @@ const pinnedWGSL = (WebGPUEngine.prototype as unknown as {
   _getWGSLShader(source: string, type: string, defines?: string): string;
 })._getWGSLShader;
 
+test("allocation-free shader completion signal follows native settlements and ignores retired generations", async (t) => {
+  const f = fixture();
+  let pending = deferred<unknown>();
+  f.engine._preparePipelineContextAsync = () => pending.promise;
+  const profile = new WebGpuCompilationProfile(f.engine, { now: f.now });
+  t.after(() => profile.dispose());
+  t.mock.method(profile, "snapshot", () => { throw new Error("retry must not serialize the diagnostic inventory"); });
+  assert.equal(profile.shaderPreparationCompletions, 0);
+  const first = f.engine._preparePipelineContextAsync({});
+  assert.equal(profile.shaderPreparationCompletions, 0);
+  pending.resolve({}); await first; await settle();
+  assert.equal(profile.shaderPreparationCompletions, 1);
+  pending = deferred();
+  const retired = f.engine._preparePipelineContextAsync({});
+  f.engine._device = new f.Device();
+  f.engine.onContextRestoredObservable.notifyObservers();
+  assert.equal(profile.shaderPreparationCompletions, 0);
+  pending.resolve({}); await retired; await settle();
+  assert.equal(profile.shaderPreparationCompletions, 0, "old native settlement cannot request work on a new generation");
+});
+
 function inventoryFixture(options: CompilationProfileOptions = {}) {
   const f = fixture();
   const engine = Object.assign(f.engine, { _getWGSLShader: pinnedWGSL });

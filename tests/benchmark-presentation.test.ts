@@ -5,10 +5,48 @@ import { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import {
   benchmarkPresentation,
+  assessBenchmarkFrames,
   createBenchmarkDownloads,
   type BenchmarkDownloadHost,
 } from "../client/benchmark-presentation";
 import { captureModelReview } from "../client/model-review";
+
+function measuredSample(frameIntervalsMs = Array(600).fill(1000 / 60)) {
+  return {
+    frameIntervalsMs,
+    frames: frameIntervalsMs.length,
+    rendering: { targetFps: 60 },
+    renderErrorCount: 0,
+    assetLoadErrorCount: 0,
+    renderHealth: { valid: true },
+  };
+}
+
+test("HUD flags a single second-long stall even when average FPS and p99 meet their limits", () => {
+  const input = measuredSample();
+  input.frameIntervalsMs[300] = 1050;
+  const original = JSON.stringify(input);
+  const verdict = assessBenchmarkFrames(input);
+  assert.equal(verdict.scope, "frame-sample");
+  assert.equal(verdict.status, "failed");
+  assert.ok(verdict.metrics!.averageFps > 54);
+  assert.ok(verdict.metrics!.p99Ms < 17);
+  assert.equal(verdict.metrics!.maxMs, 1050);
+  assert.ok(verdict.reasons.some(reason => reason.code === "max-frame"));
+  assert.equal(JSON.stringify(input), original);
+});
+
+test("HUD acceptance stays scoped to frames and refuses incomplete or unhealthy records", () => {
+  const input = measuredSample();
+  assert.equal(assessBenchmarkFrames(input).status, "passed");
+  assert.equal(assessBenchmarkFrames(input).scope, "frame-sample");
+  for (const changed of [
+    { frameIntervalsMs: undefined }, { frames: 599 }, { rendering: undefined },
+    { rendering: { targetFps: NaN } }, { renderErrorCount: 1 },
+    { assetLoadErrorCount: 1 }, { renderHealth: { valid: false } },
+    { renderHealth: undefined },
+  ]) assert.equal(assessBenchmarkFrames({ ...input, ...changed }).status, "inconclusive");
+});
 
 test("visible benchmark keeps raw frame samples and counters without serializing the model inventory", () => {
   const frames = [16.1, 17.2, 59.8];

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "render-process-guide-20261103",
+  "title": "Sjednotit výkonový návod s měřením na main a rozhodovacími pravidly",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["docs/performance/README.md", "docs/agents/handoffs/render-process-guide-20261103.md"],
+  "resources": [],
+  "acceptance": ["Pouze main a neměnné build výstupy v cache; žádné kopie projektu.", "Jedna hypotéza, ověřený sběr, plánovaná opakování, rozhodnutí a pravdivé limity důkazů.", "Příkazy odpovídají aktuálnímu harnessu a závislosti se při testování samy nemění."],
+  "verification": ["Ověřit dokumentované příkazy proti kódu a místní odkazy; neprovádět build ani GPU."],
+  "notes": ["Výslovné zadání uživatele 3.11.2026; root současně upravuje AGENTS a harness. Historické výsledky se nepřepisují. Konkrétní delegace, bez dalšího BMAD workflow."]
+}

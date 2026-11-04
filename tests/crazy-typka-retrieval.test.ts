@@ -18,7 +18,7 @@ import {
   CRAZY_TYPKA_STARTERS,
 } from "../shared/crazy-typka";
 
-const checkedNow = Date.parse("2026-10-28T12:00:00Z");
+const checkedNow = Date.parse("2026-11-03T12:00:00Z");
 
 test("pitch rental without an institution name stays with SUZ, including the next price question", () => {
   for (const query of [
@@ -168,7 +168,7 @@ test("source-specific review and Prague legal boundaries are independent and hal
       .some((chunk) => chunk.source.id === "statutes"),
   );
   const current = getKnowledgeRegistry();
-  const weeklyCutoff = Date.parse("2026-11-04T00:00:00Z");
+  const weeklyCutoff = Date.parse("2026-11-10T00:00:00Z");
   assert.equal(
     current.isSourceUsable("sh-printing-guide", weeklyCutoff - 1),
     true,
@@ -293,7 +293,7 @@ const retrieveKnowledge = (query: string, limit?: number) =>
   findKnowledge(query, limit, checkedNow);
 
 test("stale, future or inconsistent review metadata never becomes factual evidence", () => {
-  const cutoff = Date.parse("2026-11-03T00:00:00Z");
+  const cutoff = Date.parse("2026-11-10T00:00:00Z");
   assert.ok(findKnowledge("kancelář SH", 4, cutoff - 1).length > 0);
   assert.deepEqual(findKnowledge("kancelář SH", 4, cutoff), []);
   assert.deepEqual(findKnowledge("kancelář SH", 4, cutoff + 1000), []);
@@ -325,7 +325,7 @@ test("curated documents have real provenance, current statutes and content hashe
       chunk.contentSha256,
       createHash("sha256").update(chunk.text).digest("hex"),
     );
-    assert.ok(["2026-10-27", "2026-10-28"].includes(chunk.source.checkedAt));
+    assert.ok(["2026-10-27", "2026-10-28", "2026-11-03"].includes(chunk.source.checkedAt));
   }
   const membership = KNOWLEDGE_CHUNKS.find(
     (chunk) => chunk.id === "sh-membership-join",

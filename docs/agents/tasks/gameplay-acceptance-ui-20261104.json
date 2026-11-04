@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "gameplay-acceptance-ui-20261104",
+  "title": "Zobrazit nevyhovující krátký benchmark a omezit jeho přejímkový význam",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["client/ui.tsx", "client/benchmark-presentation.ts", "client/i18n-messages.ts", "tests/benchmark-presentation.test.ts", "tests/replay/runner-config.mjs", "tests/recorded-walkthrough-replay.test.ts", ".cache/main-replay-consolidation-20261029/", "docs/performance/README.md", "docs/agents/handoffs/gameplay-acceptance-ui-20261104.md"],
+  "resources": [],
+  "acceptance": ["Herní benchmark zobrazuje konkrétní nevyhovující frametime výsledek ze společného evaluatoru.", "Krátký FPS vzorek netvrdí ověření pohybu nebo sítě; výsledek chybějících vzorků není zelený.", "Návod a AGENTS rozlišují data od přijetí a vyžadují delší skutečný pohyb a síťové údaje."],
+  "verification": ["Cílené UI/presentation regrese a TypeScript; skutečná produkční kontrola společně s následujícím stabilním runtime checkpointem."],
+  "notes": ["Root vlastní UI/navazující dokumentaci; AGENTS samostatně pod administrativní rezervací. Žádná změna veřejného protokolu ani grafiky."]
+}

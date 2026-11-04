@@ -29,7 +29,7 @@ type Options = {
   definitionHash: string;
   isCurrent: () => boolean;
   onTimeline: (timeline: CadDoorTimeline | null) => void;
-  requestResync: () => void;
+  requestResync: () => void | boolean;
   onNotice: (message: DoorConnectionNotice) => void;
   now?: () => number;
 };
@@ -63,11 +63,14 @@ export class DoorConnection {
   private sendResync(): boolean {
     const now = this.now();
     if (!Number.isFinite(now) || now - this.lastResync < 1000) return false;
-    this.lastResync = now;
     try {
-      this.options.requestResync();
+      // Bootstrap may have no accepted authority yet. An unsent request must
+      // leave the cooldown available for the first valid epoch.
+      if (this.options.requestResync() === false) return false;
+      this.lastResync = now;
       return true;
     } catch {
+      this.lastResync = now;
       return false;
     }
   }

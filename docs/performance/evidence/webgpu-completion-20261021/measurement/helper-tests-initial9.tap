@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: actual UI transform is exact once, retains outer catch/dispose and original input bytes
+ok 1 - actual UI transform is exact once, retains outer catch/dispose and original input bytes
+  ---
+  duration_ms: 8.1858
+  type: 'test'
+  ...
+# Subtest: loading experiment changes exactly one declaration, original is byte identical, drift fails
+ok 2 - loading experiment changes exactly one declaration, original is byte identical, drift fails
+  ---
+  duration_ms: 1.5637
+  type: 'test'
+  ...
+# Subtest: startup terminal capture precedes original UI teardown and keeps the same thrown object
+ok 3 - startup terminal capture precedes original UI teardown and keeps the same thrown object
+  ---
+  duration_ms: 1.1246
+  type: 'test'
+  ...
+# Subtest: observer faults never replace startup failure/success and operation is called once
+ok 4 - observer faults never replace startup failure/success and operation is called once
+  ---
+  duration_ms: 0.6219
+  type: 'test'
+  ...
+# Subtest: receipt keeps rejected startup evidence, repeated bytes are idempotent and conflict preserves original
+ok 5 - receipt keeps rejected startup evidence, repeated bytes are idempotent and conflict preserves original
+  ---
+  duration_ms: 55.7283
+  type: 'test'
+  ...
+# Subtest: same-origin loopback POST, identity, array and byte bounds are enforced
+ok 6 - same-origin loopback POST, identity, array and byte bounds are enforced
+  ---
+  duration_ms: 2.634
+  type: 'test'
+  ...
+# Subtest: snapshot verifies all original files, rejects drift/path escape; bundle/helper hashes are real
+ok 7 - snapshot verifies all original files, rejects drift/path escape; bundle/helper hashes are real
+  ---
+  duration_ms: 28.1552
+  type: 'test'
+  ...
+# Subtest: overlay forbids browser engine exposure, extra readiness/render and periodic dumps during interval
+ok 8 - overlay forbids browser engine exposure, extra readiness/render and periodic dumps during interval
+  ---
+  duration_ms: 1.4632
+  type: 'test'
+  ...
+# Subtest: actual overlay failure produces a terminal export before teardown using a DOM/transport fixture, no engine
+ok 9 - actual overlay failure produces a terminal export before teardown using a DOM/transport fixture, no engine
+  ---
+  duration_ms: 7.9491
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 232.1677

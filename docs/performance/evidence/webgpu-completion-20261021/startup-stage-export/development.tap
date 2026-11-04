@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: stage export preserves76 numeric rows, repeated Medium pass identity and partial failure
+ok 1 - stage export preserves76 numeric rows, repeated Medium pass identity and partial failure
+  ---
+  duration_ms: 9.0023
+  type: 'test'
+  ...
+# Subtest: stage export bounds304rows16passes and256KiB without walking overflow or arbitrary reason keys
+ok 2 - stage export bounds304rows16passes and256KiB without walking overflow or arbitrary reason keys
+  ---
+  duration_ms: 36.03
+  type: 'test'
+  ...
+# Subtest: stage export own getter, sparse, proxy and nonfinite failures stay explicit with closed output
+ok 3 - stage export own getter, sparse, proxy and nonfinite failures stay explicit with closed output
+  ---
+  duration_ms: 1.9377
+  type: 'test'
+  ...
+# Subtest: stage receipt rejects invented mapping/fields/kinds/getters and accepts actual startup envelope headroom
+ok 4 - stage receipt rejects invented mapping/fields/kinds/getters and accepts actual startup envelope headroom
+  ---
+  duration_ms: 30.9308
+  type: 'test'
+  ...
+# Subtest: stagesSnapshot shares the original observer reaction, preserves Promise identity and scalar evidence after dispose
+ok 5 - stagesSnapshot shares the original observer reaction, preserves Promise identity and scalar evidence after dispose
+  ---
+  duration_ms: 8.2534
+  type: 'test'
+  ...
+# Subtest: actual overlay exports stage projection once at terminal before teardown, never into startup samples
+ok 6 - actual overlay exports stage projection once at terminal before teardown, never into startup samples
+  ---
+  duration_ms: 16.6488
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 704.087

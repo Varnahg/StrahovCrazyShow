@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "discord-kb-20261103-validation",
+  "title": "KEY-72: serializované DB, build, integration a praktické RAG ověření",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/discord-kb-20261103/validation/",
+    "dist/",
+    "docs/agents/handoffs/discord-kb-20261103-validation.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568",
+    "port:5493",
+    "port:8081"
+  ],
+  "acceptance": [
+    "Ověření proběhne nad stabilním checkpointem s hashy vlastních vstupů i testů a respektuje aktivní render WIP.",
+    "Izolovaná DB před migrací zachová původní legacy/extraction snapshoty; kurace má cache/idempotence/rollback důkazy.",
+    "Skutečná 60dotazová evaluace, praktické AI odpovědi, plná test suite/build/izolovaná integrace mají pravdivě zaznamenané výsledky.",
+    "Žádný cizí proces ani produkční volume není ukončeno nebo přepsáno; zdroje se uvolní po cleanup vlastních procesů."
+  ],
+  "verification": [
+    "pnpm test",
+    "pnpm build",
+    "pnpm test:integration",
+    "Cílené PostgreSQL/pgvector migration/cache testy na vlastním portu5493",
+    "CPU/AI preview na8081 bez vstupu do 3D scény; skutečné GPU okno vyžaduje navíc gpu rezervaci."
+  ],
+  "notes": [
+    "User approved full KEY-72 plan. main only. Render owner 01a1888f explicitně uvolnil heavy-validation/workspace-build/port2568 dne3.11.2026; registry se musí zkontrolovat před claimem.",
+    "Tento task neautorizuje nová source code edits; root/foundation own their files. Import budget se určí z cache preview a přesného manifestu. Žádné raw zprávy do provideru.",
+    "Integrator accepted checkpoint 2026-11-03; actual evidence and limitations in matching handoff. Own processes stopped and claim released; production activation is separate."
+  ]
+}

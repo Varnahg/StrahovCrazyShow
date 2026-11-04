@@ -1,0 +1,482 @@
+TAP version 13
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:19]: Babylon.js v9.30.0 - Null engine
+# Subtest: full native cold Mesh.render records current and previous handles; growth rerecords instead of replaying destroyed buffers
+not ok 1 - full native cold Mesh.render records current and previous handles; growth rerecords instead of replaying destroyed buffers
+  ---
+  duration_ms: 35.3647
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected "actual" not to be reference-equal to "expected":
+    
+    {
+      resources: [
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=2-Geometry_6a2ad6e0-8f90-4465-ab41-70bb3045a37c_IndexBuffer_CopyDst_Index_Storage_size8',
+          mappedAtCreation: false,
+          size: 8,
+          usage: 152
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=1-Geometry_6a2ad6e0-8f90-4465-ab41-70bb3045a37c_position_CopyDst_Vertex_Storage_size36',
+          mappedAtCreation: false,
+          size: 36,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          destroyed: true,
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=3_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          destroyed: true,
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=4_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_IndirectDrawBuffer_CopyDst_Storage_Indirect_size20',
+          mappedAtCreation: false,
+          size: 20,
+          usage: 392
+        }
+      ],
+      sequence: 1
+    }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: stable native draws retain bundle and do not alter context, bindings, indirect or UBO-slot lifecycle
+not ok 2 - stable native draws retain bundle and do not alter context, bindings, indirect or UBO-slot lifecycle
+  ---
+  duration_ms: 6.1415
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:14:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected "actual" not to be reference-equal to "expected":
+    
+    {
+      resources: [
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=9-Geometry_d101ecc7-10bb-4413-91fa-458fe33e8c2c_IndexBuffer_CopyDst_Index_Storage_size8',
+          mappedAtCreation: false,
+          size: 8,
+          usage: 152
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=8-Geometry_d101ecc7-10bb-4413-91fa-458fe33e8c2c_position_CopyDst_Vertex_Storage_size36',
+          mappedAtCreation: false,
+          size: 36,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=10_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=11_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_IndirectDrawBuffer_CopyDst_Storage_Indirect_size20',
+          mappedAtCreation: false,
+          size: 20,
+          usage: 392
+        }
+      ],
+      sequence: 1
+    }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: later actual DrawContext and temporary SubMesh shadow override invalidate lazily after another context grows storage
+not ok 3 - later actual DrawContext and temporary SubMesh shadow override invalidate lazily after another context grows storage
+  ---
+  duration_ms: 4.8534
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:21:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected "actual" not to be reference-equal to "expected":
+    
+    {
+      resources: [
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=17-Geometry_bdcb262d-5292-4c09-a735-72e468cc7aca_IndexBuffer_CopyDst_Index_Storage_size8',
+          mappedAtCreation: false,
+          size: 8,
+          usage: 152
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=16-Geometry_bdcb262d-5292-4c09-a735-72e468cc7aca_position_CopyDst_Vertex_Storage_size36',
+          mappedAtCreation: false,
+          size: 36,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          destroyed: true,
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=18_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          destroyed: true,
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=19_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_IndirectDrawBuffer_CopyDst_Storage_Indirect_size20',
+          mappedAtCreation: false,
+          size: 20,
+          usage: 392
+        }
+      ],
+      sequence: 1
+    }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: separate native render passes keep separate storage, invalidate their own changed matrix identities and keep stable reuse
+not ok 4 - separate native render passes keep separate storage, invalidate their own changed matrix identities and keep stable reuse
+  ---
+  duration_ms: 5.54
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:27:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected "actual" not to be reference-equal to "expected":
+    
+    {
+      resources: [
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=24-Geometry_a0266129-307d-44ce-a978-a795ce609cd4_IndexBuffer_CopyDst_Index_Storage_size8',
+          mappedAtCreation: false,
+          size: 8,
+          usage: 152
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=23-Geometry_a0266129-307d-44ce-a978-a795ce609cd4_position_CopyDst_Vertex_Storage_size36',
+          mappedAtCreation: false,
+          size: 36,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=27_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=28_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_IndirectDrawBuffer_CopyDst_Storage_Indirect_size20',
+          mappedAtCreation: false,
+          size: 20,
+          usage: 392
+        }
+      ],
+      sequence: 2
+    }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: first previous matrices at unchanged capacity replace current and previous identities without disturbing ready Effect
+not ok 5 - first previous matrices at unchanged capacity replace current and previous identities without disturbing ready Effect
+  ---
+  duration_ms: 3.6125
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:32:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'effectiveBuffer')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    WebGPUCacheRenderPipelineTree._setVertexState (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\WebGPU\webgpuCacheRenderPipeline.ts:910:41)
+    WebGPUCacheRenderPipelineTree._lookupRenderPipeline (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\WebGPU\webgpuCacheRenderPipeline.ts:213:14)
+    WebGPUCacheRenderPipelineTree.getRenderPipeline (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\WebGPU\webgpuCacheRenderPipeline.ts:254:29)
+    NullEngine._draw (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\webgpuEngine.pure.ts:3918:52)
+    NullEngine.drawElementsType (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\webgpuEngine.pure.ts:3993:14)
+    Mesh._draw (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2147:20)
+    Mesh._updateInstancedBuffers (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2399:18)
+    Mesh._renderWithInstances (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2439:14)
+    Mesh._processRendering (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2506:18)
+    Mesh.render (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2884:22)
+  ...
+# Subtest: no-effect native preparation grows resources without touching an unrelated draw cache; next actual draw still validates identity
+not ok 6 - no-effect native preparation grows resources without touching an unrelated draw cache; next actual draw still validates identity
+  ---
+  duration_ms: 5.0944
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:37:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected "actual" not to be reference-equal to "expected":
+    
+    {
+      resources: [
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=39-Geometry_2eb1b59a-7aba-46b1-8837-8c1dc0dbc115_IndexBuffer_CopyDst_Index_Storage_size8',
+          mappedAtCreation: false,
+          size: 8,
+          usage: 152
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=38-Geometry_2eb1b59a-7aba-46b1-8837-8c1dc0dbc115_position_CopyDst_Vertex_Storage_size36',
+          mappedAtCreation: false,
+          size: 36,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=40_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=41_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_IndirectDrawBuffer_CopyDst_Storage_Indirect_size20',
+          mappedAtCreation: false,
+          size: 20,
+          usage: 392
+        }
+      ],
+      sequence: 1
+    }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: unknown current or previous DataBuffer IDs never authorize a cached replay, including repeated null identities
+not ok 7 - unknown current or previous DataBuffer IDs never authorize a cached replay, including repeated null identities
+  ---
+  duration_ms: 5.5226
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected "actual" not to be reference-equal to "expected":
+    
+    {
+      resources: [
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=46-Geometry_b2db462d-adf5-415d-80ff-cb6264a5b597_IndexBuffer_CopyDst_Index_Storage_size8',
+          mappedAtCreation: false,
+          size: 8,
+          usage: 152
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=45-Geometry_b2db462d-adf5-415d-80ff-cb6264a5b597_position_CopyDst_Vertex_Storage_size36',
+          mappedAtCreation: false,
+          size: 36,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=47_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=48_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_IndirectDrawBuffer_CopyDst_Storage_Indirect_size20',
+          mappedAtCreation: false,
+          size: 20,
+          usage: 392
+        }
+      ],
+      sequence: 1
+    }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: disposed current buffer in a frozen native branch cannot replay a cached old raw handle
+not ok 8 - disposed current buffer in a frozen native branch cannot replay a cached old raw handle
+  ---
+  duration_ms: 9.462
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:47:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected "actual" not to be reference-equal to "expected":
+    
+    {
+      resources: [
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=51-Geometry_9ea92bf5-e54a-4f97-be51-c75f4115503f_IndexBuffer_CopyDst_Index_Storage_size8',
+          mappedAtCreation: false,
+          size: 8,
+          usage: 152
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=50-Geometry_9ea92bf5-e54a-4f97-be51-c75f4115503f_position_CopyDst_Vertex_Storage_size36',
+          mappedAtCreation: false,
+          size: 36,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=52_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_DataBufferUniqueId=53_CopyDst_Vertex_Storage_size2048',
+          mappedAtCreation: false,
+          size: 2048,
+          usage: 168
+        },
+        {
+          destroy: [Function: destroy],
+          label: 'BabylonWebGPUDevice1_IndirectDrawBuffer_CopyDst_Storage_Indirect_size20',
+          mappedAtCreation: false,
+          size: 20,
+          usage: 392
+        }
+      ],
+      sequence: 1
+    }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: actual native terminal draw and allocation exceptions keep exact original falsy values and resource refcounts
+not ok 9 - actual native terminal draw and allocation exceptions keep exact original falsy values and resource refcounts
+  ---
+  duration_ms: 4.5867
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:51:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    undefined !== 57
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 57
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-instance-buffers/instance-buffers.test.mjs:52:312)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: WebGPU compatibility mode is unchanged and never installs regular-instance bundle bookkeeping
+ok 10 - WebGPU compatibility mode is unchanged and never installs regular-instance bundle bookkeeping
+  ---
+  duration_ms: 4.9942
+  type: 'test'
+  ...
+# Subtest: actual NullEngine WebGL native mesh path stays without WebGPU context bookkeeping
+not ok 11 - actual NullEngine WebGL native mesh path stays without WebGPU context bookkeeping
+  ---
+  duration_ms: 4.7882
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:59:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 4096
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 4096
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-instance-buffers/instance-buffers.test.mjs:60:161)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: vertex-pulling native path is explicitly unchanged; this pin fix does not claim its storage-refresh defect
+ok 12 - vertex-pulling native path is explicitly unchanged; this pin fix does not claim its storage-refresh defect
+  ---
+  duration_ms: 3.2032
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 2
+# fail 10
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1472.1678

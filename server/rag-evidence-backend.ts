@@ -9,6 +9,7 @@ import {
 } from "../shared/crazy-typka";
 import type { EvidenceKnowledgeChunk } from "./rag-knowledge-types";
 import { isKnowledgeCurrent } from "./crazy-typka-retrieval";
+import { isCuratedKnowledgeCurrent } from "../shared/knowledge-curation";
 import {
   CRAZY_TYPKA_EVIDENCE_BYTES,
   crazyTypkaEvidencePayload,
@@ -146,6 +147,13 @@ export function isEvidenceCurrent(
   instant: number,
 ): boolean {
   return evidence.chunks.every(({ document }) => {
+    if ("derivation" in document) {
+      if (!isCuratedKnowledgeCurrent(document, instant)) return false;
+      // A date of observation does not establish a historical interval of validity.
+      return evidence.scope.kind === "current"
+        ? document.status === "current"
+        : document.status === "archived" && evidence.scope.asOf === undefined;
+    }
     if (!isKnowledgeCurrent(document.checkedAt, document.reviewAfter, instant))
       return false;
     if (evidence.scope.kind === "current")

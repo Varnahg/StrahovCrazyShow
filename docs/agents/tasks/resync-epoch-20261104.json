@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "resync-epoch-20261104",
+  "title": "Zamezit opakovanému resetu vstupní epochy po opožděném recovery požadavku",
+  "status": "done",
+  "dependsOn": ["gameplay-acceptance-20261104", "gameplay-acceptance-ui-20261104"],
+  "writePaths": ["shared/netcode.ts", "client/game.ts", "client/ui.tsx", "client/authority-buffer.ts", "client/door-connection.ts", "server/index.ts", "tests/resync-epoch.test.ts", "tests/client-recovery.test.ts", "tests/authority-buffer.test.ts", "tests/door-connection.test.ts", "tests/room-callbacks.test.ts", "tests/network-diagnostics.test.ts", "tests/cad-game-doors.test.ts", "scripts/integration-input-backlog.ts", "scripts/integration-respawn.ts", "scripts/integration-cad-doors.ts", "docs/agents/handoffs/resync-epoch-20261104.md", ".cache/resync-epoch-20261104/"],
+  "resources": [],
+  "acceptance": ["Resync i doorResync obsahují povinnou poslední známou vstupní epochu; V15 odmítne staré klienty.", "Dva stejné nebo smíšené požadavky staré epochy způsobí nejvýše jediný reset, bez další forced authority a bez ztráty nových vstupů.", "Aktuální spojení, rate limit, platný token a aktuální serverová epocha se ověří před mutací; žádné prodlužování timeoutů.", "Dveřní bootstrap před první autoritou bezpečně odloží neodeslaný požadavek; používá poslední validní přijatou epochu i pokud Game autoritu odmítl kvůli historii dveří.", "Zachovat retry, focus/reconnect, držené ovládání a jednorázový jump edge; žádné tvrzení o opravě nízkých FPS nebo celého6s stallu."],
+  "verification": ["Cílené regresní testy reálného handleru a klientského lifecycle, rate-limit/retry/stale/future/malformed/current-room, bootstrap/mixedchannel/server-clock-drop.", "Lehké CPU testy předat s implementací/refaktoringem. Root provede serializovaný build/fullsuite/SDK integration a cílený Edge průchod; agent žádné servery/GPU nespouští."],
+  "notes": ["Navazující konkrétní oprava podle hráčského archivu c16cb5a6 a20dvojic client-request odpovědí do20ms. Implementace až po přijetí stage1gate/UI. Root předá čisté Game/UI po release předchozíchclaims. Bez workflowrekurze a dalšíchvětví."]
+}

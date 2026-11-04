@@ -1,0 +1,10 @@
+# Předání: validate-local-interpolation-phase-20261014
+
+- Vlastník `repairs-01a13624-phase-validation`, root koordinátor; wave4 WT, větev `codex/playtest-repairs-wave4`, HEAD `f63039b4067d57c8bdbe560ead5719cfc05cbb0d` plus doložený WIP.
+- Převzaté4 Game/Timeline/test soubory byly před freeze porovnané s přesnými SHA implementačního handoffu. Ostatní source vstupy kopírované pouze z neměnného B6 candidate, s před/kopie/po hash kontrolou. Engine/IMAGE ani pracovní glTF změny nebyly vzaté z dirty stromu.
+- Stabilní snapshot `2aaa3f428bcba9527ab86c61d10cc3b85b40a9a434161683adc7e5fb0bc55e70`:8408 vstupů/511 source-config-test, právě4 delty. Původní main core hash ověřen; žádná install nebo dependency změna.
+- Skutečná sekvenční pipeline UTC15:19:31–15:23:27: **892/892 pnpm test PASS, pnpm build PASS, celá pnpm test:integration PASS**. Po doběhu511/511 source hashů shodných,2568 bez listeneru. Originální původní red a cílené52 PASS důkazy zachované.
+- Výstupy: `.cache/local-interpolation-validation/`, `docs/performance/evidence/local-interpolation-phase-20261014/{README.md,checkpoint.json,pipeline.jsonl}` a tento handoff. Refaktoring validačního pomocníka použil stejnou sekvenční orchestrace/gate jako předchozí ověřený package checkpoint, pouze s vlastním outputem; žádná změna hry integrátorem.
+- Všechny vlastní validační procesy skončily. Konkrétní PID a raw log cesty jsou v ignorované cache. Samostatné preview4186/API2581 pod serve-b6 ownerem běží dál; nebylo touto pipeline restartováno. Před každým náročným krokem ověřena absence herního TCP/nového JSONL. GPU/browser nebyly spuštěny.
+- Limity: žádný nový GPU/FPS/obrazový důkaz, lead/resync/offset problémy zůstávají. Nový fix zatím nelze stageovat jako celý Game soubor: nejprve správně oddělit starší V11 feature WIP a ověřit jednotlivé čisté mezistavy. Tento task připravil úplný zdrojový a testový důkaz, nikoli falešně samostatný commit.
+- Po zapsání evidence root uvolní pouze vlastní heavy/workspace-build/2568 rezervaci. Předaná hra a portové služby mají samostatného živého vlastníka.

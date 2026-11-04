@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "low-tree-lod-20261102-diagnostics",
+  "title": "Lokální diagnostické výstupy vlastní LOD přejímky",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [".cache/game-diagnostics/"],
+  "resources": [],
+  "acceptance": ["Vlastní izolovaný API běh zapisuje pouze nové session soubory; historické logy se nemažou ani nepřepisují."],
+  "verification": ["Root handoff uvádí vlastní session identity a ukončení serveru."],
+  "notes": ["Doplnění root low-tree-lod-20261102-root; serverový collector má pevnou cestu pod kanonickým cwd. Porty, GPU a heavy-validation rezervuje root. Založeno koordinátorem před spuštěním API."]
+}

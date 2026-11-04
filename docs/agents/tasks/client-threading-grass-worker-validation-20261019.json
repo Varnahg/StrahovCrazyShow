@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-grass-worker-validation-20261019",
+  "title": "Ověřit skutečný module worker a přínos travnatých dlaždic v produkční scéně",
+  "status": "ready",
+  "dependsOn": [
+    "client-threading-cpu-profile-20261019"
+  ],
+  "writePaths": [
+    ".cache/client-threading-grass-worker-validation-20261019/",
+    "docs/performance/evidence/client-threading-grass-worker-20261019/",
+    "docs/agents/handoffs/client-threading-grass-worker-validation-20261019.md",
+    "_bmad-output/implementation-artifacts/client-threading-grass-worker-validation-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-2e5169e7e102/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4207",
+    "port:2602",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Převzít pouze přesné reviewed worker files/tests z tasku prototype a zachovat donor, dependencies, hrané snapshots a cizí WIP.",
+    "Ověřit clean i combined stabilní snapshot, cílené refaktoring testy, pnpm test/build a izolovanou integraci podle projektových pravidel. Použít přímé runtime entrypoints pro sdílené readonly dependencies; archivovat skutečné příkazy a případná selhání bez oslabení limitů.",
+    "Build skutečného module workeru; Edge na vlastním4207/API2602. Bez CPU/shader diagnostiky interleaved default main vs grassWorker=1 při stejné kvalitě, resolution, light, trase a skutečných relacích. Zachovat škálu pro3relace před celkovou přejímkou. Ověřit worker instance/ready/completed metrics a transfer; fake transport není browser důkaz.",
+    "Porovnat FPS,p95/p99,hitches, cold coverage/convergence, native fallback, bounded queues/cache/memory, lifecycle/teleport/quality/dispose. Čas tile CPU nepovažovat za FPS zisk; selection/batch/GPU zůstávají main.",
+    "Worker default/integrace pouze při doloženém čistém přínosu bez regrese. Jinak zdokumentovat zamítnutí/lepší variantu. Issue KEY42/40 nejsou Done na základě unit testů nebo browser startupu.",
+    "Po vlastním GPU okně uzavřít scény a guarded own služby; hranou4203/starší snapshots zachovat. Commitovat ověřené celky přesné scope, průběžně Linear."
+  ],
+  "verification": [
+    "V2 target36/36 a fulltypes již PASS ve frozen unit f893fb5b44f87bef01a78d66c764ce256062c292eda796544b15703ad8d21da4. ReviewP2 nativehandoff opraven a re-reviewed bez nálezů; širší checks zde.",
+    "Před GPU ověřit skutečné klienty/URL/backend/hash/CSS/internal resolution, resourceclaims a porty. Nikdy neměřit souběžně s buildy/tests nebo jinou3Dprac í.",
+    "Záznamy uchovat včetně nulového/negativního výsledku, oddělit profilovací evidence od čistého A/B."
+  ],
+  "notes": [
+    "Navazuje na profilemain db9108dd a rozpracovanýKEY42. Prototyp opt-in, default stále main. Žádný přínos dosudnepřijat.",
+    "Root koordinátor má výslovnou uživatelskou autorizaci k implementaci/testování/commitům/Linearu. StaršíWebGPUgoal paused; neaktivovat."
+  ]
+}

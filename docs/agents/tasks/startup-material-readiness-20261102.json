@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "id": "startup-material-readiness-20261102",
+  "title": "Zabránit starému light ABI v zakrytých startup draw průchodech",
+  "writePaths": [
+    "client/startup-material-readiness.ts",
+    "tests/startup-material-readiness.test.ts",
+    "tests/webgpu-shadow-freshness.test.ts",
+    "docs/agents/handoffs/startup-material-readiness-20261102.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdřív reprodukovat skutečnou Standard/PBR main-pass větev starýHEMI/POINT96→novýsunDIR80 při čekajícím Effectu bez spuštěníbrowseru.",
+    "Startup-scoped guard odmítá nehotový hlavníshader místo hot-swappingstarého ABI; zachovává skutečné finálnídraw/health gates a obnovuje přesnou původní politiku.",
+    "Současné a synchronněnové materiály, MultiMaterialchildren,frozen,abort/dispose a pozdější vlastníci mají pokrytý lifecycle. Žádné globální trvalé přepínání ani úprava velikostí UBO."
+  ],
+  "verification": [
+    "Jen cílenéCPU/nativecontract testy; žádnýGPU/server/build/fullsuite. Root integrujeGame po předání.",
+    "Pracovat v kanonickémmain, disjunktníscope, čístAGENTS a bmad-policy, vlastníclaim předzápisem, release po handoff."
+  ],
+  "notes": [
+    "Přímá delegace rootu po skutečnévalidation chybě v81768a0b seq279; tento korektnostnífix je předpoklad shaderového kandidáta, ne hotovýFPSzisk.",
+    "Žádný dalšíBMADworkflow. Nepřepisovat shader schedulinghelper, Game ani dalšícizísoubory."
+  ]
+}

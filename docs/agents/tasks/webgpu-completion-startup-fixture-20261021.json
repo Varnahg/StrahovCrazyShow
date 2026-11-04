@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-startup-fixture-20261021",
+  "title": "KEY-31: zapojit nový plánovač do skutečné Game startup regresní fixture",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["tests/game-webgpu-startup.test.ts", "docs/agents/handoffs/webgpu-completion-startup-fixture-20261021.md"],
+  "resources": [],
+  "acceptance": [
+    "Původní VM vykonává skutečné Game.start a musí dostat jeho nový StartupPreparationLoop dependency; nevynechat žádné původní startup/health/failure případy.",
+    "Zachovat actual RenderHealth, finální submitted/effect/pipeline gate a abort/loss/latecleanup assertions. Fake pouze vhodné IO/scheduler hosty s doloženým rozsahem; ideálně skutečný adapter s injektovaným testhostem.",
+    "Nové waitForIdle musí být ověřené i v celém startup testu; nesmí se změnit očekávané chování jen kvůli tomu, že test nyní selhává na ReferenceError."
+  ],
+  "verification": ["pnpm --config.verify-deps-before-run=false exec tsx --test tests/game-webgpu-startup.test.ts tests/game-preparation-scheduler.test.ts", "Žádný build/server/GPU/fullsuite; pouze cílené CPU fixture testy."],
+  "notes": ["Full immutable40a363:1923tests,1912PASS,9FAIL,2SKIP;6FAIL jsou missing StartupPreparationLoop VMdependency,3další patří neúplným statickým snapshot vstupům v odděleném tasku. Starý snapshot/log se zachovává."]
+}

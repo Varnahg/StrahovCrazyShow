@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-acquisition",
+  "title": "RAG: úplný katalog a omezené HTTPS získávání zdrojů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "server/rag-source-catalog.ts",
+    "server/rag-source-fetch.ts",
+    "server/data/rag/source-catalog.json",
+    "shared/data/rag-publishers.json",
+    "tests/rag-source-catalog.test.ts",
+    "tests/rag-source-fetch.test.ts",
+    ".cache/rag-auto-acquisition-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-acquisition.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Katalog zachová všech114unikátních seed URL i mapování115původních řádků. Vymezí publisher/hostname/path scope a oddělí access/archive/unknown statusHint od ověřeného stavu; nevytváří ručně vybraný obsahový korpus.",
+    "Implementovat bounded HTTPS fetch se skutečnou DNS/IP SSRF kontrolou a pinováním připojení při zachování TLS kontroly původního hostitele. Každý redirect znovu ověřit proti publisher i síťové politice.",
+    "Řídit čas, počet redirectů, bajty, podporovanou signaturu/formát a conditional304. HTTP304 není důkazem dokončené následné indexace ani příkazem zahodit uložený originál; chyby nesmí předstírat platný prázdný dokument.",
+    "Rozhodnutí robots přijímat z čistého předaného callbacku; sám nepřidávat Python helper ani vlastní crawler. Přesné JSON/API rozhraní předá koordinátor ve svém research scope.",
+    "shared/data/rag-publishers.json je nový důvěryhodný datový vstup pro pozdější migraci kontraktu. Současný shared/crazy-typka.ts, provider, SQL, CI, runtime entrypointy a package/lock zůstávají mimo scope.",
+    "Společně předat implementaci, cílený refaktoring, cleanup spojení/streamů/cache a negativní i pozitivní transportní testy. Žádná instalace Node závislostí, listener ani spuštění crawleru."
+  ],
+  "verification": [
+    "Unit transporty a DNS/redirect situace jsou fake, bez skutečných GET a bez síťových listenerů. Skutečné ověření veřejných zdrojů provede následně koordinátor ve vlastním validačním rozsahu.",
+    "Ověřit úplnost katalogu vůči vstupnímu auditu, zachování duplicitních původních řádků jako vazeb a přesnou politiku vydavatelů.",
+    "Testy spouštět přímo Node/tsx, nikoli pnpm exec/run se skrytou synchronizací dependencies. Žádný heavy build/fullsuite/GPU ani placenéAPI."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/automated-document-rag, KEY-67. Konkrétní delegace koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d po katalogovém/formátovém průzkumu.",
+    "Výzkumný parent vlastní docs/rag-ingestion/20261028/ a kontrakt, tento child má samostatnou cache/handoff. Protego helper připravuje jiný vlastník; zde je pouze čisté callback rozhraní.",
+    "Před zápisem vlastní disjunktní claim. Podagent neopakuje BMAD workflow; příprava fetcheru sama není oprávněním k hromadnému provoznímu ingestu či scheduleru."
+  ]
+}

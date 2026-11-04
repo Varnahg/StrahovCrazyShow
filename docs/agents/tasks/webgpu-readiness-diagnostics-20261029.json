@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-readiness-diagnostics-20261029",
+  "title": "Startup: zpřístupnit stávající omezené readiness čítače v lokálním profilovaném multiplayeru",
+  "status": "blocked",
+  "dependsOn": [],
+  "writePaths": [
+    "client/game.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "tests/game-light-preparation.test.ts",
+    ".cache/webgpu-readiness-diagnostics-20261029/",
+    "docs/agents/handoffs/webgpu-readiness-diagnostics-20261029.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zatím pouze připravený rozsah. Implementaci spustit až po potvrzení potřeby z existujících JSONL, výslovném předání původního vlastníka, skutečném release/reclaim disjunktních scopes a změně tohoto tasku na ready.",
+    "Pokud uložený timeout neobsahuje konkrétní blocker, minimálně rozšířit sběr již existujících lightingReadiness/pipeline čítačů také na výslovně lokální profileEnvironment=1 při multiplayeru. Zachovat stávající bezpečné omezení profilování na lokální prostředí a obvyklý neprofilovaný běh.",
+    "Znovu použít výsledky existujících readiness kontrol a omezenou diagnostickou strukturu. Žádná nová GPU/mesh/effect/pipeline readiness volání, polling, nový subsystem, neomezené seznamy ani uchování renderer objektů.",
+    "Neměnit deadline/budget, pořadí přípravy kvalit, úspěch/selhání gate, init fallback, render loop nebo finální submitted-frame pravidla. Jde o sběr chybějícího důkazu, nikoli předem deklarovanou opravu timeoutu.",
+    "Záznamy mají jasnou vazbu na kvalitu/fázi/generaci a skutečný výsledek. Zachovat privacy, bez hráčských identit, tajných hodnot nebo extra síťového obsahu; normální veřejný multiplayer tím automaticky neprofilovat.",
+    "Předat úzkou implementaci, cílený refaktoring a fake/unit/strict TS důkazy. Případnou potřebu dalšího společného helperu či testu nejprve předat koordinátorovi; nepřepisovat světelné nebo pipeline moduly mimo scope."
+  ],
+  "verification": [
+    "Čtecí vstup: f92e5c75-bebd-4964-9bc3-102215c8dcf7.jsonl ze frozen4280/source0d a související GL2 JSONL. Rozlišit lighting-preparation timeout od engine init a final render-startup; konkrétní shader/material příčina zatím není doložená.",
+    "Po odblokování přímé Node cílené testy game-webgpu-startup/game-light-preparation a strict TypeScript. Doložit opt-in lokální multiplayer vs běžný multiplayer/guest, stejné pořadí a počet skutečných readiness volání, bounded data a dispose/abort cleanup.",
+    "Žádný pnpm exec/run, instalace, celá sada/build, server, browser, GPU nebo placené API pod tímto taskem. CPU fixture nedokládá reálný blocker ani opravu.",
+    "Reálný test bude vyžadovat samostatný validační scope s přesnou novou izolovanou URL/build identitou, resource claims a ověřenou jedinou3Dscénou. Neznámá otevřená uživatelská Edge karta neopravňuje další scénu spustit."
+  ],
+  "notes": [
+    "Cwd budoucí implementace C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Konkrétní čtecí návrh RAG/UI koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d pro uživatelem objednaný timeout. Tento krok zatím nemá GO ke spuštění.",
+    "BLOKACE: implementace ani rezervace se zatím nespouští. client/game.ts a tests/game-webgpu-startup.test.ts vlastní v D terrain task trees-20261025-integration/owner trees-integration-01a16b37. Před prvním zápisem je nutné doložené zúžení a skutečný release/reclaim původního scope; samotný task JSON rezervaci neruší.",
+    "tests/game-light-preparation.test.ts při registraci nemá aktivního writera a přímo pokrývá prepareLightingVariants. tests/game-authored-light-preparation.test.ts zůstává původnímu trees-20261025-game-fixtures/trees-game-fixtures-integrator-01a16b37 a není zde zapisovatelný.",
+    "Doložený současný guard v game.ts používá terrainReview && !network pro pipeline diagnostics i lightingReadiness. F92 log má lighting timeout, low/medium complete a high timeout, ale readiness ani pipeline blocker v payloadu nemá. To samo neurčuje příčinu.",
+    "UI PR38 má vlastní integrační okno a nemíchá se s touto diagnostikou. Revertovanou širokou Jantar odbočku e819 neobnovovat; žádné automatické zvětšení limitů ani prohlášení KEY31 Done.",
+    "Odlehčený postup, jeden stručný plán a cílené důkazy; nový průzkum již doloženého řetězce neopakovat bez konkrétní mezery."
+  ]
+}

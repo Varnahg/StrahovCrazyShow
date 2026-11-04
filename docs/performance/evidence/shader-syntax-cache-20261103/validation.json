@@ -1,0 +1,1215 @@
+{
+  "schemaVersion": 1,
+  "task": "shader-syntax-cache-20261103",
+  "createdAt": "2026-11-03T17:09:19.512Z",
+  "status": "v4 CPU candidate frozen for root native integration and GPU A/B; default off",
+  "prefix": {
+    "bytes": 30176,
+    "sha256": "965f9774f8fd436bcd699d6f54c0a1b64a318f554bb261a85aa9189828f55c49",
+    "preserved": true
+  },
+  "finalRuntime": {
+    "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+    "javascriptSha256": "ab2d61fcb168f8c8540c3a3c558edeed5bfedef65c05a1efb4131204d3acee60",
+    "declarationsSha256": "41ed6e8e31a218e386b4342f84a35cff004d1dfb3bb3561598a47dff84bc38fb"
+  },
+  "sources": [
+    {
+      "path": "patches/@babylonjs__core@9.30.0.patch",
+      "bytes": 46179,
+      "sha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee"
+    },
+    {
+      "path": "tests/shader-syntax-cache-native.test.ts",
+      "bytes": 20812,
+      "sha256": "8139a18cf9dda23ba9825ce52bd430607a76b522126999aa054c7eb401995667"
+    },
+    {
+      "path": "docs/performance/evidence/shader-syntax-cache-20261103/stage.mjs",
+      "bytes": 5866,
+      "sha256": "b0dc373da87625b864085aba955c6de2fd85ff9b52319966dba6c72d3ada2cce"
+    },
+    {
+      "path": "docs/performance/evidence/shader-syntax-cache-20261103/runner.mjs",
+      "bytes": 2715,
+      "sha256": "ebca7d3092a4c754c1a0baf0765241b3bfbaf642b66eea83d992013f1e5d4e27"
+    },
+    {
+      "path": "docs/performance/evidence/shader-syntax-cache-20261103/benchmark.mjs",
+      "bytes": 9064,
+      "sha256": "2fe6d3b7787ff2c3b8b85f4e18b17e9a20102e945f51ab9858d1e2672399490a"
+    },
+    {
+      "path": "docs/performance/evidence/shader-syntax-cache-20261103/profile-admission.mjs",
+      "bytes": 2436,
+      "sha256": "d22f3d6a806b5ad6ed2938bafb11152cc5e29fe960242f2cfb1826ed2c83cefa"
+    },
+    {
+      "path": "docs/performance/evidence/shader-syntax-cache-20261103/README.md",
+      "bytes": 11605,
+      "sha256": "a85e1c826d1fa9bedd839a0da3d445bbd85a56df05a717ec9875d33754bf4fef"
+    }
+  ],
+  "series": [
+    {
+      "run": "ab1",
+      "scenario": "first-sweep",
+      "patchSha256": "cbf41e7b9b8453d4201542b9ef834cbabdaf23365ad018abe7a09e96afb7e38e",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        681.4859999999999,
+        673.2920000000058,
+        670.8657999999987,
+        692.0630000000037,
+        668.0676999999996
+      ],
+      "candidateMs": [
+        504.83980000000247,
+        515.4450999999999,
+        505.09210000000076,
+        497.89430000000357,
+        508.35599999999977
+      ],
+      "ratios": [
+        0.7407926208315395,
+        0.7655595194952494,
+        0.7528958846910988,
+        0.7194349358367675,
+        0.7609348573505351
+      ],
+      "medianRatio": 0.7528958846910988
+    },
+    {
+      "run": "ab1",
+      "scenario": "warm-lookup",
+      "patchSha256": "cbf41e7b9b8453d4201542b9ef834cbabdaf23365ad018abe7a09e96afb7e38e",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        666.8256999999885,
+        666.2579999999962,
+        668.4353999999876,
+        696.982600000003,
+        737.3046000000068
+      ],
+      "candidateMs": [
+        458.70120000000315,
+        475.21219999999084,
+        467.34000000000015,
+        468.17739999999867,
+        490.12539999998626
+      ],
+      "ratios": [
+        0.6878877043881348,
+        0.713255525637206,
+        0.6991550716793408,
+        0.6717203557161924,
+        0.6647529392872115
+      ],
+      "medianRatio": 0.6878877043881348
+    },
+    {
+      "run": "ab1",
+      "scenario": "cold-miss",
+      "patchSha256": "cbf41e7b9b8453d4201542b9ef834cbabdaf23365ad018abe7a09e96afb7e38e",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        826.0778000000355,
+        664.112799999988,
+        669.825000000008,
+        686.7397000000055,
+        665.9909999999982
+      ],
+      "candidateMs": [
+        852.3596999999827,
+        850.5969000000041,
+        838.6328000000067,
+        857.8741000000009,
+        845.0323999999782
+      ],
+      "ratios": [
+        1.0318152842261905,
+        1.2808018457105772,
+        1.2520177658343548,
+        1.249198349825988,
+        1.268834563830413
+      ],
+      "medianRatio": 1.2520177658343548
+    },
+    {
+      "run": "ab1",
+      "scenario": "eviction",
+      "patchSha256": "cbf41e7b9b8453d4201542b9ef834cbabdaf23365ad018abe7a09e96afb7e38e",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        670.8492000000006,
+        672.578800000003,
+        668.5093000000015,
+        673.7808999999834,
+        669.4785000000265
+      ],
+      "candidateMs": [
+        814.7548000000097,
+        816.2326000000103,
+        809.6029999999846,
+        827.4180999999662,
+        840.2032000000545
+      ],
+      "ratios": [
+        1.2145125909071801,
+        1.213586571566048,
+        1.2110571984563008,
+        1.2280224921780754,
+        1.255011475349875
+      ],
+      "medianRatio": 1.2145125909071801
+    },
+    {
+      "run": "ab1",
+      "scenario": "oversized",
+      "patchSha256": "cbf41e7b9b8453d4201542b9ef834cbabdaf23365ad018abe7a09e96afb7e38e",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        668.8914999999688,
+        670.1808000000019,
+        675.9781999999541,
+        661.9352000000072,
+        678.5617999999522
+      ],
+      "candidateMs": [
+        691.8271000000241,
+        682.2384999999849,
+        678.701799999988,
+        674.6448999999702,
+        671.8647000000346
+      ],
+      "ratios": [
+        1.0342889691378292,
+        1.0179917120872204,
+        1.00402912401618,
+        1.0192008220743707,
+        0.9901304494300769
+      ],
+      "medianRatio": 1.0179917120872204
+    },
+    {
+      "run": "ab1",
+      "scenario": "disabled",
+      "patchSha256": "cbf41e7b9b8453d4201542b9ef834cbabdaf23365ad018abe7a09e96afb7e38e",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        678.9847999999984,
+        669.6273999999903,
+        667.200800000006,
+        676.8903000000137,
+        674.0212999999785
+      ],
+      "candidateMs": [
+        755.1160999999775,
+        687.3570999999938,
+        672.2774000000354,
+        672.989000000016,
+        671.8486000000194
+      ],
+      "ratios": [
+        1.1121251904313312,
+        1.0264769631589206,
+        1.0076088038264184,
+        0.9942364368347462,
+        0.9967765113655025
+      ],
+      "medianRatio": 1.0076088038264184
+    },
+    {
+      "run": "ab2",
+      "scenario": "first-sweep",
+      "patchSha256": "965fa6c61ab53417a25a0d51f9d6cfdebc2e2b865bc3c1a9a8b14e6f409bcd61",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        671.4798999999998,
+        668.1236999999996,
+        677.6420999999991,
+        688.4890999999952,
+        671.9772000000021
+      ],
+      "candidateMs": [
+        512.1149000000005,
+        495.7857000000022,
+        509.47199999999793,
+        506.2513000000008,
+        505.2235999999848
+      ],
+      "ratios": [
+        0.7626660157660723,
+        0.7420567478746861,
+        0.7518305016763253,
+        0.7353076468458314,
+        0.75184634240564
+      ],
+      "medianRatio": 0.7518305016763253
+    },
+    {
+      "run": "ab2",
+      "scenario": "warm-lookup",
+      "patchSha256": "965fa6c61ab53417a25a0d51f9d6cfdebc2e2b865bc3c1a9a8b14e6f409bcd61",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        670.5749000000069,
+        679.5717999999979,
+        674.4253000000099,
+        757.449800000004,
+        724.307000000008
+      ],
+      "candidateMs": [
+        460.4222999999929,
+        469.26379999999335,
+        459.8192999999992,
+        478.31009999998605,
+        504.4766999999956
+      ],
+      "ratios": [
+        0.6866083117635154,
+        0.6905286534844365,
+        0.6817942624631557,
+        0.6314743234468918,
+        0.6964956848408066
+      ],
+      "medianRatio": 0.6866083117635154
+    },
+    {
+      "run": "ab2",
+      "scenario": "cold-miss",
+      "patchSha256": "965fa6c61ab53417a25a0d51f9d6cfdebc2e2b865bc3c1a9a8b14e6f409bcd61",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        735.657299999988,
+        692.695199999991,
+        688.0607000000018,
+        678.841000000004,
+        676.7819999999883
+      ],
+      "candidateMs": [
+        873.0991000000213,
+        848.954200000022,
+        841.0061999999998,
+        858.5717000000077,
+        853.8945000000058
+      ],
+      "ratios": [
+        1.1868285681390445,
+        1.2255811791391553,
+        1.2222848943414406,
+        1.2647611149002531,
+        1.2616980061526761
+      ],
+      "medianRatio": 1.2255811791391553
+    },
+    {
+      "run": "ab2",
+      "scenario": "eviction",
+      "patchSha256": "965fa6c61ab53417a25a0d51f9d6cfdebc2e2b865bc3c1a9a8b14e6f409bcd61",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        669.8275999999823,
+        674.6454999999842,
+        668.941299999995,
+        689.4867999999915,
+        670.6388999999181
+      ],
+      "candidateMs": [
+        813.026300000005,
+        832.1086999999752,
+        811.6261000000086,
+        815.1503999999732,
+        819.2286999999997
+      ],
+      "ratios": [
+        1.2137844125862034,
+        1.233401393769016,
+        1.2132994329995992,
+        1.1822567161546578,
+        1.2215645409177722
+      ],
+      "medianRatio": 1.2137844125862034
+    },
+    {
+      "run": "ab2",
+      "scenario": "oversized",
+      "patchSha256": "965fa6c61ab53417a25a0d51f9d6cfdebc2e2b865bc3c1a9a8b14e6f409bcd61",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        670.7592000000004,
+        752.9132000000245,
+        706.2891999999702,
+        677.4396000000052,
+        675.8639000000112
+      ],
+      "candidateMs": [
+        712.2554999999847,
+        705.0840999999491,
+        744.8665999999648,
+        873.3181999999433,
+        669.5822999999873
+      ],
+      "ratios": [
+        1.0618646751322744,
+        0.9364746161973599,
+        1.0546198356140746,
+        1.2891454824901536,
+        0.9907058210979699
+      ],
+      "medianRatio": 1.0546198356140746
+    },
+    {
+      "run": "ab2",
+      "scenario": "disabled",
+      "patchSha256": "965fa6c61ab53417a25a0d51f9d6cfdebc2e2b865bc3c1a9a8b14e6f409bcd61",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        667.0070999999953,
+        668.1593000000066,
+        677.9574999999604,
+        675.0452000000296,
+        668.4328000000314
+      ],
+      "candidateMs": [
+        695.4294999999838,
+        667.1178999999756,
+        670.9228000000148,
+        664.4109000000171,
+        675.7314999999944
+      ],
+      "ratios": [
+        1.0426118402637525,
+        0.9984413896505954,
+        0.9896236858505939,
+        0.9842465363800647,
+        1.0109191230591357
+      ],
+      "medianRatio": 0.9984413896505954
+    },
+    {
+      "run": "ab3",
+      "scenario": "first-sweep",
+      "patchSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        725.9612999999999,
+        824.3880000000008,
+        696.5282000000025,
+        666.2938999999997,
+        662.7215999999971
+      ],
+      "candidateMs": [
+        541.5258000000013,
+        573.9026000000003,
+        512.6105999999954,
+        507.59890000000087,
+        500.81289999999535
+      ],
+      "ratios": [
+        0.7459430688660694,
+        0.6961559362824299,
+        0.7359509636508523,
+        0.7618243240708059,
+        0.7556912284132545
+      ],
+      "medianRatio": 0.7459430688660694
+    },
+    {
+      "run": "ab3",
+      "scenario": "warm-lookup",
+      "patchSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        668.511900000005,
+        674.3099999999995,
+        661.5979999999963,
+        665.2307999999957,
+        677.5679999999993
+      ],
+      "candidateMs": [
+        542.2820999999931,
+        466.0917000000045,
+        464.7934999999943,
+        466.4379999999928,
+        461.3869000000159
+      ],
+      "ratios": [
+        0.8111779311632135,
+        0.6912127953018713,
+        0.7025315977375943,
+        0.7011671738590514,
+        0.6809455287144853
+      ],
+      "medianRatio": 0.7011671738590514
+    },
+    {
+      "run": "ab3",
+      "scenario": "cold-miss",
+      "patchSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        662.2265999999945,
+        683.7333000000399,
+        671.6601999999693,
+        756.3564999999762,
+        696.0921000000235
+      ],
+      "candidateMs": [
+        910.8013000000028,
+        877.5558000000055,
+        895.2962999999945,
+        1038.223000000009,
+        1127.2688999999882
+      ],
+      "ratios": [
+        1.375361998445865,
+        1.2834767591397909,
+        1.3329601783759637,
+        1.3726635521741952,
+        1.6194249295458893
+      ],
+      "medianRatio": 1.3726635521741952
+    },
+    {
+      "run": "ab3",
+      "scenario": "eviction",
+      "patchSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        667.5398999999852,
+        669.9375999999975,
+        672.1614000000372,
+        678.043099999988,
+        669.6560000000245
+      ],
+      "candidateMs": [
+        834.835699999996,
+        869.601899999976,
+        877.9543000000012,
+        880.2332999999999,
+        863.8399999999529
+      ],
+      "ratios": [
+        1.2506154313772322,
+        1.2980341751231448,
+        1.3061659000352484,
+        1.298196678057804,
+        1.2899757487425203
+      ],
+      "medianRatio": 1.2980341751231448
+    },
+    {
+      "run": "ab3",
+      "scenario": "oversized",
+      "patchSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        672.3707999999679,
+        666.0212000000101,
+        664.2858000000051,
+        666.1262999999963,
+        672.9474000000118
+      ],
+      "candidateMs": [
+        675.3112999999721,
+        661.0955999999933,
+        675.4883999999947,
+        678.7960000000021,
+        664.7505999999848
+      ],
+      "ratios": [
+        1.0043733309061078,
+        0.9926044396184134,
+        1.016864126856226,
+        1.019019966633964,
+        0.987819553207239
+      ],
+      "medianRatio": 1.0043733309061078
+    },
+    {
+      "run": "ab3",
+      "scenario": "disabled",
+      "patchSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        668.6345000000001,
+        665.1030000000246,
+        677.8960000000225,
+        667.1643000000186,
+        676.921500000004
+      ],
+      "candidateMs": [
+        671.1958000000668,
+        672.5204000000303,
+        670.7253000000419,
+        689.4011000000028,
+        668.1709999999948
+      ],
+      "ratios": [
+        1.0038306428999202,
+        1.0111522576202565,
+        0.9894221237476245,
+        1.0333303205821769,
+        0.9870730948861735
+      ],
+      "medianRatio": 1.0038306428999202
+    },
+    {
+      "run": "ab4",
+      "scenario": "first-sweep",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        1044.6669000000015,
+        851.0579999999936,
+        897.3660000000064,
+        859.2683000000161,
+        704.96849999999
+      ],
+      "candidateMs": [
+        813.9520999999968,
+        859.2439999999997,
+        712.3349000000035,
+        735.0714999999946,
+        554.7170000000151
+      ],
+      "ratios": [
+        0.7791498897878315,
+        1.009618615887526,
+        0.7938064290378714,
+        0.8554621414521876,
+        0.7868677820356839
+      ],
+      "medianRatio": 0.7938064290378714
+    },
+    {
+      "run": "ab4",
+      "scenario": "warm-lookup",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        701.0580999999929,
+        722.5676999999996,
+        701.6836999999869,
+        738.1944000000076,
+        800.92219999999
+      ],
+      "candidateMs": [
+        486.10469999999987,
+        485.65939999999136,
+        486.60620000000927,
+        506.8118000000177,
+        654.1770000000251
+      ],
+      "ratios": [
+        0.6933871814618571,
+        0.6721299609711195,
+        0.6934836878781969,
+        0.6865560074690521,
+        0.8167797071925754
+      ],
+      "medianRatio": 0.6933871814618571
+    },
+    {
+      "run": "ab4",
+      "scenario": "cold-miss",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        665.2389000000185,
+        663.934600000015,
+        676.8312000000224,
+        671.9287999999906,
+        662.8686000000416
+      ],
+      "candidateMs": [
+        674.3846999999987,
+        675.5460999999814,
+        681.0975999999864,
+        657.1092999999782,
+        678.4904000000315
+      ],
+      "ratios": [
+        1.0137481437119507,
+        1.0174889213485274,
+        1.0063034919193499,
+        0.977944835821872,
+        1.0235669633468667
+      ],
+      "medianRatio": 1.0137481437119507
+    },
+    {
+      "run": "ab4",
+      "scenario": "eviction",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        730.2379999999903,
+        723.742099999974,
+        908.8796999999977,
+        679.2360999999946,
+        664.8647999999885
+      ],
+      "candidateMs": [
+        758.0022000000063,
+        740.9412999999913,
+        677.5877999999939,
+        665.8988999999856,
+        669.7935999999827
+      ],
+      "ratios": [
+        1.0380207548771994,
+        1.0237642663042787,
+        0.7455197866120188,
+        0.9803644123155275,
+        1.0074132364955917
+      ],
+      "medianRatio": 1.0074132364955917
+    },
+    {
+      "run": "ab4",
+      "scenario": "oversized",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        659.9410000000207,
+        668.0268999999898,
+        669.0589999999866,
+        674.2087000000029,
+        690.2931999999637
+      ],
+      "candidateMs": [
+        670.1146000000226,
+        688.6740999999674,
+        675.9183999999877,
+        685.357499999991,
+        737.1283000000185
+      ],
+      "ratios": [
+        1.015415923544683,
+        1.030907737397967,
+        1.0102523095870488,
+        1.0165361259799646,
+        1.0678481259848094
+      ],
+      "medianRatio": 1.0165361259799646
+    },
+    {
+      "run": "ab4",
+      "scenario": "disabled",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 3,
+      "baselineMs": [
+        734.4680000000008,
+        667.0586000000039,
+        758.3922000000312,
+        659.1623999999574,
+        671.8373000000283
+      ],
+      "candidateMs": [
+        864.6546999999991,
+        753.5008000000162,
+        932.9509999999937,
+        670.987500000083,
+        683.1287999999913
+      ],
+      "ratios": [
+        1.1772530593572468,
+        1.129587115734677,
+        1.2301695613430035,
+        1.0179395851464317,
+        1.0168068965506418
+      ],
+      "medianRatio": 1.129587115734677
+    },
+    {
+      "run": "ab4-disabled-long",
+      "scenario": "disabled",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 12,
+      "baselineMs": [
+        2721.773600000002,
+        2884.0015999999687,
+        2674.905400000014,
+        2695.8952000000318,
+        2668.8139000000047
+      ],
+      "candidateMs": [
+        2689.907199999984,
+        2867.560700000022,
+        2705.399900000004,
+        2694.863100000013,
+        2709.724800000029
+      ],
+      "ratios": [
+        0.9882920460393849,
+        0.9942992750073554,
+        1.011400216246896,
+        0.9996171587085364,
+        1.015329244200963
+      ],
+      "medianRatio": 0.9996171587085364
+    },
+    {
+      "run": "ab4-first-long",
+      "scenario": "first-sweep",
+      "patchSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "rounds": 5,
+      "sweeps": 12,
+      "baselineMs": [
+        2695.717000000001,
+        2684.9363999999914,
+        2861.4245000000064,
+        2677.9814000000733,
+        2665.7402999999867
+      ],
+      "candidateMs": [
+        2128.8945999999996,
+        2142.051900000003,
+        2526.561700000004,
+        2220.5072000000255,
+        2114.744499999968
+      ],
+      "ratios": [
+        0.7897322307942558,
+        0.7978035904314196,
+        0.8829733931473636,
+        0.829172002464231,
+        0.7933047716613575
+      ],
+      "medianRatio": 0.7978035904314196
+    },
+    {
+      "run": "ab3-cold-profile",
+      "scenario": "cold-miss",
+      "patchSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "rounds": 1,
+      "sweeps": 12,
+      "baselineMs": [
+        3446.856999999997
+      ],
+      "candidateMs": [
+        4031.2481000000053
+      ],
+      "ratios": [
+        1.169543180932661
+      ],
+      "medianRatio": 1.169543180932661
+    }
+  ],
+  "validation": {
+    "nativeStaged": {
+      "pass": 17,
+      "fail": 0,
+      "exitCode": 0,
+      "durationMs": 3128.1588,
+      "log": ".cache/shader-syntax-cache-20261103/tests-6.log"
+    },
+    "scopedTypeScript": {
+      "exitCode": 0,
+      "log": ".cache/shader-syntax-cache-20261103/types-3.log"
+    },
+    "syntaxChecks": "stage, runner, benchmark, profile-admission PASS",
+    "review": "Read-only v4 admission/reentrancy review returned no blockers on f97540a6 patch / ab2d61fc JS /8139a18c tests",
+    "nativeInstalledV4": "NOT PERFORMED: root controls package/lock/install; installed is audited v1",
+    "runtimeReadinessGPU": "NOT PERFORMED in this task",
+    "fullSuiteBuild": "root responsibility after controlled install"
+  },
+  "failedCandidates": {
+    "v1": "first-use cold/thrash regressions; same-key accounting issue fixed in v2",
+    "v2": "significant cold/thrash regressions persist",
+    "v3": "single DFS did not improve cold/thrash cost; retained raw profile"
+  },
+  "dependencyIncident": {
+    "command": "pnpm exec tsx --test tests/shader-syntax-cache-native.test.ts",
+    "session": 96427,
+    "exitCode": 1,
+    "stoppedByOwner": true,
+    "audit": ".cache/shader-syntax-cache-20261103/dependency-audit.json",
+    "rootDisposition": "Root owns controlled patch hash/lock/install and Vite8.3.4 restoration; author used direct Node only after incident",
+    "gitManifests": "package.json/pnpm-workspace.yaml/pnpm-lock.yaml unchanged by incident per root audit",
+    "installed": "core v1 Processor.js/d.ts; loaders identical; Vite8.3.5 versus expected8.3.4; six other package.json unchanged"
+  },
+  "stagingCorrection": "EOF no-newline markers fixed and covered by forward/reverse regression; initial staged hash mismatch was not package corruption",
+  "benchmarkMetadataCorrection": "Measured driver archived. Final driver only adds executedScenarios and corrects selected-scenario console count after measurements; iteration/timing logic unchanged",
+  "artifacts": [
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab1/results.json",
+      "sourceBytes": 801228,
+      "sourceSha256": "22b6aa71f29c5f1b1b007d2357283dbad661f1af2f6dabd5369cdc383fc58be7",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab1-results.json.gz",
+      "artifactBytes": 51493,
+      "artifactSha256": "9d6682e1735cc9f8ef25c3a7edc3a6807fe459b4d7915a575d0a79c297a1ec53",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab2/results.json",
+      "sourceBytes": 801250,
+      "sourceSha256": "f4439f9819bc94f032494b7a6934d1973b0eda93588dae61b3d80defdd0960a1",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab2-results.json.gz",
+      "artifactBytes": 51694,
+      "artifactSha256": "927e5f53b79cb3b062ae01934f3f5982ec35190d404df60ca931d2ec99884d37",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab3/results.json",
+      "sourceBytes": 803911,
+      "sourceSha256": "08b1b47c816e3696b3560d3957a7a3b31ab639e6ba4d1b971316970676228543",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab3-results.json.gz",
+      "artifactBytes": 52008,
+      "artifactSha256": "ee1c6d5578f807e2a5ebfb3970489360b60396ea51d47dbb0db2e20fa0272fa6",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab4/results.json",
+      "sourceBytes": 823158,
+      "sourceSha256": "f7631df5cfd2b96c9b139752675e48c0a594c2580ca2c4ae517de3791148272c",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab4-results.json.gz",
+      "artifactBytes": 53112,
+      "artifactSha256": "2c9c3f8c5c53de47141ca801a83b30fe81d83c2cd35eca82e3e2d468d5336daf",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab4-disabled-long/results.json",
+      "sourceBytes": 570143,
+      "sourceSha256": "68264fbcfc83a30e10e478edac1dfde12b35e4b9b114524a5edad09db09b5b9b",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab4-disabled-long-results.json.gz",
+      "artifactBytes": 38672,
+      "artifactSha256": "75e12a90f1bef5a4ddaac5706fd621bf56e2c2796ab156318226683f9ca6639f",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab4-first-long/results.json",
+      "sourceBytes": 572479,
+      "sourceSha256": "7fd15cf869ba908855d91c6dc5ddf937badd6b000de3d6c28691c80e3661eab7",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab4-first-long-results.json.gz",
+      "artifactBytes": 39203,
+      "artifactSha256": "16455630870addb126bef507e678a7662e65da29397ddeb2249c68ffc2ea997d",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab3-cold-profile/results.json",
+      "sourceBytes": 189699,
+      "sourceSha256": "9a20d2ace8c479fab4e4f7e4b1ddfbe9b2c71bc858fac05c43acf96eb86aa148",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab3-cold-profile-results.json.gz",
+      "artifactBytes": 13042,
+      "artifactSha256": "f81b5f45740c62e844f44fc59a0309a58f48e2ee5cbc3bbf82fca8dfc6459772",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab1.log",
+      "sourceBytes": 5836,
+      "sourceSha256": "6acfa526ad465a45cf8cd2eeb3915d5f10d34bfaa8dfc2647735512540fca9bc",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab1.log.gz",
+      "artifactBytes": 1587,
+      "artifactSha256": "8d4d7ff18f1dcf56ea61cf3e473c7e8b31874ab389d4b1e788f3a32495868a07",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab2.log",
+      "sourceBytes": 5875,
+      "sourceSha256": "207056e9be3772aeca41ebc9bdba19d5201abba7415378648308049d0c6be4e0",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab2.log.gz",
+      "artifactBytes": 1612,
+      "artifactSha256": "86d3626528c1b000d66767a8ff0a0117d68b9d134eeb5711a0d2eb606f865fb3",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab3.log",
+      "sourceBytes": 5876,
+      "sourceSha256": "efec115799f7e03459bcd0c03261fce4d452d37561bc38eaf29a6d3547fedae6",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab3.log.gz",
+      "artifactBytes": 1612,
+      "artifactSha256": "3e2389121d22400b771a41d67b16aa0dfbbbd16ebfbc9d5ad9f6d4ec7dc48944",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab4.log",
+      "sourceBytes": 5874,
+      "sourceSha256": "ea4c98eedebfa5546a9c104bac0dc93916e66b606b06c387200157785ac828ae",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab4.log.gz",
+      "artifactBytes": 1633,
+      "artifactSha256": "83b2189364716858075fd1d8b57f2bc58905af1df868fefde77c7e0d95aa2731",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab4-disabled-long.log",
+      "sourceBytes": 1936,
+      "sourceSha256": "4fe23cc057fc61b6e837704a6f1f892ba0962b6c1b096464d003bb95a0ab702f",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab4-disabled-long.log.gz",
+      "artifactBytes": 827,
+      "artifactSha256": "f03ce5caaec7e35713272f9ace45e9a835493f97cea9561bdf48db251934cf73",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/ab4-first-long.log",
+      "sourceBytes": 1946,
+      "sourceSha256": "29d93bbae8f0ebaed3d14c6ab236bceeb962c2eb5efb8b63221ce660b8341ee0",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/ab4-first-long.log.gz",
+      "artifactBytes": 826,
+      "artifactSha256": "3d4919faba8a7cfb954f4002649daafcca79b3ec3ba81a353285120d56516f28",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/cold-profile.log",
+      "sourceBytes": 1301,
+      "sourceSha256": "6b8f45ba967c668c9983f7c12150e5caaf512815abd86f5d75e06e348c8c9044",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/cold-profile.log.gz",
+      "artifactBytes": 673,
+      "artifactSha256": "6e4301d2d319220c413955c8cd44cdee8abf1423c14e8778c9ce0b41a5cad402",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/tests-1.log",
+      "sourceBytes": 749,
+      "sourceSha256": "ea7e1021df699c21f0e5bb4dabc2d05b96390112e80899c5bc1539aec877d8ad",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/tests-1.log.gz",
+      "artifactBytes": 221,
+      "artifactSha256": "dab4c4910e13d2297ca70a88c8ceb5aa68bc6b85c879c92cd0fe4273c36493fc",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/tests-2.log",
+      "sourceBytes": 1126,
+      "sourceSha256": "7162ef929cc0cfc69da22bada849722c9a9d15468cbf6355a8accba7783c0473",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/tests-2.log.gz",
+      "artifactBytes": 657,
+      "artifactSha256": "2261745b6ab22a6871047237d0b6961c55dbe14d9736f6cc802e19c5594354bb",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/tests-3.log",
+      "sourceBytes": 1343,
+      "sourceSha256": "1b3f6f2262351acef5a16a7e50be0309ced5246448b11b2fabbac07fe7736f86",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/tests-3.log.gz",
+      "artifactBytes": 744,
+      "artifactSha256": "bf74fd5af039bbf684b8d0ab5eb569ad7c27a52595621959d045cd59d31453c4",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/tests-4.log",
+      "sourceBytes": 1441,
+      "sourceSha256": "d964706c142ef65380ecae80f4170862a72151bf9a60ce0fcf61f8dbf46c50a6",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/tests-4.log.gz",
+      "artifactBytes": 785,
+      "artifactSha256": "18c63f63367bf2abb85635aa31e5a72aa4847db7a1e021e8952e75def2746a3d",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/tests-5.log",
+      "sourceBytes": 1551,
+      "sourceSha256": "8a0e32fc66982bcf1f2ec6b44e5c16dddbf5c32b750c44f2ab29237154902968",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/tests-5.log.gz",
+      "artifactBytes": 832,
+      "artifactSha256": "95c7700c2be01558efe20900ccab6388c8755a1742d7da957ba93667bd1d5511",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/tests-6.log",
+      "sourceBytes": 1923,
+      "sourceSha256": "84f3d1baedbb08146ace97ed8872c14ecdaaefcfaf7aac7418864ddf49162c7e",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/tests-6.log.gz",
+      "artifactBytes": 985,
+      "artifactSha256": "e4133de9ed3d2ab5186377d97cdc09fcaef215969f622498b4d5c49f972496ee",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/types-1.log",
+      "sourceBytes": 0,
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/types-1.log.gz",
+      "artifactBytes": 20,
+      "artifactSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/types-2.log",
+      "sourceBytes": 0,
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/types-2.log.gz",
+      "artifactBytes": 20,
+      "artifactSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/types-3.log",
+      "sourceBytes": 0,
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/types-3.log.gz",
+      "artifactBytes": 20,
+      "artifactSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/dependency-audit.json",
+      "sourceBytes": 4009,
+      "sourceSha256": "3175388b6b2bf468e156812337e56c61aab15e9d254c5ad088ec22b456d44490",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/dependency-audit.json.gz",
+      "artifactBytes": 1211,
+      "artifactSha256": "d1b52beeb1ae470f3951a989df067af3b8c92dc5b2b7e29f5e85f15b91086577",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/cold-profile/cold.cpuprofile",
+      "sourceBytes": 567984,
+      "sourceSha256": "12cf279779c33c5838bad5949c2df9a4589cf8d4a383b22d99c3044dd2a76486",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/cold-v3.cpuprofile.gz",
+      "artifactBytes": 50150,
+      "artifactSha256": "38d65a27c4c16eff926a0c093e5e5338d685aedacf249f9f3aa41a8f6fa62f57",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/cold-profile/summary-final.json",
+      "sourceBytes": 5217,
+      "sourceSha256": "288671d41e7adf09002206a2ad38018686192162a202d706ad33406211feeba8",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/cold-v3-summary.json.gz",
+      "artifactBytes": 1115,
+      "artifactSha256": "f7b83163aeaaa52f4bcd6ba623b56d02fa1cb0d0b4ba0aef1539982b662e4f9e",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/original.js",
+      "sourceBytes": 18186,
+      "sourceSha256": "44287130f5bfd1b25918e7f1e747cd0094a3f9dd279167cd1761011d46f36bc7",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/original-shaderProcessor.js.gz",
+      "artifactBytes": 3888,
+      "artifactSha256": "54900c0202827ed20492706d1018a7f015ef4ac0c266095314940d2316fc599e",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/original.d.ts",
+      "sourceBytes": 1664,
+      "sourceSha256": "a1f64b114622999838d1071f9d21b98e9167dbd0881ce1b66be542e57e6095cc",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/original-shaderProcessor.d.ts.gz",
+      "artifactBytes": 552,
+      "artifactSha256": "46f652133e50a1655194c372937d7866a87b3ab79be244977faa79b463c355d4",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/existing.patch",
+      "sourceBytes": 30176,
+      "sourceSha256": "965f9774f8fd436bcd699d6f54c0a1b64a318f554bb261a85aa9189828f55c49",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/existing-prefix.patch.gz",
+      "artifactBytes": 8060,
+      "artifactSha256": "987589a4dda9804544cfa66f1ee09afd9bb1c326d64dc8e4e6b11868e2e7ec9b",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/candidate-v2.js",
+      "sourceBytes": 26992,
+      "sourceSha256": "69de360410bfbeede37d83dd9ab830a1b7c71a898e977937e72226f5d9575e93",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/candidate-v2.js.gz",
+      "artifactBytes": 6114,
+      "artifactSha256": "3aaab13135b52057d8d62fa758b8a6da3eef17d017f68cbf65d604d5791b4eb1",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/patch-v2.patch",
+      "sourceBytes": 43012,
+      "sourceSha256": "965fa6c61ab53417a25a0d51f9d6cfdebc2e2b865bc3c1a9a8b14e6f409bcd61",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/candidate-v2.patch.gz",
+      "artifactBytes": 11264,
+      "artifactSha256": "3ce95b1d38ff2466eae1cfd703e5ee818a83df0df0fcbe3115d6b23e56e8515f",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/candidate-v3.js",
+      "sourceBytes": 28205,
+      "sourceSha256": "264baa1eaf87646d459e76176fbab2ff48fa7ad0060f2c9d4638348e2178a611",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/candidate-v3.js.gz",
+      "artifactBytes": 6360,
+      "artifactSha256": "fa79587bd6b85c3181aa23ca2d8540fccab63a8e127aa520cbcc2b8aebcb7b62",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/patch-v3.patch",
+      "sourceBytes": 44260,
+      "sourceSha256": "9eade6ae66b93fa81ac556b0a6a1a274d3c656871324e3ba3c902b4706bf58f7",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/candidate-v3.patch.gz",
+      "artifactBytes": 11513,
+      "artifactSha256": "50d5cdb3eb9b0c6d229479dadf96b0f44e7646a28ea958a22879b3771bbf0390",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/candidate.js",
+      "sourceBytes": 29898,
+      "sourceSha256": "ab2d61fcb168f8c8540c3a3c558edeed5bfedef65c05a1efb4131204d3acee60",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/candidate-v4.js.gz",
+      "artifactBytes": 6707,
+      "artifactSha256": "a16b777c8948cddb884cc46a669926877bbd835887dbfbaf9bb87a31ed0760e2",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/candidate.d.ts",
+      "sourceBytes": 3542,
+      "sourceSha256": "41ed6e8e31a218e386b4342f84a35cff004d1dfb3bb3561598a47dff84bc38fb",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/candidate-v4.d.ts.gz",
+      "artifactBytes": 1112,
+      "artifactSha256": "459290c1ae1aaea03f686f7441fad32664006f82383e3f3d04da2069c233d6ea",
+      "roundTrip": true
+    },
+    {
+      "source": ".cache/shader-syntax-cache-20261103/author/benchmark-measured-v4.mjs",
+      "sourceBytes": 8952,
+      "sourceSha256": "7ea048e66bff0347958b8b8a60bd7e2693013648ad8f3daf242dac36a6ff70f0",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/benchmark-measured-v4.mjs.gz",
+      "artifactBytes": 3276,
+      "artifactSha256": "eb26df525539108faff0d767150670f567d3199c5ab28723b2e797caf582a654",
+      "roundTrip": true
+    },
+    {
+      "source": "patches/@babylonjs__core@9.30.0.patch",
+      "sourceBytes": 46179,
+      "sourceSha256": "f97540a6800fc9b9c582cc5390fe9b03d8795f942944ae6b5ed3c58f4faf79ee",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/candidate-v4.patch.gz",
+      "artifactBytes": 11886,
+      "artifactSha256": "0cf98cf6abd5cffa6fa9d2c981502b7265e12db056062abbe64e0d86bfa61572",
+      "roundTrip": true
+    },
+    {
+      "source": "node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.js",
+      "sourceBytes": 26424,
+      "sourceSha256": "f5174b0724b965f508fd717a74c5db7f552fdc799ad77d6e67c31d42644f02ff",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/installed-v1-shaderProcessor.js.gz",
+      "artifactBytes": 5974,
+      "artifactSha256": "cc723b9fbc8ab1ed1625a2fc23ac13a4dad0918fc934ca15fc95530257c535e4",
+      "roundTrip": true
+    },
+    {
+      "source": "node_modules/@babylonjs/core/Engines/Processors/shaderProcessor.d.ts",
+      "sourceBytes": 3335,
+      "sourceSha256": "75b1f33bc50ec6adeb9eb9d29079140bd064f9d38b68d5bd320a4585ea8316e6",
+      "artifact": "docs/performance/evidence/shader-syntax-cache-20261103/artifacts/installed-v1-shaderProcessor.d.ts.gz",
+      "artifactBytes": 1064,
+      "artifactSha256": "df56e281ac918d5862b092c22ba88982d429a129fd151a2d7abc8bcbd526d6af",
+      "roundTrip": true
+    }
+  ],
+  "processes": "All own Node profiles/tests/benchmarks completed; no server/GPU or long-lived helper started"
+}

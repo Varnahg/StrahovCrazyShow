@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-cpu-profile-20261019",
+  "title": "Rozhodnout konkrétní worker úlohu skutečnými CPU stacky produkční scény",
+  "status": "done",
+  "dependsOn": [
+    "client-threading-character-material-init-20261019"
+  ],
+  "writePaths": [
+    ".cache/client-threading-cpu-profile-20261019/",
+    "docs/performance/evidence/client-threading-cpu-profile-20261019/",
+    "docs/agents/handoffs/client-threading-cpu-profile-20261019.md",
+    "_bmad-output/implementation-artifacts/client-threading-cpu-profile-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-2e5169e7e102/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4206",
+    "port:2601"
+  ],
+  "acceptance": [
+    "Navázat na přijatý character init fix, nepředefinovat cíl na další snadnou serialfixaci. Rozlišit čisté výpočty od Scene/GPU objektových operací a vybrat konkrétní worker experiment s rozhodovacím měřením.",
+    "Vlastní frozen source/test kopie combined1fbc05af + reviewed CPU helperdelta; minified build s hiddenmaps, novýsourcehash. Pouze vlastní dokument povolí js-profiling. Původní4203/starší/SDK i stopped4205 frozen beze změny.",
+    "Skutečná Edge production-scene relace, HUD/avatary, foreground a source/backend/CSS/internalresolution ověřeny. CPUtrace společně s existujícím environment-work/hitch bracketem; rawexport přes DOMpre ne přes zkracovanýrecorder.",
+    "Mapovat přesnéJS/mapSHA a1-basedfunctiondefinition pozice. Počet samples neníCPUčas; chybějící stack neníGPU/GC důkaz. Profilovacírežii a případné shaderinventory výslovně uvést, bezplainFPSA/B tvrzení.",
+    "Výstup musí zúžit nebo rozhodnout pracovnírozdělení mezi vlákna, včetně costs/risks/cache/lifecycle. Nováimplementace až v navazujícím disjunktním tasku; žádné změnyrootGame/UI/SDK ani cizíWIP.",
+    "Předrelease vlastníscény/API/preview/profilerukončit, logy/hashyevidencepředat, Linearaktualizovat."
+  ],
+  "verification": [
+    "Fresh BMAD build snapshot, cílenéhelper/lifecycle tests, úplnýTS a minifiedhidden-mapbuild. Profilovacíoverlay není runtimefeature a nevyžaduje opakovat celounezměněnousadu/integraci.",
+    "Existující scene/render/environment profily a rawCPUtrace korelovat pouze v časovém/owner scope. Zachovat neúspěšnépokusy; bez stackuvhitchokně žádná domněláatribuce."
+  ],
+  "notes": [
+    "Předchozígoalturn je progress: research9f1127f4 a actualruntimeKEY41 maincb2bed42, rawEdgeevidence. CílKEY40 stáleaktivní, žádnýworker dosudneshipnut.",
+    "PrimárníSelfProfiling specifikace znovunačtena19.10.2026, existujícíProfilerV2lokálníprovenience zmedium-cpu-profile. GPUresourcevolné poown4205cleanup; cizíserveclaims respektovat.",
+    "19.10 checkpoint přijat: helper25/25 + fullTypes/build a šest Edge profilů, evidence main db9108ddd3d069030abebd0fcccd6ecefbd0ff53. Profilovací task neznamená přijetí workeru ani splnění KEY40. Následné cílené unit36/36+fullTypes dokončeny; procesy ukončeny."
+  ]
+}

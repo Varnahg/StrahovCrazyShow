@@ -1,0 +1,48 @@
+TAP version 13
+# BJS - [04:17:49]: Babylon.js v9.30.0 - Null engine
+# BJS - [04:17:50]: Babylon.js v9.30.0 - Null engine
+# Subtest: original receiver stage chain / native-null-mono
+not ok 1 - original receiver stage chain / native-null-mono
+  ---
+  duration_ms: 1046.6593
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\receiver-stage-chain.test.ts:1:201'
+  failureType: 'testCodeFailure'
+  error: 'native-null-mono/low/vehicle-1/warm ceramic: declared receiver must reach original native instance batch'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\receiver-stage-chain.test.ts:36:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: original receiver stage chain / webgpu-perpass-branch
+not ok 2 - original receiver stage chain / webgpu-perpass-branch
+  ---
+  duration_ms: 579.2679
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\receiver-stage-chain.test.ts:1:201'
+  failureType: 'testCodeFailure'
+  error: 'webgpu-perpass-branch/low/vehicle-1/warm ceramic: declared receiver must reach original native instance batch'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\receiver-stage-chain.test.ts:36:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5443.0702

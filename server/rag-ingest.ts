@@ -1,8 +1,9 @@
 import { createKnowledgeRegistry, validateKnowledgeDatasets, type KnowledgeChunk, type RawKnowledgeChunk } from "./crazy-typka-retrieval";
 import { documentEmbeddingInput, embeddingInputHash, type Embedder, type EmbeddingProfile } from "./rag-embeddings";
-import { canonicalHash, canonicalJson, sourceVersionId, openRagImportSession, openRagDocumentImportSession, prepareDocumentSnapshot, validateProfile, vectorParameter, RagStoreError, type PreparedCorpus, type PreparedSource, type PreparedDocumentCorpus, type RagDatabaseOptions, type RagImportSession, type RagDocumentImportSession, type RagDocumentImportContext, type LegacySuppression, type LegacyRestore, type StoredSource } from "./rag-vector-store";
-import { validateKnowledgeDatasetV3 } from "./rag-document-contract";
-import type { KnowledgeDocumentBundleV3 } from "./rag-knowledge-types";
+import { canonicalHash, canonicalJson, sourceVersionId, openRagImportSession, openRagDocumentImportSession, prepareDocumentSnapshot, validateProfile, vectorParameter, inspectDocumentImport, RagStoreError, type PreparedCorpus, type PreparedSource, type PreparedDocumentCorpus, type RagDatabaseOptions, type RagImportSession, type RagDocumentImportSession, type RagDocumentImportContext, type LegacySuppression, type LegacyRestore, type StoredSource } from "./rag-vector-store";
+import { validateRagDocumentDatasetV3 as validateKnowledgeDatasetV3, isCuratedKnowledgeDocument, knowledgeReviewDay } from "./rag-curation-contract";
+import { isCuratedKnowledgeCurrent } from "../shared/knowledge-curation";
+import type { RagDocumentBundleV3 as KnowledgeDocumentBundleV3 } from "./rag-knowledge-types";
 
 export class RagImportError extends Error {
   constructor(readonly code: "invalid-import-data" | "embedding-budget" | "uncertain-embedding-attempt" | "invalid-embedding-result" | "embedding-failed" | "aborted") { super(code); }
@@ -182,6 +183,7 @@ export function prepareDocumentChanges(context: RagDocumentImportContext, input:
     if (changes.expectedSnapshotId !== (context.snapshot?.id ?? null)) throw new RagStoreError("revision-conflict");
     const old = validateKnowledgeDatasetV3(context.dataset), upserts = validateKnowledgeDatasetV3({ version: 3,
       documents: changes.upserts.map((bundle) => bundle.document), blocks: changes.upserts.flatMap((bundle) => bundle.blocks), chunks: changes.upserts.flatMap((bundle) => bundle.chunks) });
+    for (const doc of upserts.documents) if (isCuratedKnowledgeDocument(doc) && !isCuratedKnowledgeCurrent(doc, now)) throw new Error();
     const retired = changes.retireSourceVersionIds ?? [], restored = changes.restoreLegacySourceVersionIds ?? [];
     const replacements = changes.legacyReplacements ?? [];
     if (changes.collection === "archive" && (replacements.length || restored.length)) throw new Error();
@@ -208,7 +210,7 @@ export function prepareDocumentChanges(context: RagDocumentImportContext, input:
       const target = dataset.documents.find((doc) => doc.sourceVersionId === replacement.documentSourceVersionId);
       if (!live || !target || target.status !== "current" || target.authority !== live.document.authority || restores.some((entry) => entry.legacySourceId === live.document.id)
         || !dataset.chunks.some((chunk) => chunk.sourceVersionId === target.sourceVersionId)
-        || now < Date.parse(target.checkedAt + "T00:00:00Z") || now >= Date.parse(target.reviewAfter + "T00:00:00Z")
+        || now < Date.parse(knowledgeReviewDay(target) + "T00:00:00Z") || now >= Date.parse(target.reviewAfter + "T00:00:00Z")
         || (target.effectiveFrom !== null && now < Date.parse(target.effectiveFrom)) || (target.effectiveUntil !== null && now >= Date.parse(target.effectiveUntil))) throw new Error();
       const value: LegacySuppression = { legacySourceId: live.document.id, legacySourceVersionId: live.sourceVersionId, documentSourceVersionId: target.sourceVersionId };
       if (canonicalJson(suppression.get(value.legacySourceId) ?? null) !== canonicalJson(value)) introduced.push(value.legacySourceVersionId);
@@ -228,6 +230,10 @@ export async function importDocumentChanges(options: RagDocumentImportOptions): 
     const context = await session.context(changes.collection);
     return await importPreparedDocumentCorpus(prepareDocumentChanges(context, changes, options.embedder.profile), session, options);
   } finally { await session.close(); }
+}
+export async function previewDocumentChanges(options: RagDatabaseOptions & { changes: RagDocumentChangeSet; profile: EmbeddingProfile; signal?: AbortSignal }) {
+  const changes = parseDocumentChangeSet(options.changes);
+  return inspectDocumentImport(options, changes.collection, (context) => prepareDocumentChanges(context, changes, options.profile), options.signal);
 }
 export async function importPreparedDocumentCorpus(input: PreparedDocumentCorpus, session: RagDocumentImportSession, options: AlgorithmOptions): Promise<RagDocumentImportResult> {
   const plan = prepareDocumentSnapshot(input);

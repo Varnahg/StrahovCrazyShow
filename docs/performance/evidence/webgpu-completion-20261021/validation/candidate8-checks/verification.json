@@ -1,0 +1,59 @@
+{
+  "capturedAtUTC": "2026-10-21T23:34:51.152Z",
+  "sourceSnapshotId": "921f57b9328a98e0eb3026b95708b3e72a192ce65d054123eff6783449427ee1",
+  "sourceFiles": 8577,
+  "windows": {
+    "targeted": {
+      "pass": 302,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "exit": 0,
+      "scope": "15 relevant startup/preview/native-query/instance suites against actual fresh installed dependencies, no overlays"
+    },
+    "build": {
+      "exit": 0,
+      "includesFullTypescript": true,
+      "viteSeconds": 28.75
+    },
+    "integration": {
+      "exit": 0,
+      "port": 2568,
+      "linearProviderDisabled": true,
+      "scope": "Original isolated integration:12authenticated peers/single world/guest privacy/netcode/actual physical car controls/feedback transport"
+    }
+  },
+  "wholeSuiteCI": {
+    "headSha": "cb5f8cbf0380918a8ec337f2b402c5a7f743361c",
+    "run": 39673558237,
+    "pass": 2067,
+    "fail": 0,
+    "build": "pass",
+    "integration": "pass",
+    "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39673558237",
+    "source8RuntimeAndTestsSame": true
+  },
+  "files": {
+    "windows-targeted.log": {
+      "bytes": 50750,
+      "sha256": "5f8ef0e2ad92a15efde3ed07f6475010b30685a4e4612beff87cbee75c75b425"
+    },
+    "build.log": {
+      "bytes": 2725,
+      "sha256": "35ff9f6eece9ef3c7d060d95ad9b96945019fb565b111ab6e74fd7b3948805d4"
+    },
+    "integration.log": {
+      "bytes": 2231,
+      "sha256": "eca3901b8e32f418ac2996d5f35753e71524de29b76e64c95645909aba0c33fb"
+    },
+    "ci-whole-suite.log": {
+      "bytes": 545804,
+      "sha256": "06c2ffe93868fb6eb1f9538315419b59d87cdad80ccda6aff7421fbd5821595c"
+    }
+  },
+  "limitations": [
+    "CPU/build/integration do not prove actual GPU performance, car image/input projection or document-hidden behavior.",
+    "Previous source7 whole suite21fail and Windows targeted4fail remain preserved; source8 fixes only two valid fake native fixtures and adds two missing-producer integration negatives.",
+    "Original source7 first integration and diagnostic helper build briefly overlapped in own heavy-validation; this source8 production build and isolated integration ran sequentially."
+  ]
+}

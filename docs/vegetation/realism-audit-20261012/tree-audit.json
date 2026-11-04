@@ -1,0 +1,619 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-12T11:27:27.910Z",
+  "scope": "Read-only static source/asset audit. Not GPU, frame-time, network-transfer or visual acceptance evidence.",
+  "reproduce": "node --import tsx docs/vegetation/realism-audit-20261012/tree-audit.mjs",
+  "environment": {
+    "node": "v24.19.0",
+    "platform": "win32",
+    "architecture": "x64"
+  },
+  "inputs": [
+    {
+      "path": "docs/vegetation/realism-audit-20261012/tree-audit.mjs",
+      "bytes": 11633,
+      "sha256": "72e7469ea790e8313eedcd67e7e1684ee60ef657f31d546d5b9f0dd7af612bde"
+    },
+    {
+      "path": "public/models/vegetation/realistic/strahov-individual-trees.glb",
+      "bytes": 183087208,
+      "sha256": "b33d22608182ba9e73c97ccc816dde5ad2c85b3d0c5473919626b7fdda6a5358"
+    },
+    {
+      "path": "public/models/vegetation/runtime/far.glb",
+      "bytes": 76500488,
+      "sha256": "a378eb7951da498e433d5b4ca2bf3e93b2fb0f8ec740e23c81f746879b94b729"
+    },
+    {
+      "path": "public/models/vegetation/runtime/manifest.json",
+      "bytes": 58459,
+      "sha256": "41c65403a5dbc5d652b4215ff8bcc50cee4a0a5cf89ef9da61be837249001b17"
+    },
+    {
+      "path": "public/models/vegetation/realistic/manifest.json",
+      "bytes": 50311,
+      "sha256": "6ea87f17cf05333f8a90467d1208678c8294a3b69eceee5af248ca02d1700729"
+    },
+    {
+      "path": "shared/data/tree-reconstruction.json",
+      "bytes": 166023,
+      "sha256": "5956d701a781deaca2d6346c9feae7a4678cf9d94dcef97dbbca4ecdd5dfe367"
+    },
+    {
+      "path": "public/models/vegetation/realistic/texture-manifest.json",
+      "bytes": 4464,
+      "sha256": "d863498412e830a54c4d724c01fd2b1ebc8c7ae67980fac7040befefe81be97a"
+    },
+    {
+      "path": "shared/world.ts",
+      "bytes": 9016,
+      "sha256": "394fe4d61db507be8881af44a3dc417ed9c3674688cef3ba6cb9b9534a15a936"
+    },
+    {
+      "path": "shared/vegetation.ts",
+      "bytes": 13238,
+      "sha256": "da310b4c7441e98816f9fe6900145c530f7dcb6c3846fb1ff55511568a510075"
+    },
+    {
+      "path": "shared/data/landcover.json",
+      "bytes": 133300,
+      "sha256": "92425a36cfdf4bac15415c31e947bbd0e09576f5a650f9589284ee55e5402e3b"
+    },
+    {
+      "path": "shared/data/surveyed-trees.json",
+      "bytes": 53231,
+      "sha256": "1e3ad99f1640a14921ed7fc7c797c841fa2ca404e3c7c4cd4a39ffb64463ac75"
+    },
+    {
+      "path": "client/vegetation.ts",
+      "bytes": 29844,
+      "sha256": "56548718a707845a10559fec9c7f1415f05a5b81c1cf627994cdf02765b9fd2f"
+    },
+    {
+      "path": "client/tree-appearance.ts",
+      "bytes": 5658,
+      "sha256": "cdbb418181563e62c542fafdc7829b3160cf0072d5d29395cc1d618d5c44392a"
+    },
+    {
+      "path": "client/tree-wind.ts",
+      "bytes": 2527,
+      "sha256": "05a53b380c5d03deed3da3f6efd5ebb67ed646f6097a0b9aec0a50be3549160e"
+    },
+    {
+      "path": "scripts/tree-pack-blender.py",
+      "bytes": 11953,
+      "sha256": "c35b9efca02c23855b424e33921b3432e803cf1ddc9198b28f9b6ad14bae85eb"
+    },
+    {
+      "path": "scripts/tree-pack-reference.py",
+      "bytes": 9392,
+      "sha256": "da4f2d800abb90864a5a93a882c7c501453b16164c4eb6dde91ce7384c1560fc"
+    },
+    {
+      "path": "scripts/tree-pack-fetch.py",
+      "bytes": 2621,
+      "sha256": "90a5b2722fbf052b3329aa3b35d633475989ececd42b41706314f1a8abbdbf76"
+    },
+    {
+      "path": "scripts/tree-runtime-pack.mjs",
+      "bytes": 6787,
+      "sha256": "7fedc65824ee26801c36c4e3c9559c864519f8809b42e2ef0a1f7e1c7bf7ee35"
+    },
+    {
+      "path": "tests/tree-appearance.test.ts",
+      "bytes": 10455,
+      "sha256": "5ad13615426f9c8310bf6331cd06ca07813c8ba0d55dcf9528e6e70ebdc3b26d"
+    },
+    {
+      "path": "tests/vegetation-runtime.test.ts",
+      "bytes": 5520,
+      "sha256": "3f24b9f8d1b8abc56d7ed323c7577a0b9b42b6b6f3915393d675d5f9ef754521"
+    },
+    {
+      "path": "tests/vegetation-realistic-pack.test.ts",
+      "bytes": 5198,
+      "sha256": "8b08b3d7e20a36b8b83a85b857576204dca06dfd9ea641f5773fd26fa8efb5ba"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet001_2K-PNG_Color.png",
+      "bytes": 1462734,
+      "sha256": "e82912697d97a93f781b8f5402e0635085b4a92cfca0edfcd0827b890461e2d2"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet001_2K-PNG_NormalGL.png",
+      "bytes": 18335249,
+      "sha256": "ffd0c5270aadf2c5f714e577a598d472e23dc1717bfeb745eaf72696148bafb6"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet001_2K-PNG_Opacity.png",
+      "bytes": 72568,
+      "sha256": "dcdf0dec5eede53b68805154b4c73f3f3d243018fd00149dfd4599eb3ceff30f"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet001_2K-PNG_Roughness.png",
+      "bytes": 1010063,
+      "sha256": "3cc28e10180d19af10acd30a335cc76f942e7046c9467cdc97678151ac4c7f96"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet019_2K-PNG_Color.png",
+      "bytes": 2447157,
+      "sha256": "a253f3751a48fad0a83d6f817d3e28fc4a0709f9668b188934332c42ce5c1ab4"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet019_2K-PNG_NormalGL.png",
+      "bytes": 19492792,
+      "sha256": "22e9487bc0b02ef5e572e79a43fa8aee9c50b42cc5988ea975be9886fd2e47b2"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet019_2K-PNG_Opacity.png",
+      "bytes": 592074,
+      "sha256": "2ed9ff0c55a1fff2cf0fe1ae3ac584089c0ad3dad60b40534d0960af2708218a"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet019_2K-PNG_Roughness.png",
+      "bytes": 1397351,
+      "sha256": "630cebcac756d7787b8f91eeb2866336e0df291a3fa60d7b90dc6adcbea472f7"
+    },
+    {
+      "path": "public/models/vegetation/realistic/Bark012_2K-JPG_Color.jpg",
+      "bytes": 6405419,
+      "sha256": "8ab624e92663bd5e7f1636decc4da761ee314ac27ea528a962930f03d96dd08b"
+    },
+    {
+      "path": "public/models/vegetation/realistic/Bark012_2K-JPG_NormalGL.jpg",
+      "bytes": 9276070,
+      "sha256": "1ebe7bf53baaf58d48acef9046697cf7a73bc228b5700f12eaff60168533d2ad"
+    },
+    {
+      "path": "public/models/vegetation/realistic/Bark012_2K-JPG_Roughness.jpg",
+      "bytes": 2520615,
+      "sha256": "b0503fd7694f7c84ef82c960129f3e23b191267b625c4ca209296ea6ae758519"
+    }
+  ],
+  "placements": {
+    "candidateCount": 110,
+    "runtimeCount": 109,
+    "excludedCandidateIds": [
+      "ipr-b6-north-conifer"
+    ],
+    "byProvenance": {
+      "mapped-osm-node": [
+        "4314257232",
+        "4314257236",
+        "4314257237",
+        "4314257238",
+        "4314257239",
+        "4314257240",
+        "4314257241",
+        "4314257243",
+        "4314257244",
+        "4314257246",
+        "4314257248",
+        "4314257249",
+        "4314257251",
+        "4314257252",
+        "4314257253",
+        "4314257255",
+        "4314257257",
+        "4314257258",
+        "4314257259",
+        "4314257262",
+        "4314257263",
+        "4314257266",
+        "4314257268",
+        "4314257285",
+        "4314257295",
+        "4314257296",
+        "4314257297",
+        "4314257298",
+        "4314257299",
+        "4314257301",
+        "4314257302",
+        "4314257303",
+        "4314257305",
+        "4314257306",
+        "4314257307",
+        "8409343893",
+        "12177597360",
+        "12177597361",
+        "13630372581",
+        "13630372582",
+        "13630372584",
+        "13630372586",
+        "13630372587",
+        "13630372588",
+        "13904420732",
+        "13904420733",
+        "13904420734"
+      ],
+      "reference-interpreted-not-surveyed": [
+        "ipr-crown-001",
+        "ipr-crown-002",
+        "ipr-crown-003",
+        "ipr-crown-005",
+        "ipr-crown-006",
+        "ipr-crown-009",
+        "ipr-crown-010",
+        "ipr-crown-011",
+        "ipr-crown-012",
+        "ipr-crown-013",
+        "ipr-crown-014",
+        "ipr-crown-015",
+        "ipr-crown-016",
+        "ipr-crown-018",
+        "ipr-crown-019",
+        "ipr-crown-020",
+        "ipr-crown-021",
+        "ipr-crown-023",
+        "ipr-crown-024",
+        "ipr-crown-025",
+        "ipr-crown-026",
+        "ipr-crown-027",
+        "ipr-crown-028",
+        "ipr-crown-029",
+        "ipr-crown-031",
+        "ipr-crown-032",
+        "ipr-crown-033",
+        "ipr-crown-034",
+        "ipr-crown-035",
+        "ipr-crown-037",
+        "ipr-crown-038",
+        "ipr-crown-039",
+        "ipr-crown-040",
+        "ipr-crown-041",
+        "ipr-crown-046",
+        "ipr-crown-047",
+        "ipr-crown-049",
+        "ipr-crown-050",
+        "ipr-crown-051",
+        "ipr-crown-054",
+        "ipr-crown-055",
+        "ipr-crown-056",
+        "ipr-crown-057",
+        "ipr-crown-058",
+        "ipr-crown-059",
+        "ipr-crown-060",
+        "ipr-crown-061",
+        "ipr-crown-062",
+        "ipr-crown-063",
+        "ipr-crown-065",
+        "ipr-crown-068",
+        "ipr-crown-069",
+        "ipr-crown-072",
+        "ipr-crown-073",
+        "ipr-crown-074",
+        "ipr-crown-075",
+        "ipr-crown-076",
+        "ipr-crown-077",
+        "ipr-crown-078",
+        "ipr-b6-north-bare",
+        "ipr-b5-north-small",
+        "ipr-b6-south-conifer"
+      ]
+    },
+    "byAppearance": {
+      "broadleaf": [
+        "4314257232",
+        "4314257236",
+        "4314257237",
+        "4314257238",
+        "4314257239",
+        "4314257240",
+        "4314257241",
+        "4314257243",
+        "4314257244",
+        "4314257246",
+        "4314257248",
+        "4314257249",
+        "4314257251",
+        "4314257252",
+        "4314257253",
+        "4314257255",
+        "4314257257",
+        "4314257258",
+        "4314257259",
+        "4314257262",
+        "4314257263",
+        "4314257266",
+        "4314257268",
+        "4314257285",
+        "4314257295",
+        "4314257296",
+        "4314257297",
+        "4314257298",
+        "4314257299",
+        "4314257301",
+        "4314257302",
+        "4314257303",
+        "4314257305",
+        "4314257306",
+        "4314257307",
+        "8409343893",
+        "12177597360",
+        "12177597361",
+        "13630372581",
+        "13630372582",
+        "13630372584",
+        "13630372586",
+        "13630372587",
+        "13630372588",
+        "13904420732",
+        "13904420733",
+        "13904420734",
+        "ipr-crown-001",
+        "ipr-crown-002",
+        "ipr-crown-003",
+        "ipr-crown-005",
+        "ipr-crown-006",
+        "ipr-crown-009",
+        "ipr-crown-010",
+        "ipr-crown-011",
+        "ipr-crown-012",
+        "ipr-crown-013",
+        "ipr-crown-014",
+        "ipr-crown-015",
+        "ipr-crown-016",
+        "ipr-crown-018",
+        "ipr-crown-019",
+        "ipr-crown-020",
+        "ipr-crown-021",
+        "ipr-crown-023",
+        "ipr-crown-024",
+        "ipr-crown-025",
+        "ipr-crown-026",
+        "ipr-crown-027",
+        "ipr-crown-028",
+        "ipr-crown-029",
+        "ipr-crown-031",
+        "ipr-crown-032",
+        "ipr-crown-033",
+        "ipr-crown-034",
+        "ipr-crown-035",
+        "ipr-crown-037",
+        "ipr-crown-038",
+        "ipr-crown-039",
+        "ipr-crown-040",
+        "ipr-crown-041",
+        "ipr-crown-046",
+        "ipr-crown-047",
+        "ipr-crown-049",
+        "ipr-crown-050",
+        "ipr-crown-051",
+        "ipr-crown-054",
+        "ipr-crown-055",
+        "ipr-crown-056",
+        "ipr-crown-057",
+        "ipr-crown-058",
+        "ipr-crown-059",
+        "ipr-crown-060",
+        "ipr-crown-061",
+        "ipr-crown-062",
+        "ipr-crown-063",
+        "ipr-crown-065",
+        "ipr-crown-068",
+        "ipr-crown-069",
+        "ipr-crown-072",
+        "ipr-crown-073",
+        "ipr-crown-074",
+        "ipr-crown-075",
+        "ipr-crown-076",
+        "ipr-crown-077",
+        "ipr-crown-078",
+        "ipr-b5-north-small"
+      ],
+      "bare": [
+        "ipr-b6-north-bare"
+      ],
+      "conifer": [
+        "ipr-b6-south-conifer"
+      ]
+    },
+    "sourceCaptureDates": {
+      "crown": [
+        "2024-06-08"
+      ],
+      "height": [
+        "summer 2023",
+        null
+      ]
+    },
+    "limitations": [
+      "Historical captures differ; cannot infer every present-day tree or botanical species.",
+      "Green-point height/PCA can include neighbouring crowns. Parameters guide clean models and do not force photogrammetry defects into the game.",
+      "Broadleaf is the default appearance class where a ground-level species reference is unavailable.",
+      "Root positions from aerial crown centres have up to 2.5 m uncertainty; roots are grounded in native DMR in the game."
+    ]
+  },
+  "hypotheticalAllTreesAtOneLod": [
+    {
+      "lod": 0,
+      "placedTrees": 109,
+      "meshCountBeforeFrustumCulling": 217,
+      "triangles": 1950532,
+      "exportedPositionAccessorVertices": 2515786,
+      "authoredPreExportVertices": 2515786,
+      "minimumTrianglesPerTree": 1601,
+      "maximumTrianglesPerTree": 23405,
+      "detailChunkBytes": 92384234
+    },
+    {
+      "lod": 1,
+      "placedTrees": 109,
+      "meshCountBeforeFrustumCulling": 217,
+      "triangles": 648690,
+      "exportedPositionAccessorVertices": 725972,
+      "authoredPreExportVertices": 725972,
+      "minimumTrianglesPerTree": 964,
+      "maximumTrianglesPerTree": 7324,
+      "detailChunkBytes": 27297832
+    },
+    {
+      "lod": 2,
+      "placedTrees": 109,
+      "meshCountBeforeFrustumCulling": 217,
+      "triangles": 254090,
+      "exportedPositionAccessorVertices": 258416,
+      "authoredPreExportVertices": 258416,
+      "minimumTrianglesPerTree": 481,
+      "maximumTrianglesPerTree": 2773,
+      "detailChunkBytes": null
+    }
+  ],
+  "lodInterpretation": "Catalog totals for placed tree IDs, before view culling and shadow passes. Real rendering mixes LODs; these are not measured GPU workloads. Export duplicates vertices for seams, so both authored and exported counts are labelled separately.",
+  "archive": {
+    "masterBytes": 183087208,
+    "masterSha256": "b33d22608182ba9e73c97ccc816dde5ad2c85b3d0c5473919626b7fdda6a5358",
+    "bootstrapBytes": 76500488,
+    "bootstrapSha256": "a378eb7951da498e433d5b4ca2bf3e93b2fb0f8ec740e23c81f746879b94b729",
+    "embeddedTextureBytes": 67850872,
+    "bootstrapArchiveMeshCount": 219,
+    "runtimeActiveMeshesBeforeFrustumCulling": 217,
+    "extensionsUsed": [],
+    "embeddedImages": [
+      {
+        "name": "Bark012_2K-JPG_NormalGL",
+        "mimeType": "image/jpeg",
+        "bytes": 9276070,
+        "sha256": "1ebe7bf53baaf58d48acef9046697cf7a73bc228b5700f12eaff60168533d2ad",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 8,
+        "channels": 3
+      },
+      {
+        "name": "Bark012_2K-JPG_Color",
+        "mimeType": "image/jpeg",
+        "bytes": 6405419,
+        "sha256": "8ab624e92663bd5e7f1636decc4da761ee314ac27ea528a962930f03d96dd08b",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 8,
+        "channels": 3
+      },
+      {
+        "name": "Bark012_2K-JPG_Roughness",
+        "mimeType": "image/png",
+        "bytes": 4125737,
+        "sha256": "44ce0e98a2169af4f25650898f47bb01fc340e095e0ec9675bf88b921dd4ffb3",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 8,
+        "pngColorType": 2
+      },
+      {
+        "name": "LeafSet001_2K-PNG_NormalGL",
+        "mimeType": "image/png",
+        "bytes": 18335249,
+        "sha256": "ffd0c5270aadf2c5f714e577a598d472e23dc1717bfeb745eaf72696148bafb6",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 16,
+        "pngColorType": 2
+      },
+      {
+        "name": "LeafSet001_2K-PNG_Color-LeafSet001_2K-PNG_Opacity",
+        "mimeType": "image/png",
+        "bytes": 2018734,
+        "sha256": "301a27158196b87c662d884d63518c21b50c3b85f7414be0957e254ee9e41431",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 8,
+        "pngColorType": 6
+      },
+      {
+        "name": "LeafSet001_2K-PNG_Roughness",
+        "mimeType": "image/png",
+        "bytes": 2016401,
+        "sha256": "a630406a3b68a0ad22eb55bb66a0201c0c5ee044b9d19dfbea90b10c619d8247",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 8,
+        "pngColorType": 2
+      },
+      {
+        "name": "LeafSet019_2K-PNG_NormalGL",
+        "mimeType": "image/png",
+        "bytes": 19492792,
+        "sha256": "22e9487bc0b02ef5e572e79a43fa8aee9c50b42cc5988ea975be9886fd2e47b2",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 16,
+        "pngColorType": 2
+      },
+      {
+        "name": "LeafSet019_2K-PNG_Color-LeafSet019_2K-PNG_Opacity",
+        "mimeType": "image/png",
+        "bytes": 3570147,
+        "sha256": "dc89592b4793c571baa9577f0fc5422f07d75e3fef763267388ece0efb5d4f7e",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 8,
+        "pngColorType": 6
+      },
+      {
+        "name": "LeafSet019_2K-PNG_Roughness",
+        "mimeType": "image/png",
+        "bytes": 2610323,
+        "sha256": "a03850809c603c07cc3ae1cee254673e21f6855bbcb4a5d5664242b642915354",
+        "width": 2048,
+        "height": 2048,
+        "bitDepth": 8,
+        "pngColorType": 2
+      }
+    ],
+    "sizeInterpretation": "Local file bytes, not observed network bytes or GPU memory. Bootstrap includes one excluded candidate whose meshes runtime disables."
+  },
+  "opacityCoverage": [
+    {
+      "source": "public/models/vegetation/realistic/LeafSet001_2K-PNG_Opacity.png",
+      "sha256": "dcdf0dec5eede53b68805154b4c73f3f3d243018fd00149dfd4599eb3ceff30f",
+      "width": 2048,
+      "height": 2048,
+      "bitDepth": 8,
+      "pngColorType": 0,
+      "cutoff": 0.5,
+      "acceptedPixels": 817038,
+      "totalPixels": 4194304,
+      "acceptedTextureAreaFraction": 0.19479703903198242,
+      "discardedTextureAreaFraction": 0.8052029609680176,
+      "interpretation": "Base-level opacity texture area only. Not measured screen overdraw, mip coverage, fragment cost or FPS."
+    },
+    {
+      "source": "public/models/vegetation/realistic/LeafSet019_2K-PNG_Opacity.png",
+      "sha256": "2ed9ff0c55a1fff2cf0fe1ae3ac584089c0ad3dad60b40534d0960af2708218a",
+      "width": 2048,
+      "height": 2048,
+      "bitDepth": 8,
+      "pngColorType": 0,
+      "cutoff": 0.5,
+      "acceptedPixels": 956484,
+      "totalPixels": 4194304,
+      "acceptedTextureAreaFraction": 0.2280435562133789,
+      "discardedTextureAreaFraction": 0.7719564437866211,
+      "interpretation": "Base-level opacity texture area only. Not measured screen overdraw, mip coverage, fragment cost or FPS."
+    }
+  ],
+  "hypotheticalTextureAllocation": {
+    "assumptions": "Nine 2048x2048 textures uploaded as uncompressed RGBA8 with complete mip chains. Actual GPU format, allocation and duplicate resources were not inspected.",
+    "estimatedBytes": 201326592,
+    "estimatedMiB": 192,
+    "measured": false
+  },
+  "priorSessionTestObservation": {
+    "date": "2026-10-12",
+    "command": "pnpm exec tsx --test tests/tree-appearance.test.ts tests/vegetation-runtime.test.ts tests/vegetation-realistic-pack.test.ts",
+    "exitCode": 0,
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "runnerDurationMs": 8755.5603,
+    "provenance": "Observed terminal output in the tree audit agent's current research session before this evidence script was authored. No separate log was saved. This script does not rerun tests; this record is historical session evidence, not a fresh test result.",
+    "testPaths": [
+      "tests/tree-appearance.test.ts",
+      "tests/vegetation-runtime.test.ts",
+      "tests/vegetation-realistic-pack.test.ts"
+    ],
+    "limitation": "Includes Babylon NullEngine checks of data/ownership and source hashes. Not GPU performance or visual-quality validation."
+  }
+}

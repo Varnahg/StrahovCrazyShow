@@ -79,7 +79,7 @@ const startupEffects = app.body!.statements.filter(
 assert.equal(startupEffects.length, 1, "one actual Game lifecycle effect");
 const startupEffect = (startupEffects[0].expression as ts.CallExpression)
   .arguments[0];
-const hookNames = ["onInput", "onInputFrame", "onBeforeInputFrame", "onNetworkDiagnostics"];
+const hookNames = ["onInput", "onInputFrame", "onBeforeInputFrame", "onNetworkDiagnostics", "onAction"];
 const hookAssignments: ts.ExpressionStatement[] = [];
 function findHookAssignments(node: ts.Node) {
   if (
@@ -157,6 +157,10 @@ const callbacksScript = compileScript(
   ].join("\n"),
 );
 const startupScript = compileScript(`(${startupEffect.getText(ui)})()`);
+const inputBufferInitialization = app.body!.statements.find(n =>
+  ts.isIfStatement(n) && n.expression.getText(ui) === "!inputBuffer.current")!;
+assert.ok(inputBufferInitialization);
+const inputBufferScript = compileScript(inputBufferInitialization.getText(ui));
 const timingEffect = app.body!.statements.find(
   (node): node is ts.ExpressionStatement => ts.isExpressionStatement(node) &&
     ts.isCallExpression(node.expression) && node.expression.expression.getText(ui) === "useEffect" &&
@@ -231,6 +235,10 @@ const poseMethodsScript = compileScript(`({
   ${executableGameMethod("pruneDoorPrediction")},
   ${executableGameMethod("reconcile")},
   ${executableGameMethod("advanceSimulation")}
+})`);
+const doorRecoveryMethodsScript = compileScript(`({
+  ${executableGameMethod("requestDoorResync")},
+  ${executableGameMethod("reconcile")}
 })`);
 
 for (const path of ["simulation", "reconcile"] as const) {
@@ -1122,6 +1130,99 @@ test("ordinary authority backlog is applied once per frame using original arriva
     applied,
     "superseded ordinary state cannot follow a forced barrier",
   );
+});
+
+test("door bootstrap defers unsent recovery until the first valid authority, before Game readiness", () => {
+  const ui = fixture(), room = new FakeRoom();
+  ui.bind(room);
+  ui.game.ready = false;
+  room.message("doorSnapshot", null);
+  room.message("doorSnapshot", {});
+  assert.equal(room.sent.length, 0);
+  room.message("authoritative", { ...payloads().authoritative, inputEpoch: NaN });
+  assert.equal(room.sent.length, 0, "invalid authority cannot release the deferred request");
+  const first = { ...payloads().authoritative, inputEpoch: 7 };
+  room.message("authoritative", first);
+  assert.deepEqual(JSON.parse(JSON.stringify(room.sent)), [["doorResync", { inputEpoch: 7 }]]);
+  room.message("authoritative", first);
+  room.message("authoritative", { ...first, tick: 2, ack: 2 });
+  assert.equal(room.sent.length, 1, "one bootstrap request, no repeat on later authority");
+  assert.equal(ui.effects.includes("game.reconcile"), false);
+});
+
+for (const reason of ["disposed", "terminal-identity"] as const)
+  test(`deferred door recovery remains inert after ${reason} before first authority`, () => {
+    const ui = fixture(), room = new FakeRoom();
+    ui.bind(room);
+    ui.game.ready = false;
+    const doors = ui.doorConnectionRef.current!;
+    if (reason === "disposed") {
+      room.message("doorSnapshot", null);
+      doors.dispose();
+    } else {
+      room.message("doorSnapshot", { ...payloads().doorSnapshot, definitionHash: "b".repeat(64) });
+      assert.equal(doors.failed, true);
+    }
+    room.message("authoritative", payloads().authoritative);
+    room.message("doorSnapshot", payloads().doorSnapshot);
+    assert.equal(room.sent.length, 0);
+    assert.equal(doors.requestResync(), false);
+    assert.equal(doors.timeline, null);
+  });
+
+test("a replaced room cannot release its deferred request or lend its epoch to the new room", () => {
+  const ui = fixture(), oldRoom = new FakeRoom(), nextRoom = new FakeRoom();
+  ui.bind(oldRoom);
+  ui.game.ready = false;
+  oldRoom.message("doorSnapshot", null);
+  const oldDoors = ui.doorConnectionRef.current!;
+  ui.bind(nextRoom);
+  nextRoom.message("doorSnapshot", null);
+  oldRoom.message("authoritative", { ...payloads().authoritative, inputEpoch: 7 });
+  assert.equal(oldDoors.requestResync(), false);
+  assert.equal(ui.authorityBufferRef.current.inputEpoch, null);
+  assert.equal(oldRoom.sent.length, 0);
+  assert.equal(nextRoom.sent.length, 0);
+  nextRoom.message("authoritative", { ...payloads().authoritative, inputEpoch: 2 });
+  assert.deepEqual(JSON.parse(JSON.stringify(nextRoom.sent)), [["doorResync", { inputEpoch: 2 }]]);
+  ui.leave();
+  assert.equal(ui.authorityBufferRef.current.inputEpoch, null);
+});
+
+test("actual Game door-history rejection recovers with the newly accepted room epoch before its planner accepts it", () => {
+  const ui = fixture(), room = new FakeRoom();
+  ui.bind(room);
+  ui.installFrameHooks(ui.game);
+  Object.assign(ui.game, doorRecoveryMethodsScript.runInContext(ui.context), {
+    lastAuthorityTick: -1, lastDoorResync: -Infinity, networkTimeline: new NetworkTimeline(),
+  });
+  room.message("authoritative", { ...payloads().authoritative, inputEpoch: 9, resync: true });
+  assert.equal(ui.authorityBufferRef.current.inputEpoch, 9);
+  assert.equal(ui.game.networkTimeline.snapshot().inputEpoch, null, "actual Game rejects missing door history before accepting the planner epoch");
+  assert.deepEqual(JSON.parse(JSON.stringify(room.sent)), [["doorResync", { inputEpoch: 9 }]]);
+  const request = { inputEpoch: 9 };
+  assert.equal(ui.game.onAction("resync", request), true);
+  assert.equal(room.sent.at(-1)![1], request, "actual UI onAction forwards the Game recovery token unchanged");
+});
+
+test("actual UI overflow producer sends the accepted epoch and never sends an unversioned request", () => {
+  const ui = fixture(), room = new FakeRoom();
+  ui.bind(room);
+  ui.environment.FrameInputBuffer = FrameInputBuffer;
+  ui.inputBuffer.current = null as unknown as FrameInputBuffer;
+  inputBufferScript.runInContext(ui.context);
+  const overflow = (start: number, count: number) => {
+    for (let seq = start; seq < start + count; seq++)
+      ui.inputBuffer.current.enqueue({ seq, x: 1, z: 0, yaw: 0, jump: false, vehicle: false });
+  };
+  // Exhaust the real 60-packet/s budget before exceeding the 64-input queue.
+  overflow(1, 560);
+  assert.ok(ui.inputBuffer.current.snapshot().overflows > 0);
+  assert.equal(room.sent.filter(([type]) => type === "resync").length, 0);
+  room.message("authoritative", { ...payloads().authoritative, inputEpoch: 7 });
+  overflow(1000, 80);
+  const recoveries = room.sent.filter(([type]) => type === "resync");
+  assert.deepEqual(JSON.parse(JSON.stringify(recoveries)), [["resync", { inputEpoch: 7 }]]);
 });
 
 test("bootstrap authority is retained until physics is ready and multiplayer state never drains into a guest", () => {

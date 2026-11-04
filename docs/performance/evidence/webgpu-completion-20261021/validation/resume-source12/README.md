@@ -1,0 +1,3 @@
+# Actual in-session editor and continued movement
+
+Source12 no-query WebGPU completed76original startup stages in69.877s. After ordinary W movement, Tvoje postava opened inside the connected room. Niki+beard preview reached ready and was visually inspected; closing the panel preserved the same player, Game renderer and generation, with only a small settling displacement. D movement then continued normally, healthy0errors/pending. Four raw exports match original immutable receipts byte-for-byte. This is near-spawn functional evidence, not B6 resume or a performance sample. Original closed session and all inputs remain retained.

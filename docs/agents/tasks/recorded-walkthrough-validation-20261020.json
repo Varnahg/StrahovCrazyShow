@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4291"
+  ],
+  "acceptance": [
+    "Pouze testovací vrstva; žádná změna produkčního klienta, serveru, fyziky nebo veřejného API.",
+    "Výzkum, varianty, cílený refaktoring a relevantní skutečné ověření; zachovat cizí WIP a deníkové rezervace."
+  ],
+  "verification": [
+    "Sekvenční full pipeline a izolovaný browser test."
+  ],
+  "notes": [
+    "Uživatel 20. 10. 2026 požaduje replikovat oba vlastní průchody mapou pouze v testech; sampled renderer replay není deterministický input/physics replay.",
+    "Výchozí přijatý main ab39b7185d0c9fb5e393c654818f43de82e07886; izolovaná managed worktree recorded-playtest-replay.",
+    "Pouze materializace přesných existujících Git LFS blobů do nové worktree; žádná regenerace ani změna obsahu.",
+    "Koordinátor vytvořil všechny tři nové task JSON v této relaci; --adopt-dirty administrace přebírá pouze tyto vlastní metadatové soubory.",
+    "Linear KEY-49: https://linear.app/gigeconomy/issue/KEY-49; vlastní změny a předání této relace, žádný cizí WIP.",
+    "GPU přejímka čeká na skutečně otevřený hostitelský chat/panel; open_in_codex vrací queued, visibility false. Odpověď uživatele zatím chybí. Vlastní služby a GPU karty jsou ukončené.",
+    "CPU kontroly review oprav pokračují; GPU část zůstává výslovně nepřijatá do otevření panelu. ready není pokyn spouštět neobjednanou práci."
+  ],
+  "id": "recorded-walkthrough-validation-20261020",
+  "title": "Izolované ověření testového replaye, build a integrace",
+  "writePaths": [
+    "node_modules/",
+    "dist/",
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb",
+    ".cache/game-diagnostics/"
+  ]
+}

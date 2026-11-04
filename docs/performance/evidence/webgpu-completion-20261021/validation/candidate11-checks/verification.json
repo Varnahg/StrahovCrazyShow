@@ -1,0 +1,55 @@
+{
+  "source": "74dbc7a7e0474de35ca4a0152e407922d32837582b19bc66ac58de7e90ae05b9",
+  "commit": "432e197dfc39e658384276848b87c313341b20f1",
+  "files": 8580,
+  "reusedIprFiles": 7038,
+  "tests": "Windows ordinary installed native,201/201, no overlay; full pnpm test/build/integration exact-head LinuxCI39997771403 success",
+  "build": {
+    "command": "pnpm build",
+    "exit": 0,
+    "viteSeconds": 18.29
+  },
+  "integration": {
+    "command": "pnpm test:integration",
+    "exit": 0,
+    "port": 2568,
+    "linearCredential": "cleared"
+  },
+  "ci": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39997771403",
+  "hygiene": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39997771056",
+  "filesVerified": {
+    "candidate11-install-terminal.json": {
+      "sha256": "30c27bb64ede9dbbc2ba70281b496d745af1e06074e8111f8cc66d0ba97c71cb",
+      "bytes": 1074
+    },
+    "candidate11-install-final.json": {
+      "sha256": "40b379a5ab53bbfb854365694762438a899b361c2e6fae09656c91c64fa4d2bb",
+      "bytes": 694
+    },
+    "candidate11-before-install.json": {
+      "sha256": "3609d65662a21acb8e1b057ec1eddd612e0981a3ffb49789d236b344e2523a87",
+      "bytes": 10597
+    },
+    "candidate11-targeted.tap": {
+      "sha256": "6a06815041641826e66bed462eec239a85bb84ce08d78fa20d8449454ae16958",
+      "bytes": 55667
+    },
+    "candidate11-targeted.json": {
+      "sha256": "4e3ac0cf2515f161de14c1f968ffa777d4c182038d1730e0bd524f7eb59bad00",
+      "bytes": 1754
+    },
+    "candidate11-build.log": {
+      "sha256": "0d6cce92f886adc8d5073e6cdd03970e1f3f51ec379e31f578315e726291c624",
+      "bytes": 2948
+    },
+    "candidate11-integration.log": {
+      "sha256": "64a6b09c30c747e2d1707be53bffe7da572025e381c8196e5d6ed6b70bc944e8",
+      "bytes": 2231
+    },
+    "ci-432e197d.log": {
+      "sha256": "45f7290c619df825ea900aa20e3135fcfb715f0bc353493f9a13052a533dbf3f",
+      "bytes": 569203
+    }
+  },
+  "limits": "No actual GPU acceptance yet. Root discovered a possible nonstandalone/custom ShaderMaterial base-pass versus draw-pass API gap after CPU acceptance; readonly primary-source audit is pending before starting GPU/main acceptance. Existing canonical-per-pass tests alone do not close that broader native contract."
+}

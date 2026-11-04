@@ -1,0 +1,37 @@
+# Rozpracovaná práce soustředěná v main
+
+Konsolidace na přímé zadání uživatele 29. 10. 2026. Jedinou pracovní větví je `main` a jediným pracovním checkoutem `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`. Nepokračovat ve starých worktrees a nevytvářet náhradní větve.
+
+Aktuální hra zachovává přijaté CAD modely, stromy, síť, Jantar, Docker a RAG. Níže uvedené starší prototypy zůstávají **rozpracované**, neoznačují se za hotové a jejich historické varianty nepřepisují novější funkční kód. Jejich úplné zdroje, testy a historie jsou dostupné z historie `main` bez další větve. Změny, které šly bezpečně převzít samostatně, jsou přímo v současných souborech: nástroje recorded replay, chybějící browser CI a původní výzkumná evidence.
+
+| Celek | Přesný uložený zdroj | Co ještě zbývá |
+| --- | --- | --- |
+| Plynulost hraní · aktuální navázání 4.11.2026 | Hráčský archiv `cadc09c9`, testgate `77b44742` + percentilová oprava `36255bdf`, [V15 resync oprava a evidence](performance/evidence/gameplay-frame-cost-20261103/resync-epoch-20261104/README.md); [aktuální předání](agents/handoffs/gameplay-frame-cost-20261103-root.md) | Přijatý epoch guard odstraní redundantní reset stejné epochy;107 cílených testů, build, SDK a pohybový Edge průchod ověřené. Celková plynulost stále FAILED, startup měl zachovaný neúspěšný pokus. Renderové prodlevy/60FPS cíl zůstávají otevřené. NCM zůstává experiment; žádný obecný FPS zisk se netvrdí. |
+| Syntax cache shaderů · uzavřený nepřijatý experiment3.11. | `client/shader-syntax-cache.ts`, připnutý Babylon patch, Game loopback opt-in; [závěr a úplná evidence](performance/evidence/shader-syntax-cache-20261103/final-campaign.md) | DefaultOFF. C9:1/2 ON startů ready, oba OFF timeout, jeden nestabilní preflight. CPU dílčí přínos nestačil pro přijetí celé hry. Tento kandidát je uzavřený; zvýšení FPS a spolehlivý startup zůstávají nevyřešené, další zásah potřebuje vlastní doloženou příčinu. |
+| WebGPU příprava shaderů · 2.–3. 11. 2026 | Ochrana materiálů, společný RTT retry, lokální CPU diagnostika a výchozí vypnutý frontový experiment; [specifikace](../_bmad-output/implementation-artifacts/render-next-20261102/SPEC.md), [A/B](performance/evidence/render-next-20261102/candidate3/report.md), [CPU kernel](performance/evidence/shader-cpu-kernel-20261103/README.md) | Fronta není přijatá: v A/B zpomalila přípravu, zůstává jen výslovný lokální experiment. Bez Game.ready/FPS; browser starty stále timeoutují. Koherentní checkpoint má190/190 cílených testů, build a SDK integraci PASS, ale plná/GPU přejímka není zelená. Výzkum vybral omezenou AST cache; ta ještě není implementovaná. Druhá optimalizace zůstává otevřená. |
+| Profil celé hry · 2. 11. 2026 | Současný [harness, report a evidence](performance/evidence/render-profile-20261102/report.md), baseline `fdc7b919`, source/test SHA `a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904` | Jeden neúspěšný WebGPU startup, žádné platné FPS intervaly ani SDK peers. Nástroje/build/cleanup ověřené; ovládání skončilo na kontrole URL fyzického Edge okna. Ověřit viditelnou kartu, provést tři starty a původní scénáře; příčina timeoutu ani další optimalizace nejsou potvrzené. |
+| CPU snapshoty trávy a květin · 2. 11. 2026 | Aktuální PhotoGrassBatch + testy/benchmark, source/test SHA `a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904`; [evidence](performance/evidence/grass-matrix-20261102/results.md) | Implementace, datová parita, CPU A/B,58 cílených testů, build a SDK integrace prošly. Celá sada má nezměněné časové/heartbeat nestability (izolovaně procházejí); zelená celoprojektová přejímka a FPS celé hry se netvrdí. Příčiny testové infrastruktury řešit odděleně, nepřepisovat původní FAIL záznamy. |
+| Úspornější stromové FAR v Low · uzavřeno 4. 11. 2026 | Kandidát45 zachován v historii21d24c5f; [aktuální A/B a rozhodnutí](performance/evidence/low-tree-lod-20261102/pr40-20261104/README.md) | Aktivní default vrácen na FAR75. Kandidát45 snížil geometrii, ale nesplnil předem zvolené podmínky; rozdílný avatar LOD omezuje příčinný FPS závěr a obrazová přejímka45 nebyla dokončena. Experiment se nepřijímá a další měření není podmínkou publikace původního75. |
+| Avatar preview cache a uspání editoru | `67f19cbab72e1b7c2e5c9466403810ad3c4f7fca` | Přenést do současného async WebGPU/Jantar lifecycle; ověřit cold/open scénář. |
+| Postupná stavba světa/ulic a startup diagnostika | `67f19cbab72e1b7c2e5c9466403810ad3c4f7fca` | Sladit se současným CAD a seasonal world; rozdělit zbývající atomické kroky a provést praktickou přejímku. |
+| Static frustum a MeshDrawProfile | `67f19cbab72e1b7c2e5c9466403810ad3c4f7fca` | Experiment byl výchozí vypnutý; chybí srovnatelné produkční A/B. |
+| Grass worker | `a786e3e6d6d60cee1432afc0a7c064fb8b4df1fd` | Pozastavený prototyp KEY-42, chybí skutečný browser/GPU důkaz přínosu. |
+| Playtest diary, timeline a upload | `f02e98579ae5f2e6f058d02b2ec4647e15dcacb2` | Nedokončené typování/integrace a capture lifecycle; samostatná capture primitiva už má novější implementaci na main. |
+| WebGPU hry/editoru KEY-22 | `a849399f8fec940ef8e1fca429cebb1e4b464966` | 115 původně oddělených commitů zachováno; přejímka nebyla dokončena, zůstaly dlouhé intervaly a multiplayer/recovery timeouty. Portovat konkrétní opravy do současného enginu. |
+| Materiálový ACES kandidát | `557eb880b6caff433f2d8e87211b20165baa4c12` | CPU/build/integrace historicky prošly, GPU a barevná přejímka chybí. Původní wrapper ownership oprava už je přijatá na main. |
+| Úplný RAG crawler/scheduler | `aa7ec976c9b3c5cee7a7d3a13b358c6697a68525` | Výzkum a podklady zachovány; dokumentový runtime už je přijat, úplné pokrytí katalogu ještě není hotové. |
+| Tree authoring a modelové meziverze | `f4a066a0672fc3324d1daf05c0cfdd76a34094ce` | Uchovat autorské zdroje; aktivní katalog nepřepínat na historické modely se starou orientací. |
+| WebGPU výzkum a nepřijaté kandidáty | `bdc8ff57ac3c1b89ad658ce1bd17b94a89d92000` | Referenční důkazy, nikoli automaticky přijaté runtime změny. |
+
+Příklad pokračování přímo na main:
+
+```powershell
+git show 67f19cbab72e1b7c2e5c9466403810ad3c4f7fca:client/avatar-preview-cache.ts
+git diff 67f19cbab72e1b7c2e5c9466403810ad3c4f7fca^ 67f19cbab72e1b7c2e5c9466403810ad3c4f7fca -- client/avatar-preview.ts client/avatar-renderer.ts
+```
+
+Poté přenést pouze příslušnou logiku do aktuálních souborů, získat souborovou rezervaci, ověřit a commitnout na main. Plošné obnovení starého stromu by ztratilo novější úpravy.
+
+Úplný [inventář snapshotů](verification-evidence/main-consolidation-20261029/worktree-snapshots.json) obsahuje 12 zachycených dirty stromů, 1 184 výskytů změněných souborů a SHA-256. Nezávislá kontrola potvrdila všechny bloby a všech 23 unikátních LFS objektů. [Původní refs](verification-evidence/main-consolidation-20261029/refs-before.json) a [původ převzaté evidence](verification-evidence/main-consolidation-20261029/evidence-import-manifest.json) umožňují dohledat zbytek. Dva historické stashe (`8e8713966deda43d23962038115db586006cc8ce`, `860b77aeeab8799a9bafc9386ae54ed6d6ddb511`) jsou zachovány včetně jejich indexových a untracked rodičů; odpovídající funkce už main obsahoval.
+
+Ignorované neveřejné podklady a mezivýstupy mají místní obsahový archiv `.cache/main-private-preservation-20261029/`; tajemství a databáze nejsou v Gitu. Historické úkoly a handoffy popisují stav v době vzniku. Jejich staré cesty nejsou pokynem znovu založit pracovní kopii.

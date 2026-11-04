@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T11:19:23.295Z",
+  "sourceSnapshotId": "97863f520c22d6fab05349530ea84c88d4063226ef57b276e2078619a066bd67",
+  "helperSha256": "07b3e1cd51c5bc55277f03cf936b900d47a1344237fbe9db0b139cedc5a882cf",
+  "buildId": "f511d0ab7e404914032b11e03d3fad2161d7230fcd1c640f071b36ba6af5661d",
+  "actualAdapter": {
+    "name": "NVIDIA GeForce GTX1060",
+    "driver": "582.28",
+    "provenance": "Actual local nvidia-smi query outside measured intervals; browser privacy exposes nvidia/pascal"
+  },
+  "window": {
+    "initial": "Window focused=true, but test tab active=false and near1Hz presentation",
+    "resolution": "Supported windows.create({tabId}) moved only the owned test tab to its own normal window; actual tab active/selected=true and window focused=true. Normal cadence returned without runtime change.",
+    "userAuthorization": "User explicitly instructed to bring the test window forward."
+  },
+  "ci": {
+    "headSha": "8d97a47f8a0973c55d246a1c08ae432f3fa6cad9",
+    "baseSha": "9341bcef674de81abd9ae99f1afbf211672165d4",
+    "runUrl": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39585410826",
+    "tests": 1934,
+    "pass": 1934,
+    "fail": 0,
+    "skip": 0,
+    "testDurationMs": 242706.989429,
+    "build": "PASS",
+    "isolatedIntegration": "PASS",
+    "sourceSecretHygiene": "PASS",
+    "secretRunUrl": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39585410121",
+    "projectAcceptanceIssued": false,
+    "mainMerged": false,
+    "scope": "Exact named head, not later task declarations or uncommitted UI/helper repairs",
+    "rawLogSha256": "73fcfe6a6948e99c5106b60a6359379d76444fe5d9d53134b74ca0953264299e",
+    "rawLogBytes": 509060
+  },
+  "measured": [
+    {
+      "label": "inactive-1hz",
+      "attemptId": "5a817cae-d957-4237-97b6-bec80b98e53e",
+      "kind": "benchmark",
+      "completed": true,
+      "frameCount": 16,
+      "rawRafCount": 14,
+      "fps": 1.5,
+      "p95Ms": 1016.1999999284744,
+      "p99Ms": 1016.1999999284744,
+      "maxMs": 1016.1999999284744,
+      "healthValid": true,
+      "acceptedPerformance": false
+    },
+    {
+      "label": "focused-cm",
+      "attemptId": "fcd4b5e4-fb2b-46b4-9b58-42c5f754ecd3",
+      "kind": "benchmark",
+      "completed": true,
+      "frameCount": 414,
+      "rawRafCount": 412,
+      "fps": 41.3,
+      "p95Ms": 35.89999997615814,
+      "p99Ms": 64.79999995231628,
+      "maxMs": 93,
+      "healthValid": true,
+      "acceptedPerformance": false
+    },
+    {
+      "label": "focused-ncm-startup-failure",
+      "attemptId": "0b36c7cb-3974-4369-8b4a-56187562f8ab",
+      "kind": "startup",
+      "outcome": "rejected",
+      "error": {
+        "name": "Error",
+        "message": "Přípravu 3D scény se nepodařilo dokončit (timeout)."
+      },
+      "frameCount": 0,
+      "maxMs": null,
+      "acceptedPerformance": false
+    },
+    {
+      "label": "focused-webgl2",
+      "attemptId": "42b8d26d-973a-4a5b-a3c6-5a4e5f9b515f",
+      "kind": "benchmark",
+      "completed": true,
+      "frameCount": 545,
+      "rawRafCount": 543,
+      "fps": 54.4,
+      "p95Ms": 23.799999952316284,
+      "p99Ms": 28.600000023841858,
+      "maxMs": 54.199999928474426,
+      "healthValid": true,
+      "acceptedPerformance": false
+    }
+  ],
+  "files": {
+    "inactive-1hz.json": {
+      "bytes": 19415,
+      "sha256": "097705caf357e8a5d40ffd0ad171a22fa3197be11e1751b22fa4625d73350d1a"
+    },
+    "focused-cm.json": {
+      "bytes": 33045,
+      "sha256": "d27e77af899c9de6ce7732db310564935ce5eef68cba88e8cbb27b67961259a5"
+    },
+    "focused-ncm-startup-failure.json": {
+      "bytes": 137916,
+      "sha256": "dc0ce454caf8dbe6f658d334ce9313759570335b796540c1f94bcf9a16d678f1"
+    },
+    "focused-webgl2.json": {
+      "bytes": 36578,
+      "sha256": "ed2128d35160b6d760304557a0d3bab74136082fb5051f4760bf8dfb87f43571"
+    },
+    "build-identity.json": {
+      "bytes": 6770,
+      "sha256": "09b9785fc6857e9c8b52ce4191efc539dc3952b32c7ee66e767f1419956cb04b"
+    },
+    "http-identity.json": {
+      "bytes": 5073,
+      "sha256": "37a567cc8552e6bd874b83d3b9e4bb592031689de06eadd8b239bd1d971f1bcb"
+    },
+    "actual-controls.json": {
+      "bytes": 155430,
+      "sha256": "2068f3d59751e06c9eb6c05e912a0341a41d2b3b157c035d190228f50dbfae65"
+    },
+    "dedicated-active-window.jpg": {
+      "bytes": 36022,
+      "sha256": "7e586ece4ad7bd1c9c1bccc57e5bddc1a4e27c7b8b86a1631e1326d6fd3258c8"
+    }
+  },
+  "limitations": [
+    "Clock-off live-weather pilots, not causal/backend acceptance. Weather differs between runs.",
+    "First focused CM sample predates continuous system telemetry. GL sample overlaps steady telemetry.",
+    "Standard Game benchmark includes its intrinsic production BenchmarkRenderProfile.",
+    "WebGL GPU time can cover whole frame; WebGPU main-pass scope differs and was unavailable.",
+    "A helper basicSampleGatesPassed value is not acceptance of60FPS/p95/p99 or a complete migration.",
+    "NCM failure is retained and has no FPS result. Scope/fence completion dominance is not yet measured.",
+    "Full3-avatar/route/weather/LOD/lifecycle and repeated matched series remain open."
+  ],
+  "editorFiles": {
+    "01-alex.png": {
+      "bytes": 157797,
+      "sha256": "309aa87c8e559183e4c98d865c847fc47018d05fddd812bbb8cd6a0a9ef2ef6c"
+    },
+    "02-robin.png": {
+      "bytes": 157513,
+      "sha256": "851804a187e9abd10c905896d6991b53d77bdb1f04ffa945961ee730bc167412"
+    },
+    "03-eli.png": {
+      "bytes": 157755,
+      "sha256": "f6053beeef91a07c697d7cab0b5ff9c9a2abe00707d1e84a1fe22a9673fc083d"
+    },
+    "04-sam.png": {
+      "bytes": 157861,
+      "sha256": "0268fe8618add2ed587ed4109ec26b9b913e9ead8b9554e51dc57456153667a4"
+    },
+    "05-mia.png": {
+      "bytes": 157741,
+      "sha256": "b75297ce1e82c952b2be217111a47f1163efde21e97dda7c1186a98bdcc8990a"
+    },
+    "06-niki.png": {
+      "bytes": 157716,
+      "sha256": "9167543d82f58ffec639b50cf9c24c6fbeb51bba45618623e409b5d797afd332"
+    },
+    "07-face-accessories.png": {
+      "bytes": 159094,
+      "sha256": "cfa59fbf26bccb9af760431da05005b2a7fa03bba6cf9c6a306e1958ebe63b82"
+    },
+    "08-resize-1280.png": {
+      "bytes": 144949,
+      "sha256": "57678e62aa16c48886045ff3250c305ac82856ad1a7a0651ecdf007a85c82afb"
+    },
+    "09-restored-2040.png": {
+      "bytes": 157740,
+      "sha256": "c9116f11d1d39bbe623b1f340f56900946b5615c78178e6faeda14343aab3026"
+    },
+    "observations.json": {
+      "bytes": 1140,
+      "sha256": "2e9bda74150bd55dce92c09d114e361f11a4c2d39e7c1647371c28c7078a1ba2"
+    }
+  },
+  "editorLimitation": "Observations retain one historical auth warning at10:58:57 from preceding backend reload. No shader/render warning was observed in the6 ready editor screenshots; internal visibilitychange was not independently proven."
+}

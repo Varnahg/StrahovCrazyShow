@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-coordination-20261021",
+  "title": "KEY-22: výzkum, rozhodnutí a koordinace dokončení WebGPU hry i editoru",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "_bmad/render/bmad-build/player-feedback-20261020-db4fab14c5e6/",
+    "_bmad-output/implementation-artifacts/webgpu-completion-20261021/",
+    "docs/performance/evidence/webgpu-completion-20261021/research/",
+    "docs/agents/handoffs/webgpu-completion-coordination-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Prozkoumat současný přijatý main a každý otevřený migrační řetězec; odlišit doložený mechanismus, hypotézu a chybějící GPU měření.",
+    "Porovnat rozumné varianty včetně correctness, vzhledu, výkonu, cache a lifecycle; konkrétní opravy přidělit disjunktně po průzkumu.",
+    "Přejmout skutečnou funkční/obrazovou/performance matici hry i editoru, teprve pak výchozí WebGPU; plné testy/build/integrace a skutečné main CI.",
+    "Průběžně aktualizovat existující KEY-22 a jeho podúkoly; neuzavřít migraci podle dílčího CPU testu, neoslabit limity a zachovat cizí WIP."
+  ],
+  "verification": [
+    "git status, worktree list a skutečné společné claims před každou sadou úprav.",
+    "BMAD dle aktuální projektové policy a skutečně renderovaného workflow; renderer a všechny výstupy pouze v rezervovaném prefixu.",
+    "Primární Babylon/browser/WebGPU podklady a skutečná současná reprodukce; nové GPU/CPU výsledky mají úplnou source/test/asset identitu a kontrolované podmínky."
+  ],
+  "notes": [
+    "Výslovné uživatelské zadání21Oct2026: navázat KEY22, nejprve průzkum zbývajících problémů, poté opravy a skutečná obrazová/výkonová přejímka, produkční default WebGPU a integrace ověřených celků do main.",
+    "Pracovní kopie této relace .cache/player-feedback-20261020 je znovu použita v nové čisté větvi codex/webgpu-completion-20261021 z aktuálního main9341bcef. Historické postvalidation commity zůstávají v původní větvi.",
+    "134 cizích dirty cest původního shared checkoutu a metadata WIP původní WebGPU worktree se nepřebírají. Čtyři stale KEY21 claims zůstávají obsazené. Žádný cizí proces nebude ukončen podle portu nebo stáří.",
+    "Tento počáteční task neuděluje právo zapisovat do runtime, testů, package/config, katalogu nebo společného verification; přesné implementační a validační scopes koordinátor doplní po výzkumu v administrativní rezervaci.",
+    "24Oct2026 resourcehandoff to CADbuilding coordinator thread01a16b37-1237-7583-af49-52c29a82272d after root GPU/controlcapture finished: own15585/21886stopped, tab3874automaticallyclosedonturninterrupt, viewportreset; no4211/2596/2568/4213/2597listeners. Release heavy-validation/gpu/workspace-build/unusedports; retainfilesonly. Any new heavy/GPU/build/server work requires new explicit resource claim and coordination; ready/status is not resource authority. BMAD prefix narrowed to actually existing root-worktree hash, no otherworktree output ownership."
+  ]
+}

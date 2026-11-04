@@ -10,8 +10,9 @@ import { prepareRagCorpus, importPreparedCorpus, prepareDocumentChanges, importP
 import { createVectorKnowledgeStoreWithPool, type PreparedCorpus, type PreparedDocumentCorpus, type RagImportSession, type RagDocumentImportSession, type RagDocumentImportContext, type RagSqlPool } from "../server/rag-vector-store";
 import { loadApprovedRagDatasets, loadDocumentChangeFile, ragImportMain, RAG_ARCHIVE_FILES, RAG_CURRENT_FILES } from "../scripts/rag-import";
 import { buildKnowledgeDocumentV3, parserProfileSha256, requirePublishableExtraction, validateWorkerEnvelope } from "../server/rag-document-contract";
+import { buildCuratedKnowledgeDocumentV3 } from "../server/rag-curation-contract";
 import { RAG_TOKENIZER } from "../shared/rag-provenance";
-import type { DocumentMetadataV3, KnowledgeDocumentBundleV3 } from "../server/rag-knowledge-types";
+import type { CuratedKnowledgeMetadataV3, DocumentMetadataV3, KnowledgeDocumentBundleV3, RagDocumentBundleV3 } from "../server/rag-knowledge-types";
 const profile = createEmbeddingProfile({ dimensions: 3 });
 function data(count = 2) {
   const source = { ...original.sources[0], id: "sh-ingest-test", title: "Synthetic import fixture", checkedAt: "2026-10-28", reviewAfter: "2026-11-28", effectiveFrom: null, effectiveUntil: null };
@@ -91,10 +92,35 @@ function documentMemory() {
   return { session, cache, published, attempts, setLegacy(plan: PreparedCorpus) { legacyPlan = plan; } };
 }
 function documentEmbedder(action?: (count: number) => void): Embedder & { calls: string[][] } { return { ...fakeEmbedder(action), profile: documentProfile }; }
-async function documentPlan(memory: ReturnType<typeof documentMemory>, upserts: readonly KnowledgeDocumentBundleV3[], extra: Partial<Parameters<typeof prepareDocumentChanges>[1]> = {}) {
+async function documentPlan(memory: ReturnType<typeof documentMemory>, upserts: readonly RagDocumentBundleV3[], extra: Partial<Parameters<typeof prepareDocumentChanges>[1]> = {}) {
   const context = await memory.session.context("current");
   return prepareDocumentChanges(context, { collection: "current", expectedSnapshotId: context.snapshot?.id ?? null, upserts, ...extra }, documentProfile, documentNow);
 }
+
+test("curated publications reuse cache after review and preserve the head on failed changed text", async () => {
+  const metadata: CuratedKnowledgeMetadataV3 = {
+    id: "kc-ingest-synthetic", itemId: "faq-synthetic", title: "Syntetická zkušenost", status: "current", verification: "community-experience", applicability: "Syntetická služba",
+    reviewedAt: "2026-10-28", reviewAfter: "2026-11-28", factCheckedAt: null, observedFrom: "2026-09-01", observedUntil: "2026-10-01",
+    limitations: ["Syntetická neověřená zkušenost."], supportingRefs: [], archiveReason: null, versionNote: "Testovací kurace",
+  };
+  const unit = { text: "Syntetická rada obyvatel pro test importu.", headingPath: ["Zkušenost"], tokenCount: 20 };
+  const memory = documentMemory(), embedder = documentEmbedder();
+  const first = await documentPlan(memory, [buildCuratedKnowledgeDocumentV3(metadata, unit)]);
+  assert.equal((await importPreparedDocumentCorpus(first, memory.session, options(embedder))).embeddedInputs, 1);
+  const repeat = await documentPlan(memory, [buildCuratedKnowledgeDocumentV3(metadata, unit)]);
+  assert.equal((await importPreparedDocumentCorpus(repeat, memory.session, { ...options(embedder), maxEmbeddingInputs: 0, maxEmbeddingBytes: 0 })).embeddingCalls, 0);
+  const changedReview = await documentPlan(memory, [buildCuratedKnowledgeDocumentV3({ ...metadata, reviewedAt: "2026-10-29" }, unit)]);
+  assert.equal((await importPreparedDocumentCorpus(changedReview, memory.session, { ...options(embedder), maxEmbeddingInputs: 0, maxEmbeddingBytes: 0 })).embeddingCalls, 0);
+  assert.notEqual(changedReview.revisionId, first.revisionId);
+  const changedText = await documentPlan(memory, [buildCuratedKnowledgeDocumentV3(metadata, { ...unit, text: unit.text + " Doplnění." })]);
+  const failing = documentEmbedder(() => { throw new Error("synthetic unavailable provider"); });
+  await assert.rejects(importPreparedDocumentCorpus(changedText, memory.session, options(failing)), (error: any) => error.code === "embedding-failed");
+  assert.equal(memory.published.get("current")!.revisionId, changedReview.revisionId);
+  const retry = documentEmbedder();
+  await assert.rejects(importPreparedDocumentCorpus(changedText, memory.session, options(retry)), (error: any) => error.code === "uncertain-embedding-attempt");
+  assert.equal(retry.calls.length, 0);
+  assert.equal((await importPreparedDocumentCorpus(changedText, memory.session, { ...options(retry), retryUncertain: true })).embeddedInputs, 1);
+});
 test("unchanged and checked-date-only imports reuse persistent exact input cache with zero calls", async () => {
   const memory = memorySession(), embedder = fakeEmbedder(), input = data(), first = prepareRagCorpus([input], [], profile);
   const initial = await importPreparedCorpus(first, memory.session, options(embedder)); assert.equal(initial.embeddedInputs, 2); assert.equal(initial.embeddingCalls, 1);

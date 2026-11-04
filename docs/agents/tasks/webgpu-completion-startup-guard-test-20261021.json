@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-startup-guard-test-20261021",
+  "title": "KEY-31: aktualizovat skutečnou Game startup guard regresi pro třetí adapter parametr",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["tests/game-light-preparation.test.ts"],
+  "resources": [],
+  "acceptance": ["Zachovat skutečné assertion pořadí prepare po preloadstop/players a před ready, outcome log i cancellation předscene dispose. Původní přesný dvouargumentový source regex nahradit aktuálním třetím adapter argumentem, nikoli přeskočit test nebo oslabit behavior."],
+  "verification": ["Cílený game-light-preparation test a nový runtime Game post-loader ownership block test."],
+  "notes": ["První současná Game sada68/69PASS; jediný fail vznikl původním dvouargumentovým regexem po doložené změně API. Všechny původní behavior případy i4nové Game ownership případy prošly."]
+}

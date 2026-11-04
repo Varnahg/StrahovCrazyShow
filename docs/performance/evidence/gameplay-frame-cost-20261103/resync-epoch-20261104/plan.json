@@ -1,0 +1,11 @@
+{
+  "problem": "Ověřit skutečné připojení a ovládání po změně obnovy epoch a nový HUD výsledek testu",
+  "hypothesis": "V15 zachová join/pohyb/obnovu s epoch tokenem; zastaralé žádosti nemají znovu vymazat novější predikci",
+  "change": "Jediný resync/doorResync epoch guard proti předchozímu V14; renderer, fyzika a jejich limity nezměněné",
+  "metric": "Cílený průchod reálným ovládáním, automatický časový log včetně korekcí; jeden krátký HUD vzorek pro kontrolu verdiktu",
+  "correctness": "Neměnný produkční C14, WebGPU CM, Medium, CSS2040x986 podle hráčského testu, celýHUD,2SDKpeers s různými avatary, žádné jiné vlastní3D/testy/buildy",
+  "acceptance": "Ready/join V15, fyzický pohyb a zachovaná relace bez render/assetfault; actualhandler red/green a SDK jižprokázaly2resety→1 a zachovanývstup. Offline gameplaygate musí pravdivěhodnotitnovýlog; nevyhovujícíFPSzůstane failed a nepopře samostatnépřijetíúzké opravy. Žádné tvrzeníFPSzisku bezA/B.",
+  "sourceHash": "31a14cdda855eef4486ac82c63778db13d2f614676c88bb22dbd104d6da99827",
+  "build": "candidate14",
+  "run": "run1"
+}

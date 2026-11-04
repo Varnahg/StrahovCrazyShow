@@ -238,7 +238,7 @@ test("explicit archive carries versions and asOf, separates context, and binds e
   backend.validate = async () => true;
   const f = fixture({
     evidenceBackend: backend,
-    now: () => Date.parse("2026-10-29T00:45:00.000Z"),
+    now: () => Date.parse("2026-11-03T00:45:00.000Z"),
     fetch: async (url, init) => {
       if (String(url).endsWith("/moderations"))
         return Response.json({
@@ -303,7 +303,7 @@ test("explicit archive carries versions and asOf, separates context, and binds e
       1,
       "current conversation history is not archive context",
     );
-    assert.match(generations[1].instructions, /2026-10-29T00:45:00.000Z/);
+    assert.match(generations[1].instructions, /2026-11-03T00:45:00.000Z/);
     assert.match(generations[1].instructions, /"kind":"archive"/);
     assert.deepEqual(await f.send("/api/ai/chat", body), answer);
     assert.equal(generations.length, 2);
@@ -386,7 +386,7 @@ test("current request cannot publish archived evidence even when an injected asy
   backend.validate = async () => true;
   const f = fixture({
     evidenceBackend: backend,
-    now: () => Date.parse("2026-10-28T12:00:00.000Z"),
+    now: () => Date.parse("2026-11-03T12:00:00.000Z"),
   });
   try {
     const token = await f.session();
@@ -471,7 +471,7 @@ test("the exact bounded query is moderated before embedding and failed or blocke
       },
     },
     evidenceBackend: backend,
-    now: () => Date.parse("2026-10-28T12:00:00Z"),
+    now: () => Date.parse("2026-11-03T12:00:00Z"),
     fetch: async (url, init) => {
       const body = JSON.parse(String(init?.body));
       if (String(url).endsWith("/moderations")) {
@@ -659,7 +659,7 @@ for (const changed of [false, true])
     };
     const f = fixture({
       evidenceBackend: backend,
-      now: () => Date.parse("2026-10-28T12:00:00Z"),
+      now: () => Date.parse("2026-11-03T12:00:00Z"),
     });
     try {
       const token = await f.session();
@@ -919,7 +919,7 @@ test("new SH and SUZ facts reach provider and compatible client citations throug
   for (const item of cases) {
     let delivered: any;
     const f = fixture({
-      now: () => Date.parse("2026-10-28T12:00:00Z"),
+      now: () => Date.parse("2026-11-03T12:00:00Z"),
       fetch: async (url, init) => {
         if (String(url).endsWith("/moderations"))
           return Response.json({
@@ -941,6 +941,7 @@ test("new SH and SUZ facts reach provider and compatible client citations throug
       assert.ok(isCrazyTypkaChatResponse(result.body));
       assert.ok(delivered.input.at(-1).content.includes(item.id));
       assert.ok(delivered.input.at(-1).content.includes(item.authority));
+      assert.ok("url" in result.body.sources[0]);
       assert.equal(new URL(result.body.sources[0].url).hostname, item.host);
       assert.equal(
         Object.hasOwn(result.body.sources[0], "effectiveFrom"),
@@ -955,7 +956,7 @@ test("new SH and SUZ facts reach provider and compatible client citations throug
 
 for (const expiry of ["during", "replay"] as const)
   test(`all evidence dependencies expire ${expiry}, including an answer with no public citations`, async () => {
-    const cutoff = Date.parse("2026-11-04T00:00:00Z");
+    const cutoff = Date.parse("2026-11-10T00:00:00Z");
     let instant = cutoff - 1000,
       calls = 0;
     const f = fixture({
@@ -1159,7 +1160,7 @@ function fixture(options: CrazyTypkaServiceOptions = {}) {
     fetch: fetcher,
     evidenceBackend: fakeEvidenceBackend(),
     decisionRouter: fakeDecisionRouter(0.1, 0.1, decisions),
-    now: () => Date.parse("2026-10-27T12:00:00Z"),
+    now: () => Date.parse("2026-11-03T12:00:00Z"),
     ...options,
   });
   const send = async (
@@ -1614,7 +1615,7 @@ test("router admission refuses HTTP after its cap but keeps the paid attempt and
 });
 
 test("session expiry during actual evidence capture stays cancelled before embedding HTTP", async () => {
-  let instant = Date.parse("2026-10-27T12:00:00Z"),
+  let instant = Date.parse("2026-11-03T12:00:00Z"),
     captures = 0,
     embeddingCalls = 0;
   const profile = createEmbeddingProfile();
@@ -1866,7 +1867,7 @@ for (const action of [
     const reached = new Promise<void>((resolve) => {
       entered = resolve;
     });
-    let instant = Date.parse("2026-10-27T12:00:00Z"),
+    let instant = Date.parse("2026-11-03T12:00:00Z"),
       decisionSignal: AbortSignal | undefined;
     const f = fixture({
       decisionRouter: undefined,
@@ -2422,7 +2423,7 @@ test("global admission, disconnect, stalled uploads and shutdown clean their res
   assert.equal((await again).body.error, "cancelled");
 });
 test("history is bounded to six turns, and source links come only from curated metadata", async () => {
-  let instant = Date.parse("2026-10-27T12:00:00Z");
+  let instant = Date.parse("2026-11-03T12:00:00Z");
   const generationBodies: any[] = [];
   const f = fixture({
     now: () => instant,
@@ -2444,6 +2445,7 @@ test("history is bounded to six turns, and source links come only from curated m
     });
     assert.equal(result.status, 200);
     assert.ok(isCrazyTypkaResponse(result.body));
+    assert.ok("url" in result.body.sources[0]);
     assert.equal(
       result.body.sources[0].url,
       "https://www.siliconhill.cz/pages/clenstvi",
@@ -2456,7 +2458,7 @@ test("history is bounded to six turns, and source links come only from curated m
 });
 
 test("first whole greeting is local and replayable, later greetings and greeting questions use the provider", async () => {
-  let instant = Date.parse("2026-10-27T12:00:00Z");
+  let instant = Date.parse("2026-11-03T12:00:00Z");
   const f = fixture({ now: () => instant });
   const token = await f.session(),
     first = { token, requestSeq: 1, message: " Ahoj! ", locale: "cs" };
@@ -2760,7 +2762,7 @@ test("a moderation block is a confirmed replayable attempt and does not leave a 
 });
 
 test("evidence expiring during generation is never published and the rejection replays without another call", async () => {
-  const cutoff = Date.parse("2026-11-03T00:00:00Z");
+  const cutoff = Date.parse("2026-11-10T00:00:00Z");
   let instant = cutoff - 1000,
     calls = 0;
   const f = fixture({
@@ -2792,7 +2794,7 @@ test("evidence expiring during generation is never published and the rejection r
 });
 
 test("reset and expiry forget operations; cited replay loses freshness without regenerating", async () => {
-  const cutoff = Date.parse("2026-11-03T00:00:00Z");
+  const cutoff = Date.parse("2026-11-10T00:00:00Z");
   let instant = cutoff - 1000,
     calls = 0;
   const f = fixture({

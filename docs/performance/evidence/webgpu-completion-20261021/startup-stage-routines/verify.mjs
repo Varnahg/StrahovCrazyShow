@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile,readdir} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {spawnSync} from 'node:child_process';
+import ts from 'typescript';
+import {helperIdentity,sha256,sourceFiles,transformUI,transformStartupSource} from '../../../../../.cache/webgpu-completion-20261021/startup-stage-routines/helper/v18/common.mjs';
+const root=process.cwd(),pub='docs/performance/evidence/webgpu-completion-20261021/startup-stage-routines',own='.cache/webgpu-completion-20261021/startup-stage-routines',directory=own+'/helper/v18';
+const before=JSON.parse(await readFile(pub+'/before.json','utf8')),after={},drift=[];
+for(const[path,expected]of Object.entries(before.protectedFiles)){const bytes=await readFile(path);after[path]={sha256:sha256(bytes),bytes:bytes.length};if(after[path].sha256!==expected.sha256||bytes.length!==expected.bytes)drift.push(path);}
+const donorFiles={};for(const file of Object.keys(before.donorIdentity.files))donorFiles[file]=sha256(await readFile(join(before.donor,file)));
+const donor={files:donorFiles,sha256:sha256(JSON.stringify(donorFiles))};assert.equal(donor.sha256,before.donorIdentity.sha256);
+const helper=await helperIdentity(directory);assert.equal(Object.keys(helper.files).length,38);assert.deepEqual((await readdir(directory)).sort(),[...sourceFiles].sort());
+const changed=[],unchanged=[],added=[],diff=[];
+for(const[file,hash]of Object.entries(helper.files)){
+  if(!before.donorIdentity.files[file])added.push(file);else if(before.donorIdentity.files[file]===hash)unchanged.push(file);else changed.push(file);
+  if(!unchanged.includes(file)){const result=spawnSync('git',['diff','--no-index','--',before.donorIdentity.files[file]?join(before.donor,file):'NUL',join(directory,file)],{cwd:root,encoding:'utf8',windowsHide:true,maxBuffer:4*1024*1024});assert.ok(result.status===0||result.status===1,result.stderr);diff.push(result.stdout);}
+}
+const syntax=[];for(const file of sourceFiles.filter(f=>f.endsWith('.mjs'))){const result=spawnSync(process.execPath,['--check',resolve(directory,file)],{encoding:'utf8',windowsHide:true});syntax.push({file,status:result.status,stderr:result.stderr});assert.equal(result.status,0,file);}
+const transforms={};for(const[kind,file]of[['game','client/game.ts'],['light','client/light-preparation.ts']]){const bytes=await readFile(file),source=bytes.toString(),on=transformStartupSource(source,kind,'first-medium-vehicle-0');assert.equal(transformStartupSource(source,kind),source);assert.equal(ts.createSourceFile(file,on,ts.ScriptTarget.Latest,true).parseDiagnostics.length,0);transforms[kind]={before:sha256(bytes),after:sha256(on),originalNowCalls:(source.match(/options\.now\(/g)||[]).length,transformedNowCalls:(on.match(/options\.now\(/g)||[]).length};assert.equal(transforms[kind].originalNowCalls,transforms[kind].transformedNowCalls);}
+const ui=await readFile('client/ui.tsx','utf8'),transformedUI=transformUI(ui);assert.equal(ts.createSourceFile('ui.tsx',transformedUI,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(transformedUI.split('await observeStartup(g, startupCanvas, () => g.start());').length,2);
+const logs={};for(const file of(await readdir(own)).filter(f=>f.endsWith('.tap'))){const bytes=await readFile(own+'/'+file),text=bytes.toString();logs[file]={sha256:sha256(bytes),bytes:bytes.length,pass:Number(text.match(/^# pass (\d+)$/m)?.[1]),fail:Number(text.match(/^# fail (\d+)$/m)?.[1]),skip:Number(text.match(/^# skipped (\d+)$/m)?.[1]),durationMs:Number(text.match(/^# duration_ms ([\d.]+)$/m)?.[1])};}
+assert.equal(logs['targeted-final.tap'].pass,17);assert.equal(logs['targeted-final.tap'].fail,0);assert.equal(logs['original-routines-current.tap'].pass,15);assert.equal(logs['original-routines-current.tap'].fail,0);assert.equal(logs['metadata-guards-current.tap'].pass,9);assert.equal(logs['metadata-guards-current.tap'].fail,0);
+await writeFile(pub+'/helper.patch',diff.join('\n'));
+await writeFile(pub+'/verification.json',JSON.stringify({atUTC:new Date().toISOString(),scope:'Pouze cílené lehké CPU; žádný whole helper corpus/build/GPU nebo výkonové přijetí',helper,changed,added,unchanged,donor,protectedAfter:after,drift,transforms,syntax,uiParseDiagnostics:0,logs,
+commands:{new:'node --import tsx --test --test-concurrency=1 --test-reporter=tap '+directory+'/startup-stage-routines.test.mjs',original:'node --import tsx --test --test-concurrency=1 --test-reporter=tap '+directory+'/routine-cost.test.mjs',metadata:"node --import tsx --test --test-concurrency=1 --test-reporter=tap --test-name-pattern='v10 routine modules|old8/three-scope modules|actual source UI exact once|explicit build flags|canonical digest|load seal|coherently recomputed|verified source/helper|seal refuses' "+['entry-render-cost','entry-routine-cost','preparation-summary','weather-latency'].map(f=>directory+'/'+f+'.test.mjs').join(' ')},
+limitations:['NullEngine GLSL a syntetický host/timing nejsou WebGPU nebo CPU/GPU performance důkaz.','Výběr metadata testů je explicitní; nevybrané testy nejsou PASS. Celý corpus nebyl autorizován/spuštěn.','Default source transform je byteexact; nový cílový build a actual startup převezme root po CAD zdrojích.']},null,2)+'\n');
+assert.deepEqual(drift,[]);console.log(JSON.stringify({helper:helper.sha256,changed:changed.length,added:added.length,unchanged:unchanged.length,protected:Object.keys(after).length,drift,syntax:syntax.length,logs}));

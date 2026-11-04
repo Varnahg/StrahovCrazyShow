@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T13:06:56.504Z",
+  "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+  "buildId": "60cfd189f0a77eed6eeaabd600c89d43f1ac7155da034aed72277f21442dc25c",
+  "helperSha256": "19d33c4d3025df1f9bdeaaf6bd120e857d21945df31d1f116d60990536d45621",
+  "files": {
+    "startup.json": {
+      "bytes": 822689,
+      "sha256": "91fa11c7aaaa92adcd64ec777d03e5744104578c4a818c3ac1ba6f19be414aab"
+    },
+    "http-identity.json": {
+      "bytes": 6565,
+      "sha256": "5a59ff35be7ebfce33715b01a2574de07559dfddf44939be43e21315bb3af74b"
+    },
+    "build-identity.json": {
+      "bytes": 8038,
+      "sha256": "cccaada65e7dfe6c62c1d20da364c3742b5700f1db7a80f9f3971b3caf49e8b4"
+    },
+    "terminal.png": {
+      "bytes": 86797,
+      "sha256": "a91c8dc00dd2b4c66a39f31c4345e8c64e865fc09e41ec04fd6235eae4e43235"
+    }
+  },
+  "outcome": "rejected",
+  "error": {
+    "name": "RenderStartupTimeoutError",
+    "message": "Renderer startup exceeded its visible-time deadline"
+  },
+  "jobTrace": {
+    "jobs": 2050,
+    "finalGateJobs": 882,
+    "pending": [
+      [
+        2049,
+        2049,
+        1,
+        17,
+        1,
+        128766,
+        null,
+        0
+      ],
+      [
+        2050,
+        2050,
+        2,
+        17,
+        1,
+        128766.29999995232,
+        null,
+        0
+      ]
+    ],
+    "hooks": {
+      "inspectShader": "installed",
+      "observe": "installed",
+      "setStage": "installed"
+    },
+    "issues": {
+      "observerErrors": 0,
+      "overflow": 450,
+      "unknownRole": 0,
+      "unknownStage": 0,
+      "unmatchedJobs": 0,
+      "unsupportedPromise": 0,
+      "ownerChanged": 0,
+      "unexpectedReceivers": 0,
+      "restoreConflicts": 0,
+      "restoreFailures": 0,
+      "contract": 0
+    },
+    "pendingEffectRows": [
+      [
+        44,
+        44,
+        2049,
+        2050,
+        0
+      ]
+    ],
+    "pendingMeshLinks": []
+  },
+  "mappingComplete": false,
+  "acceptedGpuCause": false,
+  "acceptedPerformance": false,
+  "conclusion": "Original jobs2049/2050 map to live current Effect44/context44. No mesh link is captured; this does not establish orphan/leak, a particular material or an instancing cause. Job/API/owner issues are zero except bounded historical mapping overflow450.",
+  "missingChain": "Pinned ShadowDepthWrapper owns separate submesh→generator→main/alias depth wrappers and a baseEffect/pass map before hot-swap. Existing terminal submesh._drawWrappers scan omits those native ownership links. Extend passive mapping and test actual pinned ownership before a new same-source run.",
+  "inventory": {
+    "enabled": true,
+    "retainedCodeUnits": 33543237,
+    "limited": 1167,
+    "finalGate": {
+      "name": "submitted-frame",
+      "calls": 882,
+      "rawKnown": 0,
+      "rawRepeated": 0,
+      "bodyKnown": 0,
+      "bodyRepeated": 0,
+      "descriptorUnknown": 0,
+      "bodyUnknown": 0,
+      "limited": 882
+    },
+    "limitation": "Original32MiB budget is exhausted before final gate; limited entries are unknown, not unique. No capacity increase. Next job-attribution run disables expensive optional profileEnvironment inventory."
+  },
+  "limitations": [
+    "Diagnostic only, original startup timeout/readiness preserved.",
+    "Metadata map is explicitly incomplete; global evidenceValid is false.",
+    "No product fix, exact shader equality or whole-migration acceptance is claimed."
+  ]
+}

@@ -1,0 +1,24 @@
+import {spawnSync} from 'node:child_process';
+const code=String.raw`
+import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import{pathToFileURL}from'node:url';import{registerHooks}from'node:module';
+const base='C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020';
+const core=fs.realpathSync(path.join(base,'.cache/performance-snapshot/webgpu-completion-20261023-candidate-11/node_modules/@babylonjs/core'));
+const selected=process.argv[2]==='old'?path.join(base,'.cache/webgpu-shadow-pass-ownership-20261023/native-before/Materials/shadowDepthWrapper.js'):path.join(core,'Materials/shadowDepthWrapper.js');
+const hash=()=>crypto.createHash('sha256').update(fs.readFileSync(selected)).digest('hex'),before=hash();
+registerHooks({load(url,context,next){return new URL(url).pathname.endsWith('/Materials/shadowDepthWrapper.js')?{format:'module',source:fs.readFileSync(selected,'utf8'),shortCircuit:true}:next(url,context);}});
+const at=p=>import(pathToFileURL(path.join(core,p)).href);
+const{NullEngine}=await at('Engines/nullEngine.js'),{WebGPUEngine}=await at('Engines/webgpuEngine.js'),{Scene}=await at('scene.js'),{ShaderMaterial}=await at('Materials/shaderMaterial.js'),{ShadowDepthWrapper}=await at('Materials/shadowDepthWrapper.js'),{MeshBuilder}=await at('Meshes/meshBuilder.js'),{SpotLight}=await at('Lights/spotLight.js'),{ShadowGenerator}=await at('Lights/Shadows/shadowGenerator.js'),{FreeCamera}=await at('Cameras/freeCamera.js'),{Vector3}=await at('Maths/math.vector.js');
+const engine=new NullEngine(),scene=new Scene(engine);new FreeCamera('main',new Vector3(0,2,-4),scene);
+engine.createEffect=WebGPUEngine.prototype.createEffect;engine._releaseEffect=WebGPUEngine.prototype._releaseEffect;
+const material=new ShaderMaterial('native nonstandalone wind-compatible source',scene,{vertexSource:'attribute vec3 position;varying vec3 worldPosition;varying vec3 vNormal;void main(void){worldPosition=position;vNormal=vec3(0.,1.,0.);gl_Position=vec4(position,1.);}',fragmentSource:'varying vec3 worldPosition;varying vec3 vNormal;void main(void){gl_FragColor=vec4(1.);}'},{attributes:['position'],uniforms:['world']});
+engine._isWebGPU=true;const wrapper=new ShadowDepthWrapper(material,scene,{remappedVariables:['worldPos','worldPosition','vNormalW','vNormal']});engine._isWebGPU=false;material.shadowDepthWrapper=wrapper;
+const mesh=MeshBuilder.CreateBox('real caster',{},scene);mesh.material=material;const sub=mesh.subMeshes[0];
+const light=new SpotLight('native shadow',new Vector3(0,3,-2),new Vector3(0,-.1,1),.8,2,scene),generator=new ShadowGenerator(16,light);generator.getShadowMap().renderList=[mesh];
+const notifications=[];material.onEffectCreatedObservable.add(p=>notifications.push({pass:engine.currentRenderPassId,base:p.effect.uniqueId}));
+async function settle(fn){for(let i=0;i<100;i++){scene.incrementRenderId();if(fn())return true;await new Promise(r=>setTimeout(r,1));}return false;}
+try{engine.currentRenderPassId=0;const mainReady=await settle(()=>material.isReadyForSubMesh(mesh,sub,false));const shadowPass=generator.getShadowMap().renderPassId;engine.currentRenderPassId=shadowPass;
+const shadowReady=await settle(()=>generator.isReady(sub,false,false));const depth=wrapper.getEffect(sub,generator,shadowPass)?.effect;
+console.log(JSON.stringify({mode:process.argv[2],module:before,mainReady,mainPass:0,shadowPass,standalone:wrapper.standalone,notifications,shadowReady,derived:depth?.uniqueId??null,derivedReady:depth?.isReady()??false,stable:hash()===before,scope:'Actual ShaderMaterial main readiness and native ShadowGenerator readiness, terminal NullEngine GLSL/depth IO; no render/browser/GPU/writes'}));}
+finally{wrapper.dispose();generator.dispose();scene.dispose();engine.dispose();}
+`;
+for(const mode of ['old','new']){const r=spawnSync(process.execPath,['--input-type=module','-',mode],{input:code,encoding:'utf8',windowsHide:true});console.log(r.stdout);console.log(JSON.stringify({mode,exit:r.status,stderr:r.stderr}));}

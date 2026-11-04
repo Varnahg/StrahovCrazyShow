@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "fix-b6-transform-read-20261014",
+  "title": "KEY-16: odstranit doloženou zbytečnou invalidaci B6 pivotu při čtení fill světla",
+  "status": "blocked",
+  "dependsOn": [
+    "research-b6-render-20261014"
+  ],
+  "writePaths": [
+    "client/b6-reality.ts",
+    "tests/b6-render-lifecycle.test.ts",
+    "docs/performance/research-20261014/b6-render.md",
+    "docs/agents/handoffs/fix-b6-transform-read-20261014.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat pouze zvolenou variantuA po dokončeném research927956…: bezpečné podmíněné čtení pivotu a scratch-toRef bez dlouhodobé inversecache.",
+    "Statický pivot při chůzi nevyvolá135/134root/child lavinu; skutečné translate/rotate/scale/reparent ve stejnémrenderID zůstanou správné. Geometrie, viditelné množiny a světelná membership beze změny.",
+    "Cílený refaktoring/testy/předání společně. Neimplementovat obecný VehicleLightinghelper, floorhysteresis, glTFfastpath ani novéAPI. Samostatnýfix/commit; root vlastnípraktickouGPU přejímku a mainintegraci."
+  ],
+  "verification": [
+    "Novýtest se skutečnými B6RealityController, VehicleLighting a NullEngine: původní kód musíreprodukčněselhat,opravenýprojít. Counts/nečasovépráhy; shapeparity a dynamickéroots,LOD/attach/dispose.",
+    "RelevantnístávajícíB6,worldassetidentity,vehiclelightingtesty; úzkáTypeScriptkontrola. Žádnýfullsuite/build/GPU/server bezrootkoordinačnírezervace.",
+    "Všechnytesty v novéworktree; zaznamenatpříkazy/skutečnévýsledky, SHA kódu/testů, známél imity a ukončení helperů."
+  ],
+  "notes": [
+    "Pouze C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow, branchcodex/playtest-repairs-wave4. Nikdy runtime edit vmain.",
+    "Globálníkoordinátor přijal research a zvolilA vdocs/performance/research-20261014/decision-register.md. Researchtask musí být done předclaim.",
+    "Autor přebírá svůj vlastní výzkumný dokument zmain a smí jej přesně zkopírovat do stejné přidělené cesty veWT; nejde o cizíWIP.",
+    "Root bootstrap509/509sourceparity s0f20…; glTFfastpath pouze.cachekandidát. Předcommitemnezahrnoutcizí/nesouvisejícíbaselineWIP.",
+    "14.10 uživatel výslovně odložil GPU přejímku. Kandidát f63039b4067d57c8bdbe560ead5719cfc05cbb0d,878testů/build/integracePASS,QA připravená; runtimeintegrace main čeká na praktické ověření. Helpery ukončené a rezervace uvolněné."
+  ]
+}

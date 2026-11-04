@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "gameplay-benchmark-export-20261103",
+  "title": "Zachovat bounded frame intervals a scope dostupného WebGPU main-pass času",
+  "status": "done",
+  "dependsOn": ["gameplay-smoothness-research-20261103"],
+  "writePaths": ["shared/local-benchmark.ts", "tests/local-benchmarks.test.ts", "docs/agents/handoffs/gameplay-benchmark-export-20261103.md", ".cache/gameplay-benchmark-export-20261103/"],
+  "resources": [],
+  "acceptance": ["Projektor zachová klientem již vytvářená frameIntervalsMs a frameWork.webgpuMainPassMs/webgpuMainPassScope jako bounded validovaná data.", "Zachovat zpětnou kompatibilitu starých payloadů bez nových polí; nulové/nesprávné GPU údaje nevydávat za celé GPU měření.", "Neodstranit numeric whitelist, identity/origin/size/health ochrany; žádné arbitrarydata ani klientskéextraidentifikátory.", "Implementace/refaktoring/testy/předání jako celek, bez commitu autora."],
+  "verification": ["Cílené projector a skutečné HTTP storage roundtrip testy, invalid/mismatched/oversized arrays, finite values, scope a idempotentní dvojí projekce.", "Přímý node --import tsx; žádné build/GPU či trvalé servery."],
+  "notes": ["Root výslovně rezervuje sdílený lokální diagnostický kontrakt. Game už tato pole předává, UI i server je dnes ořezávají stejnýmprojectLocalBenchmark. Je to nutná oprava důkazů, nikoli samostatné zrychlení hry."]
+}

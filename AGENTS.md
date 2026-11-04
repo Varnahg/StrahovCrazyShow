@@ -2,6 +2,13 @@
 
 Před implementací ověř očekávané chování, existující kód a vhodné primární podklady. Uživatel výslovně požaduje průzkum před změnami a praktické ověření výsledku.
 
+## Jediná pracovní větev a kopie — výslovné zadání 29. 10. 2026
+
+- Veškerá další práce probíhá přímo na `main` v `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`. Nevytvářej jiné větve, worktrees ani kopie projektu; toto pravidlo má přednost před staršími návody a BMAD/automatizačními výchozími postupy.
+- `main` obsahuje aktuální přijatý kód i dohledatelnou rozpracovanou práci. Každý ověřený celek commituj přímo na main; nenechávej výsledek pouze ve vedlejší kopii. Neověřené prototypy označ pravdivě v `docs/work-in-progress.md`, nesmějí se ztratit ani vydávat za hotovou funkci.
+- Souběžní agenti používají tentýž checkout a disjunktní souborové rezervace. Nezakládej izolovanou větev jako náhradu koordinace. Náročné ověřování zůstává serializované.
+- Před zápisem ověř skutečný checkout a větev. Staré cesty ve výzkumu/handoffech jsou historická evidence, nikoli oprávnění je obnovit. Neměnné testovací buildy smějí být pouze výstupy v `.cache`, nikoli další Git checkouty.
+- Přehled převzatých nedokončených celků a přesných zachovaných zdrojů je v [docs/work-in-progress.md](docs/work-in-progress.md).
 ## Výslovný postup uživatele od 14. 10. 2026
 
 - Před každou opravou či funkcí nejdřív proveď důkladný výzkum celého dotčeného řetězce: příčiny, závislosti a vzájemné dopady. Projdi relevantní primární zdroje a reprodukční důkazy; odliš doložený mechanismus, hypotézu a chybějící měření.
@@ -36,6 +43,27 @@ Aktivní rezervace jsou lokální ve společném Git adresáři; nesdílejí se 
 - Podagent s konkrétním implementačním/review zadáním od koordinátora další BMAD workflow rekurzivně nespouští. Načte zdejší pravidla a policy; před zápisem získá vlastní disjunktní rezervaci, provede zadanou implementaci, refaktoring a ověření a předá důkazy. Čistě čtecí review rezervaci nepotřebuje.
 - Review, staging a commit se týkají pouze doložených vlastních změn tasku. Nikdy nepoužij upstream pokyn ke stagingu celého dirty stromu. Počet review nálezů nemá minimum; čistý výsledek je platný. Autorizovaná běžná práce nevyžaduje nové potvrzení jen kvůli BMAD kroku.
 - Instalovaná verze a týmové overrides jsou verzované; aktualizace BMAD je samostatná rezervovaná údržba. Běžící starší relace musí tuto sekci výslovně znovu načíst, než BMAD použije.
+
+## Rozhodování a délka experimentů
+
+- Před změnou nebo výkonovým během zapiš do existujícího plánu šest položek: problém, doložený mechanismus/hypotézu, jedinou zkoušenou změnu, hlavní metriku, podmínky správnosti a kritérium přijetí. Rozliš startup a plynulost hraní; dílčí CPU zrychlení není FPS důkaz.
+- Po selhání nejprve vyhodnoť uložené logy. Nový běh musí zodpovědět konkrétní rozlišovací otázku nebo být předem plánovaným opakováním. Po druhém stejném neplánovaném selhání zastav opakování a uprav diagnostický postup; bez výslovného nového zadání neprodlužuj herní timeouty a neoslabuj přejímku.
+- Výslovné zadání3.11.2026 po C10: umožnit dokončení WebGPU přípravy zvýšením rozpočtu na60s pro jednu kvalitu a180s celkem. Všechny readiness/health/submission podmínky zůstávají; staré30/90s údaje v evidenci popisují historické běhy. Změna limitu není sama o sobě zrychlením hry.
+- Před dlouhou sérií ověř identitu buildu a krátký průchod telemetrie až do uloženého výsledku. Sleduj výpadek sběru, stáří vzorků, limity a rotaci souborů. Chybějící data znamenají omezený/neplatný výsledek, nikoli úspěch. Při testování použij přímé Node CLI nebo `pnpm --config.verifyDepsBeforeRun=error`; instalace závislostí je samostatný vědomý krok.
+- Rozpracuj jeden optimalizační kandidát. Nezbytnou opravu správnosti odděl a uzavři samostatně. Výsledkem série je přijetí, zamítnutí nebo neprůkazný výsledek s přesným chybějícím měřením; další kandidát nesmí zakrýt neuzavřený předchozí.
+- Po 30 minutách bez poznatku, který mění rozhodnutí nebo vylučuje konkrétní příčinu, zvol levnější rozlišovací kontrolu, návrat k datům nebo odložení hypotézy. Jde o kontrolu účelnosti práce, nikoli automatické ukončení úkolu, zkrácení testu či nový schvalovací krok pro uživatele.
+- Opakované úkony automatizuj úzce ve stávajícím harnessu. Eviduj zvlášť build, start, měření a zbývající čas obsluhy; čekej na uložený výsledek, ne na chybovou obrazovku. Prohlížeč obsluhuj autonomně v rámci autorizace. Nevytvářej obecný řadič kvůli jedné sérii.
+- Udržuj jeden stručný aktuální stav v existujícím předání (checkpoint, závěr, další krok); historické důkazy odkazuj. Cílené kontroly průběžně, plné ověření nad stabilním checkpointem. Úspěšnou kontrolu opakuj jen po relevantní změně, selhání či nové konkrétní pochybnosti.
+- Dokončený sběr dat ani `renderHealth.valid` nepotvrzuje hratelnost. Před přejímkou použij strukturované číselné meze pro snímky, dlouhé záseky a síťové korekce/resynchronizace; samotný text `acceptance` v plánu nestačí. Chybějící nebo nesouvislá data nesmějí vyjít jako úspěch.
+- Krátké stání na spawnu slouží k izolaci nákladu. Plynulost ověř také delším skutečným pohybem s nezávislým sběrem síťových událostí; neutrální SDK spoluhráči nenahrazují pohyb hráče. Pokud už existuje nevyhovující hráčský log, nejdřív jej vyhodnoť a časově přiřaď konkrétní zásek. Další běh musí ověřovat zvolenou příčinu nebo opravu; neopakuj obecnou stacionární sérii.
+
+## Samostatné ovládání Edge při testování — zadání 4. 11. 2026
+
+- Uživatel výslovně autorizoval převzetí ovládání počítače pro testování hry: sám otevři nainstalovaný Edge, vlastní testovací kartu/okno, přepni je do popředí a proveď test. Nežádej znovu o otevření prohlížeče, přepnutí karty ani potvrzení, že je v popředí. Rozsah platí pro testování tohoto projektu; nové oprávnění řeš jen tam, kde je skutečně vyžaduje nástroj nebo bezpečnostní pravidla.
+- Nejprve použij dostupné browser API pro Edge a jeho aktuální dokumentaci. Vytvoř vlastní označenou testovací kartu; při potřebě nativního okna použij Computer Use a skutečné ID z čerstvého inventáře. Browser tab/window ID není Windows window ID. Nativní výběr okna nepoužívej jako povinný mezikrok, pokud browser API úkon zvládá.
+- Před měřením sám ověř přesnou URL, identitu buildu/relace, aktivní a viditelnou kartu, viewport a průchod diagnostiky do uloženého výsledku. Přípravu ovládání dokonči před časově omezenou sérií; během snímkového intervalu nečti DOM a nepořizuj screenshoty. Nepovažuj název okna ani otevření URL za důkaz správné hry či GPU.
+- Běžně zaniklou kartu nebo zastaralý handle obnov podle čerstvého inventáře ve stejném vybraném Edge; po chybě nejprve přečti stav a logy, opakuj jen konkrétní obnovovací krok. Bezpečnostní odmítnutí, neověřená URL nebo výslovný STOP nejsou tento případ: nepřecházej na jiný kanál, shell/CDP ani reset k obejití ochrany. Respektuj rozsah zastavení; dovoluje-li nástroj pokračovat mimo UI, zpracuj uložené logy a nezávislou práci. Vyžaduje-li ukončení tahu, uveď přesnou překážku a zachovej stav pro navázání.
+- Používej [praktický postup ve výkonovém návodu](docs/performance/README.md#samostatna-obsluha-edge). Zachovej uživatelské karty a server na 8080; uklízej pouze vlastní testovací prostředky. Zamčená plocha či výslovně požadovaný lidský zásah jsou skutečné překážky, běžná obsluha Edge nikoli.
 
 ## Pravidla hry a ověřování
 

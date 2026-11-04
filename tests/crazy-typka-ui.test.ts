@@ -58,7 +58,7 @@ test("new verified SUZ and SHerna citations survive client validation and render
     createElement(CrazyTypkaChat, { state, locale: "cs" }),
   );
   for (const source of sources) assert.ok(html.includes(source.url));
-  assert.match(html, /2026-10-28/);
+  for (const source of sources) assert.ok(html.includes(source.checkedAt));
 });
 
 const token = "a".repeat(64);

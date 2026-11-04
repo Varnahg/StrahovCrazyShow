@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "gameplay-acceptance-20261104",
+  "title": "Vyhodnotit záseky a síťovou stabilitu skutečného hraní",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["shared/gameplay-acceptance.ts", "scripts/gameplay-acceptance.mjs", "scripts/performance-experiment.mjs", "tests/gameplay-acceptance.test.ts", "tests/performance-experiment.test.ts", "docs/agents/handoffs/gameplay-acceptance-20261104.md", ".cache/gameplay-acceptance-20261104/"],
+  "resources": [],
+  "acceptance": ["Výsledek odlišuje sběr dat, krátký frame sample a přijetí skutečného pohybového scénáře.", "Konfigurovatelné číselné meze FPS/p95/p99/max/hitchů a resynců/korekce; chybějící či děravá data nemohou projít.", "Přehrání uloženého hráčského gzip logu vydá failed s konkrétními důvody; stacionární krátký vzorek nikdy nepotvrdí celou hratelnost.", "Žádný nový browser controller, změna grafiky nebo rozšiřování síťového protokolu."],
+  "verification": ["Cílené pure/CLI/monitor regrese včetně archivovaného hráčského logu, healthy/missing/gap/transition/no-movement případů; bez GPU/build/fullsuite."],
+  "notes": ["Přímá implementační delegace root4.11.2026; přečíst AGENTS/policy, získat vlastní claim, bez rekurzivního BMAD. Root naváže UI a návody samostatně; dodržet čistou sdílenou funkci bez Node závislostí pro browser."]
+}

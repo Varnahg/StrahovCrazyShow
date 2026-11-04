@@ -1,0 +1,1012 @@
+{
+  "schemaVersion": 1,
+  "decision": "reject FAR45 as default; restore FAR75",
+  "causality": "One A/B startup with moving SDK peers and uncontrolled clocks cannot establish FAR45 as the cause of the FPS difference.",
+  "thresholds": {
+    "minMedianFps": 41.7,
+    "maxMedianP95Ms": 30.399999856948853,
+    "maxMedianP99Ms": 81.80000019073486
+  },
+  "medians": {
+    "baseline": {
+      "fps": 45.6,
+      "p95Ms": 29.40000009536743,
+      "p99Ms": 39.700000047683716
+    },
+    "candidate": {
+      "fps": 26.6,
+      "p95Ms": 50.60000014305115,
+      "p99Ms": 59.299999952316284
+    }
+  },
+  "sameCamera": true,
+  "sameLighting": true,
+  "sameResolution": true,
+  "treeTriangleReduction": 0.10914699506071526,
+  "rows": [
+    {
+      "file": "baseline-d015062f-b538-473b-9c07-d66dc2561619.json",
+      "variant": "baseline",
+      "at": "2026-11-04T15:39:55.495Z",
+      "sourceHash": "ff52249dd131007c02ba8899545bc135564e08c3478c1c8b81c9d8a50d1fab44",
+      "frames": 418,
+      "fps": 41.7,
+      "p95Ms": 30.399999856948853,
+      "p99Ms": 81.80000019073486,
+      "maxMs": 240.59999990463257,
+      "hitches50": 7,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 984,
+        "height": 553
+      },
+      "quality": "low",
+      "avatars": 3,
+      "sceneView": {
+        "position": {
+          "x": 110,
+          "y": -2.323899984359741,
+          "z": 12.000005722045898
+        },
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "lightingInstant": 1792490400000,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.3960998058319092,
+            "z": 20.000003814697266
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.966224193572998,
+            -19.140361785888672,
+            1
+          ],
+          "projectionMatrix": [
+            1.2417428493499756,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        }
+      },
+      "tree": {
+        "treeInstances": 110,
+        "mappedTrees": 47,
+        "inferredTrees": 0,
+        "photoInterpretedTrees": 63,
+        "grassTiles": 0,
+        "grassClumps": 0,
+        "visibleGrassTiles": 0,
+        "visibleGrassClumps": 0,
+        "uniqueTreeModels": 110,
+        "loadedTreeMeshes": 336,
+        "bootstrapBytes": 0,
+        "activeTreeTriangles": 2527289,
+        "pendingTreeLoads": 0,
+        "legacyTreeInstances": 0,
+        "rankEnabledTreeInstances": 110,
+        "treeDetailCacheEntries": 5,
+        "treeDetailCacheBytes": 65488188,
+        "treeDetailReservedBytes": 0,
+        "treePilotGeometryBytes": 439770546,
+        "treePilotSourceBytes": 112646003,
+        "treePilotSeasonBytes": 45238974,
+        "treeTextureSourceBytes": 34305839,
+        "treeFetchedBytes": 147167242,
+        "treeFetchRequests": 239,
+        "treeDetailCounts": [
+          0,
+          3,
+          107
+        ],
+        "treeLitter": {
+          "activePatches": 1,
+          "activeItems": 94,
+          "triangles": 376,
+          "cachedPatches": 2,
+          "cacheBytes": 103680,
+          "generatedPatches": 2,
+          "pendingPatches": 0,
+          "ready": true,
+          "preparing": false,
+          "supportsTwigs": true
+        }
+      },
+      "inventory": {
+        "registeredMeshes": 5194,
+        "enabledVisibleGeometryMeshes": 2516,
+        "hiddenGeometryMeshes": 2673,
+        "enabledRegularInstances": 822,
+        "uniqueGeometries": 4324,
+        "uniqueGeometryTriangles": 7832076,
+        "enabledPotentialTriangles": 9739560,
+        "registeredMaterials": 251,
+        "enabledDistinctMaterials": 183,
+        "materialLightAssignmentGroups": 183,
+        "lights": 42,
+        "enabledLights": 1,
+        "enabledMeshCountsByMaterialClass": {
+          "PBRMaterial": 1963,
+          "StandardMaterial": 548,
+          "ShaderMaterial": 2,
+          "MultiMaterial": 3
+        },
+        "enabledTreeMeshesByLod": [
+          0,
+          6,
+          317
+        ]
+      },
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "classification": "unknown",
+        "version": "unknown version",
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "webglVersion": null,
+        "requestedPowerPreference": "high-performance"
+      }
+    },
+    {
+      "file": "baseline-1e2b2665-c4aa-4614-b1cb-e63842f94810.json",
+      "variant": "baseline",
+      "at": "2026-11-04T15:40:39.230Z",
+      "sourceHash": "ff52249dd131007c02ba8899545bc135564e08c3478c1c8b81c9d8a50d1fab44",
+      "frames": 457,
+      "fps": 45.6,
+      "p95Ms": 28.700000047683716,
+      "p99Ms": 39.700000047683716,
+      "maxMs": 49.799999952316284,
+      "hitches50": 0,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 984,
+        "height": 553
+      },
+      "quality": "low",
+      "avatars": 3,
+      "sceneView": {
+        "position": {
+          "x": 110,
+          "y": -2.323899984359741,
+          "z": 12.000004768371582
+        },
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "lightingInstant": 1792490400000,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.3960998058319092,
+            "z": 20.000003814697266
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.966224193572998,
+            -19.140361785888672,
+            1
+          ],
+          "projectionMatrix": [
+            1.2417428493499756,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        }
+      },
+      "tree": {
+        "treeInstances": 110,
+        "mappedTrees": 47,
+        "inferredTrees": 0,
+        "photoInterpretedTrees": 63,
+        "grassTiles": 0,
+        "grassClumps": 0,
+        "visibleGrassTiles": 0,
+        "visibleGrassClumps": 0,
+        "uniqueTreeModels": 110,
+        "loadedTreeMeshes": 336,
+        "bootstrapBytes": 0,
+        "activeTreeTriangles": 2527289,
+        "pendingTreeLoads": 0,
+        "legacyTreeInstances": 0,
+        "rankEnabledTreeInstances": 110,
+        "treeDetailCacheEntries": 5,
+        "treeDetailCacheBytes": 65488188,
+        "treeDetailReservedBytes": 0,
+        "treePilotGeometryBytes": 439770546,
+        "treePilotSourceBytes": 112646003,
+        "treePilotSeasonBytes": 45238974,
+        "treeTextureSourceBytes": 34305839,
+        "treeFetchedBytes": 147167242,
+        "treeFetchRequests": 239,
+        "treeDetailCounts": [
+          0,
+          3,
+          107
+        ],
+        "treeLitter": {
+          "activePatches": 1,
+          "activeItems": 94,
+          "triangles": 376,
+          "cachedPatches": 2,
+          "cacheBytes": 103680,
+          "generatedPatches": 2,
+          "pendingPatches": 0,
+          "ready": true,
+          "preparing": false,
+          "supportsTwigs": true
+        }
+      },
+      "inventory": {
+        "registeredMeshes": 5194,
+        "enabledVisibleGeometryMeshes": 2516,
+        "hiddenGeometryMeshes": 2673,
+        "enabledRegularInstances": 822,
+        "uniqueGeometries": 4324,
+        "uniqueGeometryTriangles": 7832076,
+        "enabledPotentialTriangles": 9739560,
+        "registeredMaterials": 251,
+        "enabledDistinctMaterials": 183,
+        "materialLightAssignmentGroups": 183,
+        "lights": 42,
+        "enabledLights": 1,
+        "enabledMeshCountsByMaterialClass": {
+          "PBRMaterial": 1963,
+          "StandardMaterial": 548,
+          "ShaderMaterial": 2,
+          "MultiMaterial": 3
+        },
+        "enabledTreeMeshesByLod": [
+          0,
+          6,
+          317
+        ]
+      },
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "classification": "unknown",
+        "version": "unknown version",
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "webglVersion": null,
+        "requestedPowerPreference": "high-performance"
+      }
+    },
+    {
+      "file": "baseline-8fb4187d-e775-45f2-bb47-fafc233b7bd4.json",
+      "variant": "baseline",
+      "at": "2026-11-04T15:41:13.305Z",
+      "sourceHash": "ff52249dd131007c02ba8899545bc135564e08c3478c1c8b81c9d8a50d1fab44",
+      "frames": 458,
+      "fps": 45.8,
+      "p95Ms": 29.40000009536743,
+      "p99Ms": 38.09999990463257,
+      "maxMs": 46.200000047683716,
+      "hitches50": 0,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 984,
+        "height": 553
+      },
+      "quality": "low",
+      "avatars": 3,
+      "sceneView": {
+        "position": {
+          "x": 110,
+          "y": -2.323899984359741,
+          "z": 12.000005722045898
+        },
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "lightingInstant": 1792490400000,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.3960998058319092,
+            "z": 20.000003814697266
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.966224193572998,
+            -19.140361785888672,
+            1
+          ],
+          "projectionMatrix": [
+            1.2417428493499756,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        }
+      },
+      "tree": {
+        "treeInstances": 110,
+        "mappedTrees": 47,
+        "inferredTrees": 0,
+        "photoInterpretedTrees": 63,
+        "grassTiles": 0,
+        "grassClumps": 0,
+        "visibleGrassTiles": 0,
+        "visibleGrassClumps": 0,
+        "uniqueTreeModels": 110,
+        "loadedTreeMeshes": 336,
+        "bootstrapBytes": 0,
+        "activeTreeTriangles": 2527289,
+        "pendingTreeLoads": 0,
+        "legacyTreeInstances": 0,
+        "rankEnabledTreeInstances": 110,
+        "treeDetailCacheEntries": 5,
+        "treeDetailCacheBytes": 65488188,
+        "treeDetailReservedBytes": 0,
+        "treePilotGeometryBytes": 439770546,
+        "treePilotSourceBytes": 112646003,
+        "treePilotSeasonBytes": 45238974,
+        "treeTextureSourceBytes": 34305839,
+        "treeFetchedBytes": 147167242,
+        "treeFetchRequests": 239,
+        "treeDetailCounts": [
+          0,
+          3,
+          107
+        ],
+        "treeLitter": {
+          "activePatches": 1,
+          "activeItems": 94,
+          "triangles": 376,
+          "cachedPatches": 2,
+          "cacheBytes": 103680,
+          "generatedPatches": 2,
+          "pendingPatches": 0,
+          "ready": true,
+          "preparing": false,
+          "supportsTwigs": true
+        }
+      },
+      "inventory": {
+        "registeredMeshes": 5194,
+        "enabledVisibleGeometryMeshes": 2516,
+        "hiddenGeometryMeshes": 2673,
+        "enabledRegularInstances": 822,
+        "uniqueGeometries": 4324,
+        "uniqueGeometryTriangles": 7832076,
+        "enabledPotentialTriangles": 9739560,
+        "registeredMaterials": 251,
+        "enabledDistinctMaterials": 183,
+        "materialLightAssignmentGroups": 183,
+        "lights": 42,
+        "enabledLights": 1,
+        "enabledMeshCountsByMaterialClass": {
+          "PBRMaterial": 1963,
+          "StandardMaterial": 548,
+          "ShaderMaterial": 2,
+          "MultiMaterial": 3
+        },
+        "enabledTreeMeshesByLod": [
+          0,
+          6,
+          317
+        ]
+      },
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "classification": "unknown",
+        "version": "unknown version",
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "webglVersion": null,
+        "requestedPowerPreference": "high-performance"
+      }
+    },
+    {
+      "file": "candidate-b9e18085-40a5-44f4-8aec-63c908169446.json",
+      "variant": "candidate",
+      "at": "2026-11-04T15:51:11.272Z",
+      "sourceHash": "31a14cdda855eef4486ac82c63778db13d2f614676c88bb22dbd104d6da99827",
+      "frames": 227,
+      "fps": 22.6,
+      "p95Ms": 61.299999952316284,
+      "p99Ms": 126.30000019073486,
+      "maxMs": 379.09999990463257,
+      "hitches50": 28,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 984,
+        "height": 553
+      },
+      "quality": "low",
+      "avatars": 3,
+      "sceneView": {
+        "position": {
+          "x": 110,
+          "y": -2.323899984359741,
+          "z": 12.000004768371582
+        },
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "lightingInstant": 1792490400000,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.3960998058319092,
+            "z": 20.000003814697266
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.966224193572998,
+            -19.140361785888672,
+            1
+          ],
+          "projectionMatrix": [
+            1.2417428493499756,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        }
+      },
+      "tree": {
+        "treeInstances": 110,
+        "mappedTrees": 47,
+        "inferredTrees": 0,
+        "photoInterpretedTrees": 63,
+        "grassTiles": 0,
+        "grassClumps": 0,
+        "visibleGrassTiles": 0,
+        "visibleGrassClumps": 0,
+        "uniqueTreeModels": 110,
+        "loadedTreeMeshes": 336,
+        "bootstrapBytes": 0,
+        "activeTreeTriangles": 2251443,
+        "pendingTreeLoads": 0,
+        "legacyTreeInstances": 0,
+        "rankEnabledTreeInstances": 110,
+        "treeDetailCacheEntries": 5,
+        "treeDetailCacheBytes": 65488188,
+        "treeDetailReservedBytes": 0,
+        "treePilotGeometryBytes": 439770546,
+        "treePilotSourceBytes": 112646003,
+        "treePilotSeasonBytes": 45238974,
+        "treeTextureSourceBytes": 34305839,
+        "treeFetchedBytes": 147167242,
+        "treeFetchRequests": 239,
+        "treeDetailCounts": [
+          0,
+          1,
+          109
+        ],
+        "treeLitter": {
+          "activePatches": 1,
+          "activeItems": 94,
+          "triangles": 376,
+          "cachedPatches": 2,
+          "cacheBytes": 103680,
+          "generatedPatches": 2,
+          "pendingPatches": 0,
+          "ready": true,
+          "preparing": false,
+          "supportsTwigs": true
+        }
+      },
+      "inventory": {
+        "registeredMeshes": 5202,
+        "enabledVisibleGeometryMeshes": 2526,
+        "hiddenGeometryMeshes": 2671,
+        "enabledRegularInstances": 830,
+        "uniqueGeometries": 4321,
+        "uniqueGeometryTriangles": 7835588,
+        "enabledPotentialTriangles": 9454448,
+        "registeredMaterials": 251,
+        "enabledDistinctMaterials": 183,
+        "materialLightAssignmentGroups": 183,
+        "lights": 42,
+        "enabledLights": 1,
+        "enabledMeshCountsByMaterialClass": {
+          "PBRMaterial": 1973,
+          "StandardMaterial": 548,
+          "ShaderMaterial": 2,
+          "MultiMaterial": 3
+        },
+        "enabledTreeMeshesByLod": [
+          0,
+          2,
+          323
+        ]
+      },
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "classification": "unknown",
+        "version": "unknown version",
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "webglVersion": null,
+        "requestedPowerPreference": "high-performance"
+      }
+    },
+    {
+      "file": "candidate-b9082b4b-5320-496a-a808-dd456f4078b1.json",
+      "variant": "candidate",
+      "at": "2026-11-04T15:52:13.126Z",
+      "sourceHash": "31a14cdda855eef4486ac82c63778db13d2f614676c88bb22dbd104d6da99827",
+      "frames": 425,
+      "fps": 42.4,
+      "p95Ms": 29.799999952316284,
+      "p99Ms": 42.799999952316284,
+      "maxMs": 51.299999952316284,
+      "hitches50": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 984,
+        "height": 553
+      },
+      "quality": "low",
+      "avatars": 3,
+      "sceneView": {
+        "position": {
+          "x": 110,
+          "y": -2.323899984359741,
+          "z": 12.000004768371582
+        },
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "lightingInstant": 1792490400000,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.3960998058319092,
+            "z": 20.000003814697266
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.966224193572998,
+            -19.140361785888672,
+            1
+          ],
+          "projectionMatrix": [
+            1.2417428493499756,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        }
+      },
+      "tree": {
+        "treeInstances": 110,
+        "mappedTrees": 47,
+        "inferredTrees": 0,
+        "photoInterpretedTrees": 63,
+        "grassTiles": 0,
+        "grassClumps": 0,
+        "visibleGrassTiles": 0,
+        "visibleGrassClumps": 0,
+        "uniqueTreeModels": 110,
+        "loadedTreeMeshes": 336,
+        "bootstrapBytes": 0,
+        "activeTreeTriangles": 2251443,
+        "pendingTreeLoads": 0,
+        "legacyTreeInstances": 0,
+        "rankEnabledTreeInstances": 110,
+        "treeDetailCacheEntries": 5,
+        "treeDetailCacheBytes": 65488188,
+        "treeDetailReservedBytes": 0,
+        "treePilotGeometryBytes": 439770546,
+        "treePilotSourceBytes": 112646003,
+        "treePilotSeasonBytes": 45238974,
+        "treeTextureSourceBytes": 34305839,
+        "treeFetchedBytes": 147167242,
+        "treeFetchRequests": 239,
+        "treeDetailCounts": [
+          0,
+          1,
+          109
+        ],
+        "treeLitter": {
+          "activePatches": 1,
+          "activeItems": 94,
+          "triangles": 376,
+          "cachedPatches": 2,
+          "cacheBytes": 103680,
+          "generatedPatches": 2,
+          "pendingPatches": 0,
+          "ready": true,
+          "preparing": false,
+          "supportsTwigs": true
+        }
+      },
+      "inventory": {
+        "registeredMeshes": 5202,
+        "enabledVisibleGeometryMeshes": 2526,
+        "hiddenGeometryMeshes": 2671,
+        "enabledRegularInstances": 830,
+        "uniqueGeometries": 4321,
+        "uniqueGeometryTriangles": 7835588,
+        "enabledPotentialTriangles": 9454448,
+        "registeredMaterials": 251,
+        "enabledDistinctMaterials": 183,
+        "materialLightAssignmentGroups": 183,
+        "lights": 42,
+        "enabledLights": 1,
+        "enabledMeshCountsByMaterialClass": {
+          "PBRMaterial": 1973,
+          "StandardMaterial": 548,
+          "ShaderMaterial": 2,
+          "MultiMaterial": 3
+        },
+        "enabledTreeMeshesByLod": [
+          0,
+          2,
+          323
+        ]
+      },
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "classification": "unknown",
+        "version": "unknown version",
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "webglVersion": null,
+        "requestedPowerPreference": "high-performance"
+      }
+    },
+    {
+      "file": "candidate-6b245e5b-2f4c-4a89-bb44-e29b39043682.json",
+      "variant": "candidate",
+      "at": "2026-11-04T15:52:42.342Z",
+      "sourceHash": "31a14cdda855eef4486ac82c63778db13d2f614676c88bb22dbd104d6da99827",
+      "frames": 266,
+      "fps": 26.6,
+      "p95Ms": 50.60000014305115,
+      "p99Ms": 59.299999952316284,
+      "maxMs": 62.799999952316284,
+      "hitches50": 16,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 984,
+        "height": 553
+      },
+      "quality": "low",
+      "avatars": 3,
+      "sceneView": {
+        "position": {
+          "x": 110,
+          "y": -2.323899984359741,
+          "z": 12.000004768371582
+        },
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "lightingInstant": 1792490400000,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.3960998058319092,
+            "z": 20.000003814697266
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.966224193572998,
+            -19.140361785888672,
+            1
+          ],
+          "projectionMatrix": [
+            1.2417428493499756,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        }
+      },
+      "tree": {
+        "treeInstances": 110,
+        "mappedTrees": 47,
+        "inferredTrees": 0,
+        "photoInterpretedTrees": 63,
+        "grassTiles": 0,
+        "grassClumps": 0,
+        "visibleGrassTiles": 0,
+        "visibleGrassClumps": 0,
+        "uniqueTreeModels": 110,
+        "loadedTreeMeshes": 336,
+        "bootstrapBytes": 0,
+        "activeTreeTriangles": 2251443,
+        "pendingTreeLoads": 0,
+        "legacyTreeInstances": 0,
+        "rankEnabledTreeInstances": 110,
+        "treeDetailCacheEntries": 5,
+        "treeDetailCacheBytes": 65488188,
+        "treeDetailReservedBytes": 0,
+        "treePilotGeometryBytes": 439770546,
+        "treePilotSourceBytes": 112646003,
+        "treePilotSeasonBytes": 45238974,
+        "treeTextureSourceBytes": 34305839,
+        "treeFetchedBytes": 147167242,
+        "treeFetchRequests": 239,
+        "treeDetailCounts": [
+          0,
+          1,
+          109
+        ],
+        "treeLitter": {
+          "activePatches": 1,
+          "activeItems": 94,
+          "triangles": 376,
+          "cachedPatches": 2,
+          "cacheBytes": 103680,
+          "generatedPatches": 2,
+          "pendingPatches": 0,
+          "ready": true,
+          "preparing": false,
+          "supportsTwigs": true
+        }
+      },
+      "inventory": {
+        "registeredMeshes": 5202,
+        "enabledVisibleGeometryMeshes": 2526,
+        "hiddenGeometryMeshes": 2671,
+        "enabledRegularInstances": 830,
+        "uniqueGeometries": 4321,
+        "uniqueGeometryTriangles": 7835588,
+        "enabledPotentialTriangles": 9454448,
+        "registeredMaterials": 251,
+        "enabledDistinctMaterials": 183,
+        "materialLightAssignmentGroups": 183,
+        "lights": 42,
+        "enabledLights": 1,
+        "enabledMeshCountsByMaterialClass": {
+          "PBRMaterial": 1973,
+          "StandardMaterial": 548,
+          "ShaderMaterial": 2,
+          "MultiMaterial": 3
+        },
+        "enabledTreeMeshesByLod": [
+          0,
+          2,
+          323
+        ]
+      },
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "classification": "unknown",
+        "version": "unknown version",
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "webglVersion": null,
+        "requestedPowerPreference": "high-performance"
+      }
+    }
+  ],
+  "criteria": {
+    "fps": false,
+    "p95": false,
+    "p99": true
+  },
+  "accepted": false
+}

@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "atUTC": "2026-10-24T08:12:51.988Z",
+  "scope": "Independent read-only review and local patches of QA-only tools; no fullcorpus/build/GPU acceptance",
+  "round1": {
+    "diffSha256": "26380f22c3b604360151ce9ef29aaf62c6eb26095200e9de8143b87ab9d76a09",
+    "layers": {
+      "blind": 1,
+      "edge": 2,
+      "verificationGap": 2
+    },
+    "triage": [
+      {
+        "id": "blind-1",
+        "verdict": "medium",
+        "route": "patch",
+        "location": "startup-stage-routines/helper/v18/qa-overlay.mjs:485 / receipt.mjs:23",
+        "evidence": "Supported clock+startup-routines Guest or expired arm rejects before owner installation. Producer emits null profile, validator closed(null) rejects immutable failure receipt.",
+        "fix": "Omit the existing optional profile when no owner was installed; retain rejected raw and strict validation of present profiles. Add actual pre-owner refusal regression."
+      },
+      {
+        "id": "edge-1",
+        "verdict": "medium",
+        "route": "patch",
+        "location": "startup-stage-routines/helper/v18/receipt.mjs:51",
+        "evidence": "browserBuildIdentity always emits startupRoutines, including null. Existing pipeline-inputs whitelist omits it, so ordinary enabled compiler action cannot receive ACK.",
+        "fix": "Admit only this already identity-validated scalar in the closed whitelist; test null and active targets."
+      },
+      {
+        "id": "edge-2",
+        "verdict": "medium",
+        "route": "patch",
+        "location": "startup-stage-routines/helper/v18/startup-stage-routines.mjs:110",
+        "evidence": "The first RTT observer is added before the second registration and no cleanup is recorded until both succeed. A second-add failure leaves an owned observer despite core hook cleanup; violates declared rollback.",
+        "fix": "Rollback first observer if second add fails, preserving original render/notification; targeted partial-registration regression."
+      },
+      {
+        "id": "verification-1",
+        "verdict": "medium",
+        "route": "patch",
+        "location": "startup-stage-routines/helper/v18/startup-stage-routines.test.mjs:41-52",
+        "evidence": "Preverified gap: current executions manually register options; transform callsite is only parsed. Removing injected registration can leave all existing CPU executions green with empty actual trace.",
+        "fix": "Execute actual transformed Game callsite without manual registration; assert the resulting trace."
+      },
+      {
+        "id": "verification-2",
+        "verdict": "medium",
+        "route": "patch",
+        "location": "entry-effect-cost/helper/v18/entry-effect-cost.test.mjs:66",
+        "evidence": "Preverified gap: shared stack fixture covers4→8→9/PBR but not direct Standard5→9. Removing Standard ancestor support remains green and can silently omit engine costs.",
+        "fix": "Add deterministic5→9 selfSelected regression and actual native StandardMaterial engine-call fixture."
+      }
+    ]
+  },
+  "round2": {
+    "diffSha256": "f8a7d53ac9ff85f0b4ec3af4078b207712c1d7099b3a866c19361d06d64e9468",
+    "blind": [],
+    "edge": [],
+    "verificationGap": [],
+    "allFiveFindingsClosedByReadOnlyReview": true
+  },
+  "startup": {
+    "helper": "7459213b6383e99b5b5bfc2f2b547833eb30dc566b65b8a5f0b9592d456ca800",
+    "targetedPass": 21,
+    "targetedFail": 0,
+    "targetedSkip": 0,
+    "red": {
+      "pass": 17,
+      "fail": 4
+    },
+    "oldSealFiles": 118,
+    "newSealFiles": 62,
+    "unchangedInputs": 34,
+    "changed": [
+      "qa-overlay.mjs",
+      "receipt.mjs",
+      "startup-stage-routines.mjs",
+      "startup-stage-routines.test.mjs"
+    ]
+  },
+  "entry": {
+    "helper": "80419b9012d8f8c4a0ac5f23260e874fa7cb408f9d1b9ab9dc8ac5270c7c1dd1",
+    "targetedNewPass": 2,
+    "targetedNewFail": 0,
+    "other42NotRerun": true,
+    "mutation": {
+      "pass": 0,
+      "expectedFail": 2
+    },
+    "oldSealFiles": 174,
+    "newSealFiles": 90,
+    "unchangedInputs": 37,
+    "runtimeUnchanged": true
+  },
+  "limitations": [
+    "CPU fixtures/constructor/callback/host seams remain.",
+    "Whole helper corpora and current browser/GPU profiles wait for the actual CAD resource handoff.",
+    "Original V18 inputs, manifests and HDF are preserved; production/source15 unchanged.",
+    "KEY22/main/default/steadyFPS matrix and reliable startup/recovery remain open."
+  ]
+}

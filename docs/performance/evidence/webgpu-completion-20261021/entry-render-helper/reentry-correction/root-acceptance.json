@@ -1,0 +1,104 @@
+{
+  "atUTC": "2026-10-23T20:33:29.022Z",
+  "decision": "Accepted bounded QA helper deliverable; parent KEY22/main performance acceptance remains open",
+  "helperSha256": "afccfcbd77b56758384cd1b215706302035d805e0bd6ceea14cc61a28288bf37",
+  "authorManifestSha256": "ea071f695beded9a6da0099d57d14326eafa0b0a165185a0e5c743079917377d",
+  "rootVerifiedFiles": 49,
+  "reconstructedSourceFiles": 32,
+  "independentReviews": [
+    {
+      "reviewer": "webgpu_renderer_audit",
+      "findings": [],
+      "closed": "P2 self reentry"
+    },
+    {
+      "reviewer": "webgpu_editor_audit",
+      "findings": [],
+      "closed": "P3 historical donor coverage wording"
+    }
+  ],
+  "cpu": {
+    "pass": 101,
+    "fail": 0,
+    "syntaxModules": 31,
+    "uiParseErrors": 0
+  },
+  "actualDiagnostic": {
+    "buildId": "511b1e72f4a645cbd025f952f2783b8345dc27545d3900c4393ecf431e50393d",
+    "sourceSnapshotId": "053501f0cee4c2bf6c81ab39339fa82a84f91370cc86f7907781b0c0b2098e43",
+    "beforeVehicle": false,
+    "afterVehicle": true,
+    "firstFrame": {
+      "index": 0,
+      "startedAtMs": 136680.10000002384,
+      "endedAtMs": 136807.20000004768,
+      "chainWallMs": 127.10000002384186,
+      "engineFrameId": 3273,
+      "engineFrameIdAfterRender": 3273,
+      "sceneFrameIdBefore": 3273,
+      "sceneFrameIdAfter": 3274,
+      "vehicleBeforePrelude": true,
+      "vehicleBeforeScene": true,
+      "vehicleAfterScene": true,
+      "scopes": [
+        {
+          "calls": 1,
+          "startedAtMs": 136680.10000002384,
+          "endedAtMs": 136680.39999997616,
+          "wallMs": 0.2999999523162842,
+          "threw": false
+        },
+        {
+          "calls": 1,
+          "startedAtMs": 136680.39999997616,
+          "endedAtMs": 136684.80000007153,
+          "wallMs": 4.400000095367432,
+          "threw": false
+        },
+        {
+          "calls": 1,
+          "startedAtMs": 136684.80000007153,
+          "endedAtMs": 136807.20000004768,
+          "wallMs": 122.39999997615814,
+          "threw": false
+        }
+      ],
+      "nested": [
+        {
+          "calls": 0,
+          "wallMs": 0,
+          "throws": 0
+        },
+        {
+          "calls": 0,
+          "wallMs": 0,
+          "throws": 0
+        }
+      ],
+      "progressed": true
+    },
+    "remainingHooks": 0,
+    "afterHealth": {
+      "rendererId": 2,
+      "purpose": "game",
+      "generation": 1,
+      "phase": "ready",
+      "valid": true,
+      "errorCount": 0,
+      "pendingOperations": 0,
+      "pendingPreparationOperations": 0,
+      "pendingShaderValidationOperations": 0,
+      "counts": {
+        "effect": 0,
+        "shader": 0,
+        "pipeline": 0,
+        "validation": 0,
+        "texture": 0,
+        "device": 0,
+        "render": 0
+      },
+      "firstErrors": []
+    },
+    "limits": "Actual instrumented three-scope entry, no FPS/GPU execution/main claim. Deep Scene routine attribution remains open."
+  }
+}

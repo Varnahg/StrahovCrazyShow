@@ -1,0 +1,53 @@
+{
+  "records": 2190,
+  "kinds": {
+    "session-start": 1,
+    "browser-capabilities": 1,
+    "browser-state": 2,
+    "longtask": 410,
+    "resource-timing": 18,
+    "long-animation-frame": 431,
+    "source-identity": 1,
+    "resource-window": 61,
+    "network-connecting": 2,
+    "network-connected": 2,
+    "mode-change": 2,
+    "renderer-ready": 2,
+    "network-left": 4,
+    "presentation-rate": 2,
+    "webgpu-preparation-profile": 2,
+    "game-ready": 2,
+    "network-correction": 7,
+    "frame-window": 788,
+    "frame-hitch": 46,
+    "network-round-trip": 390,
+    "recording-gap": 2,
+    "action": 5,
+    "render-fault": 5,
+    "game-dispose": 2,
+    "pagehide": 1,
+    "session-end": 1
+  },
+  "firstFault": {
+    "seq": 1672,
+    "atMs": 839127.9,
+    "kind": "render-fault",
+    "data": {
+      "channel": "render",
+      "message": "GPU query timestamp-pass: Failed to execute 'mapAsync' on 'GPUBuffer': Buffer was unmapped before mapping was resolved.",
+      "generation": 1,
+      "rendererId": 2,
+      "purpose": "game",
+      "count": 1
+    }
+  },
+  "last": {
+    "seq": 2191,
+    "atMs": 1083445.5,
+    "kind": "session-end",
+    "data": {
+      "reason": "pagehide",
+      "bestEffortTail": true
+    }
+  }
+}

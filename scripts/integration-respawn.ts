@@ -148,17 +148,18 @@ async function join(nickname: string) {
 async function ordinaryResync(probe: Probe) {
   const firstEvent = probe.events.length,
     previousEpoch = probe.authority!.inputEpoch;
-  probe.room.send("resync");
+  probe.room.send("resync", { inputEpoch: previousEpoch });
   let reply: Authority | undefined;
   await until(() => {
     reply = probe.events
       .slice(firstEvent)
       .find(
         (event) =>
-          event.type === "authoritative" && event.value.resync === true,
+          event.type === "authoritative" && event.value.resync === true &&
+          event.value.inputEpoch > previousEpoch,
       )?.value;
     return !!reply;
-  }, "ordinary resync receives its own authoritative reply");
+  }, "new input epoch after recovery or an intervening server clock drop");
   assert.equal(
     reply!.respawn,
     undefined,

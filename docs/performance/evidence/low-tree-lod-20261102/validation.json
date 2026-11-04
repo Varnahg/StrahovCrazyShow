@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-02T09:49:38.488Z",
+  "branch": "main",
+  "baseHead": "3ffaab5f0015cee45cbc336e6ca8bb753a4a63bd",
+  "implementation": "low-full-coverage-far45",
+  "status": "implemented-automated-checks-pass-gpu-acceptance-pending",
+  "source": {
+    "baseline": "3304e474e6e1653bfbaef9c2cb1059fddab60c114824e96cce9bfdef720bc85c",
+    "candidate": "0786606868a5fa20259935ad315ea57c7a540136fcdcfea5ed1ddc74fd887bbe",
+    "publicGitTree": "ce279822be17f1bbee373af19c13edd18cfaa612",
+    "publicContentHash": "45f088a91dbdc53456e8cfebb6fc50a2d3cd6914e9eba8ed197a946e947d2416",
+    "sourceAndTestFiles": 943,
+    "changedFiles": [
+      {
+        "name": "client/tree-renderer.ts",
+        "before": "b45d915b74767b7fe74bb0a6767a152c92eaa67302bdec196b81527a6913ec49",
+        "after": "5bed4b545219eaf2715b24c6e2014eb90d85eee02c4909b88e757174267bd48d"
+      },
+      {
+        "name": "tests/tree-streaming.test.ts",
+        "before": "fde508a44e4facbe337ff9b40690cec7c00b5061cf488a58adca2d9cf008de06",
+        "after": "45575f9b9452c69bc0a428acb5c0e9509c08576bbd4bf420924288e95c1a089b"
+      }
+    ]
+  },
+  "checks": {
+    "targeted": {
+      "pass": 36,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0,
+      "evidence": "docs/agents/handoffs/low-tree-lod-20261102-implementation.md"
+    },
+    "typecheckInitial": {
+      "exitCode": 1,
+      "diagnostics": [
+        "TS2540 tests/tree-streaming.test.ts:125:35",
+        "TS2540 tests/tree-streaming.test.ts:152:37"
+      ],
+      "resolution": "Fixture setup uses Object.assign, consistent with existing tests; no runtime change."
+    },
+    "typecheckFinal": {
+      "exitCode": 0
+    },
+    "fullSuite": {
+      "tests": 2853,
+      "pass": 2848,
+      "fail": 0,
+      "skipped": 5,
+      "cancelled": 0,
+      "durationMs": 1613907.9619,
+      "exitCode": 0,
+      "skipLines": [
+        "﹣ real feedback form preserves native IndexedDB image bytes across offline/reload and shows matching receipt (4.6923ms) # Native browser regression runs in Linux CI; opt in with FEEDBACK_RUN_BROWSER_TEST=1 locally",
+        "﹣ preserves a trailing space in a valid POSIX checkout path (0.3469ms) # SKIP",
+        "﹣ optional original report audit verifies every URL row and original bytes (0.2821ms) # SKIP",
+        "﹣ opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurrency and abort (2.0773ms) # SKIP",
+        "﹣ captured station HTML never promotes Serverovna after an outdoor sensor row disappears (0.9273ms) # Local primary station capture unavailable; section fixture remains mandatory"
+      ]
+    },
+    "standardBuild": {
+      "command": "pnpm build",
+      "exitCode": 0
+    },
+    "candidateBuild": {
+      "exitCode": 0,
+      "timingsMs": {
+        "publicHashBefore": 21484.399599999997,
+        "publicHashAfter": 21101.005999999998,
+        "totalBuildAndValidation": 52229.3798
+      }
+    },
+    "integration": {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "peers": 12
+    },
+    "review": {
+      "findings": [],
+      "scope": [
+        "client/tree-renderer.ts",
+        "tests/tree-streaming.test.ts",
+        "docs/performance/evidence/low-tree-lod-20261102/harness/run.mjs"
+      ]
+    }
+  },
+  "gpuAcceptance": {
+    "status": "blocked",
+    "reason": "Local browser use is disabled in Work settings",
+    "newFpsMeasurements": 0,
+    "visualAcceptance": false
+  },
+  "logs": {
+    "typecheck-2.log": {
+      "path": ".cache/low-tree-lod-20261102/typecheck-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full-test-1.log": {
+      "path": ".cache/low-tree-lod-20261102/full-test-1.log",
+      "sha256": "ee81f3061c19d022c02bcffd927074164e2978a1f535aab49dbbb2f0cdd95d13"
+    },
+    "build-1.log": {
+      "path": ".cache/low-tree-lod-20261102/build-1.log",
+      "sha256": "ee6e618028b0c579ab33da401c7fd64d42e55513028d6b4a8f86d44b9ca2516a"
+    },
+    "candidate-build-1.log": {
+      "path": ".cache/low-tree-lod-20261102/candidate-build-1.log",
+      "sha256": "50bc1a8f7ac61ec10b974fd3f972f27470b5996422c593615dd405e1cc73560e"
+    },
+    "integration-1.log": {
+      "path": ".cache/low-tree-lod-20261102/integration-1.log",
+      "sha256": "1c5ee6421724f00c0b9a9ba45189d59e425367f66aa90e21bd60953af412827c"
+    }
+  }
+}

@@ -314,9 +314,12 @@ try {
     worldEpoch: "foreign-guest-world",
   });
   assert.equal(wrong.reason, "wrong-world");
-  const snapshots = bob.snapshotCount;
-  bob.room.send("doorResync");
-  await until(() => bob.snapshotCount > snapshots, "explicit complete resync");
+  const snapshots = bob.snapshotCount, recoveryEpoch = bob.authority!.inputEpoch;
+  bob.room.send("doorResync", { inputEpoch: recoveryEpoch });
+  await until(
+    () => bob.snapshotCount > snapshots && bob.authority!.inputEpoch > recoveryEpoch,
+    "complete snapshot and new epoch after recovery or an intervening server clock drop",
+  );
   assert.equal(bob.timeline!.revision, 0);
   evidence.checks.push(
     "far request and foreign world rejected without fanout; explicit resync is complete",

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "gameplay-routine-capture-20261104",
+  "title": "Připojit existující osmiframový profil do samostatného diagnostického buildu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["docs/performance/evidence/gameplay-routine-20261104/", "docs/agents/handoffs/gameplay-routine-capture-20261104.md"],
+  "resources": [],
+  "acceptance": ["Žádná změna produkční hry ani historického harnessu; opt-in diagnostický Vite transform používá existující routine-cost helper.", "Osm skutečných renderů, žádný souběžný HUD benchmark, omezená životnost a viditelný raw JSON.", "Manifest zahrnuje helper, adapter/plugin a tests před/po buildu i serve; raw profil není vydáván za čistý FPS test."],
+  "verification": ["Lehký cílený test transformace/identity/lifecycle podle rozsahu. Build a GPU provede výhradně root pod validační rezervací."],
+  "notes": ["Přímá implementační delegace root4.11.2026; bez rekurzivního BMAD. Použít canonical main a hotový helper, žádné kopie projektu. Výstupy C12 patří root tasku."]
+}

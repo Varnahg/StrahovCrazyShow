@@ -170,7 +170,7 @@ test("actual Game prepares three render qualities without changing requested aut
     f.passes.map((p) => p.finalRestore),
     [false, false, true],
   );
-  assert.ok(f.passes.every((p) => p.timeoutMs! > 0 && p.timeoutMs! <= 30_000));
+  assert.ok(f.passes.every((p) => p.timeoutMs! > 0 && p.timeoutMs! <= 60_000));
   assert.equal(
     f.adaptive.state,
     requested,

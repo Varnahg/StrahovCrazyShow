@@ -1,0 +1,22 @@
+# Progressive quality order after actual High timeout
+
+Source9 original noquery CM startup failed before any post-ready attribution was armed: Low19stages22,246.7ms, High19stages30,012ms (timeout), total52,258.8ms,paused0. Earlier High29,249.5ms had only750.5ms margin. No system telemetry was collected for the failure, so thermal/scheduling/driver cause is unknown. Native shader, readiness and source bytes remain the reviewed source9. The actual failed run and full source/helper proof are retained in validation/car-epoch-startup-failure-source9.
+
+Primary chain prepareAllRenderQualities→quality helper→real lighting stages/controllers shows Low omits the expensive alpha-shadow path; Medium first introduces the shared PBR/leaf PCF/material work, Cinematic1024/PCF_LOW and car256; High adds Cinematic2048/PCF_MEDIUM, car512 and wider LOD. Current requestedMedium order Low→High→Medium concentrates new shadow/material work in High. The shared-work hypothesis is source-supported but its GPU benefit is unmeasured.
+
+| Choice | Cost, cache, lifecycle and behavior | Decision |
+| --- | --- | --- |
+| Raise30s/pass or90s total | Hides current measured failure, longer waits | Reject |
+| Drop quality/light profiles or warm requested only | Leaves supported later variants cold, changes established coverage | Reject |
+| Remove repeated clamped stages only | Saves some redundant frames; no evidence that one High duplicate is sufficient headroom | May evaluate later, not this repair |
+| Split/reset High clocks | Changes the original bounded-work guarantee | Reject |
+| New permanent Effect/generator cache | Broad ownership/disposal/reflection risks before actual epoch discriminator | Reject |
+| Fixed progressive Low→Medium→High, then requested final if needed | Reuses existing complete passes and resource owners; potentially distributes shared work. Extra final pass has a real cost, still inside original shared30/90 clocks | Selected smallest product change |
+
+Only render-quality-preparation.ts sequencing changes. Stable High remains3passes57stages; stable Low/Medium4passes76stages; a late final requested-quality change may need5passes95stages, still within the original total90s and per-pass30s without reset. The existing finalPass flags, dynamic requested getter, restoration, cancellation/error/paused clocks and final submitted-view gate stay unchanged. WebGL keeps its original9stage lighting path, which bypasses all-native-quality sequencing.
+
+The native GPU improvement is a hypothesis until root measures a new immutable source. CPU regressions should prove order/coverage/restoration and unchanged deadlines, not manufacture timing/FPS claims. Four of the initial six allocated fixtures need new all-quality counts/order/final callbacks; two single-pass fixtures stay unchanged. The broader14-root run later found two additional direct consumers, explicitly transferred and added to scope before editing as described below. A Map keyed by quality/stage still has57unique projections when actual work is76; never conflate these counts. Late request regressions must trigger on the actual final Medium, not its new earlier progressive occurrence. No Actor/camera/input/physics/light/shader/backend/asset/dependency changes are authorized by this decision.
+
+Additional original-record evidence: High vehicle-2 took3,238.7ms/9renders and6 mesh/presentation-coverage restarts; vehicle0/1 had3 such restarts each. Vegetation loads at most2 detail requests concurrently; Medium30/100m versus High40/135m radii can shift some streaming work earlier. This supports testing the ordering hypothesis without proving its result. The redundant High keyed2 cost115.7ms/3renders/no restarts; removing it alone might hide this12ms overrun but is not demonstrated robust against the earlier750ms variation.
+
+Current broader CPU check is269/272 with3 preserved failures in two previously missed direct consumers. game-preparation-baseline must now assert four passes and the unchanged90s rejection: fourth pass receives2,900ms remaining but its intentionally noncooperative29,000ms fixture returns at116,100ms and must yield timeout. game-preparation-scheduler must forward the same loop object four times for native, once for WebGL. Author stopped before either unallocated write, recorded quality-order/SCOPE-TRANSFER.json109e62d7 and released; root expanded exactly those2test paths before its reclaim. These are obsolete contract expectations, not an observed renderer fault or a reason to relax deadlines.

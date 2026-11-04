@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-main-20261030-build",
+  "title": "Sestavit současný main pro uživatelské Docker spuštění",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [".cache/docker-main-20261030-build/", "docs/agents/handoffs/docker-main-20261030-build.md"],
+  "resources": ["heavy-validation"],
+  "acceptance": ["Docker image vychází ze současného main v kanonickém C checkoutu; žádná jiná pracovní kopie nevznikne.", "Výsledek buildu a identita image jsou doložené; cizí WIP a databázové volumes zůstávají zachované."],
+  "verification": ["Docker build obsahuje kontrolu runtime assetů, TypeScript a Vite.", "Porovnat dostupný image se současným source; build opakovat pouze při skutečném rozdílu."],
+  "notes": ["Přímé zadání uživatele 30.10.2026: zapnout hlavní main přes Docker. Provoz na8080 má samostatný task.", "Pouhé provozní spuštění existující implementace; nevzniká nový BMAD feature workflow."]
+}

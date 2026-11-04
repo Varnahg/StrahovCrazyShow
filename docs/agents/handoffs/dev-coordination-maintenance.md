@@ -87,3 +87,11 @@ Po skutečném release gate-integratora rozšířen pouze jeho worker task o scr
 ## Konečný checkpoint
 
 21.10 perftransit admin aktualizoval pouze šest vlastních tasků KEY54/KEY53 na done po doložených produktových merge a main CI. Resource-only validation/publication i tento administrativní slot zůstávají ready. Katalogová změna nenahrazuje rezervace ani rušení procesů. Žádné cizí tasky/WIP se neměnily.
+# Převzetí katalogu pro low stromové LOD · 2. 11. 2026
+
+- Vlastník `gfx-20261102-root-admin`, kanonický checkout `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`, větev `main`, výchozí `6f26342736b5e285429379847e4ea7e4801173c9`.
+- Uživatel výslovně odpověděl „tak to zkontroluj, commitni a pokračuj“ na blokaci administrativního claimu souborem `docs/agents/tasks/main-lfs-index-recovery-20261030.json`. Převzata je evidence tohoto jediného tasku; další tři původní untracked podklady nejsou součástí commitu.
+- Původní JSON je zachován beze změny: historický stav `ready` není novým spuštěním LFS obnovy. Kontrola všech 609 cest potvrdila, že jsou verzované v `assets/` nebo `public/`; obě oblasti nemají pracovní diff. Katalog prošel `node scripts/agent-tasks.mjs validate` (572 definic, 1 původní rezervace).
+- První čtecí kontrola přes celý `git ls-files` překročila výchozí Node maxBuffer. Opakování omezené na `assets/ public/` s explicitním limitem prošlo; žádný obsah assetů ani index se tím neměnil.
+- Claim `dev-coordination-maintenance` úspěšně získán s `--adopt-dirty` na základě tohoto uživatelského předání. Původní serve rezervace portu 8080 zůstává cizímu vlastníkovi.
+

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-preparation-baseline-candidate-20261018",
+  "title": "KEY-31: sjednotit výchozí renderový stav před dočasnými kvalitami",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-preparation-baseline-candidate-20261018/", "docs/agents/handoffs/webgpu-preparation-baseline-candidate-20261018.md"],
+  "resources": [],
+  "acceptance": [
+    "Pouze vlastní copied native+combined kandidát, bez nativních/primary/dependency/hraných změn. Předchozí authored2stage V1, IBLproof a veškeréRED zachovat. Je to doprovodná oprava doložené nativeinicializace, neadopce cizíhoC5WIP.",
+    "Jediná nová runtime delta v obou client/game.ts: jednorázová synchronizace existujícího updateRenderEnvironment v aktuálněpožadované quality/scaling předprvní dočasnou quality, UVNITŘ prvního prepareRenderQualities.applyQuality callbacku. Předtím preparingRenderQuality=true, aby původní finally obnovil stav i při chybě. Čas se započítá dopůvodního prvního30s/pass a90s budgetu.",
+    "Použít skutečný aktuálníčas/weather/actorposition/self, dt0; actor, fyziku, síť, kameru a požadovanou adaptive revision neměnit. Pak původní dočasnáquality a původní3pass/41stage pořadí včetnělatest-requestrestore. WebGL path neměnit.",
+    "Žádná C5 updatePreloadVisuals kopie v native, matrixreorder, globálnízměna Cinematic constructor/lowgrade, dalšístage/timeout/cache nebo změna vendor/helperruntime. Známá extra nativní dočasnápostprocessalokace patří do výsledků, není zdarma.",
+    "Číst zmrazenou corrected IBL dependency kopii pouzereadonly: .cache/webgpu-standard-ibl-define-proof-20261018/case/node_modules/@babylonjs/{core,loaders}; JS91e9810b0fea2366e407cd58e2cbb1bbde31c39525c03b1aba75efcc5e218f33, d.ts8cf3184e7b2566b99c3602e5dcc409eefd2cff795ad3546bebe2a02f0477a07d. Vlastníresolver/vstupy podvlastnícache, nicnepatchovat přesjunction.",
+    "Použít skutečné oddělené native/client+shared a combined inputy, nikoli C5adaptaci vydávanouzanative. Přesný helperV1 zůstává jako vstup, jeho chybějící owner/lifecycle/legacy přejímka se tím neprohlašuje za hotovou."
+  ],
+  "verification": [
+    "Actual native i combined historie pro requestedlow/medium/high, actualfactories+Cinematic+Game, oba vehiclelowdraws, cap4 a deferredcleanup. Přesný original nativeRED3navíc a po baselinefixu car1/0/1/0 targetlow replay0/0/0/0, wholedefines/Effect/context reuse. Výslovně rozlišrequestedquality historii odlowreplaycíle; medium/high driving není automatickypokryté.",
+    "Úzké actualGame/regresní testy firstsyncjednou, originalWebGL, latestrequestrestore, exception/cancel/dispose a synchronizačníCPUcena odečtená způvodního timeoutu. Původníassertions neoslabit, nezaměnit plnýGame důkaz zaimitačníscheduler.",
+    "LehkéCPU a cílenýrefaktoring pouze. BezfullTS/fullsuite/build/GPU/server/install/commit. Runtime source diff musí být pouzeGamebaseline změna proti dokumentovaným vstupům. Manifest/handoff, vlastníprocesyukončit, heartbeat a release; bezrekurzivníhoBMAD."
+  ],
+  "notes": [
+    "Native Game vytvoříCinematic a začnequalitymatrix bezprvníhoCinematicupdate. Requestedmedium/high začínálow: imageProcessingenabledtrue. NáslednýPPchain nastavífalse; prvnícarLow pakvyžaduje3novéprogramy. CombinedC5 jejvypne užpreloadem. Report03 exactdelta všech3rodin: pryčCOLORCURVES,CONTRAST,EXPOSURE,IMAGEPROCESSING,TONEMAPPING2; novějenTONEMAPPING0. ŽádnáIBL/attribute/disposal/capdelta.",
+    "Alternativyzdůvodněněodmítnuty: requested-first neřešírequestedlow a měnírequested-last kontrakt; Ctor/low normalizace mění iWebGL/low-onlyvzhled. Jednorázový existujícíenvironmentupdate je správnáGamehranice. Native medium/high navícdočasněvytvoříPPchainpředlow; combinedjijižmá/retinuje. Přiznat a pozdějizměřitvpůvodnímbudgetu.",
+    "IBLproofactor dne18.10.2026 explicitněpředal correctedvendor/nativeinputs kREADONLYpoužití; isolationSHA02c702c4430388f01c4a3386d920a1100c423030d7807b88d1e5677bbf90a584, native-inputsSHAf1d179bd6b48706c69477c6456848a68431f81458053f313da9e8f9eb094b104. Jehoproofsummary seještědokončuje, nesahatnajehozápisy.",
+    "AktivníBMADspec-key-31-long-frame-gaps,krok03. Root následněspojípouzeověřené části helper/IBL/baseline a provedeGPU+clean/combinedpipeline; toto nenífinaladopce. Hrané4198 a staršíbuildy bezezměny."
+  ]
+}

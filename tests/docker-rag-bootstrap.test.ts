@@ -4,10 +4,32 @@ import { readFile } from "node:fs/promises";
 import { bootstrapDecision, manageBootstrapHead, validateBootstrapCache, validateBootstrapDocuments, provisionRoles, importBootstrap, seedEmbeddingCache, assertBootstrapProfile, bootstrapSeedRevision, bootstrapFailure, type BootstrapMarker } from "../scripts/docker-rag-bootstrap";
 import { loadApprovedRagDatasets } from "../scripts/rag-import";
 import { createEmbeddingProfile, type Embedder } from "../server/rag-embeddings";
-import { prepareRagCorpus } from "../server/rag-ingest";
+import { prepareDocumentChanges, prepareRagCorpus } from "../server/rag-ingest";
+import { buildCuratedKnowledgeDocumentV3 } from "../server/rag-curation-contract";
+import { documentEmbeddingInputV3, embeddingInputHash } from "../server/rag-embeddings";
 import { canonicalHash, type RagImportSession, type SqlResult, type PreparedDocumentCorpus, type RagDocumentImportSession, type RagSearchSnapshot } from "../server/rag-vector-store";
 
 const profile=createEmbeddingProfile({dimensions:3}), old="1".repeat(64), target="2".repeat(64), foreign="3".repeat(64);
+
+test("bootstrap accepts reviewed curation with the same exact input cache guard as extracted documents", async () => {
+  const bundle = buildCuratedKnowledgeDocumentV3({
+    id: "bootstrap-community", itemId: "bootstrap-community", title: "Syntetická komunitní zkušenost",
+    status: "current", verification: "community-experience", applicability: "Pouze testovací situace.",
+    reviewedAt: "2026-11-03", reviewAfter: "2027-02-01", factCheckedAt: null,
+    observedFrom: "2026-10-01", observedUntil: "2026-10-01",
+    limitations: ["Syntetický test, nejde o skutečný obsah chatu."], supportingRefs: [],
+    archiveReason: null, versionNote: "Test bootstrapu kurace.",
+  }, { text: "Otázka: Jak se domluvit? Odpověď: V testovacím případu pomohla předchozí domluva.", headingPath: ["Test"], tokenCount: 40 });
+  const bundles = validateBootstrapDocuments({schemaVersion: 1, revision: 2, bundles: [bundle]});
+  assert.equal(bundles[0].document.sourceVersionId, bundle.document.sourceVersionId);
+  assert.equal(bundles[0].document.authority, null);
+  const p = createEmbeddingProfile({dimensions: 3, inputVersion: "title-heading-text-v2"});
+  const input = documentEmbeddingInputV3(bundle.document, bundle.chunks[0], p);
+  const entry = {profile: p, input, inputHash: embeddingInputHash(input), vector: [1,0,0]};
+  const datasets = await loadApprovedRagDatasets();
+  assert.equal(validateBootstrapCache({schemaVersion: 1, entries: [entry]}, datasets, bundles).length, 1);
+  assert.throws(() => validateBootstrapCache({schemaVersion: 1, entries: [{...entry,input:"Raw private conversation",inputHash:embeddingInputHash("Raw private conversation")}]}, datasets, bundles));
+});
 function state() {
   const heads=new Map<string,string>(), markers=new Map<string,BootstrapMarker>();
   const query=async(sql:string, values:unknown[]=[]):Promise<SqlResult>=>{
@@ -20,6 +42,219 @@ function state() {
   };
   return {heads,markers,query};
 }
+
+const curatedCutoff = Date.parse("2026-11-10T00:00:00Z");
+const noEmbeddingBudget = { maxEmbeddingInputs: 0, maxEmbeddingBytes: 0 };
+function curatedSeed(id: string, reviewAfter = "2026-11-10", reviewedAt = "2026-11-03", official = false, archived = false) {
+  return buildCuratedKnowledgeDocumentV3({
+    id, itemId: id, title: "Syntetická znalost " + id,
+    status: archived ? "archived" : "current",
+    verification: official ? "verified-official" : "community-experience",
+    applicability: "Pouze syntetický test bootstrapu.", reviewedAt, reviewAfter,
+    factCheckedAt: official ? reviewedAt : null,
+    observedFrom: "2026-10-01", observedUntil: "2026-10-01",
+    limitations: ["Syntetický test bez původních zpráv."],
+    supportingRefs: official ? [{ publisher: "silicon-hill", title: "Testovaný veřejný zdroj",
+      url: "https://www.siliconhill.cz/pages/clenstvi", locator: "Správa členství",
+      factCheckedAt: reviewedAt, reviewAfter }] : [],
+    archiveReason: archived ? "Syntetická archivní verze." : null, versionNote: "Test bootstrapu.",
+  }, { text: "Syntetická přenositelná odpověď.", headingPath: ["Test"], tokenCount: 35 });
+}
+function curatedBootstrapFixture() {
+  const s = state(), p = createEmbeddingProfile({ dimensions: 3 });
+  const dp = createEmbeddingProfile({ dimensions: 3, inputVersion: "title-heading-text-v2" });
+  const datasets = { currentDatasets: [{ version: 2, sources: [], chunks: [] }], archiveDatasets: [] };
+  const plans = new Map<"current" | "archive", PreparedDocumentCorpus>();
+  const prepared: PreparedDocumentCorpus[] = [];
+  const stats = { migrations: 0, opened: 0, closed: 0, embeddingCalls: 0, documentPublishAttempts: 0 };
+  let failDocumentPublication = false;
+  const shared = {
+    async prepare() { return "building" as const; },
+    async cached(_profile: typeof p, inputs: readonly { inputHash: string }[]) { return new Set(inputs.map(input => input.inputHash)); },
+    async uncertain() { return []; },
+    async startAttempt() { throw Error("synthetic cache must prevent API work"); },
+    async completeAttempt() {}, async failAttempt() {}, async close() { stats.closed++; },
+  };
+  const dependencies = {
+    query: s.query,
+    async migrate() { stats.migrations++; },
+    async legacy(): Promise<RagImportSession> {
+      stats.opened++;
+      return { ...shared, async publish(plan) { s.heads.set("public", plan.revisionId); } };
+    },
+    async documents(): Promise<RagDocumentImportSession> {
+      stats.opened++;
+      return { ...shared,
+        async context(collection) {
+          const scope = { kind: collection };
+          const heads: RagSearchSnapshot["heads"] = {
+            legacy: collection === "current" && s.heads.has("public") ? { name: "public", revisionId: s.heads.get("public")!, profile: p } : null,
+            documents: collection === "current" && plans.has("current") ? { name: "public-documents", revisionId: plans.get("current")!.revisionId, profile: dp } : null,
+            archive: collection === "archive" && plans.has("archive") ? { name: "public-archive", revisionId: plans.get("archive")!.revisionId, profile: dp } : null,
+          };
+          const snapshot: RagSearchSnapshot = { id: canonicalHash(["search-view-v1", scope, heads]), scope, heads,
+            embeddingSpace: { provider: p.provider, model: p.model, dimensions: p.dimensions } };
+          return { collection, snapshot, dataset: plans.get(collection)?.dataset ?? { version: 3, documents: [], blocks: [], chunks: [] }, suppressions: [], legacySources: [] };
+        },
+        async prepare(plan) { prepared.push(plan); return "building"; },
+        async publish(plan) {
+          stats.documentPublishAttempts++;
+          if (failDocumentPublication) throw Error("synthetic publication interrupted");
+          plans.set(plan.collection, plan);
+          s.heads.set(plan.collection === "current" ? "public-documents" : "public-archive", plan.revisionId);
+        },
+      };
+    },
+    embedder(profile: typeof p): Embedder { return { profile, async embed() { stats.embeddingCalls++; throw Error("unexpected API work"); } }; },
+  };
+  return { ...s, stats, plans, prepared, datasets, profile: p, dependencies,
+    failPublication() { failDocumentPublication = true; },
+    resumePublication() { failDocumentPublication = false; },
+    run(bundles: Parameters<typeof importBootstrap>[1], seedRevision = 2) { return importBootstrap(datasets, bundles, p, dependencies, noEmbeddingBudget, undefined, seedRevision); },
+  };
+}
+
+test("ordinary bootstrap restart after curated expiry retains the published dataset without API work", async t => {
+  let instant = curatedCutoff - 1;
+  t.mock.method(Date, "now", () => instant);
+  const f = curatedBootstrapFixture(), bundles = [curatedSeed("short-review"), curatedSeed("long-review", "2026-12-03")];
+  await f.run(bundles);
+  const heads = structuredClone(f.heads), markers = structuredClone(f.markers), dataset = structuredClone(f.plans.get("current")!.dataset);
+  instant = curatedCutoff;
+  const result = await f.run(bundles);
+  assert.equal(result.find(outcome => outcome.head === "public-documents")?.action, "unchanged");
+  assert.deepEqual(f.heads, heads);
+  assert.deepEqual(f.markers, markers);
+  assert.deepEqual(f.plans.get("current")!.dataset, dataset);
+  assert.equal(f.stats.documentPublishAttempts, 1);
+  assert.equal(f.stats.embeddingCalls, 0);
+  assert.equal(f.stats.opened, f.stats.closed);
+});
+
+test("fresh bootstrap after expiry admits only eligible current curated seeds", async t => {
+  t.mock.method(Date, "now", () => curatedCutoff);
+  const f = curatedBootstrapFixture(), expired = curatedSeed("expired-review"), eligible = curatedSeed("eligible-review", "2026-12-03");
+  await f.run([expired, eligible]);
+  const plan = f.plans.get("current")!;
+  assert.deepEqual(plan.dataset.documents.map(document => document.id), ["eligible-review"]);
+  assert.deepEqual(plan.upsertSourceVersionIds, [eligible.document.sourceVersionId]);
+  assert.equal(plan.inputs.length, 1);
+  assert.equal(f.stats.embeddingCalls, 0);
+  assert.equal(f.stats.opened, f.stats.closed);
+});
+
+test("curated expiry is half-open at UTC midnight, including an all-expired current seed", async t => {
+  let instant = curatedCutoff - 1;
+  t.mock.method(Date, "now", () => instant);
+  const bundle = curatedSeed("boundary-review"), before = curatedBootstrapFixture();
+  await before.run([bundle]);
+  assert.equal(before.plans.get("current")!.dataset.documents.length, 1);
+  const head = before.heads.get("public-documents");
+  instant = curatedCutoff;
+  const restarted = await before.run([bundle]);
+  assert.equal(restarted.find(outcome => outcome.head === "public-documents")?.action, "unchanged");
+  assert.equal(before.heads.get("public-documents"), head);
+  for (const at of [curatedCutoff, curatedCutoff + 1]) {
+    instant = at;
+    const fresh = curatedBootstrapFixture();
+    await fresh.run([bundle]);
+    assert.deepEqual(fresh.plans.get("current")!.dataset.documents, []);
+    assert.deepEqual(fresh.plans.get("current")!.upsertSourceVersionIds, []);
+    assert.equal(fresh.stats.embeddingCalls, 0);
+    assert.equal(fresh.stats.opened, fresh.stats.closed);
+  }
+  // The exception belongs to bootstrap admission, not the explicit importer.
+  assert.throws(() => prepareDocumentChanges({ collection: "current", snapshot: null,
+    dataset: { version: 3, documents: [], blocks: [], chunks: [] }, suppressions: [], legacySources: [] },
+  { collection: "current", expectedSnapshotId: null, upserts: [bundle] },
+  createEmbeddingProfile({ dimensions: 3, inputVersion: "title-heading-text-v2" }), instant), /invalid-import-data/);
+});
+
+test("bootstrap expiry filtering preserves context documents absent from the seed", async t => {
+  let instant = curatedCutoff - 1;
+  t.mock.method(Date, "now", () => instant);
+  const f = curatedBootstrapFixture(), short = curatedSeed("short-review"), long = curatedSeed("long-review", "2026-12-03");
+  await f.run([short, long, curatedSeed("retained-context", "2026-12-03")]);
+  const dataset = structuredClone(f.plans.get("current")!.dataset), heads = structuredClone(f.heads);
+  instant = curatedCutoff;
+  await f.run([short, long]);
+  assert.deepEqual(f.heads, heads);
+  assert.deepEqual(f.plans.get("current")!.dataset, dataset);
+  assert.equal(f.stats.documentPublishAttempts, 1);
+});
+
+test("malformed expired seeds are validated before migration or any publication", async t => {
+  t.mock.method(Date, "now", () => curatedCutoff);
+  const bundle = curatedSeed("malformed-expired");
+  const corrupted = { ...bundle, chunks: bundle.chunks.map(chunk => ({ ...chunk, text: "Unhashed changed text." })) };
+  for (const bundles of [[corrupted], [bundle, bundle]]) {
+    const f = curatedBootstrapFixture();
+    await assert.rejects(f.run(bundles), /invalid-document-data/);
+    assert.equal(f.stats.migrations, 0);
+    assert.equal(f.stats.opened, 0);
+    assert.equal(f.heads.size, 0);
+    assert.equal(f.markers.size, 0);
+    assert.equal(f.stats.embeddingCalls, 0);
+  }
+});
+
+test("future reviewed or fact-checked seeds are rejected rather than filtered away", async t => {
+  t.mock.method(Date, "now", () => curatedCutoff);
+  for (const official of [false, true]) {
+    const f = curatedBootstrapFixture();
+    await f.run([]);
+    const heads = structuredClone(f.heads), markers = structuredClone(f.markers);
+    await assert.rejects(f.run([curatedSeed("future-review", "2026-12-03", "2026-11-11", official)]), /invalid-import-data/);
+    assert.deepEqual(f.heads, heads);
+    assert.deepEqual(f.markers, markers);
+    assert.equal(f.stats.documentPublishAttempts, 0);
+    assert.equal(f.stats.embeddingCalls, 0);
+    assert.equal(f.stats.opened, f.stats.closed);
+  }
+});
+
+test("archived curated seeds do not receive the current-upsert expiry exception", async t => {
+  t.mock.method(Date, "now", () => curatedCutoff);
+  const f = curatedBootstrapFixture();
+  await assert.rejects(f.run([curatedSeed("expired-archive", "2026-11-10", "2026-11-03", false, true)]), /invalid-import-data/);
+  assert.equal(f.heads.has("public-archive"), false);
+  assert.equal(f.stats.documentPublishAttempts, 0);
+  assert.equal(f.stats.opened, f.stats.closed);
+});
+
+test("bootstrap uses one captured clock for expiry filtering and admission", async t => {
+  let reads = 0;
+  t.mock.method(Date, "now", () => reads++ === 0 ? curatedCutoff - 1 : curatedCutoff);
+  const f = curatedBootstrapFixture();
+  await f.run([curatedSeed("captured-clock")]);
+  assert.equal(f.plans.get("current")!.dataset.documents.length, 1);
+  assert.equal(reads, 1);
+});
+
+test("pending publication crossing expiry fails closed even when all current seeds expire", async t => {
+  let instant = curatedCutoff - 1;
+  t.mock.method(Date, "now", () => instant);
+  for (const publishedBefore of [false, true]) {
+    instant = curatedCutoff - 1;
+    const f = curatedBootstrapFixture(), bundles = [curatedSeed("pending-review")];
+    if (publishedBefore) await f.run([curatedSeed("retained-base", "2026-12-03")], 1);
+    f.failPublication();
+    await assert.rejects(f.run(bundles), /synthetic publication interrupted/);
+    const heads = structuredClone(f.heads), markers = structuredClone(f.markers);
+    const prepared = f.prepared.length, attempts = f.stats.documentPublishAttempts;
+    assert.ok(f.markers.get("public-documents")?.pendingTarget);
+    assert.equal(f.heads.has("public-documents"), publishedBefore);
+    instant = curatedCutoff;
+    f.resumePublication();
+    await assert.rejects(f.run(bundles), /bootstrap-seed-revision-conflict/);
+    assert.deepEqual(f.heads, heads);
+    assert.deepEqual(f.markers, markers);
+    assert.equal(f.prepared.length, prepared, "pending import must not be retried with a different target");
+    assert.equal(f.stats.documentPublishAttempts, attempts);
+    assert.equal(f.stats.embeddingCalls, 0);
+    assert.equal(f.stats.opened, f.stats.closed);
+  }
+});
 test("bootstrap preserves externally managed or replaced legacy and v3 heads",async()=>{
   for(const name of ["public","public-documents","public-archive"]){
     const s=state();s.heads.set(name,foreign);let called=false;

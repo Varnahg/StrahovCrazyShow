@@ -1,0 +1,65 @@
+TAP version 13
+# BJS - [18:55:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [18:55:06]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 1 - actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 1236.125
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:7320'
+  failureType: 'testCodeFailure'
+  error: 'the actual in-frustum car caster, not only its far duplicate, must draw during loading'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:160:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":42,"after":42,"delta":0}
+# BJS - [18:55:07]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 2 - actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 434.2626
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:7320'
+  failureType: 'testCodeFailure'
+  error: 'the actual in-frustum car caster, not only its far duplicate, must draw during loading'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:160:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":35,"after":35,"delta":0}
+# Subtest: async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+ok 3 - async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+  ---
+  duration_ms: 203.9001
+  type: 'test'
+  ...
+# BJS - [18:55:03]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual cached per-pass PBR and native last-notified base create the observed two shadow epochs
+ok 4 - actual cached per-pass PBR and native last-notified base create the observed two shadow epochs
+  ---
+  duration_ms: 299.7667
+  type: 'test'
+  ...
+# {"scope":"CPU native state/Effect lifetime; terminal GLSL IO, no GPU pixels","shadowPass":2,"mainPass":1,"firstBase":0,"mainBase":2,"firstDepth":1,"secondDepth":3,"masks":8}
+1..4
+# tests 4
+# suites 0
+# pass 2
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5313.8883

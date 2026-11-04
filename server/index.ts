@@ -51,6 +51,7 @@ import {
 } from "../shared/network-diagnostics";
 import {
   PROTOCOL_VERSION,
+  resyncRequestMatchesEpoch,
   SIM_HZ,
   type ActorState,
   type Authority,
@@ -131,24 +132,25 @@ class StrahovRoom extends Room {
     this.onMessage("doorRequest", (c, raw: unknown) => {
       this.doorInteractions.receive(c, c.auth.id, raw);
     });
-    this.onMessage("doorResync", (c) => {
+    const recoverInputEpoch = (c: Client, raw: unknown, rateKey: string) => {
+      const queue = this.inputQueues.get(c.auth.id);
       if (
         this.connections.get(c.auth.id) !== c ||
-        !this.inputQueues.has(c.auth.id) ||
-        !store.rate(c.auth.id, "door-resync", 2, 1000)
+        !queue ||
+        !resyncRequestMatchesEpoch(raw, queue.frontier().inputEpoch) ||
+        !store.rate(c.auth.id, rateKey, 2, 1000)
       )
         return;
-      this.resetInputEpoch(c.auth.id, this.inputQueues.get(c.auth.id)!);
+      // A delayed retry must not clear new input or force another client rebase.
+      this.resetInputEpoch(c.auth.id, queue);
       this.sendAuthority(c, true, "client-request");
-    });
-    this.onMessage("resync", (c) => {
-      if (store.rate(c.auth.id, "resync", 2, 1000)) {
-        const queue = this.inputQueues.get(c.auth.id);
-        if (!queue) return;
-        this.resetInputEpoch(c.auth.id, queue);
-        this.sendAuthority(c, true, "client-request");
-      }
-    });
+    };
+    this.onMessage("doorResync", (c, raw: unknown) =>
+      recoverInputEpoch(c, raw, "door-resync"),
+    );
+    this.onMessage("resync", (c, raw: unknown) =>
+      recoverInputEpoch(c, raw, "resync"),
+    );
     this.onMessage("networkProbe", (c, raw: unknown) => {
       const nonce = networkProbeNonce(raw);
       if (

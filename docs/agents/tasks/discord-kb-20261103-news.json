@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "discord-kb-20261103-news",
+  "title": "KEY-72: kurace všech pěti kanálů Novinky Strahovské",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/discord-kb-20261103/curation/news/",
+    "docs/agents/handoffs/discord-kb-20261103-news.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Všech 1689 zpráv v pěti Novinky Strahovské exportech je prozkoumáno a má disposition, ne pouze vzorek.",
+    "Od jednorázových a neaktuálních pozvánek oddělit trvalé služby, změny provozu, přesuny nebo opravy; kandidáti mají konkrétní zdrojové zprávy a ověření primárních podkladů.",
+    "Žádné osobní údaje v kandidátním veřejném znění, raw IDs pouze v neveřejném auditu. Chybějící obsah se nedomýšlí."
+  ],
+  "verification": [
+    "Přesná coverage proti raw/corpus manifestu a kontrola všech candidate references.",
+    "Root nebo jiný agent provede druhé obsahové review accepted položek před embeddingy."
+  ],
+  "notes": [
+    "Schválený plán KEY-72, main pouze. Použít .cache/discord-kb-20261103/raw/corpus/; původní exporty read-only. Nespouštět rekurzivně BMAD.",
+    "Stejný privátní candidate JSON kontrakt jako forum/blocks/general. Tato partition se nepřekrývá s root other-without-news.",
+    "Integrator acceptance 2026-11-03: own implementation/content verified and handed off. Commits b1ea7317 runtime, 9292f891 tooling, c82c6b33 reviewed144 units+cache. Whole KEY-72 release validation/deployment remains root+validation task, not implied by this subtask status."
+  ]
+}

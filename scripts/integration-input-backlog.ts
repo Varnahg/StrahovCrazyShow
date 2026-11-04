@@ -206,13 +206,19 @@ try {
 
   const beforeRecovery = delayed.authority!,
     recoveryCount = delayed.recoveries.length;
-  delayed.room.send("resync");
+  delayed.room.send("resync", { inputEpoch: beforeRecovery.inputEpoch });
+  let recovery: ScriptAuthority | undefined;
   await until(
-    () => delayed.recoveries.length > recoveryCount,
-    "explicit client recovery response",
+    () => {
+      recovery = delayed.recoveries.slice(recoveryCount).find(
+        ({ authority }) => authority.inputEpoch > beforeRecovery.inputEpoch,
+      )?.authority;
+      return !!recovery;
+    },
+    "new input epoch after recovery or an intervening server clock drop",
   );
-  const recovery = delayed.recoveries[recoveryCount].authority;
-  assert.equal(recovery.resyncReason, "client-request");
+  assert.ok(recovery);
+  assert.ok(["client-request", "server-clock-drop"].includes(recovery.resyncReason!));
   assert.ok(recovery.inputEpoch > beforeRecovery.inputEpoch);
   assert.equal(recovery.ack, 0);
   assert.equal(recovery.inputTickBase, recovery.tick);

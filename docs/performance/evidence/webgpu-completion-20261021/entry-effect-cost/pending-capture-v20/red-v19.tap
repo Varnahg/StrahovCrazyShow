@@ -1,0 +1,62 @@
+TAP version 13
+# BJS - [11:36:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:36:07]: Babylon.js v9.30.0 - Null engine
+# Subtest: new pending shader-validation after one native accepted frame retains all eight consecutive original frames
+not ok 1 - new pending shader-validation after one native accepted frame retains all eight consecutive original frames
+  ---
+  duration_ms: 202.0553
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-effect-cost\\helper\\v20\\pending-capture.test.mjs:44:55'
+  failureType: 'testCodeFailure'
+  error: |-
+    post-admission pending work must not retire the same renderer
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\.cache\webgpu-completion-20261021\entry-effect-cost\helper\v20\pending-capture.test.mjs:49:11)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.start (node:internal/test_runner/test:1242:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# Subtest: new pending preparation after one native accepted frame retains all eight consecutive original frames
+not ok 2 - new pending preparation after one native accepted frame retains all eight consecutive original frames
+  ---
+  duration_ms: 6.7746
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-effect-cost\\helper\\v20\\pending-capture.test.mjs:44:55'
+  failureType: 'testCodeFailure'
+  error: |-
+    post-admission pending work must not retire the same renderer
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\.cache\webgpu-completion-20261021\entry-effect-cost\helper\v20\pending-capture.test.mjs:49:11)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2639.3629

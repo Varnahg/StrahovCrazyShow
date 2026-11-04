@@ -1,0 +1,3418 @@
+{
+  "session": "30f33f13-d19a-4bd7-b81b-5daa774376e5",
+  "from": 958123.7000000477,
+  "to": 988123.7000000477,
+  "scope": "Exact arm/end time bracket, selected hitch/longtask/LoAF/gap records only. Native F actions unlogged; not causal GPU timing.",
+  "records": [
+    {
+      "seq": 1976,
+      "atMs": 958606.9,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 55.1,
+        "intervalStartMs": 958526.8999999762,
+        "intervalEndMs": 958582,
+        "recordedAtMs": 958606.6000000238,
+        "currentCpuStartMs": 958582,
+        "previousFrame": {
+          "frameStartedAtMs": 958527,
+          "frameMs": 25.5,
+          "cpuMs": 53.7,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.2,
+            "world": 0,
+            "avatarsAndCamera": 0.3,
+            "environment": 0.1,
+            "render": 53.1,
+            "labels": 0
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.922933578491211,
+            "y": 2.618303060531616,
+            "z": -30.552417755126953
+          },
+          "zone": "b6:0",
+          "speed": 0.000012696309283910523,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17520,
+            "authorityPackets": 15618,
+            "corrections": 65,
+            "resyncs": 2,
+            "lastCorrectionMetres": 0.0005996416858686516,
+            "lastMotionAgeMs": 74.20000004768372,
+            "authorityAgeMs": 20,
+            "authorityTick": 60586,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 32,
+              "ack": 30061,
+              "predictedSeq": 30072,
+              "retainedInputs": 11,
+              "rttMs": 28.200000047683716,
+              "rawRttMs": 28.200000047683716,
+              "rttMeasuredAtMs": 956584.7000000477,
+              "supportedRttMeasuredAtMs": 956584.7000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 30066.544000005768,
+              "clockAnchorAtMs": 957738.3000000715,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 3,
+                "inFlight": 8,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": 19.600000023841858,
+                "oldestUnackedAgeMs": 184.5,
+                "lastSendAgeMs": 20.200000047683716,
+                "lastTimerAgeMs": 20.200000047683716,
+                "lastFrameAgeMs": 19.300000071525574,
+                "lastTimerIntervalMs": 80,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 30069,
+                "lastAck": 30061,
+                "produced": 47151,
+                "sentInputs": 47148,
+                "sentPackets": 19218,
+                "resets": 17,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 28.200000047683716,
+                "rawRoundTripMs": 28.200000047683716,
+                "measuredAt": 956584.7000000477,
+                "retainedLongTasks": 3,
+                "timeouts": 0,
+                "contaminatedSamples": 1,
+                "acceptedSamples": 395
+              },
+              "authorities": {
+                "received": 17524,
+                "superseded": 1876,
+                "barriers": 32,
+                "ordinaryApplied": 15616,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 31.38040000002366,
+                "cpuMs": 0.435399999958463,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 13.517433333403252,
+                "callbacks": 42294,
+                "elapsedMeanMs": 23.993478604530196,
+                "cpuMeanMs": 0.3290237764225185,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 32,
+                "inputTickBase": 30525,
+                "tick": 60586,
+                "ack": 30061,
+                "receivedSeq": 30064,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47122,
+                "consumed": 47119,
+                "idleTicks": 5716,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 60586,
+                "modeMismatchTicks": 0,
+                "resets": 31,
+                "discarded": 0,
+                "lastInputAgeMs": 52.13809999998193,
+                "oldestQueuedAgeMs": 52.13809999998193,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 848.2999999523163,
+        "currentCpuMs": 24.6,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.4,
+          "world": 0.1,
+          "avatarsAndCamera": 0.3,
+          "environment": 1.9,
+          "render": 21.9,
+          "labels": 0
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.922933578491211,
+            "y": 2.618303060531616,
+            "z": -30.552417755126953
+          },
+          "zone": "b6:0",
+          "speed": 0.000012696309283910523,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17537,
+            "authorityPackets": 15634,
+            "corrections": 65,
+            "resyncs": 2,
+            "lastCorrectionMetres": 0.0005996416858686516,
+            "lastMotionAgeMs": 105.39999997615814,
+            "authorityAgeMs": 80,
+            "authorityTick": 60636,
+            "pendingInputs": 12,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 32,
+              "ack": 30111,
+              "predictedSeq": 30123,
+              "retainedInputs": 12,
+              "rttMs": 28.200000047683716,
+              "rawRttMs": 28.200000047683716,
+              "rttMeasuredAtMs": 956584.7000000477,
+              "supportedRttMeasuredAtMs": 956584.7000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 30113.842000002907,
+              "clockAnchorAtMs": 958526.6000000238,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 12,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 186.5,
+                "lastSendAgeMs": 24.300000071525574,
+                "lastTimerAgeMs": 80,
+                "lastFrameAgeMs": 24.300000071525574,
+                "lastTimerIntervalMs": 25.800000071525574,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 30123,
+                "lastAck": 30111,
+                "produced": 47202,
+                "sentInputs": 47202,
+                "sentPackets": 19235,
+                "resets": 17,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 28.200000047683716,
+                "rawRoundTripMs": 54.89999997615814,
+                "measuredAt": 958581.7000000477,
+                "retainedLongTasks": 5,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 395
+              },
+              "authorities": {
+                "received": 17541,
+                "superseded": 1877,
+                "barriers": 32,
+                "ordinaryApplied": 15632,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 15.763900000019929,
+                "cpuMs": 0.20519999996758997,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 14.109200000063032,
+                "callbacks": 42330,
+                "elapsedMeanMs": 23.99277366406804,
+                "cpuMeanMs": 0.32902051972629737,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 32,
+                "inputTickBase": 30525,
+                "tick": 60636,
+                "ack": 30111,
+                "receivedSeq": 30116,
+                "depth": 5,
+                "maxDepth": 10,
+                "accepted": 47174,
+                "consumed": 47169,
+                "idleTicks": 5716,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 60636,
+                "modeMismatchTicks": 0,
+                "resets": 31,
+                "discarded": 0,
+                "lastInputAgeMs": 15.579600000055507,
+                "oldestQueuedAgeMs": 15.579600000055507,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 1977,
+      "atMs": 958607.7,
+      "kind": "longtask",
+      "data": {
+        "startTime": 958526.8999999762,
+        "duration": 54
+      }
+    },
+    {
+      "seq": 1978,
+      "atMs": 958683.4,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 958526.3999999762,
+        "duration": 54.700000047683716,
+        "blockingDuration": 4.3,
+        "renderStart": 958526.8999999762,
+        "styleAndLayoutStart": 958581,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 54,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1980,
+      "atMs": 959367.8,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 358.6,
+        "intervalStartMs": 958939.3999999762,
+        "intervalEndMs": 959298,
+        "recordedAtMs": 959367.6000000238,
+        "currentCpuStartMs": 959298,
+        "previousFrame": {
+          "frameStartedAtMs": 958939.3999999762,
+          "frameMs": 25.5,
+          "cpuMs": 354.4,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.3,
+            "world": 0.1,
+            "avatarsAndCamera": 0.3,
+            "environment": 23.3,
+            "render": 330.3,
+            "labels": 0.1
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.922933578491211,
+            "y": 2.618303060531616,
+            "z": -30.552417755126953
+          },
+          "zone": "b6:0",
+          "speed": 0.000012696309283910523,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17537,
+            "authorityPackets": 15634,
+            "corrections": 65,
+            "resyncs": 2,
+            "lastCorrectionMetres": 0.0005996416858686516,
+            "lastMotionAgeMs": 105.39999997615814,
+            "authorityAgeMs": 80,
+            "authorityTick": 60636,
+            "pendingInputs": 12,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 32,
+              "ack": 30111,
+              "predictedSeq": 30123,
+              "retainedInputs": 12,
+              "rttMs": 28.200000047683716,
+              "rawRttMs": 28.200000047683716,
+              "rttMeasuredAtMs": 956584.7000000477,
+              "supportedRttMeasuredAtMs": 956584.7000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 30113.842000002907,
+              "clockAnchorAtMs": 958526.6000000238,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 12,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 186.5,
+                "lastSendAgeMs": 24.300000071525574,
+                "lastTimerAgeMs": 80,
+                "lastFrameAgeMs": 24.300000071525574,
+                "lastTimerIntervalMs": 25.800000071525574,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 30123,
+                "lastAck": 30111,
+                "produced": 47202,
+                "sentInputs": 47202,
+                "sentPackets": 19235,
+                "resets": 17,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 28.200000047683716,
+                "rawRoundTripMs": 54.89999997615814,
+                "measuredAt": 958581.7000000477,
+                "retainedLongTasks": 5,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 395
+              },
+              "authorities": {
+                "received": 17541,
+                "superseded": 1877,
+                "barriers": 32,
+                "ordinaryApplied": 15632,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 15.763900000019929,
+                "cpuMs": 0.20519999996758997,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 14.109200000063032,
+                "callbacks": 42330,
+                "elapsedMeanMs": 23.99277366406804,
+                "cpuMeanMs": 0.32902051972629737,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 32,
+                "inputTickBase": 30525,
+                "tick": 60636,
+                "ack": 30111,
+                "receivedSeq": 30116,
+                "depth": 5,
+                "maxDepth": 10,
+                "accepted": 47174,
+                "consumed": 47169,
+                "idleTicks": 5716,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 60636,
+                "modeMismatchTicks": 0,
+                "resets": 31,
+                "discarded": 0,
+                "lastInputAgeMs": 15.579600000055507,
+                "oldestQueuedAgeMs": 15.579600000055507,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 761,
+        "currentCpuMs": 69.6,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.4,
+          "world": 0.1,
+          "avatarsAndCamera": 2.6,
+          "environment": 7,
+          "render": 59.4,
+          "labels": 0.1
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.922933578491211,
+            "y": 2.618303060531616,
+            "z": -30.552417755126953
+          },
+          "zone": "b6:0",
+          "speed": 0.000012696309283910523,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17544,
+            "authorityPackets": 15640,
+            "corrections": 65,
+            "resyncs": 2,
+            "lastCorrectionMetres": 0.0005996416858686516,
+            "lastMotionAgeMs": 508.7000000476837,
+            "authorityAgeMs": 539.6000000238419,
+            "authorityTick": 60654,
+            "pendingInputs": 15,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 32,
+              "ack": 30129,
+              "predictedSeq": 30144,
+              "retainedInputs": 15,
+              "rttMs": 28.200000047683716,
+              "rawRttMs": 28.200000047683716,
+              "rttMeasuredAtMs": 956584.7000000477,
+              "supportedRttMeasuredAtMs": 956584.7000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 30131.926000001476,
+              "clockAnchorAtMs": 958828,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 15,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 661.6000000238419,
+                "lastSendAgeMs": 428,
+                "lastTimerAgeMs": 562.5,
+                "lastFrameAgeMs": 69.20000004768372,
+                "lastTimerIntervalMs": 25.700000047683716,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 30144,
+                "lastAck": 30129,
+                "produced": 47223,
+                "sentInputs": 47223,
+                "sentPackets": 19242,
+                "resets": 17,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 28.200000047683716,
+                "rawRoundTripMs": 54.89999997615814,
+                "measuredAt": 958581.7000000477,
+                "retainedLongTasks": 5,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 395
+              },
+              "authorities": {
+                "received": 17547,
+                "superseded": 1877,
+                "barriers": 32,
+                "ordinaryApplied": 15638,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 26.290000000037253,
+                "cpuMs": 0.22149999998509884,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 1.5831000000457105,
+                "callbacks": 42342,
+                "elapsedMeanMs": 23.992763287043598,
+                "cpuMeanMs": 0.32900650654230046,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 32,
+                "inputTickBase": 30525,
+                "tick": 60654,
+                "ack": 30129,
+                "receivedSeq": 30133,
+                "depth": 4,
+                "maxDepth": 10,
+                "accepted": 47191,
+                "consumed": 47187,
+                "idleTicks": 5716,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 60654,
+                "modeMismatchTicks": 0,
+                "resets": 31,
+                "discarded": 0,
+                "lastInputAgeMs": 0.38989999995101243,
+                "oldestQueuedAgeMs": 50.14099999994505,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 1981,
+      "atMs": 959374,
+      "kind": "longtask",
+      "data": {
+        "startTime": 958939.3999999762,
+        "duration": 357
+      }
+    },
+    {
+      "seq": 1982,
+      "atMs": 959374.1,
+      "kind": "longtask",
+      "data": {
+        "startTime": 959297.8999999762,
+        "duration": 71
+      }
+    },
+    {
+      "seq": 1988,
+      "atMs": 962989.2,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 3637.3,
+        "intervalStartMs": 959298,
+        "intervalEndMs": 962935.3000000715,
+        "recordedAtMs": 962988.8000000715,
+        "currentCpuStartMs": 962935.3000000715,
+        "previousFrame": {
+          "frameStartedAtMs": 959298,
+          "frameMs": 358.6,
+          "cpuMs": 69.6,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.4,
+            "world": 0.1,
+            "avatarsAndCamera": 2.6,
+            "environment": 7,
+            "render": 59.4,
+            "labels": 0.1
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.922933578491211,
+            "y": 2.618303060531616,
+            "z": -30.552417755126953
+          },
+          "zone": "b6:0",
+          "speed": 0.000012696309283910523,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17544,
+            "authorityPackets": 15640,
+            "corrections": 65,
+            "resyncs": 2,
+            "lastCorrectionMetres": 0.0005996416858686516,
+            "lastMotionAgeMs": 508.7000000476837,
+            "authorityAgeMs": 539.6000000238419,
+            "authorityTick": 60654,
+            "pendingInputs": 15,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 32,
+              "ack": 30129,
+              "predictedSeq": 30144,
+              "retainedInputs": 15,
+              "rttMs": 28.200000047683716,
+              "rawRttMs": 28.200000047683716,
+              "rttMeasuredAtMs": 956584.7000000477,
+              "supportedRttMeasuredAtMs": 956584.7000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 30131.926000001476,
+              "clockAnchorAtMs": 958828,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 15,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 661.6000000238419,
+                "lastSendAgeMs": 428,
+                "lastTimerAgeMs": 562.5,
+                "lastFrameAgeMs": 69.20000004768372,
+                "lastTimerIntervalMs": 25.700000047683716,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 30144,
+                "lastAck": 30129,
+                "produced": 47223,
+                "sentInputs": 47223,
+                "sentPackets": 19242,
+                "resets": 17,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 28.200000047683716,
+                "rawRoundTripMs": 54.89999997615814,
+                "measuredAt": 958581.7000000477,
+                "retainedLongTasks": 5,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 395
+              },
+              "authorities": {
+                "received": 17547,
+                "superseded": 1877,
+                "barriers": 32,
+                "ordinaryApplied": 15638,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 26.290000000037253,
+                "cpuMs": 0.22149999998509884,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 1.5831000000457105,
+                "callbacks": 42342,
+                "elapsedMeanMs": 23.992763287043598,
+                "cpuMeanMs": 0.32900650654230046,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 32,
+                "inputTickBase": 30525,
+                "tick": 60654,
+                "ack": 30129,
+                "receivedSeq": 30133,
+                "depth": 4,
+                "maxDepth": 10,
+                "accepted": 47191,
+                "consumed": 47187,
+                "idleTicks": 5716,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 60654,
+                "modeMismatchTicks": 0,
+                "resets": 31,
+                "discarded": 0,
+                "lastInputAgeMs": 0.38989999995101243,
+                "oldestQueuedAgeMs": 50.14099999994505,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 3621.2000000476837,
+        "currentCpuMs": 53.5,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.9,
+          "world": 0.1,
+          "avatarsAndCamera": 0.3,
+          "environment": 6.4,
+          "render": 45.8,
+          "labels": 0
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17625,
+            "authorityPackets": 15642,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 109,
+            "authorityAgeMs": 108.89999997615814,
+            "authorityTick": 60900,
+            "pendingInputs": 9,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 216,
+              "predictedSeq": 225,
+              "retainedInputs": 9,
+              "rttMs": 0.8000000715255737,
+              "rawRttMs": 0.8000000715255737,
+              "rttMeasuredAtMs": 962521.2000000477,
+              "supportedRttMeasuredAtMs": 962521.2000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 216,
+              "clockAnchorAtMs": 962880,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 5,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 53,
+                "lastSendAgeMs": 52.699999928474426,
+                "lastTimerAgeMs": 57.59999990463257,
+                "lastFrameAgeMs": 52.699999928474426,
+                "lastTimerIntervalMs": 35.800000071525574,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 225,
+                "lastAck": 216,
+                "produced": 47228,
+                "sentInputs": 47228,
+                "sentPackets": 19243,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 0.8000000715255737,
+                "rawRoundTripMs": 0.8000000715255737,
+                "measuredAt": 962521.2000000477,
+                "retainedLongTasks": 7,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 397
+              },
+              "authorities": {
+                "received": 17630,
+                "superseded": 1958,
+                "barriers": 33,
+                "ordinaryApplied": 15639,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 29.603899999987334,
+                "cpuMs": 0.31689999997615814,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 0.4250999999917335,
+                "callbacks": 42506,
+                "elapsedMeanMs": 23.996622243918505,
+                "cpuMeanMs": 0.32882138992177784,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 60900,
+                "ack": 216,
+                "receivedSeq": 0,
+                "depth": 0,
+                "maxDepth": 10,
+                "accepted": 47202,
+                "consumed": 47202,
+                "idleTicks": 5947,
+                "idleTicksSinceInput": 216,
+                "lastAppliedTick": 60669,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": null,
+                "oldestQueuedAgeMs": null,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 1990,
+      "atMs": 963037.3,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 61.1,
+        "intervalStartMs": 962935.3000000715,
+        "intervalEndMs": 962996.3999999762,
+        "recordedAtMs": 963037.1000000238,
+        "currentCpuStartMs": 962996.3999999762,
+        "previousFrame": {
+          "frameStartedAtMs": 962935.3000000715,
+          "frameMs": 3637.3,
+          "cpuMs": 53.5,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.9,
+            "world": 0.1,
+            "avatarsAndCamera": 0.3,
+            "environment": 6.4,
+            "render": 45.8,
+            "labels": 0
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17625,
+            "authorityPackets": 15642,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 109,
+            "authorityAgeMs": 108.89999997615814,
+            "authorityTick": 60900,
+            "pendingInputs": 9,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 216,
+              "predictedSeq": 225,
+              "retainedInputs": 9,
+              "rttMs": 0.8000000715255737,
+              "rawRttMs": 0.8000000715255737,
+              "rttMeasuredAtMs": 962521.2000000477,
+              "supportedRttMeasuredAtMs": 962521.2000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 216,
+              "clockAnchorAtMs": 962880,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 5,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 53,
+                "lastSendAgeMs": 52.699999928474426,
+                "lastTimerAgeMs": 57.59999990463257,
+                "lastFrameAgeMs": 52.699999928474426,
+                "lastTimerIntervalMs": 35.800000071525574,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 225,
+                "lastAck": 216,
+                "produced": 47228,
+                "sentInputs": 47228,
+                "sentPackets": 19243,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 0.8000000715255737,
+                "rawRoundTripMs": 0.8000000715255737,
+                "measuredAt": 962521.2000000477,
+                "retainedLongTasks": 7,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 397
+              },
+              "authorities": {
+                "received": 17630,
+                "superseded": 1958,
+                "barriers": 33,
+                "ordinaryApplied": 15639,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 29.603899999987334,
+                "cpuMs": 0.31689999997615814,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 0.4250999999917335,
+                "callbacks": 42506,
+                "elapsedMeanMs": 23.996622243918505,
+                "cpuMeanMs": 0.32882138992177784,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 60900,
+                "ack": 216,
+                "receivedSeq": 0,
+                "depth": 0,
+                "maxDepth": 10,
+                "accepted": 47202,
+                "consumed": 47202,
+                "idleTicks": 5947,
+                "idleTicksSinceInput": 216,
+                "lastAppliedTick": 60669,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": null,
+                "oldestQueuedAgeMs": null,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 48.299999952316284,
+        "currentCpuMs": 40.7,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.5,
+          "world": 0.2,
+          "avatarsAndCamera": 0.2,
+          "environment": 0.4,
+          "render": 39.3,
+          "labels": 0.1
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17625,
+            "authorityPackets": 15642,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 109,
+            "authorityAgeMs": 108.89999997615814,
+            "authorityTick": 60900,
+            "pendingInputs": 9,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 216,
+              "predictedSeq": 225,
+              "retainedInputs": 9,
+              "rttMs": 0.8000000715255737,
+              "rawRttMs": 0.8000000715255737,
+              "rttMeasuredAtMs": 962521.2000000477,
+              "supportedRttMeasuredAtMs": 962521.2000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 216,
+              "clockAnchorAtMs": 962880,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 5,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 53,
+                "lastSendAgeMs": 52.699999928474426,
+                "lastTimerAgeMs": 57.59999990463257,
+                "lastFrameAgeMs": 52.699999928474426,
+                "lastTimerIntervalMs": 35.800000071525574,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 225,
+                "lastAck": 216,
+                "produced": 47228,
+                "sentInputs": 47228,
+                "sentPackets": 19243,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 0.8000000715255737,
+                "rawRoundTripMs": 0.8000000715255737,
+                "measuredAt": 962521.2000000477,
+                "retainedLongTasks": 7,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 397
+              },
+              "authorities": {
+                "received": 17630,
+                "superseded": 1958,
+                "barriers": 33,
+                "ordinaryApplied": 15639,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 29.603899999987334,
+                "cpuMs": 0.31689999997615814,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 0.4250999999917335,
+                "callbacks": 42506,
+                "elapsedMeanMs": 23.996622243918505,
+                "cpuMeanMs": 0.32882138992177784,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 60900,
+                "ack": 216,
+                "receivedSeq": 0,
+                "depth": 0,
+                "maxDepth": 10,
+                "accepted": 47202,
+                "consumed": 47202,
+                "idleTicks": 5947,
+                "idleTicksSinceInput": 216,
+                "lastAppliedTick": 60669,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": null,
+                "oldestQueuedAgeMs": null,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 1991,
+      "atMs": 963038.4,
+      "kind": "longtask",
+      "data": {
+        "startTime": 962935.1000000238,
+        "duration": 55
+      }
+    },
+    {
+      "seq": 1992,
+      "atMs": 963072.7,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 958938.8999999762,
+        "duration": 357.40000009536743,
+        "blockingDuration": 307.3,
+        "renderStart": 958939.3999999762,
+        "styleAndLayoutStart": 959296.1000000238,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 356.60000002384186,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1993,
+      "atMs": 963072.8,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 959297.3999999762,
+        "duration": 71,
+        "blockingDuration": 20.6,
+        "renderStart": 959298,
+        "styleAndLayoutStart": 959368.3999999762,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 70.30000007152557,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1994,
+      "atMs": 963110.3,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 959369.2000000477,
+        "duration": 3621,
+        "blockingDuration": 8.7,
+        "renderStart": 962935.2000000477,
+        "styleAndLayoutStart": 962990.1000000238,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 54.699999928474426,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1995,
+      "atMs": 963242.1,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 51.2,
+        "intervalStartMs": 963152.7000000477,
+        "intervalEndMs": 963203.8999999762,
+        "recordedAtMs": 963241.8999999762,
+        "currentCpuStartMs": 963203.8999999762,
+        "previousFrame": {
+          "frameStartedAtMs": 963152.7000000477,
+          "frameMs": 41.9,
+          "cpuMs": 46,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.4,
+            "world": 0.1,
+            "avatarsAndCamera": 0.3,
+            "environment": 0.3,
+            "render": 44.9,
+            "labels": 0
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17625,
+            "authorityPackets": 15642,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 109,
+            "authorityAgeMs": 108.89999997615814,
+            "authorityTick": 60900,
+            "pendingInputs": 9,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 216,
+              "predictedSeq": 225,
+              "retainedInputs": 9,
+              "rttMs": 0.8000000715255737,
+              "rawRttMs": 0.8000000715255737,
+              "rttMeasuredAtMs": 962521.2000000477,
+              "supportedRttMeasuredAtMs": 962521.2000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 216,
+              "clockAnchorAtMs": 962880,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 5,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 53,
+                "lastSendAgeMs": 52.699999928474426,
+                "lastTimerAgeMs": 57.59999990463257,
+                "lastFrameAgeMs": 52.699999928474426,
+                "lastTimerIntervalMs": 35.800000071525574,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 225,
+                "lastAck": 216,
+                "produced": 47228,
+                "sentInputs": 47228,
+                "sentPackets": 19243,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 0.8000000715255737,
+                "rawRoundTripMs": 0.8000000715255737,
+                "measuredAt": 962521.2000000477,
+                "retainedLongTasks": 7,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 397
+              },
+              "authorities": {
+                "received": 17630,
+                "superseded": 1958,
+                "barriers": 33,
+                "ordinaryApplied": 15639,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 29.603899999987334,
+                "cpuMs": 0.31689999997615814,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 0.4250999999917335,
+                "callbacks": 42506,
+                "elapsedMeanMs": 23.996622243918505,
+                "cpuMeanMs": 0.32882138992177784,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 60900,
+                "ack": 216,
+                "receivedSeq": 0,
+                "depth": 0,
+                "maxDepth": 10,
+                "accepted": 47202,
+                "consumed": 47202,
+                "idleTicks": 5947,
+                "idleTicksSinceInput": 216,
+                "lastAppliedTick": 60669,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": null,
+                "oldestQueuedAgeMs": null,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 253.09999990463257,
+        "currentCpuMs": 38,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.5,
+          "world": 0.1,
+          "avatarsAndCamera": 0.2,
+          "environment": 6.7,
+          "render": 30.5,
+          "labels": 0
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17630,
+            "authorityPackets": 15646,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 42.09999990463257,
+            "authorityAgeMs": 42,
+            "authorityTick": 60915,
+            "pendingInputs": 10,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 231,
+              "predictedSeq": 241,
+              "retainedInputs": 10,
+              "rttMs": 0.8000000715255737,
+              "rawRttMs": 0.8000000715255737,
+              "rttMeasuredAtMs": 962521.2000000477,
+              "supportedRttMeasuredAtMs": 962521.2000000477,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 235.1939999985695,
+              "clockAnchorAtMs": 963199.8999999762,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 10,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 168.5,
+                "lastSendAgeMs": 37.5,
+                "lastTimerAgeMs": 89.29999995231628,
+                "lastFrameAgeMs": 37.5,
+                "lastTimerIntervalMs": 42.299999952316284,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 241,
+                "lastAck": 231,
+                "produced": 47244,
+                "sentInputs": 47244,
+                "sentPackets": 19249,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 0.8000000715255737,
+                "rawRoundTripMs": 0.8000000715255737,
+                "measuredAt": 962521.2000000477,
+                "retainedLongTasks": 7,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 397
+              },
+              "authorities": {
+                "received": 17635,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15643,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 31.069999999948777,
+                "cpuMs": 0.28040000004693866,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 15.802299999979823,
+                "callbacks": 42518,
+                "elapsedMeanMs": 23.996091121407403,
+                "cpuMeanMs": 0.3288064631453784,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 60915,
+                "ack": 231,
+                "receivedSeq": 235,
+                "depth": 4,
+                "maxDepth": 10,
+                "accepted": 47217,
+                "consumed": 47213,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 60915,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 32.99730000004638,
+                "oldestQueuedAgeMs": 70.51370000001043,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 2010,
+      "atMs": 972862.4,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 57.6,
+        "intervalStartMs": 972747.7000000477,
+        "intervalEndMs": 972805.3000000715,
+        "recordedAtMs": 972862.1000000238,
+        "currentCpuStartMs": 972805.3000000715,
+        "previousFrame": {
+          "frameStartedAtMs": 972747.7000000477,
+          "frameMs": 34.2,
+          "cpuMs": 55.5,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.4,
+            "world": 0.1,
+            "avatarsAndCamera": 0.3,
+            "environment": 0.4,
+            "render": 54.3,
+            "labels": 0
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17814,
+            "authorityPackets": 15830,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 59,
+            "authorityAgeMs": 31.300000071525574,
+            "authorityTick": 61468,
+            "pendingInputs": 9,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 784,
+              "predictedSeq": 793,
+              "retainedInputs": 9,
+              "rttMs": 55.699999928474426,
+              "rawRttMs": 55.699999928474426,
+              "rttMeasuredAtMs": 970596.8999999762,
+              "supportedRttMeasuredAtMs": 970596.8999999762,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 786.7439999985694,
+              "clockAnchorAtMs": 972392.3999999762,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 3,
+                "inFlight": 6,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": 58.700000047683716,
+                "oldestUnackedAgeMs": 170.89999997615814,
+                "lastSendAgeMs": 59.39999997615814,
+                "lastTimerAgeMs": 59.39999997615814,
+                "lastFrameAgeMs": 30.800000071525574,
+                "lastTimerIntervalMs": 58.700000047683716,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 790,
+                "lastAck": 784,
+                "produced": 47796,
+                "sentInputs": 47793,
+                "sentPackets": 19417,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 55.699999928474426,
+                "rawRoundTripMs": 55.699999928474426,
+                "measuredAt": 970596.8999999762,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 401
+              },
+              "authorities": {
+                "received": 17819,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15827,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 31.79700000002049,
+                "cpuMs": 0.4198999999789521,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 1.2595333333193446,
+                "callbacks": 42911,
+                "elapsedMeanMs": 23.990769877187667,
+                "cpuMeanMs": 0.3280240590994552,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61468,
+                "ack": 784,
+                "receivedSeq": 786,
+                "depth": 2,
+                "maxDepth": 10,
+                "accepted": 47768,
+                "consumed": 47766,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61468,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 40.945399999967776,
+                "oldestQueuedAgeMs": 40.945399999967776,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 438.39999997615814,
+        "currentCpuMs": 56.8,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.6,
+          "world": 0.1,
+          "avatarsAndCamera": 1.6,
+          "environment": 0.5,
+          "render": 53.9,
+          "labels": 0.1
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17822,
+            "authorityPackets": 15838,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 57.39999997615814,
+            "authorityAgeMs": 57.200000047683716,
+            "authorityTick": 61491,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 807,
+              "predictedSeq": 818,
+              "retainedInputs": 11,
+              "rttMs": 52.10000002384186,
+              "rawRttMs": 52.10000002384186,
+              "rttMeasuredAtMs": 972610,
+              "supportedRttMeasuredAtMs": 972610,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 811.4999999999999,
+              "clockAnchorAtMs": 972805,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 215.10000002384186,
+                "lastSendAgeMs": 56.39999997615814,
+                "lastTimerAgeMs": 114.70000004768372,
+                "lastFrameAgeMs": 56.39999997615814,
+                "lastTimerIntervalMs": 34.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 818,
+                "lastAck": 807,
+                "produced": 47821,
+                "sentInputs": 47821,
+                "sentPackets": 19425,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 52.10000002384186,
+                "rawRoundTripMs": 52.10000002384186,
+                "measuredAt": 972610,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 402
+              },
+              "authorities": {
+                "received": 17827,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15835,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 20.635399999911897,
+                "cpuMs": 0.1805000000167638,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 6.163399999960129,
+                "callbacks": 42929,
+                "elapsedMeanMs": 23.98975432458245,
+                "cpuMeanMs": 0.32798589764533165,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61491,
+                "ack": 807,
+                "receivedSeq": 810,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47792,
+                "consumed": 47789,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61491,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 21.010999999940395,
+                "oldestQueuedAgeMs": 87.27090000000317,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 2011,
+      "atMs": 972863.7,
+      "kind": "longtask",
+      "data": {
+        "startTime": 972747.6000000238,
+        "duration": 56
+      }
+    },
+    {
+      "seq": 2012,
+      "atMs": 972863.7,
+      "kind": "longtask",
+      "data": {
+        "startTime": 972805.2000000477,
+        "duration": 58
+      }
+    },
+    {
+      "seq": 2014,
+      "atMs": 972916.5,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 59.3,
+        "intervalStartMs": 972805.3000000715,
+        "intervalEndMs": 972864.6000000238,
+        "recordedAtMs": 972915.8999999762,
+        "currentCpuStartMs": 972864.6000000238,
+        "previousFrame": {
+          "frameStartedAtMs": 972805.3000000715,
+          "frameMs": 57.6,
+          "cpuMs": 56.8,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.6,
+            "world": 0.1,
+            "avatarsAndCamera": 1.6,
+            "environment": 0.5,
+            "render": 53.9,
+            "labels": 0.1
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17822,
+            "authorityPackets": 15838,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 57.39999997615814,
+            "authorityAgeMs": 57.200000047683716,
+            "authorityTick": 61491,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 807,
+              "predictedSeq": 818,
+              "retainedInputs": 11,
+              "rttMs": 52.10000002384186,
+              "rawRttMs": 52.10000002384186,
+              "rttMeasuredAtMs": 972610,
+              "supportedRttMeasuredAtMs": 972610,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 811.4999999999999,
+              "clockAnchorAtMs": 972805,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 215.10000002384186,
+                "lastSendAgeMs": 56.39999997615814,
+                "lastTimerAgeMs": 114.70000004768372,
+                "lastFrameAgeMs": 56.39999997615814,
+                "lastTimerIntervalMs": 34.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 818,
+                "lastAck": 807,
+                "produced": 47821,
+                "sentInputs": 47821,
+                "sentPackets": 19425,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 52.10000002384186,
+                "rawRoundTripMs": 52.10000002384186,
+                "measuredAt": 972610,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 402
+              },
+              "authorities": {
+                "received": 17827,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15835,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 20.635399999911897,
+                "cpuMs": 0.1805000000167638,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 6.163399999960129,
+                "callbacks": 42929,
+                "elapsedMeanMs": 23.98975432458245,
+                "cpuMeanMs": 0.32798589764533165,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61491,
+                "ack": 807,
+                "receivedSeq": 810,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47792,
+                "consumed": 47789,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61491,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 21.010999999940395,
+                "oldestQueuedAgeMs": 87.27090000000317,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 53.799999952316284,
+        "currentCpuMs": 51.3,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 1.6,
+          "world": 0.3,
+          "avatarsAndCamera": 0.6,
+          "environment": 0.5,
+          "render": 48.3,
+          "labels": 0
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17822,
+            "authorityPackets": 15838,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 57.39999997615814,
+            "authorityAgeMs": 57.200000047683716,
+            "authorityTick": 61491,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 807,
+              "predictedSeq": 818,
+              "retainedInputs": 11,
+              "rttMs": 52.10000002384186,
+              "rawRttMs": 52.10000002384186,
+              "rttMeasuredAtMs": 972610,
+              "supportedRttMeasuredAtMs": 972610,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 811.4999999999999,
+              "clockAnchorAtMs": 972805,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 215.10000002384186,
+                "lastSendAgeMs": 56.39999997615814,
+                "lastTimerAgeMs": 114.70000004768372,
+                "lastFrameAgeMs": 56.39999997615814,
+                "lastTimerIntervalMs": 34.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 818,
+                "lastAck": 807,
+                "produced": 47821,
+                "sentInputs": 47821,
+                "sentPackets": 19425,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 52.10000002384186,
+                "rawRoundTripMs": 52.10000002384186,
+                "measuredAt": 972610,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 402
+              },
+              "authorities": {
+                "received": 17827,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15835,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 20.635399999911897,
+                "cpuMs": 0.1805000000167638,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 6.163399999960129,
+                "callbacks": 42929,
+                "elapsedMeanMs": 23.98975432458245,
+                "cpuMeanMs": 0.32798589764533165,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61491,
+                "ack": 807,
+                "receivedSeq": 810,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47792,
+                "consumed": 47789,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61491,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 21.010999999940395,
+                "oldestQueuedAgeMs": 87.27090000000317,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 2015,
+      "atMs": 972962.2,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 53.7,
+        "intervalStartMs": 972864.6000000238,
+        "intervalEndMs": 972918.3000000715,
+        "recordedAtMs": 972962.1000000238,
+        "currentCpuStartMs": 972918.3000000715,
+        "previousFrame": {
+          "frameStartedAtMs": 972864.6000000238,
+          "frameMs": 59.3,
+          "cpuMs": 51.3,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 1.6,
+            "world": 0.3,
+            "avatarsAndCamera": 0.6,
+            "environment": 0.5,
+            "render": 48.3,
+            "labels": 0
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17822,
+            "authorityPackets": 15838,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 57.39999997615814,
+            "authorityAgeMs": 57.200000047683716,
+            "authorityTick": 61491,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 807,
+              "predictedSeq": 818,
+              "retainedInputs": 11,
+              "rttMs": 52.10000002384186,
+              "rawRttMs": 52.10000002384186,
+              "rttMeasuredAtMs": 972610,
+              "supportedRttMeasuredAtMs": 972610,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 811.4999999999999,
+              "clockAnchorAtMs": 972805,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 215.10000002384186,
+                "lastSendAgeMs": 56.39999997615814,
+                "lastTimerAgeMs": 114.70000004768372,
+                "lastFrameAgeMs": 56.39999997615814,
+                "lastTimerIntervalMs": 34.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 818,
+                "lastAck": 807,
+                "produced": 47821,
+                "sentInputs": 47821,
+                "sentPackets": 19425,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 52.10000002384186,
+                "rawRoundTripMs": 52.10000002384186,
+                "measuredAt": 972610,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 402
+              },
+              "authorities": {
+                "received": 17827,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15835,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 20.635399999911897,
+                "cpuMs": 0.1805000000167638,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 6.163399999960129,
+                "callbacks": 42929,
+                "elapsedMeanMs": 23.98975432458245,
+                "cpuMeanMs": 0.32798589764533165,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61491,
+                "ack": 807,
+                "receivedSeq": 810,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47792,
+                "consumed": 47789,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61491,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 21.010999999940395,
+                "oldestQueuedAgeMs": 87.27090000000317,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 100,
+        "currentCpuMs": 43.8,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.6,
+          "world": 0.1,
+          "avatarsAndCamera": 0.8,
+          "environment": 7.6,
+          "render": 34.7,
+          "labels": 0
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17822,
+            "authorityPackets": 15838,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 57.39999997615814,
+            "authorityAgeMs": 57.200000047683716,
+            "authorityTick": 61491,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 807,
+              "predictedSeq": 818,
+              "retainedInputs": 11,
+              "rttMs": 52.10000002384186,
+              "rawRttMs": 52.10000002384186,
+              "rttMeasuredAtMs": 972610,
+              "supportedRttMeasuredAtMs": 972610,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 811.4999999999999,
+              "clockAnchorAtMs": 972805,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 215.10000002384186,
+                "lastSendAgeMs": 56.39999997615814,
+                "lastTimerAgeMs": 114.70000004768372,
+                "lastFrameAgeMs": 56.39999997615814,
+                "lastTimerIntervalMs": 34.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 818,
+                "lastAck": 807,
+                "produced": 47821,
+                "sentInputs": 47821,
+                "sentPackets": 19425,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 52.10000002384186,
+                "rawRoundTripMs": 52.10000002384186,
+                "measuredAt": 972610,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 402
+              },
+              "authorities": {
+                "received": 17827,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15835,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 20.635399999911897,
+                "cpuMs": 0.1805000000167638,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 6.163399999960129,
+                "callbacks": 42929,
+                "elapsedMeanMs": 23.98975432458245,
+                "cpuMeanMs": 0.32798589764533165,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61491,
+                "ack": 807,
+                "receivedSeq": 810,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47792,
+                "consumed": 47789,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61491,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 21.010999999940395,
+                "oldestQueuedAgeMs": 87.27090000000317,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 2016,
+      "atMs": 972963.4,
+      "kind": "longtask",
+      "data": {
+        "startTime": 972864.3999999762,
+        "duration": 53
+      }
+    },
+    {
+      "seq": 2017,
+      "atMs": 972963.4,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 972743.7000000477,
+        "duration": 60,
+        "blockingDuration": 9.3,
+        "renderStart": 972747.7000000477,
+        "styleAndLayoutStart": 972803.5,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 55.799999952316284,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    },
+    {
+      "seq": 2018,
+      "atMs": 973003.6,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 50.6,
+        "intervalStartMs": 972918.4000000954,
+        "intervalEndMs": 972969,
+        "recordedAtMs": 973003.6000000238,
+        "currentCpuStartMs": 972969,
+        "previousFrame": {
+          "frameStartedAtMs": 972918.3000000715,
+          "frameMs": 53.7,
+          "cpuMs": 43.8,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.6,
+            "world": 0.1,
+            "avatarsAndCamera": 0.8,
+            "environment": 7.6,
+            "render": 34.7,
+            "labels": 0
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17822,
+            "authorityPackets": 15838,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 57.39999997615814,
+            "authorityAgeMs": 57.200000047683716,
+            "authorityTick": 61491,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 807,
+              "predictedSeq": 818,
+              "retainedInputs": 11,
+              "rttMs": 52.10000002384186,
+              "rawRttMs": 52.10000002384186,
+              "rttMeasuredAtMs": 972610,
+              "supportedRttMeasuredAtMs": 972610,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 811.4999999999999,
+              "clockAnchorAtMs": 972805,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 215.10000002384186,
+                "lastSendAgeMs": 56.39999997615814,
+                "lastTimerAgeMs": 114.70000004768372,
+                "lastFrameAgeMs": 56.39999997615814,
+                "lastTimerIntervalMs": 34.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 818,
+                "lastAck": 807,
+                "produced": 47821,
+                "sentInputs": 47821,
+                "sentPackets": 19425,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 52.10000002384186,
+                "rawRoundTripMs": 52.10000002384186,
+                "measuredAt": 972610,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 402
+              },
+              "authorities": {
+                "received": 17827,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15835,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 20.635399999911897,
+                "cpuMs": 0.1805000000167638,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 6.163399999960129,
+                "callbacks": 42929,
+                "elapsedMeanMs": 23.98975432458245,
+                "cpuMeanMs": 0.32798589764533165,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61491,
+                "ack": 807,
+                "receivedSeq": 810,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47792,
+                "consumed": 47789,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61491,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 21.010999999940395,
+                "oldestQueuedAgeMs": 87.27090000000317,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 141.5,
+        "currentCpuMs": 34.6,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.8,
+          "world": 0,
+          "avatarsAndCamera": 0.4,
+          "environment": 0.4,
+          "render": 32.9,
+          "labels": 0.1
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 17822,
+            "authorityPackets": 15838,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 57.39999997615814,
+            "authorityAgeMs": 57.200000047683716,
+            "authorityTick": 61491,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 807,
+              "predictedSeq": 818,
+              "retainedInputs": 11,
+              "rttMs": 52.10000002384186,
+              "rawRttMs": 52.10000002384186,
+              "rttMeasuredAtMs": 972610,
+              "supportedRttMeasuredAtMs": 972610,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 811.4999999999999,
+              "clockAnchorAtMs": 972805,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 215.10000002384186,
+                "lastSendAgeMs": 56.39999997615814,
+                "lastTimerAgeMs": 114.70000004768372,
+                "lastFrameAgeMs": 56.39999997615814,
+                "lastTimerIntervalMs": 34.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 818,
+                "lastAck": 807,
+                "produced": 47821,
+                "sentInputs": 47821,
+                "sentPackets": 19425,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 52.10000002384186,
+                "rawRoundTripMs": 52.10000002384186,
+                "measuredAt": 972610,
+                "retainedLongTasks": 1,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 402
+              },
+              "authorities": {
+                "received": 17827,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 15835,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 20.635399999911897,
+                "cpuMs": 0.1805000000167638,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 6.163399999960129,
+                "callbacks": 42929,
+                "elapsedMeanMs": 23.98975432458245,
+                "cpuMeanMs": 0.32798589764533165,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 61491,
+                "ack": 807,
+                "receivedSeq": 810,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 47792,
+                "consumed": 47789,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 61491,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 21.010999999940395,
+                "oldestQueuedAgeMs": 87.27090000000317,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 2019,
+      "atMs": 973004.7,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 972804.5,
+        "duration": 58.89999997615814,
+        "blockingDuration": 8.5,
+        "renderStart": 972805.3000000715,
+        "styleAndLayoutStart": 972863.3000000715,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 58,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    },
+    {
+      "seq": 2020,
+      "atMs": 973031.4,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 972863.6000000238,
+        "duration": 53.60000002384186,
+        "blockingDuration": 2.9,
+        "renderStart": 972864.5,
+        "styleAndLayoutStart": 972917,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 52.39999997615814,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    },
+    {
+      "seq": 2036,
+      "atMs": 982928.8,
+      "kind": "frame-hitch",
+      "data": {
+        "frameMs": 70.6,
+        "intervalStartMs": 982823.8999999762,
+        "intervalEndMs": 982894.5,
+        "recordedAtMs": 982928.6000000238,
+        "currentCpuStartMs": 982894.5,
+        "previousFrame": {
+          "frameStartedAtMs": 982823.8999999762,
+          "frameMs": 38.8,
+          "cpuMs": 66.2,
+          "gpuMs": null,
+          "phases": {
+            "simulation": 0.4,
+            "world": 0.1,
+            "avatarsAndCamera": 0.3,
+            "environment": 0.3,
+            "render": 65.1,
+            "labels": 0
+          }
+        },
+        "previousContext": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 18005,
+            "authorityPackets": 16020,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 25.5,
+            "authorityAgeMs": 82.20000004768372,
+            "authorityTick": 62037,
+            "pendingInputs": 11,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 1353,
+              "predictedSeq": 1364,
+              "retainedInputs": 11,
+              "rttMs": 32.10000002384186,
+              "rawRttMs": 32.10000002384186,
+              "rttMeasuredAtMs": 980552.8000000715,
+              "supportedRttMeasuredAtMs": 980552.8000000715,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 6,
+              "clockSeqAtAnchor": 1355.4299999999998,
+              "clockAnchorAtMs": 981870.5,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 11,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 193.90000009536743,
+                "lastSendAgeMs": 25.300000071525574,
+                "lastTimerAgeMs": 53.200000047683716,
+                "lastFrameAgeMs": 25.300000071525574,
+                "lastTimerIntervalMs": 54,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 1364,
+                "lastAck": 1353,
+                "produced": 48367,
+                "sentInputs": 48367,
+                "sentPackets": 19592,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 32.10000002384186,
+                "rawRoundTripMs": 32.10000002384186,
+                "measuredAt": 980552.8000000715,
+                "retainedLongTasks": 3,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 406
+              },
+              "authorities": {
+                "received": 18009,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 16017,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 30.600000000093132,
+                "cpuMs": 0.19989999989047647,
+                "steps": 2,
+                "droppedMs": 0,
+                "accumulatorMs": 11.45200000004739,
+                "callbacks": 43313,
+                "elapsedMeanMs": 23.987289081799922,
+                "cpuMeanMs": 0.3272736291648491,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 62037,
+                "ack": 1353,
+                "receivedSeq": 1356,
+                "depth": 3,
+                "maxDepth": 10,
+                "accepted": 48338,
+                "consumed": 48335,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 62037,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 22.232099999906495,
+                "oldestQueuedAgeMs": 22.232099999906495,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "previousContextAgeMs": 975.8999999761581,
+        "currentCpuMs": 34.1,
+        "currentGpuMs": null,
+        "currentPhases": {
+          "simulation": 0.7,
+          "world": 0,
+          "avatarsAndCamera": 0.4,
+          "environment": 0.3,
+          "render": 32.6,
+          "labels": 0.1
+        },
+        "context": {
+          "mode": "multiplayer",
+          "connection": "connected",
+          "position": {
+            "x": 6.92293643951416,
+            "y": 2.618303060531616,
+            "z": -30.55241584777832
+          },
+          "zone": "b6:0",
+          "speed": 0.000011719615997662913,
+          "vehicle": false,
+          "rendering": {
+            "mode": "auto",
+            "quality": "low",
+            "targetFps": 60,
+            "hardwareScaling": 2
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986
+          },
+          "renderResolution": {
+            "width": 1020,
+            "height": 493
+          },
+          "network": {
+            "motionPackets": 18023,
+            "authorityPackets": 16039,
+            "corrections": 67,
+            "resyncs": 3,
+            "lastCorrectionMetres": 0,
+            "lastMotionAgeMs": 104.79999995231628,
+            "authorityAgeMs": 38,
+            "authorityTick": 62094,
+            "pendingInputs": 13,
+            "visualCorrectionMetres": 0,
+            "timeline": {
+              "inputEpoch": 33,
+              "ack": 1410,
+              "predictedSeq": 1423,
+              "retainedInputs": 13,
+              "rttMs": 53.700000047683716,
+              "rawRttMs": 53.700000047683716,
+              "rttMeasuredAtMs": 982596.3000000715,
+              "supportedRttMeasuredAtMs": 982596.3000000715,
+              "pendingRttMs": null,
+              "pendingRttMeasuredAtMs": null,
+              "pendingRttExpiresAtMs": null,
+              "leadTicks": 7,
+              "clockSeqAtAnchor": 1416.6360000014304,
+              "clockAnchorAtMs": 982890.6000000238,
+              "deliveryBudgetExceeded": false,
+              "clockCalibrated": true
+            },
+            "transport": {
+              "sender": {
+                "queued": 0,
+                "inFlight": 13,
+                "maxQueued": 7,
+                "oldestQueuedAgeMs": null,
+                "oldestUnackedAgeMs": 242.39999997615814,
+                "lastSendAgeMs": 33.60000002384186,
+                "lastTimerAgeMs": 105,
+                "lastFrameAgeMs": 33.60000002384186,
+                "lastTimerIntervalMs": 73.10000002384186,
+                "maxTimerIntervalMs": 4136.900000095367,
+                "lastSentSeq": 1423,
+                "lastAck": 1410,
+                "produced": 48426,
+                "sentInputs": 48426,
+                "sentPackets": 19610,
+                "resets": 19,
+                "discardedInputs": 0,
+                "expiredQueuedInputs": 0,
+                "overflows": 0,
+                "sendErrors": 0
+              },
+              "probe": {
+                "pendingMs": null,
+                "predictionRoundTripMs": 53.700000047683716,
+                "rawRoundTripMs": 53.700000047683716,
+                "measuredAt": 982596.3000000715,
+                "retainedLongTasks": 3,
+                "timeouts": 0,
+                "contaminatedSamples": 2,
+                "acceptedSamples": 407
+              },
+              "authorities": {
+                "received": 18028,
+                "superseded": 1959,
+                "barriers": 33,
+                "ordinaryApplied": 16036,
+                "rejected": 0
+              }
+            },
+            "server": {
+              "clock": {
+                "elapsedMs": 15.730199999874458,
+                "cpuMs": 0.2482000000309199,
+                "steps": 1,
+                "droppedMs": 0,
+                "accumulatorMs": 10.885599999920354,
+                "callbacks": 43356,
+                "elapsedMeanMs": 23.985397306024538,
+                "cpuMeanMs": 0.327198341637074,
+                "elapsedMaxMs": 765.8521000000001,
+                "cpuMaxMs": 159.50159999998868,
+                "droppedTotalMs": 5000.000000000001
+              },
+              "queue": {
+                "inputEpoch": 33,
+                "inputTickBase": 60684,
+                "tick": 62094,
+                "ack": 1410,
+                "receivedSeq": 1417,
+                "depth": 7,
+                "maxDepth": 10,
+                "accepted": 48399,
+                "consumed": 48392,
+                "idleTicks": 5951,
+                "idleTicksSinceInput": 0,
+                "lastAppliedTick": 62094,
+                "modeMismatchTicks": 0,
+                "resets": 32,
+                "discarded": 0,
+                "lastInputAgeMs": 3.530599999940023,
+                "oldestQueuedAgeMs": 38.64749999996275,
+                "resolution": "scheduled-tick",
+                "rejected": {
+                  "invalid": 0,
+                  "epoch": 7,
+                  "late": 14,
+                  "ahead": 0,
+                  "duplicate": 0
+                }
+              }
+            }
+          }
+        },
+        "visibility": "visible",
+        "afterVisibilityChange": false
+      }
+    },
+    {
+      "seq": 2037,
+      "atMs": 982929.4,
+      "kind": "longtask",
+      "data": {
+        "startTime": 982823.8999999762,
+        "duration": 66
+      }
+    },
+    {
+      "seq": 2038,
+      "atMs": 982986.7,
+      "kind": "long-animation-frame",
+      "data": {
+        "startTime": 982823.5,
+        "duration": 66.89999997615814,
+        "blockingDuration": 16.6,
+        "renderStart": 982823.8999999762,
+        "styleAndLayoutStart": 982890.3000000715,
+        "scripts": [
+          {
+            "source": "http://127.0.0.1:4213/assets/babylon-D2WjRl2d.js",
+            "function": "",
+            "position": 206501,
+            "duration": 66.40000009536743,
+            "forcedStyleAndLayoutDuration": 0
+          }
+        ]
+      }
+    }
+  ]
+}

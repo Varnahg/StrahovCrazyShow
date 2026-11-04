@@ -23,6 +23,11 @@ export class AuthorityBuffer {
   private taken = 0;
   private rejected = 0;
 
+  /** Latest validated receipt, even if Game cannot yet replay its door history. */
+  get inputEpoch(): number | null {
+    return this.frontier?.inputEpoch ?? null;
+  }
+
   offer(packet: Authority, receivedAt: number): AuthorityOffer {
     if (this.disposed) return { kind: "rejected", reason: "disposed" };
     if (

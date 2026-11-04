@@ -137,6 +137,39 @@ test("a revision gap pauses authority and requests one bounded recovery, then co
   pre.dispose();
 });
 
+test("unsent bootstrap recovery keeps cooldown available; sends and thrown attempts retain 1s throttle", () => {
+  let now = 0, calls = 0, outcome: "unsent" | "sent" | "throw" = "unsent";
+  const connection = new DoorConnection({
+    definitions: [definition], definitionHash: identity.definitionHash,
+    isCurrent: () => true, onTimeline() {}, onNotice() {}, now: () => now,
+    requestResync: () => {
+      calls++;
+      if (outcome === "throw") throw new Error("transport failed");
+      return outcome === "sent";
+    },
+  });
+  assert.equal(connection.requestResync(), false);
+  outcome = "sent";
+  assert.equal(connection.requestResync(), true, "first authority may arrive in the same millisecond");
+  assert.equal(calls, 2);
+  now = 999;
+  assert.equal(connection.requestResync(), false);
+  assert.equal(calls, 2);
+  now = 1000;
+  outcome = "throw";
+  assert.equal(connection.requestResync(), false);
+  now = 1999;
+  assert.equal(connection.requestResync(), false);
+  assert.equal(calls, 3);
+  now = 2000;
+  outcome = "sent";
+  assert.equal(connection.requestResync(), true);
+  connection.dispose();
+  now = 3000;
+  assert.equal(connection.requestResync(), false);
+  assert.equal(calls, 4);
+});
+
 test("mismatched model/epoch fails closed once; a new connection is required to establish another world", () => {
   const f = fixture();
   f.connection.receiveSnapshot(snapshot());

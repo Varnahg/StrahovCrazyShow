@@ -20,6 +20,7 @@ import type { NetworkProbeReply } from "../shared/network-diagnostics";
 
 import {
   benchmarkPresentation,
+  assessBenchmarkFrames,
   createBenchmarkDownloads,
 } from "./benchmark-presentation";
 import { WorldDock } from "./world-dock";
@@ -394,7 +395,9 @@ export function App() {
           droppedInputs: snapshot.queued,
         });
         try {
-          room.current?.send("resync");
+          const inputEpoch = authorityBufferRef.current?.inputEpoch;
+          if (inputEpoch != null && connectedRef.current && modeRef.current === "multi")
+            room.current?.send("resync", { inputEpoch });
         } catch (error) {
           sessionDiagnostics.event("network-send-error", {
             message: String(error),
@@ -845,6 +848,7 @@ export function App() {
     connectedRef.current = true;
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
+    let deferredDoorResync = false;
     const doors: DoorConnection = new DoorConnection({
       definitions: CAD_DOOR_DEFINITIONS,
       definitionHash: CAD_DOOR_DEFINITION_HASH,
@@ -853,7 +857,17 @@ export function App() {
         if (doorConnectionRef.current === doors && game.current?.network)
           game.current.attachDoorTimeline(timeline);
       },
-      requestResync: () => r.send("doorResync"),
+      requestResync: () => {
+        if (room.current !== r || doorConnectionRef.current !== doors) return false;
+        const inputEpoch = authorityBufferRef.current?.inputEpoch;
+        if (inputEpoch == null) {
+          deferredDoorResync = true;
+          return false;
+        }
+        deferredDoorResync = false;
+        r.send("doorResync", { inputEpoch });
+        return true;
+      },
       onNotice: message => notice(t(message)),
     });
     doorConnectionRef.current = doors;
@@ -925,7 +939,12 @@ export function App() {
     });
     callbacks.onMessage("authoritative", (data: Authority) => {
       const result = authorityBufferRef.current?.offer(data, performance.now());
-      if (result?.kind !== "barrier") return;
+      if (!result || result.kind === "rejected") return;
+      if (deferredDoorResync) {
+        deferredDoorResync = false;
+        doors.requestResync();
+      }
+      if (result.kind !== "barrier") return;
       if (
         modeRef.current === "multi" &&
         game.current?.network &&
@@ -2856,6 +2875,10 @@ function BenchmarkControls({
   const [running, setRunning] = useState(false);
   const [downloadError, setDownloadError] = useState(false);
   const downloads = useMemo(() => createBenchmarkDownloads(), []);
+  const frameAssessment = useMemo(
+    () => result ? assessBenchmarkFrames(result) : null,
+    [result],
+  );
   const resultJSON = useMemo(
     () =>
       result ? JSON.stringify(benchmarkPresentation(result), null, 2) : "",
@@ -2912,6 +2935,29 @@ function BenchmarkControls({
               )}
             </p>
           )}
+          {frameAssessment && (
+            <>
+              <p role={frameAssessment.status === "failed" ? "alert" : "status"}>
+                <strong>{t(frameAssessment.status === "failed"
+                  ? "Plynulost vzorku nevyhovuje."
+                  : frameAssessment.status === "passed"
+                    ? "Krátký snímkový vzorek splnil limity."
+                    : "Plynulost vzorku nelze spolehlivě vyhodnotit.")}</strong>
+              </p>
+              <p className="small muted">
+                {t("Krátké měření samo neověřuje plynulost chůze ani stabilitu připojení.")}
+              </p>
+              {frameAssessment.metrics && (
+                <p className="small muted">
+                  {t("Nejdelší snímek: {duration} ms · snímky od {threshold} ms: {count}.", {
+                    duration: formatNumber(frameAssessment.metrics.maxMs, { maximumFractionDigits: 1 }),
+                    threshold: formatNumber(frameAssessment.policy.hitchThresholdMs),
+                    count: formatNumber(frameAssessment.metrics.hitches),
+                  })}
+                </p>
+              )}
+            </>
+          )}
           <p>
             <strong>{formatNumber(result.averageFps)} FPS</strong> ·{" "}
             {t(
@@ -2924,6 +2970,11 @@ function BenchmarkControls({
             )}{" "}
             · p95{" "}
             {formatNumber(result.p95FrameMs, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            })}{" "}
+            ms · p99{" "}
+            {formatNumber(result.p99FrameMs, {
               minimumFractionDigits: 1,
               maximumFractionDigits: 1,
             })}{" "}

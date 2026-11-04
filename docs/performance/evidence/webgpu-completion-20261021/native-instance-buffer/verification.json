@@ -1,0 +1,195 @@
+{
+  "checkedAtUTC": "2026-10-21T18:00:09.842Z",
+  "scope": "Portable installed native CPU tests and one explicit isolated Mesh source overlay. Actual cold native Mesh.render chain/base Material; fake ready Effect and terminal GPU/raster IO. No install/GPU/performance/actual37326 claim.",
+  "red": {
+    "command": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe --import tsx --test --test-reporter=tap C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\webgpu-instance-buffers.test.ts",
+    "exit": 1,
+    "tests": 14,
+    "pass": 4,
+    "fail": 10,
+    "logSha256": "1ae3c6926b9856f9bf61ca338fe6fd081e8ea299aac314bf42c9a0c268b0b8ef"
+  },
+  "green": {
+    "command": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe --import file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-native-instance-buffer-20261021/candidate-import.mjs --import tsx --test --test-reporter=tap C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\webgpu-instance-buffers.test.ts",
+    "exit": 0,
+    "tests": 14,
+    "pass": 14,
+    "fail": 0,
+    "logSha256": "b304ac584ba7cebad71af34ca223bfab2318041336c18b30c2f0ccfb9a26f188"
+  },
+  "inline": {
+    "exit": 0,
+    "sourceSha256": "b0910a1ea745a0a0463700408f1bc97ff2aaa8e7624483f2548d6b3627c62186",
+    "logSha256": "ba65afd98f80863ac2920a16244832d1da16647ecb81f76ebb5776ce683fbc8b",
+    "witness": {
+      "nativeEntry": "Mesh.render",
+      "baseMaterialNative": true,
+      "nativePipelineCache": true,
+      "nativeBindGroupCache": true,
+      "recorded": 1,
+      "reused": 1,
+      "oldBytes": 2048,
+      "currentBytes": 4096,
+      "oldRefsAfterGrowth": 0,
+      "previousOldBytes": 2048,
+      "previousCurrentBytes": 4096,
+      "bundleStayed": true,
+      "firstBundleHeldOld": true,
+      "firstBundleHeldPrevious": true,
+      "oldDestroyed": true,
+      "previousDestroyed": true,
+      "secondBundleHeldNew": false,
+      "contextDirty": false,
+      "materialDirty": false
+    }
+  },
+  "types": {
+    "exit": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scope": "strict TS portable wrapper only; not full project semantic check"
+  },
+  "syntax": [
+    {
+      "file": "tests/fixtures/webgpu-instance-buffers/loader.mjs",
+      "exit": 0
+    },
+    {
+      "file": "tests/fixtures/webgpu-instance-buffers/fixture.mjs",
+      "exit": 0
+    },
+    {
+      "file": "tests/fixtures/webgpu-instance-buffers/instance-buffers.test.mjs",
+      "exit": 0
+    },
+    {
+      "file": "docs/performance/evidence/webgpu-completion-20261021/native-instance-buffer/prepare.mjs",
+      "exit": 0
+    },
+    {
+      "file": "docs/performance/evidence/webgpu-completion-20261021/native-instance-buffer/verify.mjs",
+      "exit": 0
+    }
+  ],
+  "sourceBefore": {
+    "patches/@babylonjs__core@9.30.0.patch": "597beca732c25cbb128271fad6681fd0176726962ede3218db41057359ea9b72",
+    "pnpm-lock.yaml": "d91d6f2cdc70196ee1a44b7ae9b1adab8b8bd48f2092b138a4def94a12c668df",
+    "tests/webgpu-instance-buffers.test.ts": "1f15285f94e8b2139fccfe6224354c2ed699db9b3b0ae836e52d9e6505f6493e",
+    "tests/fixtures/webgpu-instance-buffers/loader.mjs": "4c327eb50f04073d9cb528d991ab29da207f4c0d3d9bf0d4b1c981b6f99ebeae",
+    "tests/fixtures/webgpu-instance-buffers/fixture.mjs": "75a0fa204a3db179b2f4af34ffe0a05f09c7398b1968da0395db91bc51a64ec8",
+    "tests/fixtures/webgpu-instance-buffers/instance-buffers.test.mjs": "4815460eb5aa85266c7fb7ede1df99940b9bbdc8b41911f56bc9a950e0cbe857"
+  },
+  "sourceAfter": {
+    "patches/@babylonjs__core@9.30.0.patch": "597beca732c25cbb128271fad6681fd0176726962ede3218db41057359ea9b72",
+    "pnpm-lock.yaml": "d91d6f2cdc70196ee1a44b7ae9b1adab8b8bd48f2092b138a4def94a12c668df",
+    "tests/webgpu-instance-buffers.test.ts": "1f15285f94e8b2139fccfe6224354c2ed699db9b3b0ae836e52d9e6505f6493e",
+    "tests/fixtures/webgpu-instance-buffers/loader.mjs": "4c327eb50f04073d9cb528d991ab29da207f4c0d3d9bf0d4b1c981b6f99ebeae",
+    "tests/fixtures/webgpu-instance-buffers/fixture.mjs": "75a0fa204a3db179b2f4af34ffe0a05f09c7398b1968da0395db91bc51a64ec8",
+    "tests/fixtures/webgpu-instance-buffers/instance-buffers.test.mjs": "4815460eb5aa85266c7fb7ede1df99940b9bbdc8b41911f56bc9a950e0cbe857"
+  },
+  "installedMeshBefore": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+  "installedMeshAfter": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+  "nativeBefore": {
+    "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+    "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+    "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+    "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+    "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+    "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+    "Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+    "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "Engines/WebGPU/webgpuBufferManager.js": "61c58c90f79daf4b0d056651cf68e913cd56e995d4a63ad13d0a25706faebbb4",
+    "Engines/WebGPU/webgpuDrawContext.js": "af624b950873798563d2e74e0a71bc040e8102b38eb0afd20e10217bb0500bf9",
+    "Engines/WebGPU/webgpuMaterialContext.js": "59dd6f6d46fa4a02bc85404a5f8bd3b9fd51b04bb6a9739d1273cfdc8776f426",
+    "Engines/WebGPU/webgpuCacheRenderPipeline.js": "0255aecc004130080fdeb98902140f27065675dffa702da26a57ed8e7e7567d8",
+    "Engines/WebGPU/webgpuCacheRenderPipelineTree.js": "4103e79456c240de9dfe6c330737ac80446d058cc9b04a2c04be1d39fe841c3a",
+    "Engines/WebGPU/webgpuCacheBindGroups.js": "9d5cc0ba685b968e6fb8cfa0a744cd7f4c722fb80c2c2b406b474fef669e6444",
+    "Engines/WebGPU/webgpuBundleList.js": "db4395cb60aafdc82eb9b3a86b9c5c3db0c505ba7d7ebe7a39c0d59b5bf9c79d",
+    "Buffers/buffer.pure.js": "2ab7b005f08bd38ce0a4b159f089e09d51a6e80b88e3887d15a3b083a53b86de",
+    "Buffers/buffer.align.pure.js": "1253444020e21600f1ef31675873f7721903ad87d50637ba932eae20d7bfa655",
+    "Buffers/dataBuffer.js": "bb2306ce32a8dddda2d789bb639d3915270aff0bd9bbd2220d28f3677ea89b7e",
+    "Meshes/WebGPU/webgpuDataBuffer.js": "d7558387e96876be36fc1fe19e89ff6609e68be68150c611d5298f0b366d1ee6",
+    "Meshes/geometry.js": "3e9ffc263d0e334e785031cbdef2a95013643f0e0b0e701990408caaabf48a16",
+    "Meshes/subMesh.pure.js": "d9b6f61a0f5ad773ab23c67393a8bad278dea133f539887458d1e208f8df1458",
+    "Meshes/abstractMesh.pure.js": "b092740a1bb15d6d5f457a68854569eb596c95b5c85047eae5e805acdcf8029d",
+    "Meshes/instancedMesh.pure.js": "280d4b8a4b013a0d1d6ca57dbc02799153bd8461f8cc688c04ba3e3ceed1afa8",
+    "Materials/material.pure.js": "57ea7fa9a4c31d7cefa2fbbfa5c7c53db85f1ea783447f0146b8b9b101343676",
+    "Materials/drawWrapper.js": "ecf5bc98dda701b691bc4e2ea0fe4a9a37a5dd82e2c4bd5c18c4a830aed6d297",
+    "scene.pure.js": "7306a197afd211ba2e6269dddd68c6dac4974429fce500948cbbb4498a69e69a",
+    "Engines/nullEngine.pure.js": "5c844b68167f2dca140491cb224b5c7cfab3472e4f6ce8676057d575e909b921",
+    "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+  },
+  "nativeAfter": {
+    "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+    "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+    "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+    "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+    "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+    "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+    "Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+    "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "Engines/WebGPU/webgpuBufferManager.js": "61c58c90f79daf4b0d056651cf68e913cd56e995d4a63ad13d0a25706faebbb4",
+    "Engines/WebGPU/webgpuDrawContext.js": "af624b950873798563d2e74e0a71bc040e8102b38eb0afd20e10217bb0500bf9",
+    "Engines/WebGPU/webgpuMaterialContext.js": "59dd6f6d46fa4a02bc85404a5f8bd3b9fd51b04bb6a9739d1273cfdc8776f426",
+    "Engines/WebGPU/webgpuCacheRenderPipeline.js": "0255aecc004130080fdeb98902140f27065675dffa702da26a57ed8e7e7567d8",
+    "Engines/WebGPU/webgpuCacheRenderPipelineTree.js": "4103e79456c240de9dfe6c330737ac80446d058cc9b04a2c04be1d39fe841c3a",
+    "Engines/WebGPU/webgpuCacheBindGroups.js": "9d5cc0ba685b968e6fb8cfa0a744cd7f4c722fb80c2c2b406b474fef669e6444",
+    "Engines/WebGPU/webgpuBundleList.js": "db4395cb60aafdc82eb9b3a86b9c5c3db0c505ba7d7ebe7a39c0d59b5bf9c79d",
+    "Buffers/buffer.pure.js": "2ab7b005f08bd38ce0a4b159f089e09d51a6e80b88e3887d15a3b083a53b86de",
+    "Buffers/buffer.align.pure.js": "1253444020e21600f1ef31675873f7721903ad87d50637ba932eae20d7bfa655",
+    "Buffers/dataBuffer.js": "bb2306ce32a8dddda2d789bb639d3915270aff0bd9bbd2220d28f3677ea89b7e",
+    "Meshes/WebGPU/webgpuDataBuffer.js": "d7558387e96876be36fc1fe19e89ff6609e68be68150c611d5298f0b366d1ee6",
+    "Meshes/geometry.js": "3e9ffc263d0e334e785031cbdef2a95013643f0e0b0e701990408caaabf48a16",
+    "Meshes/subMesh.pure.js": "d9b6f61a0f5ad773ab23c67393a8bad278dea133f539887458d1e208f8df1458",
+    "Meshes/abstractMesh.pure.js": "b092740a1bb15d6d5f457a68854569eb596c95b5c85047eae5e805acdcf8029d",
+    "Meshes/instancedMesh.pure.js": "280d4b8a4b013a0d1d6ca57dbc02799153bd8461f8cc688c04ba3e3ceed1afa8",
+    "Materials/material.pure.js": "57ea7fa9a4c31d7cefa2fbbfa5c7c53db85f1ea783447f0146b8b9b101343676",
+    "Materials/drawWrapper.js": "ecf5bc98dda701b691bc4e2ea0fe4a9a37a5dd82e2c4bd5c18c4a830aed6d297",
+    "scene.pure.js": "7306a197afd211ba2e6269dddd68c6dac4974429fce500948cbbb4498a69e69a",
+    "Engines/nullEngine.pure.js": "5c844b68167f2dca140491cb224b5c7cfab3472e4f6ce8676057d575e909b921",
+    "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+  },
+  "nativeStable": true,
+  "coreSingleton": true,
+  "pinnedVersion": "9.30.0",
+  "patch": {
+    "oldPatchSha256": "965f9774f8fd436bcd699d6f54c0a1b64a318f554bb261a85aa9189828f55c49",
+    "newPatchSha256": "597beca732c25cbb128271fad6681fd0176726962ede3218db41057359ea9b72",
+    "oldLockSha256": "cb0c10f624a76ccd59ef44ed6a61935c58512a2a13711d6bf439a68f015359a7",
+    "newLockSha256": "d91d6f2cdc70196ee1a44b7ae9b1adab8b8bd48f2092b138a4def94a12c668df",
+    "lockReferences": 6,
+    "inverseLockExact": true,
+    "oldSectionsByteExact": true,
+    "sourceBefore": {
+      "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+      "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+      "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+      "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+      "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+      "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+      "Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1"
+    },
+    "sourceAfter": {
+      "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+      "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+      "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+      "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+      "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+      "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+      "Meshes/mesh.pure.js": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a"
+    },
+    "fullReverseApplyExact": true,
+    "candidateMeshSha256": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a"
+  }
+}

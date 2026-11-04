@@ -1,0 +1,2789 @@
+{
+  "schemaVersion": 1,
+  "scope": "Separate startup diagnostics, not FPS acceptance. Candidate4 metrics lost by reserved privacy key; candidate5 fixed timing key. Nested CPU intervals are not added. WGSL pair does not isolate parse from processor transformations.",
+  "artifacts": [
+    {
+      "source": ".cache\\game-diagnostics\\1b26f970-d6f0-4c7a-bd44-c532cc111a76.jsonl",
+      "archive": "raw/candidate4.jsonl.gz",
+      "bytes": 97230,
+      "sha256": "35c74ddd587f1d23748c85c38970037c91c914afa68a780c1332b7bcb9d8db51",
+      "gzipBytes": 13475,
+      "gzipSha256": "1648eeaa21467e68de651fdd4054a605fcb039801f6fae83c75cf697ec01362c"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate4/build/identity.json",
+      "archive": "raw/candidate4-build-identity.json.gz",
+      "bytes": 3461547,
+      "sha256": "549296a39e411ed18e169d59c90324f6e2d6dd22940bedf99b108632b74e7823",
+      "gzipBytes": 906789,
+      "gzipSha256": "0bb6c53a155451935957e7c7ba56e893c879262f5094d926d4572e2149302853"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate4/runs/run1/cleanup.json",
+      "archive": "raw/candidate4-cleanup.json.gz",
+      "bytes": 273,
+      "sha256": "3f208dd74649d943c08ce82606050b9e4ecf8c3ea06853e8605a695538cffe95",
+      "gzipBytes": 225,
+      "gzipSha256": "2600242e3809a98518b0880aa89131f3a69ee8aa26065a386e0abba7d87a8d55"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate4/runs/run1/system/samples.jsonl",
+      "archive": "raw/candidate4-system.jsonl.gz",
+      "bytes": 14678868,
+      "sha256": "f494e9eb8c443da4fc9e95260c96ed78d6d6f94fc3e784bceb711464a8f4c356",
+      "gzipBytes": 1358629,
+      "gzipSha256": "c552626fdcabdac4785eb9f716aa5b9b714553ec0611883a68b54c0d515964eb"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate4/runs/run1/system/runtime.json",
+      "archive": "raw/candidate4-system-runtime.json.gz",
+      "bytes": 1352,
+      "sha256": "37897a64e83c2c9c699d3fe3c3afe2ccd424133f5ca86250938101388756f397",
+      "gzipBytes": 537,
+      "gzipSha256": "b27873036544e26df1ae22122a8130ec394f2b41593ca36ff6906e56636779a1"
+    },
+    {
+      "source": ".cache\\game-diagnostics\\4f940985-2499-4ab8-916e-5c469e240573.jsonl",
+      "archive": "raw/candidate5.jsonl.gz",
+      "bytes": 111564,
+      "sha256": "08a5e4df5ff3bf2b15cee8af817ff5a3d3132ba876027d3358535c2031587f4e",
+      "gzipBytes": 15892,
+      "gzipSha256": "08eabc136bdf6ab234c6b7816501d9d403168f2ac035fc73a079b96800fae20e"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate5/build/identity.json",
+      "archive": "raw/candidate5-build-identity.json.gz",
+      "bytes": 3461555,
+      "sha256": "74482caa94f9b7a318928aa187e1e19c95c1c5fb72e3191351d806eb0206e073",
+      "gzipBytes": 906793,
+      "gzipSha256": "11481266d1b0ed0bfdebbb9220f04c7d055074c83b04fe41e8079d08303fd73c"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate5/runs/run1/cleanup.json",
+      "archive": "raw/candidate5-cleanup.json.gz",
+      "bytes": 273,
+      "sha256": "a906e3abba3b8d5e980d442a4b08e01a7fe3e8e7973452c0de02e2d81bb86d59",
+      "gzipBytes": 225,
+      "gzipSha256": "3ab9540b183048bffde936f31448d95e42fc845d428552920667455b6c960dcb"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate5/runs/run1/system/samples.jsonl",
+      "archive": "raw/candidate5-system.jsonl.gz",
+      "bytes": 23078237,
+      "sha256": "151dc214ddac31061ecd78270a01660814e8ee1d2adc21dcb80b0dba897eb6c4",
+      "gzipBytes": 2097740,
+      "gzipSha256": "36344f64cf49574f36eb6116138006e100c7ce3c84df16aa058fc864e4398910"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate5/runs/run1/system/runtime.json",
+      "archive": "raw/candidate5-system-runtime.json.gz",
+      "bytes": 1351,
+      "sha256": "28bd4f78eb86be163b0466b4e5b7e8ce2d773e24c4e2b5b083e781d2c1f7791f",
+      "gzipBytes": 534,
+      "gzipSha256": "4fa201e1f3fd459d39c8e15bb24c4920aaad95bf6e04878d4ef2738eb297541c"
+    },
+    {
+      "source": ".cache\\game-diagnostics\\96946ec9-f7f8-4194-8649-93354af7083f.jsonl",
+      "archive": "raw/candidate6.jsonl.gz",
+      "bytes": 113074,
+      "sha256": "2a521620721fbe77ba9afdcb6800f627033f4ed768b4dd1b14431d7a8eac7c9c",
+      "gzipBytes": 16493,
+      "gzipSha256": "a2daa4b2785a65781cdda64d31b1811810e63dfd4164fe8755135ff9bda5519d"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate6/build/identity.json",
+      "archive": "raw/candidate6-build-identity.json.gz",
+      "bytes": 3461555,
+      "sha256": "d0259b4abf7e3a98f65fdd1bb66be94d838ac7b550559bf128b0bfb7d4a23a93",
+      "gzipBytes": 906777,
+      "gzipSha256": "2afb6ffb32b7eda18e5632ce636122ddf2a18fc7cc570a1aaa1ec792c6e36588"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate6/runs/run1/cleanup.json",
+      "archive": "raw/candidate6-cleanup.json.gz",
+      "bytes": 273,
+      "sha256": "c857a1c93783a3604d12cc037857e1f4e02bd215b3cc1c9628bdf72a669175aa",
+      "gzipBytes": 225,
+      "gzipSha256": "6bb23951d45fca9562874c1fadc0f1c920fe80bdcb110ab6310d714faa0fcc79"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate6/runs/run1/system/samples.jsonl",
+      "archive": "raw/candidate6-system.jsonl.gz",
+      "bytes": 36460362,
+      "sha256": "4064be22f3adf3a53d2716273bfa7461e82543960116ea68fa802b739031f2f7",
+      "gzipBytes": 3400194,
+      "gzipSha256": "a17c19d53f9cbd4fe7a1f6c51529eae981cae6f4ef1fdd3004c2c5de0c8b112b"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate6/runs/run1/system/runtime.json",
+      "archive": "raw/candidate6-system-runtime.json.gz",
+      "bytes": 1352,
+      "sha256": "c76ee2a100bf852e97f93e70cca2fa7f5d13a21fc0950b1d7ed550fc70ac9887",
+      "gzipBytes": 533,
+      "gzipSha256": "69d6a90d867b43929f73ae7e0adac3637d633ca1164d5596bfe591a49fe016cf"
+    }
+  ],
+  "runs": [
+    {
+      "candidate": 4,
+      "buildSourceHash": "2b196a411f0a9ab1dacdbe06472d564f710753914651100622b02f5939d7f79e",
+      "sessionFile": ".cache\\game-diagnostics\\1b26f970-d6f0-4c7a-bd44-c532cc111a76.jsonl",
+      "prefix": {
+        "bytes": 94002,
+        "sha256": "2a4047769319201db3b85e8f9b481f276ecab5acd28c937802814541dcdd685d"
+      },
+      "status": "failed",
+      "cpuDataAvailable": false,
+      "cpuRecords": [
+        {
+          "seq": 90,
+          "atMs": 40366.6,
+          "kind": "startup-cpu-profile",
+          "data": {
+            "stage": "preparation-start",
+            "rendererId": 2
+          }
+        },
+        {
+          "seq": 204,
+          "atMs": 72709.4,
+          "kind": "startup-cpu-profile",
+          "data": {
+            "stage": "startup-end",
+            "rendererId": 2
+          }
+        }
+      ],
+      "delta": null,
+      "lighting": {
+        "seq": 200,
+        "atMs": 70887.2,
+        "kind": "lighting-preparation",
+        "data": {
+          "status": "timeout",
+          "elapsedMs": 30519.89999985695,
+          "activeElapsedMs": 30519.89999985695,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stages": [
+            {
+              "stage": "vehicle-0",
+              "elapsedMs": 3435.2000000476837,
+              "activeElapsedMs": 3435.2000000476837,
+              "pausedMs": 0,
+              "tickCount": 25,
+              "rafGap": {
+                "count": 25,
+                "totalMs": 3414.7000000476837,
+                "maxMs": 838.4000000953674
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 3,
+                  "totalMs": 124.00000023841858,
+                  "maxMs": 69.80000019073486
+                },
+                "checkBatch": {
+                  "calls": 22,
+                  "totalMs": 360.7999999523163,
+                  "maxMs": 79.70000004768372
+                },
+                "render": {
+                  "calls": 6,
+                  "totalMs": 1415,
+                  "maxMs": 704.7000000476837
+                }
+              },
+              "restartReasons": {
+                "meshes": 2
+              },
+              "checks": 859,
+              "renders": 6,
+              "restarts": 2,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 343,
+                "cursor": 343,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "vehicle-1",
+              "elapsedMs": 2157.7999999523163,
+              "activeElapsedMs": 2157.7999999523163,
+              "pausedMs": 0,
+              "tickCount": 21,
+              "rafGap": {
+                "count": 21,
+                "totalMs": 2164.7999999523163,
+                "maxMs": 960
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 9.5,
+                  "maxMs": 9.5
+                },
+                "checkBatch": {
+                  "calls": 20,
+                  "totalMs": 347.19999980926514,
+                  "maxMs": 60
+                },
+                "render": {
+                  "calls": 8,
+                  "totalMs": 1120.599999666214,
+                  "maxMs": 947
+                }
+              },
+              "restartReasons": {},
+              "checks": 686,
+              "renders": 8,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 343,
+                "cursor": 343,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "current-off",
+              "elapsedMs": 3061.4000000953674,
+              "activeElapsedMs": 3061.4000000953674,
+              "pausedMs": 0,
+              "tickCount": 21,
+              "rafGap": {
+                "count": 21,
+                "totalMs": 3047.399999856949,
+                "maxMs": 1358.5999999046326
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 39.700000047683716,
+                  "maxMs": 39.700000047683716
+                },
+                "checkBatch": {
+                  "calls": 20,
+                  "totalMs": 340.2000002861023,
+                  "maxMs": 77
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1359,
+                  "maxMs": 1239
+                }
+              },
+              "restartReasons": {},
+              "checks": 880,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 440,
+                "cursor": 440,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "current-on",
+              "elapsedMs": 3425.399999856949,
+              "activeElapsedMs": 3425.399999856949,
+              "pausedMs": 0,
+              "tickCount": 29,
+              "rafGap": {
+                "count": 29,
+                "totalMs": 3413.600000143051,
+                "maxMs": 1381.8999998569489
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 35.69999980926514,
+                  "maxMs": 35.69999980926514
+                },
+                "checkBatch": {
+                  "calls": 28,
+                  "totalMs": 255.80000042915344,
+                  "maxMs": 41.299999952316284
+                },
+                "render": {
+                  "calls": 8,
+                  "totalMs": 1486.0000002384186,
+                  "maxMs": 1212.2000000476837
+                }
+              },
+              "restartReasons": {},
+              "checks": 884,
+              "renders": 8,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 442,
+                "cursor": 442,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-0-off",
+              "elapsedMs": 2411.7999999523163,
+              "activeElapsedMs": 2411.7999999523163,
+              "pausedMs": 0,
+              "tickCount": 18,
+              "rafGap": {
+                "count": 18,
+                "totalMs": 2432.5,
+                "maxMs": 1044.2000000476837
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 36.59999990463257,
+                  "maxMs": 36.59999990463257
+                },
+                "checkBatch": {
+                  "calls": 17,
+                  "totalMs": 181.00000023841858,
+                  "maxMs": 28.799999952316284
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1017.2000000476837,
+                  "maxMs": 938
+                }
+              },
+              "restartReasons": {},
+              "checks": 878,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-0-on",
+              "elapsedMs": 2884.9000000953674,
+              "activeElapsedMs": 2884.9000000953674,
+              "pausedMs": 0,
+              "tickCount": 18,
+              "rafGap": {
+                "count": 18,
+                "totalMs": 2879.5,
+                "maxMs": 1226.0999999046326
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 29.299999952316284,
+                  "maxMs": 29.299999952316284
+                },
+                "checkBatch": {
+                  "calls": 17,
+                  "totalMs": 454.89999985694885,
+                  "maxMs": 164.70000004768372
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1209.7999999523163,
+                  "maxMs": 1122.2999999523163
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-1-off",
+              "elapsedMs": 3022.7000000476837,
+              "activeElapsedMs": 3022.7000000476837,
+              "pausedMs": 0,
+              "tickCount": 29,
+              "rafGap": {
+                "count": 29,
+                "totalMs": 3004.0999999046326,
+                "maxMs": 1078.7999999523163
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 2,
+                  "totalMs": 22.5,
+                  "maxMs": 14.799999952316284
+                },
+                "checkBatch": {
+                  "calls": 27,
+                  "totalMs": 301.10000014305115,
+                  "maxMs": 77.19999980926514
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1431.4000000953674,
+                  "maxMs": 1062.3999998569489
+                }
+              },
+              "restartReasons": {
+                "weather": 1
+              },
+              "checks": 1050,
+              "renders": 4,
+              "restarts": 1,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-1-on",
+              "elapsedMs": 3649.899999856949,
+              "activeElapsedMs": 3649.899999856949,
+              "pausedMs": 0,
+              "tickCount": 20,
+              "rafGap": {
+                "count": 20,
+                "totalMs": 3656.7999999523163,
+                "maxMs": 1520.9000000953674
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 19.300000190734863,
+                  "maxMs": 19.300000190734863
+                },
+                "checkBatch": {
+                  "calls": 19,
+                  "totalMs": 329.5000002384186,
+                  "maxMs": 85.09999990463257
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1559.6999998092651,
+                  "maxMs": 1430.5999999046326
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-2-off",
+              "elapsedMs": 251.40000009536743,
+              "activeElapsedMs": 251.40000009536743,
+              "pausedMs": 0,
+              "tickCount": 11,
+              "rafGap": {
+                "count": 11,
+                "totalMs": 266.60000014305115,
+                "maxMs": 82.60000014305115
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 10.5,
+                  "maxMs": 10.5
+                },
+                "checkBatch": {
+                  "calls": 10,
+                  "totalMs": 45.69999980926514,
+                  "maxMs": 7.799999952316284
+                },
+                "render": {
+                  "calls": 3,
+                  "totalMs": 122.29999995231628,
+                  "maxMs": 71
+                }
+              },
+              "restartReasons": {},
+              "checks": 878,
+              "renders": 3,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-2-on",
+              "elapsedMs": 321.59999990463257,
+              "activeElapsedMs": 321.59999990463257,
+              "pausedMs": 0,
+              "tickCount": 12,
+              "rafGap": {
+                "count": 12,
+                "totalMs": 316.2999999523163,
+                "maxMs": 104.60000014305115
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 12.600000143051147,
+                  "maxMs": 12.600000143051147
+                },
+                "checkBatch": {
+                  "calls": 11,
+                  "totalMs": 52.39999985694885,
+                  "maxMs": 8.700000047683716
+                },
+                "render": {
+                  "calls": 3,
+                  "totalMs": 151.39999961853027,
+                  "maxMs": 90.09999990463257
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 3,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "day-0-off",
+              "elapsedMs": 3030.2000000476837,
+              "activeElapsedMs": 3030.2000000476837,
+              "pausedMs": 0,
+              "tickCount": 21,
+              "rafGap": {
+                "count": 21,
+                "totalMs": 3030.5999999046326,
+                "maxMs": 1717
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 24.5,
+                  "maxMs": 24.5
+                },
+                "checkBatch": {
+                  "calls": 20,
+                  "totalMs": 224.5,
+                  "maxMs": 34.59999990463257
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1790.3000001907349,
+                  "maxMs": 1689.4000000953674
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "day-0-on",
+              "elapsedMs": 1763.4000000953674,
+              "activeElapsedMs": 1763.4000000953674,
+              "pausedMs": 0,
+              "tickCount": 1,
+              "rafGap": {
+                "count": 1,
+                "totalMs": 33.40000009536743,
+                "maxMs": 33.40000009536743
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 14.900000095367432,
+                  "maxMs": 14.900000095367432
+                },
+                "checkBatch": {
+                  "calls": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "render": {
+                  "calls": 1,
+                  "totalMs": 1747.0999999046326,
+                  "maxMs": 1747.0999999046326
+                }
+              },
+              "restartReasons": {},
+              "checks": 0,
+              "renders": 1,
+              "restarts": 0,
+              "lastState": {
+                "operation": "render",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 0
+              },
+              "passQuality": "low"
+            }
+          ],
+          "qualities": [
+            {
+              "quality": "low",
+              "finalPass": false,
+              "status": "timeout",
+              "failureStep": null,
+              "elapsedMs": 30519.799999952316,
+              "activeElapsedMs": 30519.799999952316,
+              "pausedMs": 0,
+              "stageCount": 12
+            }
+          ],
+          "shaderScheduling": {
+            "active": false,
+            "inert": true,
+            "disposed": false,
+            "faulted": false,
+            "queued": 0,
+            "pending": 0,
+            "started": 0,
+            "completed": 0,
+            "cancelled": 0,
+            "passthrough": 0,
+            "frameCount": 0,
+            "workCpuCount": 0,
+            "workCpuMs": 0,
+            "workCpuMaxMs": 0
+          },
+          "readiness": {
+            "quality": "low",
+            "stage": "day-0-on",
+            "lastGate": null,
+            "mesh": null,
+            "material": null,
+            "waits": {
+              "mesh": 0,
+              "precipitation": 0,
+              "pipeline": 0,
+              "health": 0,
+              "effects": 0
+            }
+          },
+          "pipeline": {
+            "active": true,
+            "inert": false,
+            "disposed": false,
+            "faulted": false,
+            "completionSerial": 428,
+            "provenSerial": 428,
+            "lastRenderComplete": false,
+            "entries": {
+              "total": 48,
+              "pending": 48,
+              "ready": 0
+            },
+            "work": {
+              "total": 48,
+              "pending": 48,
+              "retiredPending": 0
+            },
+            "renders": {
+              "total": 53,
+              "complete": 33,
+              "incomplete": 20
+            },
+            "readiness": {
+              "checks": 60,
+              "waits": 16,
+              "lastResult": true
+            },
+            "skips": {
+              "pending-entry": 3295,
+              "capacity": 0,
+              "descriptor-disabled": 0,
+              "descriptor-identity": 0
+            },
+            "retirements": {
+              "invalidIdentity": 0,
+              "disabled": 0,
+              "unusedReady": 0
+            },
+            "lastSkip": {
+              "reason": "pending-entry",
+              "effectId": 419,
+              "effectName": "pbr",
+              "identityChanges": []
+            }
+          },
+          "pipelineScope": "Snapshot after restoration; readiness and lastState describe the last attempted stage."
+        }
+      },
+      "compiler": {
+        "seq": 201,
+        "atMs": 70890,
+        "kind": "webgpu-preparation-profile",
+        "data": {
+          "active": true,
+          "backend": "webgpu",
+          "generation": 1,
+          "attachedAfterDeviceCreation": true,
+          "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+          "metrics": {
+            "glslToSpirv": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "spirvToWgsl": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "compilerLoad": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderPreparation": {
+              "calls": 410,
+              "completed": 410,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 497.6999979019165,
+              "cpuMaxMs": 30.899999856948853,
+              "asyncTotalMs": 236523.99999928474,
+              "asyncMaxMs": 1804.7000000476837
+            },
+            "shaderModule": {
+              "calls": 820,
+              "completed": 820,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 193.10000085830688,
+              "cpuMaxMs": 3.4000000953674316,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderValidation": {
+              "calls": 820,
+              "completed": 750,
+              "failures": 0,
+              "pending": 70,
+              "cpuTotalMs": 14.800001859664917,
+              "cpuMaxMs": 0.3000001907348633,
+              "asyncTotalMs": 721026.7000098228,
+              "asyncMaxMs": 2212.4000000953674
+            },
+            "syncPipeline": {
+              "calls": 29,
+              "completed": 29,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0.9999997615814209,
+              "cpuMaxMs": 0.20000004768371582,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "asyncPipeline": {
+              "calls": 476,
+              "completed": 428,
+              "failures": 0,
+              "pending": 48,
+              "cpuTotalMs": 26.400001525878906,
+              "cpuMaxMs": 0.40000009536743164,
+              "asyncTotalMs": 586181.5999994278,
+              "asyncMaxMs": 2788.5
+            },
+            "submit": {
+              "calls": 821,
+              "completed": 821,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 25.399999856948853,
+              "cpuMaxMs": 0.20000004768371582,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            }
+          },
+          "hooks": {
+            "engine._initializeLimits": "installed",
+            "engine._compileRawShaderToSpirV": "installed",
+            "engine.prepareGlslangAndTintAsync": "installed",
+            "engine._preparePipelineContextAsync": "installed",
+            "engine._createPipelineStageDescriptor": "installed",
+            "tint.convertSpirV2WGSL": "not-created",
+            "device.createShaderModule": "installed",
+            "device.createRenderPipeline": "installed",
+            "device.createRenderPipelineAsync": "installed",
+            "queue.submit": "installed",
+            "module.getCompilationInfo": "installed"
+          },
+          "observerErrors": 0,
+          "shaderInventory": null,
+          "bundleCountersLastFrame": {
+            "numEnableEffects": 0,
+            "numEnableDrawWrapper": 0,
+            "numBundleCreationNonCompatMode": 0,
+            "numBundleReuseNonCompatMode": 0
+          },
+          "sharedCacheCounters": {
+            "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+            "values": {
+              "NumCacheHitWithoutHash": 84033,
+              "NumCacheHitWithHash": 9993,
+              "NumCacheMiss": 464,
+              "NumPipelineCreationLastFrame": 0
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "seq": 202,
+          "atMs": 70890.8,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 205,
+          "atMs": 72710.2,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at hh.start (http://127.0.0.1:4179/assets/game-Cwht8EzY.js:878:28384)\n    at async http://127.0.0.1:4179/assets/index-BhKHBuSc.js:16:4497531"
+          }
+        }
+      ]
+    },
+    {
+      "candidate": 5,
+      "buildSourceHash": "b0c4a119159b67dc38bedd00b7046e37ec76f5bc18f61823f1290740101510f4",
+      "sessionFile": ".cache\\game-diagnostics\\4f940985-2499-4ab8-916e-5c469e240573.jsonl",
+      "prefix": {
+        "bytes": 107634,
+        "sha256": "b5ef0b2ed55cc3b497519faad63fb0358f9d0d6f90e9c776be214c4a21746c6c"
+      },
+      "status": "failed",
+      "cpuDataAvailable": true,
+      "cpuRecords": [
+        {
+          "seq": 97,
+          "atMs": 35237.3,
+          "kind": "startup-cpu-profile",
+          "data": {
+            "stage": "preparation-start",
+            "rendererId": 2,
+            "timing": {
+              "active": true,
+              "inert": false,
+              "disposed": false,
+              "suspended": false,
+              "generation": 1,
+              "lastGenerationReason": null,
+              "scope": {
+                "createEffect": "Inclusive synchronous caller wall time until return/throw; nested calls overlap. Return values are never inspected or observed as Promises.",
+                "wgsl": "Engine-owned WGSL initializeShaders entry through matching finalizeShaders return/throw. Includes intervening synchronous processing and callbacks; nested in createEffect when invoked there. Never add parent and child totals.",
+                "crossing": "A single queued microtask marker detects the pinned processing path crossing a microtask boundary. Crossed spans are latency, not CPU. Ambiguous/reentrant/missing-context spans are excluded from CPU. This is not a thread-running or GPU metric.",
+                "coverage": "Only this engine createEffect and its current _shaderProcessorWGSL are observed. Custom processors and unmatched/incomplete processing are explicit omissions. Counters are cumulative; generation changes invalidate direct same-generation comparisons.",
+                "overhead": "Clock reads, bounded bookkeeping and existing nested observers remain included. No shader strings, hashes, per-call logs or large objects are retained in snapshots."
+              },
+              "createEffect": {
+                "calls": 2039,
+                "returned": 2039,
+                "thrown": 0,
+                "timingSamples": 2039,
+                "cpuTotalMs": 329.49999809265137,
+                "cpuMaxMs": 57
+              },
+              "wgslProcessing": {
+                "syncCpu": {
+                  "samples": 20,
+                  "totalMs": 357.2000000476837,
+                  "maxMs": 55.799999952316284
+                },
+                "crossedMicrotaskLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "ambiguousLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "pending": 0,
+                "limit": 64
+              },
+              "counts": {
+                "initialized": 20,
+                "finalized": 20,
+                "matched": 20,
+                "initializeThrown": 0,
+                "finalizeThrown": 0,
+                "unmatchedFinalize": 0,
+                "invalidContext": 0,
+                "replacedContext": 0,
+                "capacityOmitted": 0,
+                "retired": 0,
+                "reentrantCreateEffect": 0,
+                "interruptedCreateEffect": 0,
+                "invalidSpans": 0,
+                "observerErrors": 0,
+                "invalidClocks": 0,
+                "generationChanges": 0,
+                "ownershipChanges": 0,
+                "pendingPeak": 1
+              },
+              "hooks": {
+                "createEffect": "installed",
+                "getShaderProcessor": "installed",
+                "initializeShaders": "installed",
+                "finalizeShaders": "installed"
+              }
+            }
+          }
+        },
+        {
+          "seq": 220,
+          "atMs": 68343.2,
+          "kind": "startup-cpu-profile",
+          "data": {
+            "stage": "startup-end",
+            "rendererId": 2,
+            "timing": {
+              "active": false,
+              "inert": false,
+              "disposed": true,
+              "suspended": false,
+              "generation": 1,
+              "lastGenerationReason": null,
+              "scope": {
+                "createEffect": "Inclusive synchronous caller wall time until return/throw; nested calls overlap. Return values are never inspected or observed as Promises.",
+                "wgsl": "Engine-owned WGSL initializeShaders entry through matching finalizeShaders return/throw. Includes intervening synchronous processing and callbacks; nested in createEffect when invoked there. Never add parent and child totals.",
+                "crossing": "A single queued microtask marker detects the pinned processing path crossing a microtask boundary. Crossed spans are latency, not CPU. Ambiguous/reentrant/missing-context spans are excluded from CPU. This is not a thread-running or GPU metric.",
+                "coverage": "Only this engine createEffect and its current _shaderProcessorWGSL are observed. Custom processors and unmatched/incomplete processing are explicit omissions. Counters are cumulative; generation changes invalidate direct same-generation comparisons.",
+                "overhead": "Clock reads, bounded bookkeeping and existing nested observers remain included. No shader strings, hashes, per-call logs or large objects are retained in snapshots."
+              },
+              "createEffect": {
+                "calls": 11892,
+                "returned": 11892,
+                "thrown": 0,
+                "timingSamples": 11892,
+                "cpuTotalMs": 13261.899997711182,
+                "cpuMaxMs": 772.3999998569489
+              },
+              "wgslProcessing": {
+                "syncCpu": {
+                  "samples": 410,
+                  "totalMs": 12584.800000429153,
+                  "maxMs": 770.2999999523163
+                },
+                "crossedMicrotaskLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "ambiguousLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "pending": 0,
+                "limit": 64
+              },
+              "counts": {
+                "initialized": 410,
+                "finalized": 410,
+                "matched": 410,
+                "initializeThrown": 0,
+                "finalizeThrown": 0,
+                "unmatchedFinalize": 0,
+                "invalidContext": 0,
+                "replacedContext": 0,
+                "capacityOmitted": 0,
+                "retired": 0,
+                "reentrantCreateEffect": 0,
+                "interruptedCreateEffect": 0,
+                "invalidSpans": 0,
+                "observerErrors": 0,
+                "invalidClocks": 0,
+                "generationChanges": 0,
+                "ownershipChanges": 0,
+                "pendingPeak": 1
+              },
+              "hooks": {
+                "createEffect": "disposed",
+                "getShaderProcessor": "disposed",
+                "initializeShaders": "disposed",
+                "finalizeShaders": "disposed"
+              }
+            }
+          }
+        }
+      ],
+      "delta": {
+        "generation": 1,
+        "createEffectCalls": 9853,
+        "createEffectCpuMs": 12932.39999961853,
+        "wgslPairs": 390,
+        "wgslCpuMs": 12227.60000038147,
+        "counts": {
+          "initialized": 390,
+          "finalized": 390,
+          "matched": 390,
+          "initializeThrown": 0,
+          "finalizeThrown": 0,
+          "unmatchedFinalize": 0,
+          "invalidContext": 0,
+          "replacedContext": 0,
+          "capacityOmitted": 0,
+          "retired": 0,
+          "reentrantCreateEffect": 0,
+          "interruptedCreateEffect": 0,
+          "invalidSpans": 0,
+          "observerErrors": 0,
+          "invalidClocks": 0,
+          "generationChanges": 0,
+          "ownershipChanges": 0
+        },
+        "pendingPeakAfter": 1
+      },
+      "lighting": {
+        "seq": 216,
+        "atMs": 66474.9,
+        "kind": "lighting-preparation",
+        "data": {
+          "status": "timeout",
+          "elapsedMs": 31236.799999952316,
+          "activeElapsedMs": 31236.799999952316,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stages": [
+            {
+              "stage": "vehicle-0",
+              "elapsedMs": 4719.399999856949,
+              "activeElapsedMs": 4719.399999856949,
+              "pausedMs": 0,
+              "tickCount": 32,
+              "rafGap": {
+                "count": 32,
+                "totalMs": 4701,
+                "maxMs": 1500.7000000476837
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 3,
+                  "totalMs": 126.59999966621399,
+                  "maxMs": 58.19999980926514
+                },
+                "checkBatch": {
+                  "calls": 29,
+                  "totalMs": 571.5999991893768,
+                  "maxMs": 245.89999985694885
+                },
+                "render": {
+                  "calls": 15,
+                  "totalMs": 2485.0000002384186,
+                  "maxMs": 1367.5
+                }
+              },
+              "restartReasons": {
+                "meshes": 2
+              },
+              "checks": 902,
+              "renders": 15,
+              "restarts": 2,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 343,
+                "cursor": 343,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "vehicle-1",
+              "elapsedMs": 2699.5999999046326,
+              "activeElapsedMs": 2699.5999999046326,
+              "pausedMs": 0,
+              "tickCount": 18,
+              "rafGap": {
+                "count": 18,
+                "totalMs": 2697.699999809265,
+                "maxMs": 1721.5999999046326
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 7.099999904632568,
+                  "maxMs": 7.099999904632568
+                },
+                "checkBatch": {
+                  "calls": 17,
+                  "totalMs": 261.5000002384186,
+                  "maxMs": 37.799999952316284
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1842.6000003814697,
+                  "maxMs": 1711.6000001430511
+                }
+              },
+              "restartReasons": {},
+              "checks": 686,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 343,
+                "cursor": 343,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "current-off",
+              "elapsedMs": 3283.2000000476837,
+              "activeElapsedMs": 3283.2000000476837,
+              "pausedMs": 0,
+              "tickCount": 24,
+              "rafGap": {
+                "count": 24,
+                "totalMs": 3264,
+                "maxMs": 2602.9000000953674
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 49.59999990463257,
+                  "maxMs": 49.59999990463257
+                },
+                "checkBatch": {
+                  "calls": 23,
+                  "totalMs": 277.6000006198883,
+                  "maxMs": 44.39999985694885
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1565.1999998092651,
+                  "maxMs": 1398.7999999523163
+                }
+              },
+              "restartReasons": {},
+              "checks": 880,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 440,
+                "cursor": 440,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "current-on",
+              "elapsedMs": 3381.2000000476837,
+              "activeElapsedMs": 3381.2000000476837,
+              "pausedMs": 0,
+              "tickCount": 25,
+              "rafGap": {
+                "count": 25,
+                "totalMs": 3380,
+                "maxMs": 1315.9000000953674
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 42.60000014305115,
+                  "maxMs": 42.60000014305115
+                },
+                "checkBatch": {
+                  "calls": 24,
+                  "totalMs": 360.8999996185303,
+                  "maxMs": 57.40000009536743
+                },
+                "render": {
+                  "calls": 7,
+                  "totalMs": 1409.1000003814697,
+                  "maxMs": 1175.5
+                }
+              },
+              "restartReasons": {},
+              "checks": 884,
+              "renders": 7,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 442,
+                "cursor": 442,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-0-off",
+              "elapsedMs": 2343.899999856949,
+              "activeElapsedMs": 2343.899999856949,
+              "pausedMs": 0,
+              "tickCount": 19,
+              "rafGap": {
+                "count": 19,
+                "totalMs": 2364.600000143051,
+                "maxMs": 1027.2999999523163
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 29,
+                  "maxMs": 29
+                },
+                "checkBatch": {
+                  "calls": 18,
+                  "totalMs": 343.099999666214,
+                  "maxMs": 164.5
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1027.4000000953674,
+                  "maxMs": 950.1000001430511
+                }
+              },
+              "restartReasons": {},
+              "checks": 878,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-0-on",
+              "elapsedMs": 2964.5,
+              "activeElapsedMs": 2964.5,
+              "pausedMs": 0,
+              "tickCount": 18,
+              "rafGap": {
+                "count": 18,
+                "totalMs": 2964,
+                "maxMs": 1235.7999999523163
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 29.799999952316284,
+                  "maxMs": 29.799999952316284
+                },
+                "checkBatch": {
+                  "calls": 17,
+                  "totalMs": 258.3999996185303,
+                  "maxMs": 52.299999952316284
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1179.3000001907349,
+                  "maxMs": 1100.2000000476837
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-1-off",
+              "elapsedMs": 2516.5,
+              "activeElapsedMs": 2516.5,
+              "pausedMs": 0,
+              "tickCount": 19,
+              "rafGap": {
+                "count": 19,
+                "totalMs": 2514.5,
+                "maxMs": 1067.9000000953674
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 17.399999856948853,
+                  "maxMs": 17.399999856948853
+                },
+                "checkBatch": {
+                  "calls": 18,
+                  "totalMs": 222.2999997138977,
+                  "maxMs": 44.89999985694885
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1122.9000000953674,
+                  "maxMs": 1048.7999999523163
+                }
+              },
+              "restartReasons": {},
+              "checks": 878,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-1-on",
+              "elapsedMs": 3220.899999856949,
+              "activeElapsedMs": 3220.899999856949,
+              "pausedMs": 0,
+              "tickCount": 26,
+              "rafGap": {
+                "count": 26,
+                "totalMs": 3213.899999856949,
+                "maxMs": 1181
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 2,
+                  "totalMs": 18.700000047683716,
+                  "maxMs": 10.5
+                },
+                "checkBatch": {
+                  "calls": 24,
+                  "totalMs": 647.8000004291534,
+                  "maxMs": 244.80000019073486
+                },
+                "render": {
+                  "calls": 6,
+                  "totalMs": 1268.1000003814697,
+                  "maxMs": 1105.6000001430511
+                }
+              },
+              "restartReasons": {
+                "weather": 1
+              },
+              "checks": 1506,
+              "renders": 6,
+              "restarts": 1,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-2-off",
+              "elapsedMs": 275.2000000476837,
+              "activeElapsedMs": 275.2000000476837,
+              "pausedMs": 0,
+              "tickCount": 12,
+              "rafGap": {
+                "count": 12,
+                "totalMs": 283.40000009536743,
+                "maxMs": 72.39999985694885
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 8.799999952316284,
+                  "maxMs": 8.799999952316284
+                },
+                "checkBatch": {
+                  "calls": 11,
+                  "totalMs": 47.10000014305115,
+                  "maxMs": 6.200000047683716
+                },
+                "render": {
+                  "calls": 3,
+                  "totalMs": 121.10000014305115,
+                  "maxMs": 62.700000047683716
+                }
+              },
+              "restartReasons": {},
+              "checks": 878,
+              "renders": 3,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-2-on",
+              "elapsedMs": 252.20000004768372,
+              "activeElapsedMs": 252.20000004768372,
+              "pausedMs": 0,
+              "tickCount": 11,
+              "rafGap": {
+                "count": 11,
+                "totalMs": 249.40000009536743,
+                "maxMs": 79.19999980926514
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 9.699999809265137,
+                  "maxMs": 9.699999809265137
+                },
+                "checkBatch": {
+                  "calls": 10,
+                  "totalMs": 48.69999980926514,
+                  "maxMs": 8.900000095367432
+                },
+                "render": {
+                  "calls": 3,
+                  "totalMs": 122.89999985694885,
+                  "maxMs": 68.40000009536743
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 3,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "day-0-off",
+              "elapsedMs": 2647.5,
+              "activeElapsedMs": 2647.5,
+              "pausedMs": 0,
+              "tickCount": 18,
+              "rafGap": {
+                "count": 18,
+                "totalMs": 2647.5999999046326,
+                "maxMs": 1062.6000001430511
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 21.700000047683716,
+                  "maxMs": 21.700000047683716
+                },
+                "checkBatch": {
+                  "calls": 17,
+                  "totalMs": 240,
+                  "maxMs": 73.70000004768372
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1115.4000000953674,
+                  "maxMs": 1039.2000000476837
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "day-0-on",
+              "elapsedMs": 1931.7000000476837,
+              "activeElapsedMs": 1931.7000000476837,
+              "pausedMs": 0,
+              "tickCount": 1,
+              "rafGap": {
+                "count": 1,
+                "totalMs": 29.299999952316284,
+                "maxMs": 29.299999952316284
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 10.400000095367432,
+                  "maxMs": 10.400000095367432
+                },
+                "checkBatch": {
+                  "calls": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "render": {
+                  "calls": 1,
+                  "totalMs": 1920.2999999523163,
+                  "maxMs": 1920.2999999523163
+                }
+              },
+              "restartReasons": {},
+              "checks": 0,
+              "renders": 1,
+              "restarts": 0,
+              "lastState": {
+                "operation": "render",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 0
+              },
+              "passQuality": "low"
+            }
+          ],
+          "qualities": [
+            {
+              "quality": "low",
+              "finalPass": false,
+              "status": "timeout",
+              "failureStep": null,
+              "elapsedMs": 31236.799999952316,
+              "activeElapsedMs": 31236.799999952316,
+              "pausedMs": 0,
+              "stageCount": 12
+            }
+          ],
+          "shaderScheduling": {
+            "active": false,
+            "inert": true,
+            "disposed": false,
+            "faulted": false,
+            "queued": 0,
+            "pending": 0,
+            "started": 0,
+            "completed": 0,
+            "cancelled": 0,
+            "passthrough": 0,
+            "frameCount": 0,
+            "workCpuCount": 0,
+            "workCpuMs": 0,
+            "workCpuMaxMs": 0
+          },
+          "readiness": {
+            "quality": "low",
+            "stage": "day-0-on",
+            "lastGate": null,
+            "mesh": null,
+            "material": null,
+            "waits": {
+              "mesh": 0,
+              "precipitation": 0,
+              "pipeline": 0,
+              "health": 0,
+              "effects": 0
+            }
+          },
+          "pipeline": {
+            "active": true,
+            "inert": false,
+            "disposed": false,
+            "faulted": false,
+            "completionSerial": 428,
+            "provenSerial": 428,
+            "lastRenderComplete": false,
+            "entries": {
+              "total": 48,
+              "pending": 48,
+              "ready": 0
+            },
+            "work": {
+              "total": 48,
+              "pending": 48,
+              "retiredPending": 0
+            },
+            "renders": {
+              "total": 59,
+              "complete": 35,
+              "incomplete": 24
+            },
+            "readiness": {
+              "checks": 67,
+              "waits": 21,
+              "lastResult": true
+            },
+            "skips": {
+              "pending-entry": 3321,
+              "capacity": 0,
+              "descriptor-disabled": 0,
+              "descriptor-identity": 0
+            },
+            "retirements": {
+              "invalidIdentity": 0,
+              "disabled": 0,
+              "unusedReady": 0
+            },
+            "lastSkip": {
+              "reason": "pending-entry",
+              "effectId": 419,
+              "effectName": "pbr",
+              "identityChanges": []
+            }
+          },
+          "pipelineScope": "Snapshot after restoration; readiness and lastState describe the last attempted stage."
+        }
+      },
+      "compiler": {
+        "seq": 217,
+        "atMs": 66476.1,
+        "kind": "webgpu-preparation-profile",
+        "data": {
+          "active": true,
+          "backend": "webgpu",
+          "generation": 1,
+          "attachedAfterDeviceCreation": true,
+          "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+          "metrics": {
+            "glslToSpirv": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "spirvToWgsl": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "compilerLoad": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderPreparation": {
+              "calls": 410,
+              "completed": 410,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 486.2000026702881,
+              "cpuMaxMs": 21.09999990463257,
+              "asyncTotalMs": 254707.30000424385,
+              "asyncMaxMs": 1929.7999999523163
+            },
+            "shaderModule": {
+              "calls": 820,
+              "completed": 820,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 197.40000128746033,
+              "cpuMaxMs": 8,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderValidation": {
+              "calls": 820,
+              "completed": 750,
+              "failures": 0,
+              "pending": 70,
+              "cpuTotalMs": 15.599999189376831,
+              "cpuMaxMs": 0.7999999523162842,
+              "asyncTotalMs": 723934.3999986649,
+              "asyncMaxMs": 1930.2000000476837
+            },
+            "syncPipeline": {
+              "calls": 29,
+              "completed": 29,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 1.1999998092651367,
+              "cpuMaxMs": 0.10000014305114746,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "asyncPipeline": {
+              "calls": 476,
+              "completed": 428,
+              "failures": 0,
+              "pending": 48,
+              "cpuTotalMs": 26.799997091293335,
+              "cpuMaxMs": 0.3000001907348633,
+              "asyncTotalMs": 574686.0999970436,
+              "asyncMaxMs": 2418.5
+            },
+            "submit": {
+              "calls": 693,
+              "completed": 693,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 21.60000205039978,
+              "cpuMaxMs": 0.5,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            }
+          },
+          "hooks": {
+            "engine._initializeLimits": "installed",
+            "engine._compileRawShaderToSpirV": "installed",
+            "engine.prepareGlslangAndTintAsync": "installed",
+            "engine._preparePipelineContextAsync": "installed",
+            "engine._createPipelineStageDescriptor": "installed",
+            "tint.convertSpirV2WGSL": "not-created",
+            "device.createShaderModule": "installed",
+            "device.createRenderPipeline": "installed",
+            "device.createRenderPipelineAsync": "installed",
+            "queue.submit": "installed",
+            "module.getCompilationInfo": "installed"
+          },
+          "observerErrors": 0,
+          "shaderInventory": null,
+          "bundleCountersLastFrame": {
+            "numEnableEffects": 0,
+            "numEnableDrawWrapper": 0,
+            "numBundleCreationNonCompatMode": 0,
+            "numBundleReuseNonCompatMode": 0
+          },
+          "sharedCacheCounters": {
+            "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+            "values": {
+              "NumCacheHitWithoutHash": 60503,
+              "NumCacheHitWithHash": 8032,
+              "NumCacheMiss": 464,
+              "NumPipelineCreationLastFrame": 0
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "seq": 218,
+          "atMs": 66476.5,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 221,
+          "atMs": 68343.8,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at hh.start (http://127.0.0.1:4179/assets/game-CZGMiWM9.js:878:28383)\n    at async http://127.0.0.1:4179/assets/index-DDg5KF_e.js:16:4497531"
+          }
+        }
+      ]
+    },
+    {
+      "candidate": 6,
+      "buildSourceHash": "bf6283d58e5e5c277cca590d462c193d0a3a7737fc9756997d33c7b4c867d5fc",
+      "sessionFile": ".cache\\game-diagnostics\\96946ec9-f7f8-4194-8649-93354af7083f.jsonl",
+      "prefix": {
+        "bytes": 105319,
+        "sha256": "a479ac01ffad732e08c04f65705bfd94f0e2d289ec0f4f127c75f7a6add12072"
+      },
+      "status": "failed",
+      "cpuDataAvailable": true,
+      "cpuRecords": [
+        {
+          "seq": 108,
+          "atMs": 35374.5,
+          "kind": "startup-cpu-profile",
+          "data": {
+            "stage": "preparation-start",
+            "rendererId": 2,
+            "timing": {
+              "active": true,
+              "inert": false,
+              "disposed": false,
+              "suspended": false,
+              "generation": 1,
+              "lastGenerationReason": null,
+              "scope": {
+                "createEffect": "Inclusive synchronous caller wall time until return/throw; nested calls overlap. Return values are never inspected or observed as Promises.",
+                "wgsl": "Engine-owned WGSL initializeShaders entry through matching finalizeShaders return/throw. Includes intervening synchronous processing and callbacks; nested in createEffect when invoked there. Never add parent and child totals.",
+                "processorMethods": "Inclusive synchronous native method bodies until return/throw; no return-value inspection. Child calls can overlap and can run outside a tracked pair. Unavailable methods are omissions, not observed zero cost. Never add children to pair/createEffect totals. Pair minus child totals is not automatically parser CPU: includes, conversion, callbacks and observer overhead remain unclassified.",
+                "crossing": "A single queued microtask marker detects the pinned processing path crossing a microtask boundary. Crossed spans are latency, not CPU. Ambiguous/reentrant/missing-context spans are excluded from CPU. This is not a thread-running or GPU metric.",
+                "coverage": "Only this engine createEffect and its current _shaderProcessorWGSL are observed. Custom processors and unmatched/incomplete processing are explicit omissions. Counters are cumulative; generation changes invalidate direct same-generation comparisons.",
+                "overhead": "Clock reads, bounded bookkeeping and existing nested observers remain included. No shader strings, hashes, per-call logs or large objects are retained in snapshots."
+              },
+              "createEffect": {
+                "calls": 2330,
+                "returned": 2330,
+                "thrown": 0,
+                "timingSamples": 2330,
+                "cpuTotalMs": 336.29999923706055,
+                "cpuMaxMs": 65.69999980926514
+              },
+              "wgslProcessing": {
+                "syncCpu": {
+                  "samples": 20,
+                  "totalMs": 365.7999999523163,
+                  "maxMs": 63.39999985694885
+                },
+                "crossedMicrotaskLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "ambiguousLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "pending": 0,
+                "limit": 64
+              },
+              "processorMethods": {
+                "initializeShaders": {
+                  "calls": 20,
+                  "returned": 20,
+                  "thrown": 0,
+                  "timingSamples": 20,
+                  "cpuTotalMs": 0.2999999523162842,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "preProcessShaderCode": {
+                  "calls": 40,
+                  "returned": 40,
+                  "thrown": 0,
+                  "timingSamples": 40,
+                  "cpuTotalMs": 39.500001430511475,
+                  "cpuMaxMs": 25.5,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "preProcessor": {
+                  "calls": 0,
+                  "returned": 0,
+                  "thrown": 0,
+                  "timingSamples": 0,
+                  "cpuTotalMs": 0,
+                  "cpuMaxMs": 0,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "postProcessor": {
+                  "calls": 40,
+                  "returned": 40,
+                  "thrown": 0,
+                  "timingSamples": 40,
+                  "cpuTotalMs": 6.6000001430511475,
+                  "cpuMaxMs": 0.7000000476837158,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "finalizeShaders": {
+                  "calls": 20,
+                  "returned": 20,
+                  "thrown": 0,
+                  "timingSamples": 20,
+                  "cpuTotalMs": 11.299999713897705,
+                  "cpuMaxMs": 1.5999999046325684,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                }
+              },
+              "counts": {
+                "initialized": 20,
+                "finalized": 20,
+                "matched": 20,
+                "initializeThrown": 0,
+                "finalizeThrown": 0,
+                "unmatchedFinalize": 0,
+                "invalidContext": 0,
+                "replacedContext": 0,
+                "capacityOmitted": 0,
+                "retired": 0,
+                "reentrantCreateEffect": 0,
+                "interruptedCreateEffect": 0,
+                "invalidSpans": 0,
+                "observerErrors": 0,
+                "invalidClocks": 0,
+                "generationChanges": 0,
+                "ownershipChanges": 0,
+                "pendingPeak": 1
+              },
+              "hooks": {
+                "createEffect": "installed",
+                "getShaderProcessor": "installed",
+                "initializeShaders": "installed",
+                "preProcessShaderCode": "installed",
+                "preProcessor": "unavailable",
+                "postProcessor": "installed",
+                "finalizeShaders": "installed"
+              }
+            }
+          }
+        },
+        {
+          "seq": 212,
+          "atMs": 66458.7,
+          "kind": "startup-cpu-profile",
+          "data": {
+            "stage": "startup-end",
+            "rendererId": 2,
+            "timing": {
+              "active": false,
+              "inert": false,
+              "disposed": true,
+              "suspended": false,
+              "generation": 1,
+              "lastGenerationReason": null,
+              "scope": {
+                "createEffect": "Inclusive synchronous caller wall time until return/throw; nested calls overlap. Return values are never inspected or observed as Promises.",
+                "wgsl": "Engine-owned WGSL initializeShaders entry through matching finalizeShaders return/throw. Includes intervening synchronous processing and callbacks; nested in createEffect when invoked there. Never add parent and child totals.",
+                "processorMethods": "Inclusive synchronous native method bodies until return/throw; no return-value inspection. Child calls can overlap and can run outside a tracked pair. Unavailable methods are omissions, not observed zero cost. Never add children to pair/createEffect totals. Pair minus child totals is not automatically parser CPU: includes, conversion, callbacks and observer overhead remain unclassified.",
+                "crossing": "A single queued microtask marker detects the pinned processing path crossing a microtask boundary. Crossed spans are latency, not CPU. Ambiguous/reentrant/missing-context spans are excluded from CPU. This is not a thread-running or GPU metric.",
+                "coverage": "Only this engine createEffect and its current _shaderProcessorWGSL are observed. Custom processors and unmatched/incomplete processing are explicit omissions. Counters are cumulative; generation changes invalidate direct same-generation comparisons.",
+                "overhead": "Clock reads, bounded bookkeeping and existing nested observers remain included. No shader strings, hashes, per-call logs or large objects are retained in snapshots."
+              },
+              "createEffect": {
+                "calls": 8963,
+                "returned": 8963,
+                "thrown": 0,
+                "timingSamples": 8963,
+                "cpuTotalMs": 14717.700001716614,
+                "cpuMaxMs": 1479
+              },
+              "wgslProcessing": {
+                "syncCpu": {
+                  "samples": 332,
+                  "totalMs": 14060.200001239777,
+                  "maxMs": 1475.2999999523163
+                },
+                "crossedMicrotaskLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "ambiguousLatency": {
+                  "samples": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "pending": 0,
+                "limit": 64
+              },
+              "processorMethods": {
+                "initializeShaders": {
+                  "calls": 332,
+                  "returned": 332,
+                  "thrown": 0,
+                  "timingSamples": 332,
+                  "cpuTotalMs": 0.8999998569488525,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "preProcessShaderCode": {
+                  "calls": 664,
+                  "returned": 664,
+                  "thrown": 0,
+                  "timingSamples": 664,
+                  "cpuTotalMs": 355.40000081062317,
+                  "cpuMaxMs": 25.5,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "preProcessor": {
+                  "calls": 0,
+                  "returned": 0,
+                  "thrown": 0,
+                  "timingSamples": 0,
+                  "cpuTotalMs": 0,
+                  "cpuMaxMs": 0,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "postProcessor": {
+                  "calls": 664,
+                  "returned": 664,
+                  "thrown": 0,
+                  "timingSamples": 664,
+                  "cpuTotalMs": 264.4000027179718,
+                  "cpuMaxMs": 9.299999952316284,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                },
+                "finalizeShaders": {
+                  "calls": 332,
+                  "returned": 332,
+                  "thrown": 0,
+                  "timingSamples": 332,
+                  "cpuTotalMs": 477.3999967575073,
+                  "cpuMaxMs": 91.19999980926514,
+                  "outsideTrackedSpan": 0,
+                  "nestedCalls": 0,
+                  "interruptedCalls": 0
+                }
+              },
+              "counts": {
+                "initialized": 332,
+                "finalized": 332,
+                "matched": 332,
+                "initializeThrown": 0,
+                "finalizeThrown": 0,
+                "unmatchedFinalize": 0,
+                "invalidContext": 0,
+                "replacedContext": 0,
+                "capacityOmitted": 0,
+                "retired": 0,
+                "reentrantCreateEffect": 0,
+                "interruptedCreateEffect": 0,
+                "invalidSpans": 0,
+                "observerErrors": 0,
+                "invalidClocks": 0,
+                "generationChanges": 0,
+                "ownershipChanges": 0,
+                "pendingPeak": 1
+              },
+              "hooks": {
+                "createEffect": "disposed",
+                "getShaderProcessor": "disposed",
+                "initializeShaders": "disposed",
+                "preProcessShaderCode": "disposed",
+                "preProcessor": "unavailable",
+                "postProcessor": "disposed",
+                "finalizeShaders": "disposed"
+              }
+            }
+          }
+        }
+      ],
+      "delta": {
+        "generation": 1,
+        "createEffectCalls": 6633,
+        "createEffectCpuMs": 14381.400002479553,
+        "wgslPairs": 312,
+        "wgslCpuMs": 13694.40000128746,
+        "methods": {
+          "initializeShaders": {
+            "calls": 312,
+            "cpuMs": 0.5999999046325684,
+            "outsideTrackedSpan": 0,
+            "nestedCalls": 0
+          },
+          "preProcessShaderCode": {
+            "calls": 624,
+            "cpuMs": 315.8999993801117,
+            "outsideTrackedSpan": 0,
+            "nestedCalls": 0
+          },
+          "preProcessor": {
+            "calls": 0,
+            "cpuMs": 0,
+            "outsideTrackedSpan": 0,
+            "nestedCalls": 0
+          },
+          "postProcessor": {
+            "calls": 624,
+            "cpuMs": 257.80000257492065,
+            "outsideTrackedSpan": 0,
+            "nestedCalls": 0
+          },
+          "finalizeShaders": {
+            "calls": 312,
+            "cpuMs": 466.0999970436096,
+            "outsideTrackedSpan": 0,
+            "nestedCalls": 0
+          }
+        }
+      },
+      "lighting": {
+        "seq": 208,
+        "atMs": 65766.5,
+        "kind": "lighting-preparation",
+        "data": {
+          "status": "timeout",
+          "elapsedMs": 30390.299999952316,
+          "activeElapsedMs": 30390.299999952316,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stages": [
+            {
+              "stage": "vehicle-0",
+              "elapsedMs": 5282.700000047684,
+              "activeElapsedMs": 5282.700000047684,
+              "pausedMs": 0,
+              "tickCount": 35,
+              "rafGap": {
+                "count": 35,
+                "totalMs": 5256.400000095367,
+                "maxMs": 1949.3999998569489
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 3,
+                  "totalMs": 131.2000002861023,
+                  "maxMs": 64.20000004768372
+                },
+                "checkBatch": {
+                  "calls": 32,
+                  "totalMs": 534.8999996185303,
+                  "maxMs": 122.29999995231628
+                },
+                "render": {
+                  "calls": 15,
+                  "totalMs": 2803.199999809265,
+                  "maxMs": 1730.9000000953674
+                }
+              },
+              "restartReasons": {
+                "meshes": 2
+              },
+              "checks": 903,
+              "renders": 15,
+              "restarts": 2,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 343,
+                "cursor": 343,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "vehicle-1",
+              "elapsedMs": 2845.2000000476837,
+              "activeElapsedMs": 2845.2000000476837,
+              "pausedMs": 0,
+              "tickCount": 20,
+              "rafGap": {
+                "count": 20,
+                "totalMs": 2847.5,
+                "maxMs": 1821.6000001430511
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 10.200000047683716,
+                  "maxMs": 10.200000047683716
+                },
+                "checkBatch": {
+                  "calls": 19,
+                  "totalMs": 433.7999999523163,
+                  "maxMs": 145.40000009536743
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1926.2999999523163,
+                  "maxMs": 1805.7999999523163
+                }
+              },
+              "restartReasons": {},
+              "checks": 686,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 343,
+                "cursor": 343,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "current-off",
+              "elapsedMs": 4075.7999999523163,
+              "activeElapsedMs": 4075.7999999523163,
+              "pausedMs": 0,
+              "tickCount": 25,
+              "rafGap": {
+                "count": 25,
+                "totalMs": 4063,
+                "maxMs": 3328
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 65.69999980926514,
+                  "maxMs": 65.69999980926514
+                },
+                "checkBatch": {
+                  "calls": 24,
+                  "totalMs": 388.5000009536743,
+                  "maxMs": 98
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 2114.2999999523163,
+                  "maxMs": 1950.4000000953674
+                }
+              },
+              "restartReasons": {},
+              "checks": 880,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 440,
+                "cursor": 440,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "current-on",
+              "elapsedMs": 4399.599999904633,
+              "activeElapsedMs": 4399.599999904633,
+              "pausedMs": 0,
+              "tickCount": 27,
+              "rafGap": {
+                "count": 27,
+                "totalMs": 4396.200000047684,
+                "maxMs": 2419.2000000476837
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 43.799999952316284,
+                  "maxMs": 43.799999952316284
+                },
+                "checkBatch": {
+                  "calls": 26,
+                  "totalMs": 349.7000002861023,
+                  "maxMs": 100.40000009536743
+                },
+                "render": {
+                  "calls": 7,
+                  "totalMs": 2716.800000190735,
+                  "maxMs": 2371.9000000953674
+                }
+              },
+              "restartReasons": {},
+              "checks": 884,
+              "renders": 7,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 442,
+                "cursor": 442,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-0-off",
+              "elapsedMs": 2828.2999999523163,
+              "activeElapsedMs": 2828.2999999523163,
+              "pausedMs": 0,
+              "tickCount": 21,
+              "rafGap": {
+                "count": 21,
+                "totalMs": 2831.0999999046326,
+                "maxMs": 1809.2999999523163
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 43.5,
+                  "maxMs": 43.5
+                },
+                "checkBatch": {
+                  "calls": 20,
+                  "totalMs": 313.6000006198883,
+                  "maxMs": 75.59999990463257
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 1825.0999999046326,
+                  "maxMs": 1719.0999999046326
+                }
+              },
+              "restartReasons": {},
+              "checks": 878,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-0-on",
+              "elapsedMs": 4924,
+              "activeElapsedMs": 4924,
+              "pausedMs": 0,
+              "tickCount": 20,
+              "rafGap": {
+                "count": 20,
+                "totalMs": 4928.700000047684,
+                "maxMs": 3456.2000000476837
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 35.40000009536743,
+                  "maxMs": 35.40000009536743
+                },
+                "checkBatch": {
+                  "calls": 19,
+                  "totalMs": 297.69999957084656,
+                  "maxMs": 41.700000047683716
+                },
+                "render": {
+                  "calls": 4,
+                  "totalMs": 3513.699999809265,
+                  "maxMs": 3413.2000000476837
+                }
+              },
+              "restartReasons": {},
+              "checks": 882,
+              "renders": 4,
+              "restarts": 0,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 441,
+                "cursor": 441,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-1-off",
+              "elapsedMs": 2718.5,
+              "activeElapsedMs": 2718.5,
+              "pausedMs": 0,
+              "tickCount": 20,
+              "rafGap": {
+                "count": 20,
+                "totalMs": 2731,
+                "maxMs": 1250.3999998569489
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 2,
+                  "totalMs": 27.99999976158142,
+                  "maxMs": 25.199999809265137
+                },
+                "checkBatch": {
+                  "calls": 18,
+                  "totalMs": 187.2000002861023,
+                  "maxMs": 25.799999952316284
+                },
+                "render": {
+                  "calls": 5,
+                  "totalMs": 1342.8000001907349,
+                  "maxMs": 1202.2000000476837
+                }
+              },
+              "restartReasons": {
+                "weather": 1
+              },
+              "checks": 878,
+              "renders": 5,
+              "restarts": 1,
+              "lastState": {
+                "operation": "effects",
+                "queueLength": 439,
+                "cursor": 439,
+                "retryCount": 0,
+                "readyRenders": 2
+              },
+              "passQuality": "low"
+            },
+            {
+              "stage": "night-1-on",
+              "elapsedMs": 2430.899999856949,
+              "activeElapsedMs": 2430.899999856949,
+              "pausedMs": 0,
+              "tickCount": 2,
+              "rafGap": {
+                "count": 2,
+                "totalMs": 1206.7000000476837,
+                "maxMs": 1180.4000000953674
+              },
+              "cpu": {
+                "apply": {
+                  "calls": 1,
+                  "totalMs": 11.700000047683716,
+                  "maxMs": 11.700000047683716
+                },
+                "checkBatch": {
+                  "calls": 1,
+                  "totalMs": 12,
+                  "maxMs": 12
+                },
+                "render": {
+                  "calls": 1,
+                  "totalMs": 1130.5999999046326,
+                  "maxMs": 1130.5999999046326
+                }
+              },
+              "restartReasons": {},
+              "checks": 1,
+              "renders": 1,
+              "restarts": 0,
+              "lastState": {
+                "operation": "check",
+                "queueLength": 441,
+                "cursor": 1,
+                "retryCount": 0,
+                "readyRenders": 0
+              },
+              "passQuality": "low"
+            }
+          ],
+          "qualities": [
+            {
+              "quality": "low",
+              "finalPass": false,
+              "status": "timeout",
+              "failureStep": null,
+              "elapsedMs": 30390.200000047684,
+              "activeElapsedMs": 30390.200000047684,
+              "pausedMs": 0,
+              "stageCount": 8
+            }
+          ],
+          "shaderScheduling": {
+            "active": false,
+            "inert": true,
+            "disposed": false,
+            "faulted": false,
+            "queued": 0,
+            "pending": 0,
+            "started": 0,
+            "completed": 0,
+            "cancelled": 0,
+            "passthrough": 0,
+            "frameCount": 0,
+            "workCpuCount": 0,
+            "workCpuMs": 0,
+            "workCpuMaxMs": 0
+          },
+          "readiness": {
+            "quality": "low",
+            "stage": "night-1-on",
+            "lastGate": null,
+            "mesh": null,
+            "material": null,
+            "waits": {
+              "mesh": 0,
+              "precipitation": 0,
+              "pipeline": 0,
+              "health": 0,
+              "effects": 0
+            }
+          },
+          "pipeline": {
+            "active": true,
+            "inert": false,
+            "disposed": false,
+            "faulted": false,
+            "completionSerial": 351,
+            "provenSerial": 331,
+            "lastRenderComplete": false,
+            "entries": {
+              "total": 49,
+              "pending": 29,
+              "ready": 20
+            },
+            "work": {
+              "total": 49,
+              "pending": 29,
+              "retiredPending": 0
+            },
+            "renders": {
+              "total": 44,
+              "complete": 21,
+              "incomplete": 23
+            },
+            "readiness": {
+              "checks": 47,
+              "waits": 19,
+              "lastResult": true
+            },
+            "skips": {
+              "pending-entry": 2956,
+              "capacity": 0,
+              "descriptor-disabled": 0,
+              "descriptor-identity": 0
+            },
+            "retirements": {
+              "invalidIdentity": 0,
+              "disabled": 0,
+              "unusedReady": 0
+            },
+            "lastSkip": {
+              "reason": "pending-entry",
+              "effectId": 341,
+              "effectName": "pbr",
+              "identityChanges": []
+            }
+          },
+          "pipelineScope": "Snapshot after restoration; readiness and lastState describe the last attempted stage."
+        }
+      },
+      "compiler": {
+        "seq": 209,
+        "atMs": 65771.8,
+        "kind": "webgpu-preparation-profile",
+        "data": {
+          "active": true,
+          "backend": "webgpu",
+          "generation": 1,
+          "attachedAfterDeviceCreation": true,
+          "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+          "metrics": {
+            "glslToSpirv": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "spirvToWgsl": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "compilerLoad": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderPreparation": {
+              "calls": 332,
+              "completed": 332,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 483.20000195503235,
+              "cpuMaxMs": 25.59999990463257,
+              "asyncTotalMs": 319646.49999427795,
+              "asyncMaxMs": 3360.2000000476837
+            },
+            "shaderModule": {
+              "calls": 664,
+              "completed": 664,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 213.19999980926514,
+              "cpuMaxMs": 19.100000143051147,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderValidation": {
+              "calls": 664,
+              "completed": 631,
+              "failures": 0,
+              "pending": 33,
+              "cpuTotalMs": 13.500001192092896,
+              "cpuMaxMs": 1.2999999523162842,
+              "asyncTotalMs": 838823.2000079155,
+              "asyncMaxMs": 3479.800000190735
+            },
+            "syncPipeline": {
+              "calls": 29,
+              "completed": 29,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 1.1999998092651367,
+              "cpuMaxMs": 0.10000014305114746,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "asyncPipeline": {
+              "calls": 380,
+              "completed": 351,
+              "failures": 0,
+              "pending": 29,
+              "cpuTotalMs": 28.49999713897705,
+              "cpuMaxMs": 3.299999952316284,
+              "asyncTotalMs": 610366.5999991894,
+              "asyncMaxMs": 3478
+            },
+            "submit": {
+              "calls": 608,
+              "completed": 608,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 22.400002241134644,
+              "cpuMaxMs": 0.5999999046325684,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            }
+          },
+          "hooks": {
+            "engine._initializeLimits": "installed",
+            "engine._compileRawShaderToSpirV": "installed",
+            "engine.prepareGlslangAndTintAsync": "installed",
+            "engine._preparePipelineContextAsync": "installed",
+            "engine._createPipelineStageDescriptor": "installed",
+            "tint.convertSpirV2WGSL": "not-created",
+            "device.createShaderModule": "installed",
+            "device.createRenderPipeline": "installed",
+            "device.createRenderPipelineAsync": "installed",
+            "queue.submit": "installed",
+            "module.getCompilationInfo": "installed"
+          },
+          "observerErrors": 0,
+          "shaderInventory": null,
+          "bundleCountersLastFrame": {
+            "numEnableEffects": 0,
+            "numEnableDrawWrapper": 0,
+            "numBundleCreationNonCompatMode": 0,
+            "numBundleReuseNonCompatMode": 0
+          },
+          "sharedCacheCounters": {
+            "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+            "values": {
+              "NumCacheHitWithoutHash": 57082,
+              "NumCacheHitWithHash": 7020,
+              "NumCacheMiss": 367,
+              "NumPipelineCreationLastFrame": 0
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "seq": 210,
+          "atMs": 65772.8,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 213,
+          "atMs": 66459.2,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at _h.start (http://127.0.0.1:4179/assets/game-ClzP8cjw.js:878:28383)\n    at async http://127.0.0.1:4179/assets/index-C-j7SZ6x.js:16:4497531"
+          }
+        }
+      ]
+    }
+  ]
+}

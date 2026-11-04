@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-preparation-budget-20261103",
+  "title": "Zvýšit WebGPU přípravný limit podle výslovné změny zadání",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["client/render-quality-preparation.ts", "tests/render-quality-preparation.test.ts", "tests/game-preparation-baseline.test.ts", "tests/game-quality-preparation.test.ts", "docs/agents/handoffs/webgpu-preparation-budget-20261103.md", ".cache/webgpu-preparation-budget-20261103/"],
+  "resources": [],
+  "acceptance": ["Výslovná autorizace uživatele3.11. nahrazuje starý30/90s kontrakt proWebGPU:60s na kvalitu,180s celkem.", "Zachovat všechny tři kvality, real readiness/health/submission, čas apply/restore, zrušení a finite budget.", "Nezměnit obecný30s default light-preparation proWebGL2. Staré neúspěšné důkazy zůstávají platnou historií, neznačit je zpětněPASS."],
+  "verification": ["Cílené rozpočtové regrese včetně>30s úspěchu a nových horníchmezí, scopedTS; následnýnovýbuild a skutečný běžnýWebGPUstart přes rootvalidačníclaim.", "Žádné pokračování nad hranýmC10 buildem; C11 musí mít nový source/testhash."],
+  "notes": ["User: increasni limit na tomwebgpu, potřebujeme zprovoznitwebgpu. C10CM skončil30.0287s při restore, NCM došelready. Toto je dostupnostní oprava, nikoli FPSoptimalizace."]
+}

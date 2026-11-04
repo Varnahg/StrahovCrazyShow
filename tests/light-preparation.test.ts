@@ -169,6 +169,21 @@ test("old hot-swapped ready meshes do not complete while the new engine effect i
   assert.equal(result.status, "timeout");
   assert.equal(f.state().restoredSettings, 7);
   assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
+  assert.equal(result.stages[0].lastState?.readyRenders, 0);
+});
+
+test("timeout preserves queue progress before restore and does not call it a failed shader", async () => {
+  const f = fixture({ batchSize: 2 });
+  const pending = f.start();
+  f.tick(); // apply and the first progress draw
+  f.tick(); // only two of five mesh checks fit
+  f.timeout();
+  const result = await pending;
+  assert.equal(result.status, "timeout");
+  assert.equal(result.failureStep, null);
+  assert.deepEqual(result.stages[0].lastState, {
+    operation: "check", queueLength: 5, cursor: 2, retryCount: 0, readyRenders: 0,
+  });
 });
 
 test("optional native day coverage has exactly thirteen stages and two completed readiness draws per stage", async () => {

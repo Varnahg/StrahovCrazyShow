@@ -1,0 +1,63 @@
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/README.md b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/README.md
+index 58d064ff..e05b05cc 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/README.md
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/README.md
+@@ -1,5 +1,9 @@
+ # První vstup: dvě vnitřní effect hranice
+ 
++## V21: own-data normalizace trigger limits
++
++Úzký review patch normalizuje uzavřená scalar `limits` před legacy validací. Getter, vlastní/inherited toJSON i toJSON v hodnotě limitu se odmítají bez spuštění. Veřejná signatura, return identity i schema zůstávají V20. Ostatní runtime soubory jsou byteexact V20; nové cílené regrese a evidence jsou v `entry-effect-cost/review-fix-v21/`. Původní V20 helper c9f68706 a jeho65payloadů jsou immutable.
++
+ ## V20: pending práce během accepted capture
+ 
+ V20 je nová immutable kopie. Samostatný `entry-effect-trigger.mjs` nahrazuje controller pouze nové10target akce; `entry-routine-cost.mjs`, routine/core, entry-render a celé původní8target/3scope akce zůstávají byteexact V19. Source pack má42 vstupů. UI i receipt používají nový trigger/profile schemaVersion2; stará schemata a product zůstávají původní.
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/entry-effect-trigger.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-trigger.mjs
+index 88e844d0..ee1314f7 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/entry-effect-trigger.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-trigger.mjs
+@@ -154,7 +154,8 @@ const baseKeys='schemaVersion,scope,limits,active,complete,reason,armedAtMs,dead
+ export function validateEntryEffectTrigger(value,profile){
+   const p=closed(value,[...baseKeys,'firstFailure','pendingAtTerminal']);
+   if(p.schemaVersion!==2||p.scope!==ENTRY_EFFECT_TRIGGER_SCOPE||!ENTRY_EFFECT_TRIGGER_REASONS.includes(p.reason))throw Error('Effect trigger schema/scope');
+-  const original=Object.fromEntries(baseKeys.map(k=>[k,p[k]]));original.schemaVersion=1;original.scope=ENTRY_ROUTINE_SCOPE;validateEntryTrigger(original,profile);
++  const limits=closed(p.limits,Object.keys(ENTRY_ROUTINE_LIMITS));for(const [key,expected]of Object.entries(ENTRY_ROUTINE_LIMITS))if(limits[key]!==expected)throw Error('Effect trigger limits');
++  const original=Object.fromEntries(baseKeys.map(k=>[k,p[k]]));original.limits=limits;original.schemaVersion=1;original.scope=ENTRY_ROUTINE_SCOPE;validateEntryTrigger(original,profile);
+   validateGuardFailure(p.firstFailure);const terminal=validateGuardSample(p.pendingAtTerminal);
+   if(p.firstFailure&&p.firstFailure.source!=='trigger')throw Error('Effect trigger witness source');
+   if(p.reason!=='complete'&&!p.firstFailure)throw Error('Effect trigger missing failure witness');
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/pending-capture.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/pending-capture.test.mjs
+index 6d9bfcc8..fea88e7c 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v20/pending-capture.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/pending-capture.test.mjs
+@@ -22,6 +22,7 @@ const baseline=process.env.EFFECT_BASELINE==='v19';
+ const oldTrigger=baseline?await import('../v19/entry-routine-cost.mjs'):null;
+ const oldAdapter=baseline?await import('../v19/entry-effect-cost.mjs'):null;
+ const trigger=oldTrigger?.captureEntryRoutineCost??captureEntryEffectTrigger,adapter=oldAdapter?.captureEntryEffects??captureEntryEffects;
++const limitsValidator=process.env.EFFECT_LIMITS_BASELINE==='v20'?(await import('../v20/entry-effect-trigger.mjs')).validateEntryEffectTrigger:validateEntryEffectTrigger;
+ const turn=()=>new Promise(resolve=>setImmediate(resolve));
+ const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve();};
+ const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};};
+@@ -100,6 +101,22 @@ test('new trigger and profile receipt reject schema, pending, witness and frame
+    assert.ok(Buffer.byteLength(JSON.stringify(raw.entryEffectProfile))<256*1024);clean(f,r);
+  }finally{owner?.dispose();f.dispose();}
+ });
++for(const shape of ['field-getter','own-toJSON-function','own-toJSON-getter','inherited-toJSON-getter','nested-value-toJSON'])test('limits own-data rejects '+shape+' without executing accessors or toJSON',async()=>{
++ const f=fixture();let owner;try{owner=captureEntryEffectTrigger(f.game,f.options);owner.dispose();const r=await owner.done,p=structuredClone(r.entryTrigger),correct={...p.limits};let reads=0;
++   if(shape==='field-getter')Object.defineProperty(p.limits,'deadlineMs',{enumerable:true,get(){reads++;return correct.deadlineMs;}});
++   if(shape==='own-toJSON-function')p.limits.toJSON=()=>{reads++;return correct;};
++   if(shape==='own-toJSON-getter')Object.defineProperty(p.limits,'toJSON',{get(){reads++;return()=>{reads++;return correct;};}});
++   if(shape==='inherited-toJSON-getter')Object.setPrototypeOf(p.limits,{get toJSON(){reads++;return()=>{reads++;return correct;};}});
++   if(shape==='nested-value-toJSON')p.limits.deadlineMs={toJSON(){reads++;return correct.deadlineMs;}};
++   let rejected=false;try{limitsValidator(p,r.routineProfile);}catch{rejected=true;}
++   assert.equal(reads,0,'nested limit validation must not execute an accessor/toJSON');assert.equal(rejected,true,'non-scalar or accessor-backed limits must be rejected');
++ }finally{owner?.dispose();f.dispose();}
++});
++test('limits own-data preserves the public return and valid scalar limits',async()=>{
++ const f=fixture();let owner;try{owner=captureEntryEffectTrigger(f.game,f.options);owner.dispose();const r=await owner.done;
++   for(const prototype of [Object.prototype,null]){const p=structuredClone(r.entryTrigger),limits=Object.assign(Object.create(prototype),p.limits);p.limits=limits;assert.equal(validateEntryEffectTrigger(p,r.routineProfile),p);assert.equal(p.limits,limits);assert.deepEqual(Reflect.ownKeys(limits),['deadlineMs','frames','standbyCalls']);}
++ }finally{owner?.dispose();f.dispose();}
++});
+ test('both disabled new APIs avoid Game reads and legacy controller/runtime bytes remain exact',()=>{
+  const hostile=new Proxy({},{get(){assert.fail('default-off read');},getOwnPropertyDescriptor(){assert.fail('default-off descriptor');}});assert.equal(captureEntryEffectTrigger(hostile),undefined);assert.equal(captureEntryEffects(hostile),undefined);
+  for(const file of ['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs'])assert.deepEqual(fs.readFileSync(new URL(file,import.meta.url)),fs.readFileSync(new URL('../v19/'+file,import.meta.url)));

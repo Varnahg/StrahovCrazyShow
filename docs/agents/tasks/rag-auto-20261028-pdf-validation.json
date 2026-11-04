@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-pdf-validation",
+  "title": "RAG: omezený živý pilot kvality OpenAI PDF kandidáta",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-auto-pdf-validation-20261028/",
+    "docs/agents/handoffs/rag-auto-20261028-pdf-validation.md"
+  ],
+  "resources": [
+    "openai-paid-validation"
+  ],
+  "acceptance": [
+    "Za celý checkpoint nejvýše2 POST /v1/responses/input_tokens a2 Responses extraction pokusy, celkem4HTTP. Žádné retry, přepínání modelu nebo nový rozpočet po selhání; všechny odeslané/nejisté pokusy se zachovávají přes restart.",
+    "Jen dvě již uložená veřejná jednostránková SÚZ PDF: smlouva198187B SHA2568ef4883e3ee2bdc4788425db2cb428a53574cf6aa7e4ebad664d26756ad82a62 a screenshot96519B SHA256c8fa5f785f4fad80cba311a560665b4dfef1f2bcfd45ade7ce8b2c4618b4023b. Před sítí znovu ověřit bajty/hash/počet stran.",
+    "Explicitní gpt-6.1-sol/low, detail high, maxInputTokens20000 a maxOutputTokens8192 na extraction. Count nad limitem, refusal, timeout, nejisté odeslání nebo kvalitativní neúspěch neautorizují automatický další pokus.",
+    "Durable append-only ledger rezervuje pokus ještě před HTTP. Count pokusy/request IDs se evidují s billing unknown, nikoli jako fakturovaná nula; potvrzené usage a unknown zůstanou oddělené.",
+    "Klíč čte jen původní koordinátor ze známého AppData secrets/openai.env mimo Git; nevypisovat ani nekopírovat do Git/Linear. Raw PDF a kandidát zůstávají pouze v owned ignored cache.",
+    "Posoudit čísla, strany, tabulkové vazby, oba jazyky a úplnost proti původnímu obrazu. Screenshotové datum21.10.2026 je ukázkový údaj, ne dnešní deadline nebo stav účtu.",
+    "Žádná DB, embedding, crawl, serving, GPU, build nebo instalace. Kandidát ani úspěch těchto dvou případů nejsou automatickým přijetím/publikací do RAG; normalizer/orchestrace a širší kvalita zůstávají otevřené."
+  ],
+  "verification": [
+    "Před spuštěním vlastní claim a přesný stabilní67test/strictTS adapter checkpoint včetně opravenýchP2; během placených volání source neměnit.",
+    "Předem uložit plán dvou vzorků, jejich úplné identity a limity; po běhu bezpečné receipts, actual model/usage, kvalitu a zachované chyby. Žádný API nebo model download mimo předanéPDF bytes.",
+    "Používat přímý Node entrypoint, bez package manageru. Po skončení ukončit vlastní pomocníky, zapsat souhrn čerpání a skutečně uvolnit placené validační okno."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, KEY-67. Konkrétní bounded pilot předal koordinátor01a17e9d-dd4a-7fe3-91ac-4f3bc548982d po67/67fakeHTTP a strictTS/re-review; fake testy nejsou důkaz skutečné OCR kvality.",
+    "Samostatný rozpočet od uzavřeného Decisions checkpointu KEY-68; jeho dřívější čerpání se nepřepisuje ani neslučuje. Primární API shape je kontrakt adaptéru, nikoli domněnka podle validity JSON.",
+    "Žádné čtení cizích credentialů; admin pouze registruje metadata a sám nevolá API."
+  ]
+}

@@ -89,7 +89,7 @@ const compiled = ts.transpileModule(
 // Same-realm object literals exercise the real sanitizer's plain-object policy.
 const script = new Script(`(function(environment) {
   const { exports, Vector3, Quaternion, writeQuaternion, writeVector3, performance, document, window,
-    testImportMeta, sessionDiagnostics, vehicleCameraCanFollow, zoneAt, applyArtLighting, getTreeSeasonState, snapshotTransportDiagnostics, snapshotTimelineDiagnostics, readWebGpuMainPassTiming } = environment;
+    testImportMeta, sessionDiagnostics, vehicleCameraCanFollow, zoneAt, applyArtLighting, getTreeSeasonState, snapshotTransportDiagnostics, snapshotTimelineDiagnostics, readWebGpuMainPassTiming, HUNT_POINTS, localizeText } = environment;
   ${compiled}
   return FrameGame;
 })`);
@@ -149,6 +149,8 @@ function fixture(hostname = "localhost") {
     sessionDiagnostics: recorder,
     vehicleCameraCanFollow: () => false,
     zoneAt: () => "outside",
+    HUNT_POINTS: [],
+    localizeText: (text: string) => text,
     applyArtLighting: () => ({ night: 0, keySource: "sun" }),
   });
   const counter = { count: 1, current: 2_000_000 };
@@ -396,6 +398,47 @@ test("actual production Game.frame automatically records intervals, six phases a
   );
 });
 
+test("actual Game pairs completed recorder and HUD work with the next frame without changing six-phase scope", async (t) => {
+  const f = fixture();
+  t.after(() => f.recorder.dispose());
+  f.recorder.start(); await f.recorder.flush();
+  f.game.engine.getDeltaTime = () => 100;
+  f.game.engine.getFps = () => 10;
+  f.game.scene.getActiveIndices = () => 3;
+  f.game.instrumentation.drawCallsCounter = { current: 1 };
+  f.game.nearbyDoor = () => null;
+  f.game.lastStats = 0;
+  const context = f.game.diagnosticContext;
+  f.game.diagnosticContext = () => { f.time(f.environment.now() + 17); return context(); };
+  let stats = 0;
+  f.game.onStats = () => { stats++; f.time(f.environment.now() + 20); };
+  f.time(1000); f.game.frame();
+  assert.equal(stats, 1);
+  const marker = f.game.completedDiagnosticCallback;
+  const firstStart = marker.frameStartedAtMs, firstCpu = f.game.lastCpuFrameMs;
+  assert.equal(marker.cpuMs, firstCpu);
+  f.time(1100); f.game.frame();
+  assert.equal(f.game.completedDiagnosticCallback, marker, "one reused marker, no new object each frame");
+  assert.notEqual(marker.frameStartedAtMs, firstStart);
+  f.time(2200); f.tick(); await f.recorder.flush();
+  const hitch = f.records().filter(r => r.kind === "frame-hitch").find(r => r.data.previousFrame)!;
+  const previous = hitch.data.previousFrame as any;
+  assert.equal(previous.frameStartedAtMs, firstStart);
+  assert.equal(previous.callbackCpuMs, firstCpu);
+  assert.equal(previous.callbackTailMs, firstCpu - previous.cpuMs);
+  assert.ok(previous.callbackTailMs >= 37, "recorder context and HUD tail are inside the completed callback");
+  const windows = f.records().filter(r => r.kind === "frame-window");
+  assert.ok(windows.some(r => Number(r.data.recorderMaxMs) >= 17));
+  assert.deepEqual(windows.flatMap(r => r.data.previousCallbackCpuMs as any[]), [null, firstCpu]);
+  for (const batch of f.posts) assert.ok(validateDiagnosticsBatch(batch));
+  f.game.resetDiagnosticContext();
+  assert.equal(f.game.completedDiagnosticCallback, undefined);
+  f.time(2300); f.game.frame();
+  f.recorder.resetFrameContext(); await f.recorder.flush();
+  const lastHitch = f.records().filter(r => r.kind === "frame-hitch").at(-1)!;
+  assert.equal(lastHitch.data.previousFrame, null);
+});
+
 test("actual frame context isolates guest and dispose invalidates once without further rendering", async (t) => {
   const f = fixture();
   t.after(() => f.recorder.dispose());
@@ -459,6 +502,74 @@ test("actual Game lifecycle timing survives the real diagnostic privacy filter",
   assert.equal(timing.phases.beginFrame.calls, 1);
   assert.equal(timing.phases.endFrame.cpuTotalMs, 4);
   assert.equal(timing.phases.endFrame.asyncCompletion, "unobserved");
+});
+
+test("standalone lifecycle QA is loopback-only and does not enable shader inventories", () => {
+  const constructor = declaration.members.find(ts.isConstructorDeclaration)!;
+  const statements = constructor.body!.statements;
+  const selected = statements.filter(node => {
+    const code = node.getText(source);
+    return code.startsWith("this.compilationProfile =") || code.startsWith("const lifecycleRequests =") ||
+      code.startsWith("const lifecycleOnly =") || code.startsWith("if (this.environmentProfile || lifecycleOnly)");
+  });
+  assert.equal(selected.length, 4);
+  const initialize = new Script(`(function(window, WebGpuCompilationProfile, WebGpuFrameLifecycleProfile, sessionDiagnostics, performance) {
+    ${ts.transpileModule(selected.map(n => n.getText(source)).join("\n"), { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText}
+  })`).runInThisContext();
+  for (const [hostname, search, expected] of [
+    ["localhost", "?profileFrameLifecycle=1", true], ["LOCALHOST", "?profileFrameLifecycle=1", true],
+    ["127.0.0.1", "?profileFrameLifecycle=1", true], ["[::1]", "?profileFrameLifecycle=1", true],
+    ["example.com", "?profileFrameLifecycle=1", false], ["localhost", "", false],
+    ["localhost", "?profileFrameLifecycle=0", false], ["localhost", "?profileFrameLifecycle=1&profileFrameLifecycle=1", false],
+  ] as const) {
+    let clock = 100, lifecycleCount = 0, slow: ((sample: object) => void) | undefined;
+    const events: unknown[] = [], game = { engine: {}, environmentProfile: undefined, renderHealth: { rendererId: 1 } };
+    initialize.call(game, { location: { hostname, search } }, class {
+      constructor(_engine: object, options: { captureShaderInventory: boolean; captureUnusedDefineInventory: boolean }) {
+        assert.equal(options.captureShaderInventory, false); assert.equal(options.captureUnusedDefineInventory, false);
+      }
+    }, class {
+      constructor(_engine: object, options: { onSlowCall: (sample: object) => void }) { lifecycleCount++; slow = options.onSlowCall; }
+    }, { event: (...args: unknown[]) => events.push(args) }, { now: () => clock });
+    assert.equal(lifecycleCount, Number(expected));
+    if (slow) {
+      for (let i = 0; i < 20; i++) slow({ phase: "endFrame", cpuMs: 30 });
+      assert.equal(events.length, 8);
+      clock = 1100; slow({ phase: "endFrame", cpuMs: 30 }); assert.equal(events.length, 9);
+    }
+  }
+});
+
+test("production benchmark boundaries retain actual lifecycle counters through both privacy passes", async (t) => {
+  const f = fixture(); t.after(() => f.recorder.dispose());
+  let clock = 0;
+  Object.assign(f.game.engine, { isWebGPU: true, getHostWindow: () => null,
+    beginFrame() { clock += 2; }, endFrame() { clock += 4; } });
+  f.game.renderHealth.rendererId = 73;
+  f.game.frameLifecycleProfile = new WebGpuFrameLifecycleProfile(f.game.engine, { now: () => clock });
+  t.after(() => f.game.frameLifecycleProfile.dispose());
+  function boundary(methodName: string, stage: string) {
+    const method = declaration.members.find(n => n.name?.getText(source) === methodName)!;
+    let found: ts.IfStatement | undefined;
+    function visit(node: ts.Node) {
+      if (ts.isIfStatement(node) && node.expression.getText(source) === "this.frameLifecycleProfile" &&
+          node.thenStatement.getText(source).includes(JSON.stringify(stage))) found = node;
+      ts.forEachChild(node, visit);
+    }
+    visit(method); assert.ok(found, stage);
+    return new Script(`(function(sessionDiagnostics) { ${found.getText(source)} })`).runInThisContext();
+  }
+  f.recorder.start(); await f.recorder.flush();
+  boundary("startBenchmark", "benchmark-start").call(f.game, f.recorder);
+  f.game.engine.beginFrame(); f.game.engine.endFrame();
+  boundary("frame", "benchmark-end").call(f.game, f.recorder);
+  await f.recorder.flush();
+  const records = f.posts.flatMap(batch => validateDiagnosticsBatch(batch)!.records)
+    .filter(r => r.kind === "engine-frame-profile");
+  assert.deepEqual(records.map(r => r.data.stage), ["benchmark-start", "benchmark-end"]);
+  assert.equal(records[1].data.slowEventLimitPerSecond, 8);
+  const start = records[0].data.timing as any, end = records[1].data.timing as any;
+  assert.equal(end.phases.endFrame.cpuTotalMs - start.phases.endFrame.cpuTotalMs, 4);
 });
 
 test("real Game frames survive recorder, validator, local collector and report with bounded own telemetry", async (t) => {

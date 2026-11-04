@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "d-cache-cleanup-20261028",
+  "title": "Bezpečně sdílet shodné statické kopie starých cache na D:",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/terrain-validation-20261025/",
+    ".cache/trees-validation-20261025/",
+    ".cache/d-cache-cleanup-20261028/",
+    "docs/agents/handoffs/d-cache-cleanup-20261028.md"
+  ],
+  "resources": [
+    "disk-d-scs-cache-cleanup"
+  ],
+  "acceptance": [
+    "Pracovat pouze v D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Před každou změnou ověřit absolutní cílové i zdrojové cesty, jejich příslušnost k povoleným cache a skutečnou identitu souboru/inode; neprocházet junctiony do jiných stromů.",
+    "VÝSLOVNĚ VYLOUČENO: .cache/trees-validation-20261025/candidate-v13/ jako zdroj i cíl, celý D main a pracovní runtime/assety/WIP, node_modules, Git/LFS a běžící servery. Nesmějí se měnit atributy ani obsah inode sdíleného s v13/main. Pokud bezpečné oddělení nelze doložit, kandidát se přeskočí.",
+    "Pouze staré neměnné statické duplikáty: SHA-256 a skutečná bajtová shoda se znovu ověří bezprostředně před náhradou samostatné kopie hardlinkem na zachovanou neměnnou kopii. Zachovat původní cesty a obsah; zdroj musí zůstat zachovaný a nesmí být aktivním zapisovaným souborem.",
+    "Zachovat všechny jedinečné soubory, source/testy, compiled JS, logy, manifests a receipts. Žádné rekurzivní mazání snapshotů, přesouvání celých kopií ani změny zdrojového kódu. Žádný build, testovací herní proces, GPU, Blender nebo install.",
+    "Předat vlastní záznam skutečně změněných cest, ověřených hashů/identit a dosaženého fyzického uvolnění místa; neodvozovat úsporu ze součtu logických velikostí. Po dokončení ukončit vlastní pomocníky, předat výsledek a uvolnit rezervaci."
+  ],
+  "verification": [
+    "Před zápisem vlastní claim cleanup-01a17fe0, aktuální registry a read-only ověření skutečných procesů; samotný údaj portu či historický PID není oprávnění proces zastavit.",
+    "Po každé náhradě ověřit shodný obsah, existenci původní cesty a hardlink identity. Chráněný v13/main a zachované důkazy nesmí být změněné.",
+    "Plná validační pipeline se zde nespouští. Dokončení úklidu oznámit původnímu vlastníkovi před jeho návratem do validačního scope."
+  ],
+  "notes": [
+    "Autorizace člověka ověřena v chatu Smaž neaktivní chaty a větve, thread 01a17fe0-11ea-7401-ae77-9ff148a83282: zachovat aktivní práci a neintegrované změny, domluvit předání a bezpečně uvolnit cache na D:.",
+    "Task přidělil admin trees-20261025-admin; úklid provádí výhradně koordinátor cleanup-01a17fe0 po vlastním claimu z uvedené D worktree. Admin úklid neprovádí a task za příjemce nenárokuje.",
+    "Dočasné předání je v docs/agents/handoffs/trees-20261025-validation.md. Původní owner uvolní pouze trees-20261025-validation; port/GPU a další rezervace zůstávají. Do převzatého scope se nevrátí před oznámením dokončení a release cleanup tasku.",
+    "Široké writePaths jsou zámkem pro spolupráci, nikoli zrušením uvedených výjimek. candidate-v13 je chráněný i uvnitř rezervovaného rodiče.",
+    "Uživatel nežádá odstranění důkazů. Nepřijímá se rekurzivní mazání verzí, přesun na C: ani změna aktivní testovací verze.",
+    "Přijato 28. 10. 2026 po skutečném release cleanup-01a17fe0. Předání docs/agents/handoffs/d-cache-cleanup-20261028.md; evidence-manifest SHA-256 4b44f14516fc25cdd9494bd1ae35d429704a01fa585ead514d4c379986b2e589. Příjemce znovu ověřil manifest a všech 13 připnutých důkazních souborů. Závěrečný audit autora: 3921 změněných cest, 43483 chráněných v13/main souborů a 34 původních WIP souborů PASS; pozorovaný nárůst volného místa D 26888486912 B. Čistý main de6f87a2 potvrzen, staré nově sdílené assety vyžadují před editací samostatnou writable kopii. Původní validační scope znovu získal trees-validation-01a16b37; žádná herní ani výkonová přejímka se tím netvrdí."
+  ]
+}

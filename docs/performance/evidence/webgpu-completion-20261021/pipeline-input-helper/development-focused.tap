@@ -1,0 +1,250 @@
+TAP version 13
+# Subtest: defaultoff does not touch Game/options or install anything
+ok 1 - defaultoff does not touch Game/options or install anything
+  ---
+  duration_ms: 2.5967
+  type: 'test'
+  ...
+# Subtest: original receiver/args/Promise identity, four hashes and family/whitelist privacy, native pending is allowed
+ok 2 - original receiver/args/Promise identity, four hashes and family/whitelist privacy, native pending is allowed
+  ---
+  duration_ms: 6.4168
+  type: 'test'
+  ...
+# Subtest: all original return identities preserved: undefined
+ok 3 - all original return identities preserved: undefined
+  ---
+  duration_ms: 1.2193
+  type: 'test'
+  ...
+# Subtest: all original return identities preserved: null
+ok 4 - all original return identities preserved: null
+  ---
+  duration_ms: 1.8162
+  type: 'test'
+  ...
+# Subtest: all original return identities preserved: false
+ok 5 - all original return identities preserved: false
+  ---
+  duration_ms: 0.8408
+  type: 'test'
+  ...
+# Subtest: all original return identities preserved: 0
+ok 6 - all original return identities preserved: 0
+  ---
+  duration_ms: 0.7651
+  type: 'test'
+  ...
+# Subtest: all original return identities preserved: 
+ok 7 - all original return identities preserved: 
+  ---
+  duration_ms: 0.7219
+  type: 'test'
+  ...
+# Subtest: all original return identities preserved: [object Object]
+ok 8 - all original return identities preserved: [object Object]
+  ---
+  duration_ms: 0.8121
+  type: 'test'
+  ...
+# Subtest: all original return identities preserved: [object Promise]
+ok 9 - all original return identities preserved: [object Promise]
+  ---
+  duration_ms: 0.7165
+  type: 'test'
+  ...
+# Subtest: original synchronous falsy throw is unchanged: undefined
+ok 10 - original synchronous falsy throw is unchanged: undefined
+  ---
+  duration_ms: 1.5104
+  type: 'test'
+  ...
+# Subtest: original synchronous falsy throw is unchanged: null
+ok 11 - original synchronous falsy throw is unchanged: null
+  ---
+  duration_ms: 0.7311
+  type: 'test'
+  ...
+# Subtest: original synchronous falsy throw is unchanged: false
+ok 12 - original synchronous falsy throw is unchanged: false
+  ---
+  duration_ms: 0.5603
+  type: 'test'
+  ...
+# Subtest: original synchronous falsy throw is unchanged: 0
+ok 13 - original synchronous falsy throw is unchanged: 0
+  ---
+  duration_ms: 0.508
+  type: 'test'
+  ...
+# Subtest: original synchronous falsy throw is unchanged: 
+ok 14 - original synchronous falsy throw is unchanged: 
+  ---
+  duration_ms: 0.5383
+  type: 'test'
+  ...
+# Subtest: original synchronous falsy throw is unchanged: Error: original
+ok 15 - original synchronous falsy throw is unchanged: Error: original
+  ---
+  duration_ms: 0.4895
+  type: 'test'
+  ...
+# Subtest: original rejection is observed without replacement/unhandled side rejection
+ok 16 - original rejection is observed without replacement/unhandled side rejection
+  ---
+  duration_ms: 1.2725
+  type: 'test'
+  ...
+# Subtest: exotic then/constructor/species accessors are not invoked by diagnostics
+ok 17 - exotic then/constructor/species accessors are not invoked by diagnostics
+  ---
+  duration_ms: 4.0723
+  type: 'test'
+  ...
+# Subtest: pending originals and hashes at the same deadline remain partial, late callbacks cannot mutate sealed record
+ok 18 - pending originals and hashes at the same deadline remain partial, late callbacks cannot mutate sealed record
+  ---
+  duration_ms: 1.1985
+  type: 'test'
+  ...
+# Subtest: hash fulfilment exactly at deadline is not admitted and hash failure remains explicit
+ok 19 - hash fulfilment exactly at deadline is not admitted and hash failure remains explicit
+  ---
+  duration_ms: 3.8792
+  type: 'test'
+  ...
+# Subtest: 32-call, UTF8 per-call and total-byte budgets are exact and reject before oversize encoding/hash
+ok 20 - 32-call, UTF8 per-call and total-byte budgets are exact and reject before oversize encoding/hash
+  ---
+  duration_ms: 48.36
+  type: 'test'
+  ...
+# Subtest: surrogate UTF8 lengths match original hashing bytes; selected flag overflow is partial
+ok 21 - surrogate UTF8 lengths match original hashing bytes; selected flag overflow is partial
+  ---
+  duration_ms: 1.5846
+  type: 'test'
+  ...
+# Subtest: bad arguments/own getters are not invoked and context resource objects never export
+ok 22 - bad arguments/own getters are not invoked and context resource objects never export
+  ---
+  duration_ms: 0.6678
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: actor
+ok 23 - exact owner retirement: actor
+  ---
+  duration_ms: 0.4734
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: scene
+ok 24 - exact owner retirement: scene
+  ---
+  duration_ms: 0.2182
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: engine
+ok 25 - exact owner retirement: engine
+  ---
+  duration_ms: 0.1617
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: device
+ok 26 - exact owner retirement: device
+  ---
+  duration_ms: 0.1722
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: profile
+ok 27 - exact owner retirement: profile
+  ---
+  duration_ms: 0.1686
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: generation
+ok 28 - exact owner retirement: generation
+  ---
+  duration_ms: 0.2088
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: renderer
+ok 29 - exact owner retirement: renderer
+  ---
+  duration_ms: 0.2105
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: startup
+ok 30 - exact owner retirement: startup
+  ---
+  duration_ms: 0.258
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: current
+ok 31 - exact owner retirement: current
+  ---
+  duration_ms: 0.2851
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: health
+ok 32 - exact owner retirement: health
+  ---
+  duration_ms: 0.2294
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: scene-method
+ok 33 - exact owner retirement: scene-method
+  ---
+  duration_ms: 0.1848
+  type: 'test'
+  ...
+# Subtest: exact owner retirement: profile-hook
+ok 34 - exact owner retirement: profile-hook
+  ---
+  duration_ms: 0.1708
+  type: 'test'
+  ...
+# Subtest: foreign receiver/method preserved, stale original hook after retirement is pure passthrough
+ok 35 - foreign receiver/method preserved, stale original hook after retirement is pure passthrough
+  ---
+  duration_ms: 0.4797
+  type: 'test'
+  ...
+# Subtest: abort/disposal/rejoin and synchronous listener/timer races clean exact descriptor and timer
+ok 36 - abort/disposal/rejoin and synchronous listener/timer races clean exact descriptor and timer
+  ---
+  duration_ms: 1.2989
+  type: 'test'
+  ...
+# Subtest: no overlapping owner and max4 explicit sequential attempts, freshGame has independent budget
+ok 37 - no overlapping owner and max4 explicit sequential attempts, freshGame has independent budget
+  ---
+  duration_ms: 1.5309
+  type: 'test'
+  ...
+# Subtest: partial installation and hash-time synchronous abort restore without changing original result
+ok 38 - partial installation and hash-time synchronous abort restore without changing original result
+  ---
+  duration_ms: 0.8742
+  type: 'test'
+  ...
+# Subtest: strict projection and receipt negative cases, standard routine receipts unaffected
+ok 39 - strict projection and receipt negative cases, standard routine receipts unaffected
+  ---
+  duration_ms: 2.3986
+  type: 'test'
+  ...
+# Subtest: pinned actual signature/emptykey/SHADER_NAME AST contract and36sealed inputs preserve old modules/buttons
+ok 40 - pinned actual signature/emptykey/SHADER_NAME AST contract and36sealed inputs preserve old modules/buttons
+  ---
+  duration_ms: 273.1068
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 40
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1503.2499

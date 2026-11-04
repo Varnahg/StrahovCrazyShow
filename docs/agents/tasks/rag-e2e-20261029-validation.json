@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-e2e-20261029-validation",
+  "title": "RAG: omezený živý průchod jedné smlouvy od embeddingů po citovanou odpověď",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/rag-e2e-20261029/",
+    "docs/agents/handoffs/rag-e2e-20261029-validation.md"
+  ],
+  "resources": [
+    "openai-paid-validation"
+  ],
+  "acceptance": [
+    "Koordinátor provede jediný konkrétní slice: již ověřená veřejná smlouva SÚZ s raw SHA256 8ef4883e3ee2bdc4788425db2cb428a53574cf6aa7e4ebad664d26756ad82a62 a finální ok normalizace56bloků/56chunků → skutečné embeddingy → vlastní scratch v3 DB → skutečný service request → ověřitelná citace.",
+    "Souhrnný nepřekročitelný limit tohoto tasku: nejvýše60 nových dokumentových embedding inputs a30000 UTF-8 bytů celkem, nejvýše2 dokumentové embedding HTTP,2 query embedding HTTP (každý vstup do8191 UTF-8 bytů),2 Decisions,2 Responses (nejvýše1complex),4 moderace. Jde nejvýše o12 HTTP volání uvedených kategorií, nikoli o nový rozpočet při opakování procesu.",
+    "Před každým HTTP zapsat trvalý attempt ledger; failed/unknown pokusy se započítávají. Bez automatických retry v SDK, transportu nebo harnessu a bez restartování rozpočtu. Při chybě či nejistém výsledku zastavit placený běh a předat stav; žádný opakovací loop.",
+    "Použít přijatou policy Luna/none a pouze podle stávajícího Decisions routingu případný Sol/low, se stávajícími output caps. Žádný nový PDF count/generation, crawl, download, jiný dokument nebo klasifikační krok.",
+    "Klíče čte pouze původní root koordinátor ze známých soukromých env vstupů; nikdy jejich hodnoty v Gitu, logu, handoffu nebo delegaci. Helpery/výstupy/ledger a scratch artefakty pouze ve vlastní cache; source moduly se tímto taskem nemění.",
+    "DB a HTTP část pouze při současně získaném rag-auto-20261028-integration claimu pro heavy-validation a porty5468/2568 a po ověření vlastnictví procesů. Výlučně vlastní databáze se jménem *_test; původní placenou DB ani její volume nemigrovat, nepřepisovat ani nemažat.",
+    "Následný totožný import a requestSeq replay musí prokazatelně způsobit0 dalších API volání. Zachovat snapshot/dependency revalidaci, model budgets, privacy, moderaci a správnou citaci skutečné verze; neobcházet publication quality gates.",
+    "Žádné GPU, hra, hrané služby, instalace nebo nové buildy. Před release ukončit vlastní pomocníky/testserver a předat konkrétní výsledky; vlastní DB proces uklidit koordinovaně pod integračním claimem. Jeden úspěšný dokument neznamená import všech zdrojů ani Done celého KEY-67."
+  ],
+  "verification": [
+    "Nejdřív uzavřít konkrétní chat-wire regresi, převzít stabilní checkpoint a zaznamenat source hash, raw/candidate/envelope identitu a účinné budgety. Vstupní normalizace je .cache/rag-auto-normalizer-20261028/handoff-contract/result.json s odpovídajícím request.json; žádné opakování API extrakce.",
+    "Bez placeného HTTP ověřit ledger persistence, limitování všech kategorií včetně failed/unknown, zákaz transport retries, skutečný DB název/ownership a oddělení původní DB. Tyto kontroly nesmějí tajně poslat modelový požadavek.",
+    "V živém průchodu doložit skutečné počty/usage, sourceVersion a citaci, serverový current čas a archive/current status, reuse při druhém importu a0 API při replay. Bez klíčů a soukromého obsahu v publikovaném důkazu.",
+    "Porovnat relevantní původní DB head/cache/vektorové stavy před a po bez změny jejich obsahu; při nejistém nebo neúspěšném pokusu nepřepisovat stav jako PASS. Uvést nepokryté obecné ingestion/archive/crawler scénáře.",
+    "Přímé explicitní Node/izolované nástroje, žádné pnpm exec/run nebo synchronizace dependencies. Odlehčený postup: stručný handoff, cílené důkazy a společné review funkčního celku."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, KEY-67. Konkrétní živý pilot a rozpočet předal autorizovaný RAG koordinátor01a17e9d-dd4a-7fe3-91ac-4f3bc548982d jako navázání na uživatelem požadované skutečné OpenAI embeddingy/vector DB a první end-to-end průchod.",
+    "Store checkpoint010c2a73a574523e63967381d31ba3a98a48f900; koordinátor hlásí skutečnou DB přejímku19/19 po opravě PL/pgSQL a zachování původního head+90vectors. Toto není nahrazení důkazů budoucího E2E. Chat-wire první124/125 ještě není hotový checkpoint.",
+    "Publikačně použitelná normalizace smlouvy je ok; parserProfile SHA7bd30915044a8d874a0b5559f4516de4d1fd01e1d2835c8016f2dd5c79ce377c. Druhý screenshot kandidát zůstává review-required a tento task jej nepublikuje.",
+    "Paid resource je oddělený od existujícího integračního tasku; samotný tento claim neopravňuje spouštět DB, HTTP ani zabrat jejich porty. Při registraci nejsou uvedené paid/heavy/port zdroje v cizím claimu; ready přesto nenahrazuje nový claim a kontrolu skutečných listenerů.",
+    "Původní strahov-rag-20261028 paid DB/volume, snapshoty4278/4280 a cizí procesy zůstávají chráněné. Cleanup smí zasáhnout pouze přesně ověřené vlastní scratch artefakty; žádné Docker reset/prune.",
+    "Úpravy dalších zdrojů a prvních dvou obrazovek/loaderu nejsou součást tohoto tasku. Po vyčerpání nebo nejistotě se rozpočet neobnovuje přejmenováním úkolu."
+  ]
+}

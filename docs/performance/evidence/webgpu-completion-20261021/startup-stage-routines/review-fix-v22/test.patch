@@ -1,0 +1,41 @@
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-effects.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v22/startup-stage-effects.test.mjs
+index 0f65f17d..917e211a 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-effects.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v22/startup-stage-effects.test.mjs
+@@ -212,7 +212,35 @@ test('unreached/partial targets and repeated Medium keep truthful pass indices/s
+   const f=fixture('first-high-day-1-on');try{await run(f);f.game.quality='high';const {result}=await run(f,actual,{quality:'high',timeoutMs:100});assert.equal(result.status,'timeout');f.owner.dispose('startup-rejected');const p=f.owner.snapshot();assert.equal(p.complete,false);assert.equal(p.capture.reached,false);assert.equal(p.passes.length,2);probe.validateStartupStageEffects(p,'first-high-day-1-on');}finally{f.dispose();}
+   const b=fixture();try{await run(b);const frameIds=b.owner.snapshot().capture.frames.map(f=>f.frameId);await run(b);b.owner.dispose('startup-resolved');const p=b.owner.snapshot();assert.equal(p.passes.length,2);assert.deepEqual(p.capture.frames.map(f=>f.frameId),frameIds);assert.equal(p.capture.passIndex,0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);}finally{b.dispose();}
+ });
+-test('foreign scenes pass through selected prototype hooks and abort/rejoin retire late options',()=>{
++test('foreign scenes pass through selected prototype hooks and abort/rejoin retire late options',async()=>{
++  async function capture(insertForeign){
++    const own=fixture(),foreign=fixture(null);let owner,clockReads=0,foreignRenders=0,foreignBinds=0;
++    try{
++      // Equal fixed native warmup avoids comparing shader-load/cache transitions.
++      for(let i=0;i<8;i++){own.scene.render();foreign.scene.render();await new Promise(setImmediate);}
++      for(const f of[own,foreign])assert.equal(f.mesh.material.isReadyForSubMesh(f.mesh,f.mesh.subMeshes[0],false),true);
++      foreign.scene.onBeforeRenderObservable.add(()=>foreignRenders++);
++      foreign.mesh.material.onBindObservable.add(()=>foreignBinds++);
++      own.owner.dispose();owner=probe.createStartupStageEffects(own.game,{target:STARTUP_ROUTINE_TARGETS[0],profileNow:()=>++clockReads});
++      const options={};probe.registerStartupOptions(own.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);
++      const ownBefore=own.scene._frameId,foreignBefore=foreign.scene._frameId,token=probe.startupRenderBegin(options,3);assert.ok(token);
++      if(insertForeign)foreign.scene.render();
++      own.scene.render();probe.startupRenderEnd(token,4,true);
++      assert.equal(own.scene._frameId,ownBefore+1,'original own render executes once');
++      assert.equal(foreign.scene._frameId,foreignBefore+Number(insertForeign),'original foreign frame progress is preserved');
++      assert.equal(foreignRenders,Number(insertForeign));
++      if(insertForeign)assert.ok(foreignBinds>0,'original foreign material bind still executes');else assert.equal(foreignBinds,0);
++      probe.startupStageSaved(options,0,5,false);probe.startupPassFinished(options,6,'complete');owner.dispose('startup-resolved');
++      const profile=owner.snapshot();probe.validateStartupStageEffects(profile,STARTUP_ROUTINE_TARGETS[0]);assert.equal(profile.complete,true);assert.equal(profile.capture.frames.length,1);
++      return{clockReads,rows:profile.capture.frames[0].rows.map(({id,phase,calls,falseReturns,nullReturns,throws})=>({id,phase,calls,falseReturns,nullReturns,throws}))};
++    }finally{owner?.dispose();own.dispose();foreign.dispose();}
++  }
++  const baseline=await capture(false),inserted=await capture(true);
++  assert.ok(baseline.clockReads>0);assert.ok(baseline.rows.some(row=>row.calls>0));
++  assert.equal(inserted.clockReads,baseline.clockReads,'foreign receivers add no profile clock reads');
++  assert.deepEqual(inserted.rows,baseline.rows,'foreign receivers add no exported own routine counters');
++  // These synthetic clock-read/counter checks do not subtract real nested wall
++  // time: an original foreign callback may still belong to an outer own span.
+   const f=fixture(),other=fixture(null);try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);const token=probe.startupRenderBegin(options,3);other.scene.render();f.scene.render();probe.startupRenderEnd(token,4,true);
+     f.game.startupAbort.abort();const old=f.owner.snapshot();assert.equal(old.active,false);assert.equal(old.remainingRoutineHooks,0);probe.startupStageSaved(options,0,8,false);assert.deepEqual(f.owner.snapshot(),old);
+     const fresh=probe.createStartupStageEffects(f.game,{target:STARTUP_ROUTINE_TARGETS[0]});assert.equal(fresh.snapshot().active,false,'aborted identity cannot restart');fresh.dispose();

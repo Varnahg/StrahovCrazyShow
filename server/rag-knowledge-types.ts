@@ -7,6 +7,7 @@ import type {
   PublisherId,
   SourceSpan,
 } from "../shared/rag-provenance";
+import type { CuratedKnowledgeSource } from "../shared/knowledge-curation";
 
 export const KNOWLEDGE_TOPICS = Object.freeze([
   "membership",
@@ -196,4 +197,26 @@ export type ResolvedKnowledgeChunkV3 = Readonly<{
   spans: readonly SourceSpan[];
   topic: null;
 }>;
-export type EvidenceKnowledgeChunk = KnowledgeChunk | ResolvedKnowledgeChunkV3;
+export type CuratedKnowledgeMetadataV3 = Readonly<
+  Omit<CuratedKnowledgeSource, "adaptation" | "sourceId" | "sourceVersionId"> & {
+    archiveReason: string | null;
+    versionNote: string;
+  }
+>;
+export type CuratedKnowledgeDocumentV3 = CuratedKnowledgeMetadataV3 & Readonly<{
+  schemaVersion: 3;
+  derivation: "knowledge-curation";
+  sourceVersionId: string;
+  authority: null;
+  effectiveFrom: null;
+  effectiveUntil: null;
+  curation: Readonly<{ profileId: string; normalizedSha256: string }>;
+}>;
+export type RagDocumentV3 = KnowledgeDocumentV3 | CuratedKnowledgeDocumentV3;
+export type RagDocumentDatasetV3 = Omit<KnowledgeDatasetV3, "documents"> & Readonly<{ documents: readonly RagDocumentV3[] }>;
+export type RagDocumentBundleV3 = Omit<KnowledgeDocumentBundleV3, "document"> & Readonly<{ document: RagDocumentV3 }>;
+export type ResolvedCuratedKnowledgeChunkV3 = Omit<ResolvedKnowledgeChunkV3, "source" | "document"> & Readonly<{
+  source: CuratedKnowledgeSource;
+  document: CuratedKnowledgeDocumentV3;
+}>;
+export type EvidenceKnowledgeChunk = KnowledgeChunk | ResolvedKnowledgeChunkV3 | ResolvedCuratedKnowledgeChunkV3;

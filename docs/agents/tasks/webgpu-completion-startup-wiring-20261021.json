@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-startup-wiring-20261021",
+  "title": "KEY-31: zapojit jediný startup work scheduler do skutečné Game",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/game.ts", "tests/game-preparation-scheduler.test.ts", "docs/agents/handoffs/webgpu-completion-startup-wiring-20261021.md"],
+  "resources": [],
+  "acceptance": [
+    "Vytvořit adapter až po stop původního preload loop, použít jej pouze v prepareLighting/prepareLightingVariants; existující přímé testové hosty a API kompatibilně zachovat.",
+    "render je lazy manuální frame, run/stop synchronní booltick. Všechny kvality používají jediný adapter se zachovaným fence backpressure i mezi passy.",
+    "Zachovat pipelinePreparation a finální waitForRenderStartup actual submitted/mesh/effect/health gate. Finally ukončí pouze vlastní startup loop/ports; gameplay má původní RAF."
+  ],
+  "verification": ["Cílené skutečné Game light/quality/authored/vehicle/baseline testy a nový wiring test; rootheavyclaim následně fullsuite/build/integrační+GPU proof."],
+  "notes": ["Koordinátor vlastní explicitní společný Game soubor; helper a light state machine jsou disjunktně přidělené. Změny se přijmou pouze spolu s relevantními testy a skutečným pilotem, bez oslabenílimitů."]
+}

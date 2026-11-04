@@ -481,6 +481,11 @@ export const messages = {
   "Změřit FPS po dobu 10 sekund": "Measure FPS for 10 seconds",
   "Během měření se automatická kvalita nemění.":
     "Automatic quality is held steady during the measurement.",
+  "Plynulost vzorku nevyhovuje.": "The frame sample fails the smoothness limits.",
+  "Krátký snímkový vzorek splnil limity.": "The short frame sample meets the limits.",
+  "Plynulost vzorku nelze spolehlivě vyhodnotit.": "This frame sample cannot be reliably assessed.",
+  "Krátké měření samo neověřuje plynulost chůze ani stabilitu připojení.": "A short measurement alone does not verify smooth movement or connection stability.",
+  "Nejdelší snímek: {duration} ms · snímky od {threshold} ms: {count}.": "Longest frame: {duration} ms · frames at or above {threshold} ms: {count}.",
   "Výsledek se uloží pouze na tomto počítači.":
     "The result is saved only on this computer.",
   "Měření je neplatné: prostředí obsahuje chybu vykreslování nebo načtení modelů. Obnov stránku před dalším měřením.":

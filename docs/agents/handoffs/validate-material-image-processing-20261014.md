@@ -1,0 +1,11 @@
+# Předání: validate-material-image-processing-20261014
+
+- Vlastník `repairs-01a13624-image-validation`, root koordinátor. Ownership WT, větev `codex/image-processing-ownership`, základ `6df08fb6b4003bc958a72fd58592ee24fa74dc41` plus přesný IMAGE-01 delta.
+- Převzatý implementační manifest a všechny jeho source/test/research/log hashes před freeze ověřené. Root měnil jen validační cache a vlastní evidence, nikoli implementaci.
+- Freeze vyšel z neměnného engine checkpointu8eea6163; na jeho wave3 cinematic s reuse byl aplikován právě jeden předaný hunk a výsledek ověřen SHA64f4c6…. Původní test před jedinou assertion změnou byl porovnán s HEAD, takže whole-file test copy nepřinesla jiný WIP. Nový7test je byte-identický se svým red testem.
+- Snapshot `d032be6510b1a94c9bbada421ad84da50ddfc97e0498df4bc4eb896f1145c19f`:8410 vstupů/513 source-config-test, právě3 delty proti engine checkpointu. Game phase, novější glTF guard a jiné pracovní změny v něm nejsou.
+- Skutečná pipeline UTC15:30:22–15:34:34: **895/895 testů, build a celá integrace PASS**. Po pipeline513/513 zdrojových hashů a oba patched engine JS hashes shodné. Integrační2568 volný. Cílené23/23, narrow types a původní red/legacy failure jsou v implementačním handoffu.
+- Výstupy: `.cache/material-image-processing-validation/`, `docs/performance/evidence/material-image-processing-20261014/{README.md,checkpoint.json,pipeline.jsonl}` a tento handoff. Freeze helper explicitně kontroluje jediný patch hunk a preserve-reuse hash; společný validační runner zachovává skutečné exit codes a předstartovní kontrolu herní aktivity.
+- Všechny vlastní validační procesy skončily. Provozní identity zůstávají jen v ignorované cache. Živé preview4186/API2581 drží samostatný serve-b6 owner a tento task ho nezastavil nebo nepřebuildoval. Před každým náročným krokem nebyl připojený herní klient ani nový JSONL.
+- Limity: GPU/pixely/FPS neověřené, LDR/bloom vizuální změna potřebuje praktické srovnání. KEY-14/4 a celkový cíl zůstávají otevřené. Po přesném staging auditu lze uložit samostatný lokální kandidátní commit; main integrace a skutečná grafická přejímka následují zvlášť.
+- Po commitu root uvolní vlastní validační rezervaci. Původní wave3/main a jejich dependency instalace zůstávají nedotčené.

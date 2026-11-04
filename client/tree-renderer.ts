@@ -35,13 +35,18 @@ export const TREE_DETAIL_BYTES_LIMIT = 64 * 1024 * 1024;
 export const TREE_PILOT_BYTES_LIMIT = 96 * 1024 * 1024;
 const fullLeaf: TreePhenology = Object.freeze({ leafAmount: 1, maturity: 1, senescence: 0, litterPotential: 0 });
 const referenceFocalPixels = 720 / (2 * Math.tan(.85 / 2));
+const lowFullCoverageFarDistance = 75;
 /** Curved individual leaves remain the hero LOD. Only an audited full LOD1
- * may replace it sooner; historical sparse LODs retain their original policy. */
+ * may replace it sooner. Low keeps the established FAR distance until a measured alternative is accepted;
+ * all distances scale with projection, while historical LODs keep their policy. */
 export function treeDetailForProjection(distance: number, quality: string, profile?: TreeLodProfile, projectionScale = 1): TreeLod {
   if (profile !== "full-coverage") return treeDetailLevel(distance, quality);
   const scale = Number.isFinite(projectionScale) && projectionScale > 0 ? projectionScale : 1;
-  const normalized = distance / scale, near = quality === "high" ? 12 : quality === "medium" ? 8 : 6;
-  return normalized < near ? 0 : treeDetailLevel(normalized, quality) === 2 ? 2 : 1;
+  const normalized = distance / scale;
+  const near = quality === "high" ? 12 : quality === "medium" ? 8 : 6;
+  if (normalized < near) return 0;
+  if (quality === "low") return normalized < lowFullCoverageFarDistance ? 1 : 2;
+  return treeDetailLevel(normalized, quality) === 2 ? 2 : 1;
 }
 type TreeGroup = { id: string; x: number; z: number; root: TransformNode; lods: Mesh[][]; active: number; desired: number; family: TreeFamily; seed: number; pilot: boolean; lodProfile?: TreeLodProfile; phenology?: TreePhenology; stream?: { id: string; prototype: TreePrototype } };
 type PilotParts = (ReturnType<typeof decodeTreePrototype>[number] & { clusterKey?: string })[];

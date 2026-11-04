@@ -3,8 +3,10 @@ import { readFile } from "node:fs/promises";
 import { Pool } from "pg";
 import { documentEmbeddingInput, documentEmbeddingInputV3, embeddingInputHash, validateEmbeddingProfile, type EmbeddingProfile } from "./rag-embeddings";
 import { validateKnowledgeDatasets, type KnowledgeAuthority, type KnowledgeChunk, type KnowledgeDocument, type KnowledgeTopic, type RawKnowledgeChunk } from "./crazy-typka-retrieval";
-import { DOCUMENT_VALIDATION_LIMITS, resolveKnowledgeChunkV3, validateKnowledgeDatasetV3, validateKnowledgeDocumentV3 } from "./rag-document-contract";
-import type { EvidenceKnowledgeChunk, KnowledgeDatasetV3, KnowledgeDocumentV3, KnowledgeChunkV3 } from "./rag-knowledge-types";
+import { DOCUMENT_VALIDATION_LIMITS } from "./rag-document-contract";
+import { isCuratedKnowledgeDocument, knowledgeReviewDay, resolveRagKnowledgeChunkV3 as resolveKnowledgeChunkV3, validateRagDocumentDatasetV3 as validateKnowledgeDatasetV3, validateRagDocumentV3 as validateKnowledgeDocumentV3 } from "./rag-curation-contract";
+import { isCuratedKnowledgeCurrent } from "../shared/knowledge-curation";
+import type { EvidenceKnowledgeChunk, RagDocumentDatasetV3 as KnowledgeDatasetV3, RagDocumentV3 as KnowledgeDocumentV3, KnowledgeChunkV3 } from "./rag-knowledge-types";
 import { RAG_PUBLISHERS, isRagInstant, type PublisherId } from "../shared/rag-provenance";
 
 export type RagSnapshot = { revisionId: string; profile: EmbeddingProfile };
@@ -236,7 +238,7 @@ async function active(lease: Lease): Promise<RagSnapshot | null> {
     FROM rag_schema_version v LEFT JOIN rag_heads h ON h.name='public'
     LEFT JOIN rag_revisions r ON r.id=h.revision_id AND r.state='ready'
     LEFT JOIN rag_profiles p ON p.id=r.profile_id WHERE v.singleton=true`);
-  if (rows.length !== 1 || ![1, 2].includes(Number(rows[0].version))) throw new RagStoreError("invalid-schema");
+  if (rows.length !== 1 || ![1, 2, 3].includes(Number(rows[0].version))) throw new RagStoreError("invalid-schema");
   const row = rows[0]; if (row.revision_id === null) return null;
   const profile = { id: row.id, provider: row.provider, model: row.model, dimensions: row.dimensions, inputVersion: row.input_version } as EmbeddingProfile;
   const snapshot = { revisionId: row.revision_id as string, profile }; snapshotValid(snapshot);
@@ -359,7 +361,7 @@ export async function migrateRagSchemaWithPool(pool: RagSqlPool, roles: RagMigra
   let lease: Lease | undefined, locked = false;
   try {
     const requestedRoles = migrationRoles(roles);
-    const files = await Promise.all(["./rag-schema.sql", "./rag-migrations/002-documents.sql"].map((path) => readFile(new URL(path, import.meta.url), "utf8")));
+    const files = await Promise.all(["./rag-schema.sql", "./rag-migrations/002-documents.sql", "./rag-migrations/003-knowledge-curation.sql"].map((path) => readFile(new URL(path, import.meta.url), "utf8")));
     const checksums = files.map((sql) => createHash("sha256").update(sql, "utf8").digest("hex"));
     lease = await manager.acquire(signal);
     const lock = await lease.query("SELECT pg_try_advisory_lock(18472, 1) AS acquired");
@@ -492,7 +494,7 @@ function sameSpace(a: EmbeddingProfile, b: EmbeddingProfile) {
 }
 async function schemaVersion(lease: Lease): Promise<number> {
   const { rows } = await lease.query("SELECT version FROM rag_schema_version WHERE singleton=true");
-  if (rows.length !== 1 || ![1, 2].includes(Number(rows[0].version))) throw new RagStoreError("invalid-schema");
+  if (rows.length !== 1 || ![1, 2, 3].includes(Number(rows[0].version))) throw new RagStoreError("invalid-schema");
   return Number(rows[0].version);
 }
 function profileRow(row: Record<string, unknown>, prefix = ""): EmbeddingProfile {
@@ -548,7 +550,8 @@ async function captureSearchInLease(lease: Lease, input: KnowledgeScope): Promis
   return makeSearchSnapshot(scope, heads);
 }
 function documentUsable(document: KnowledgeDocumentV3, scope: KnowledgeScope, now: number): boolean {
-  if (!Number.isFinite(now) || now < Date.parse(document.checkedAt + "T00:00:00Z") || now >= Date.parse(document.reviewAfter + "T00:00:00Z")) return false;
+  if (isCuratedKnowledgeDocument(document) && !isCuratedKnowledgeCurrent(document, now)) return false;
+  if (!Number.isFinite(now) || now < Date.parse(knowledgeReviewDay(document) + "T00:00:00Z") || now >= Date.parse(document.reviewAfter + "T00:00:00Z")) return false;
   if (scope.kind === "current") return document.status === "current" && (document.effectiveFrom === null || now >= Date.parse(document.effectiveFrom))
     && (document.effectiveUntil === null || now < Date.parse(document.effectiveUntil));
   return document.status === "archived" && (scope.asOf === undefined || (document.effectiveFrom !== null && document.effectiveUntil !== null
@@ -558,7 +561,7 @@ function checkedV3Document(row: Record<string, unknown>, scope?: KnowledgeScope,
   try {
     const doc = validateKnowledgeDocumentV3(row.metadata);
     if (row.source_version_id !== doc.sourceVersionId || row.source_id !== doc.id || row.authority !== doc.authority || row.status !== doc.status
-      || Number(row.checked_ms) !== Date.parse(doc.checkedAt + "T00:00:00Z") || Number(row.review_ms) !== Date.parse(doc.reviewAfter + "T00:00:00Z")
+      || Number(row.checked_ms) !== Date.parse(knowledgeReviewDay(doc) + "T00:00:00Z") || Number(row.review_ms) !== Date.parse(doc.reviewAfter + "T00:00:00Z")
       || (doc.effectiveFrom === null ? row.from_ms !== null : Number(row.from_ms) !== Date.parse(doc.effectiveFrom))
       || (doc.effectiveUntil === null ? row.until_ms !== null : Number(row.until_ms) !== Date.parse(doc.effectiveUntil))
       || typeof row.sealed !== "boolean" || (scope !== undefined && now !== undefined && (!row.sealed || !documentUsable(doc, scope, now)))) throw new Error();
@@ -631,7 +634,7 @@ function searchMethods(manager: ReturnType<typeof managePool>): Pick<RagVectorSt
             legal = asOf === undefined ? "" : `AND v.effective_from IS NOT NULL AND v.effective_until IS NOT NULL AND v.effective_from<=${bind(asOf, "timestamptz")} AND ${bind(asOf, "timestamptz")}<v.effective_until`;
           }
           queries.push(`SELECT 'document' AS representation,'${archive ? "public-archive" : "public-documents"}' AS head,c.chunk_id,c.payload,e.input_hash,e.input_text,v.source_id,
-            v.id AS source_version_id,v.metadata->'extraction'->>'normalizedSha256' AS content_hash,v.metadata,v.authority,v.status,
+            v.id AS source_version_id,COALESCE(v.metadata->'extraction'->>'normalizedSha256',v.metadata->'curation'->>'normalizedSha256') AS content_hash,v.metadata,v.authority,v.status,
             extract(epoch from v.checked_at)*1000 AS checked_ms,extract(epoch from v.review_after)*1000 AS review_ms,
             extract(epoch from v.effective_from)*1000 AS from_ms,extract(epoch from v.effective_until)*1000 AS until_ms,v.sealed,e.embedding <=> $1::vector AS distance
             FROM rag_revision_document_chunks rc JOIN rag_document_chunks c ON c.source_version_id=rc.source_version_id AND c.chunk_id=rc.chunk_id
@@ -747,7 +750,7 @@ function embeddingSession(lease: Lease): Pick<RagImportSession, "cached" | "unce
 }
 
 async function currentDocumentContext(lease: Lease, collection: "current" | "archive"): Promise<RagDocumentImportContext> {
-  if (!["current", "archive"].includes(collection) || await schemaVersion(lease) !== 2) throw new RagStoreError("invalid-schema");
+  if (!["current", "archive"].includes(collection) || await schemaVersion(lease) < 2) throw new RagStoreError("invalid-schema");
   const snapshot = await captureSearchInLease(lease, { kind: collection });
   const head = collection === "current" ? snapshot?.heads.documents : snapshot?.heads.archive;
   let dataset = emptyDocumentDataset();
@@ -815,7 +818,7 @@ function assertDocumentTransition(plan: PreparedDocumentCorpus, context: RagDocu
 }
 async function assertLegacySpace(lease: Lease, profile: EmbeddingProfile) {
   if (profile.inputVersion !== "title-locator-text-v1") throw new RagStoreError("invalid-database-data");
-  if (await schemaVersion(lease) === 2) {
+  if (await schemaVersion(lease) >= 2) {
     const view = await captureSearchInLease(lease, { kind: "current" });
     if (view?.heads.documents && !sameSpace(view.heads.documents.profile, profile)) throw new RagStoreError("profile-conflict");
   }
@@ -823,13 +826,48 @@ async function assertLegacySpace(lease: Lease, profile: EmbeddingProfile) {
 export async function openRagDocumentImportSession(options: RagDatabaseOptions, signal?: AbortSignal): Promise<RagDocumentImportSession> {
   return openRagDocumentImportSessionWithPool(createRagPool(options), signal);
 }
+export type RagDocumentImportPreview = Readonly<{
+  readOnly: true; collection: "current" | "archive"; expectedSnapshotId: string | null;
+  revisionId: string; profileId: string; documents: number; chunks: number;
+  totalInputs: number; reusedInputs: number; missingInputs: number; missingInputBytes: number;
+  missingInputTokens: number; uncertainInputs: number; migrationRequired: boolean;
+}>;
+/** No ledger recovery, attempt records, publication writes or provider calls. */
+export async function inspectDocumentImportWithPool(pool: RagSqlPool, collection: "current" | "archive", prepare: (context: RagDocumentImportContext) => PreparedDocumentCorpus, signal?: AbortSignal): Promise<RagDocumentImportPreview> {
+  const manager = managePool(pool);
+  try {
+    return await manager.run(signal, (lease) => transaction(lease, async () => {
+      const context = await currentDocumentContext(lease, collection), plan = checkedDocumentPlan(prepare(context));
+      assertDocumentTransition(plan, context, Date.now());
+      const cached = await embeddingSession(lease).cached(plan.profile, plan.inputs);
+      const missing = plan.inputs.filter((input) => !cached.has(input.inputHash));
+      const missingHashes = new Set(missing.map((input) => input.inputHash));
+      const { rows } = await lease.query("SELECT input_hashes FROM rag_embedding_attempts WHERE profile_id=$1 AND state IN ('inflight','uncertain')", [plan.profile.id]);
+      const uncertain = new Set<string>();
+      for (const row of rows) {
+        if (!Array.isArray(row.input_hashes) || !row.input_hashes.every((value) => typeof value === "string" && hashPattern.test(value))) throw new RagStoreError("invalid-database-data");
+        for (const value of row.input_hashes) if (missingHashes.has(value)) uncertain.add(value);
+      }
+      const tokens = new Map(plan.chunks.map((chunk) => [chunk.inputHash, chunk.raw.tokenCount]));
+      return Object.freeze({ readOnly: true, collection, expectedSnapshotId: context.snapshot?.id ?? null,
+        revisionId: plan.revisionId, profileId: plan.profile.id, documents: plan.dataset.documents.length, chunks: plan.chunks.length,
+        totalInputs: plan.inputs.length, reusedInputs: cached.size, missingInputs: missing.length,
+        missingInputBytes: missing.reduce((sum, input) => sum + Buffer.byteLength(input.input, "utf8"), 0),
+        missingInputTokens: missing.reduce((sum, input) => sum + tokens.get(input.inputHash)!, 0), uncertainInputs: uncertain.size,
+        migrationRequired: (await schemaVersion(lease)) < 3 && plan.dataset.documents.some(isCuratedKnowledgeDocument) });
+    }, true));
+  } finally { await manager.close(); }
+}
+export async function inspectDocumentImport(options: RagDatabaseOptions, collection: "current" | "archive", prepare: (context: RagDocumentImportContext) => PreparedDocumentCorpus, signal?: AbortSignal): Promise<RagDocumentImportPreview> {
+  return inspectDocumentImportWithPool(createRagPool(options), collection, prepare, signal);
+}
 export async function openRagDocumentImportSessionWithPool(pool: RagSqlPool, signal?: AbortSignal, now: () => number = Date.now): Promise<RagDocumentImportSession> {
   const manager = managePool(pool); let lease: Lease;
   try {
     lease = await manager.acquire(signal);
     const { rows } = await lease.query("SELECT pg_try_advisory_lock(18472, 1) AS acquired");
     if (rows[0]?.acquired !== true) throw new RagStoreError("import-busy");
-    if (await schemaVersion(lease) !== 2) throw new RagStoreError("invalid-schema");
+    if (await schemaVersion(lease) < 2) throw new RagStoreError("invalid-schema");
   } catch (error) { await manager.close(); throw error; }
   let closed = false;
   const contexts = new Map<"current" | "archive", RagDocumentImportContext>();
@@ -843,7 +881,12 @@ export async function openRagDocumentImportSessionWithPool(pool: RagSqlPool, sig
     if ((current?.id ?? null) !== (plan.baseSnapshot?.id ?? null)) throw new RagStoreError("revision-conflict");
     let base = contexts.get(plan.collection);
     if (!base || (base.snapshot?.id ?? null) !== (current?.id ?? null)) { base = await currentDocumentContext(lease, plan.collection); contexts.set(plan.collection, base); }
-    assertDocumentTransition(plan, base, now()); return false;
+    assertDocumentTransition(plan, base, now());
+    for (const doc of plan.dataset.documents) if (plan.upsertSourceVersionIds.includes(doc.sourceVersionId) && isCuratedKnowledgeDocument(doc)) {
+      if (await schemaVersion(lease) < 3) throw new RagStoreError("invalid-schema");
+      if (!isCuratedKnowledgeCurrent(doc, now())) throw new RagStoreError("invalid-database-data");
+    }
+    return false;
   }
   return {
     context,
@@ -867,7 +910,7 @@ export async function openRagDocumentImportSessionWithPool(pool: RagSqlPool, sig
         for (const doc of plan.dataset.documents) {
           const blocks = plan.dataset.blocks.filter((item) => item.sourceVersionId === doc.sourceVersionId), chunks = plan.dataset.chunks.filter((item) => item.sourceVersionId === doc.sourceVersionId);
           await lease.query(`INSERT INTO rag_document_versions(id,source_id,authority,status,checked_at,review_after,effective_from,effective_until,block_count,chunk_count,metadata)
-            VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb) ON CONFLICT DO NOTHING`, [doc.sourceVersionId, doc.id, doc.authority, doc.status, doc.checkedAt + "T00:00:00Z", doc.reviewAfter + "T00:00:00Z", doc.effectiveFrom, doc.effectiveUntil, blocks.length, chunks.length, JSON.stringify(doc)]);
+            VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb) ON CONFLICT DO NOTHING`, [doc.sourceVersionId, doc.id, doc.authority, doc.status, knowledgeReviewDay(doc) + "T00:00:00Z", doc.reviewAfter + "T00:00:00Z", doc.effectiveFrom, doc.effectiveUntil, blocks.length, chunks.length, JSON.stringify(doc)]);
           const existing = await lease.query("SELECT metadata,block_count,chunk_count,sealed FROM rag_document_versions WHERE id=$1", [doc.sourceVersionId]);
           if (existing.rows.length !== 1 || canonicalJson(existing.rows[0].metadata) !== canonicalJson(doc) || existing.rows[0].block_count !== blocks.length || existing.rows[0].chunk_count !== chunks.length || typeof existing.rows[0].sealed !== "boolean") throw new RagStoreError("invalid-database-data");
           if (!existing.rows[0].sealed) {

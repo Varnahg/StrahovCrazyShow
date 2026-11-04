@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { Script } from "node:vm";
+import ts from "typescript";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Game } from "../client/game";
 import { NetworkTimeline } from "../client/network-timeline";
@@ -681,9 +684,9 @@ test("a render stall preserves held controls, bounds recovery requests and resum
   c.game.reconcile(c.doors.withAuthority(packet), 0);
   const sent: any[] = [];
   c.game.onInput = (input) => sent.push(input);
-  const requests: string[] = [];
-  c.game.onAction = (action) => {
-    requests.push(action);
+  const requests: { action: string; data: unknown }[] = [];
+  c.game.onAction = (action, data) => {
+    requests.push({ action, data });
     return true;
   };
   c.game.advanceSimulation(1 / 60, 0);
@@ -691,6 +694,7 @@ test("a render stall preserves held controls, bounds recovery requests and resum
   const beforeStall = sent.length;
   c.game.advanceSimulation(0.1, 1500);
   c.game.advanceSimulation(0.1, 1550);
+  c.game.advanceSimulation(0.1, 2502);
   assert.equal(
     sent.length,
     beforeStall,
@@ -699,14 +703,14 @@ test("a render stall preserves held controls, bounds recovery requests and resum
   assert.deepEqual([...c.game.keys], ["KeyW", "Space"]);
   assert.deepEqual(
     requests,
-    ["resync"],
-    "recovery is bounded during repeated stale frames",
+    [{ action: "resync", data: { inputEpoch: 1 } }, { action: "resync", data: { inputEpoch: 1 } }],
+    "1s retry repeats the same accepted epoch until new authority arrives",
   );
   c.game.reconcile(
     c.doors.withAuthority({ ...packet, inputEpoch: 2, inputTickBase: 190, tick: 190, time: 11500 }),
-    1550,
+    2502,
   );
-  c.game.advanceSimulation(1 / 60, 1550);
+  c.game.advanceSimulation(1 / 60, 2502);
   const fresh = sent.slice(beforeStall);
   assert.equal(fresh.length, 6);
   assert.ok(fresh.every((input) => input.inputEpoch === 2 && input.z !== 0));
@@ -716,7 +720,7 @@ test("a render stall preserves held controls, bounds recovery requests and resum
   );
   const state = c.actor.capture();
   assert.equal(
-    c.game.reconcile(c.doors.withAuthority({ ...packet, tick: 191, ack: 91, time: 11516 }), 1560),
+    c.game.reconcile(c.doors.withAuthority({ ...packet, tick: 191, ack: 91, time: 11516 }), 2512),
     false,
   );
   assert.deepEqual(
@@ -724,6 +728,38 @@ test("a render stall preserves held controls, bounds recovery requests and resum
     state,
     "old epoch is rejected even with newer tick",
   );
+});
+
+test("actual visibility producer waits for authority and sends its epoch only on visible multiplayer return", (t) => {
+  const c = context();
+  t.after(() => c.dispose());
+  const source = ts.createSourceFile("game.ts", readFileSync(new URL("../client/game.ts", import.meta.url), "utf8"), ts.ScriptTarget.Latest, true);
+  const gameClass = source.statements.find((n): n is ts.ClassDeclaration => ts.isClassDeclaration(n) && n.name?.text === "Game")!;
+  const initializer = (name: string) => {
+    const member = gameClass.members.find((n): n is ts.PropertyDeclaration => ts.isPropertyDeclaration(n) && n.name.getText(source) === name);
+    assert.ok(member?.initializer);
+    return member.initializer.getText(source);
+  };
+  // Arrow instance fields are absent from the constructor-free Rapier fixture.
+  new Script(ts.transpileModule(`(function() { this.blur = ${initializer("blur")}; this.visibility = ${initializer("visibility")}; }).call(game)`, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022 },
+  }).outputText).runInNewContext({ game: c.game, document: { get hidden() { return hidden; } } });
+  let hidden = false;
+  const requests: unknown[] = [];
+  c.game.onAction = (action, data) => { requests.push({ action, data }); };
+  c.game.visibility();
+  assert.equal(c.game.keys.size, 0);
+  assert.deepEqual(requests, [], "no epoch means no recovery request");
+  c.game.reconcile(c.doors.withAuthority({ inputEpoch: 4, inputTickBase: 0, tick: 1, ack: 1, receivedSeq: 1, time: 1000, state: c.actor.capture(), resync: true }), 0);
+  hidden = true;
+  c.game.visibility();
+  assert.equal(requests.length, 0);
+  hidden = false;
+  c.game.visibility();
+  assert.deepEqual(JSON.parse(JSON.stringify(requests)), [{ action: "resync", data: { inputEpoch: 4 } }]);
+  c.game.network = false;
+  c.game.visibility();
+  assert.equal(requests.length, 1);
 });
 
 test("unsupported clean transport latency preserves controls without resetting the server epoch every second", (t) => {

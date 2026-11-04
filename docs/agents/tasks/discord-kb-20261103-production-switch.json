@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "discord-kb-20261103-production-switch",
+  "title": "KEY-72: koordinované nasazení ověřeného runtime a bootstrapu",
+  "status": "done",
+  "dependsOn": [
+    "discord-kb-20261103-validation",
+    "discord-kb-20261103-bootstrap-expiry"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "writePaths": [
+    ".cache/discord-kb-20261103/production/",
+    "docs/agents/handoffs/discord-kb-20261103-production-switch.md"
+  ],
+  "acceptance": [
+    "Existing production serve owner retains port8080 reservation; this task adds only coordinated deployment validation and its own evidence.",
+    "Use prepared immutable game c82 and tools d05 images, exact IIDs, existing project/volumes/secrets, --no-build --pull never and embedding budget0/0.",
+    "Before switch recheck production identity and original heads; preserve prior images and allowlisted RAG backup. Never delete volumes or overwrite foreign updates.",
+    "After bootstrap verify schema3, expected heads and sourceVersion IDs,145documents/200docchunks/45legacychunks/245cache, health+AI readiness and unchanged volumes.",
+    "Record actual result and safe recovery state on failure; root marks whole KEY72 Done only after confirmation."
+  ],
+  "verification": [
+    "Read-only preflight+postflight and actual authorized Compose switch; no rebuild or raw-chat data.",
+    "At most one synthetic final AI query if needed; bootstrap itself must use0newembeddinginputs."
+  ],
+  "notes": [
+    "User explicitly approved entire KEY72 plan including activation after verification and coordination with active owners. Root prepared images and released heavy-validation/own test processes.",
+    "Runtime image strahov-crazy-show:git-c82c6b33 IDsha256:73a983eae229181a5d42ebb632d1957b54af6a57ca0f601a2fdf559c3a442edf; tools strahov-rag-tools:git-d05c893e IDsha256:5697d2cc4ad2aa1daba16fdd3d57076d69348775377a693a07f3f3bcc5958ece.",
+    "Read docs/agents/handoffs/discord-kb-20261103-validation.md and prepared .cache/discord-kb-20261103/validation/release/compose-images.yaml. Main only; no new branches/worktrees/copies. Do not use old tools c82.",
+    "Final acceptance 2026-11-03: production switch commit2b11a563, verified gamec82 + toolsd05, schema3 and exact heads/sourceVersions/cache; root independently confirmed health/AI. Full-suite2setupFAIL plus exact2PASS reruns remain disclosed. Durable byte-identical override docs/rag-ingestion/20261103-discord/compose-release.yaml; no further runtime/build/test/asset changes by this task."
+  ]
+}

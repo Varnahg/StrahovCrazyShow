@@ -1,5 +1,61 @@
 # Ověření dema a známá omezení
 
+## Publikační PR40 a rozhodnutí Low LOD · 4. listopadu 2026
+
+[Současné V15 A75/B45](performance/evidence/low-tree-lod-20261102/pr40-20261104/README.md) uzavírá kandidáta45 jako nepřijatý; default se vrací75. Šest produkčních Edge/WebGPU vzorků se shodnou kamerou, časem a1280×720/984×553 snížilo stromovou geometrii10,9%, ale nesplnilo předem zvolenéFPS/p95 meze. Pohybliví peers navíc měnili avatar LOD (Anear1/medium2, Bnear3), takže rozdílFPS nelze připsat stromoLOD. Kandidátní obrazová trasa nebyla po selhání zahájena. PůvodníA75 také vykazuje dlouhé záseky až7,54s při změněHigh; celková plynulost zůstává otevřená.
+
+Zdroj/test/asset manifesty, všechny raw intervaly, systémová telemetrie, screenshoty, vyhodnocení a nezávislá post-run revalidace jsou v uvedené evidenci. Oba staršíharness shutdowny nenapsalycleanup.json; následně ověřené ukončení vlastníchprocesů/portů a úplné bytehashy jsou vedené samostatně. Nové finálníCI a review budou doložené na přesnémPRhead; zelený původní12d81aa9 se za novéCI nevydává.
+
+## Ochrana startup shaderů a přímý CPU profil · 3. listopadu 2026
+
+Koherentní renderovací checkpoint obsahuje ochranu proti starému hot-swapped Standard/PBR shaderu, retry jednorázových RTT i bez fronty a lokální CPU diagnostiku. Fronta je výchozí vypnutá a dostupná jen jako výslovný loopback experiment. Poslední společná sada **190/190 cílených testů PASS**, produkční build a izolovaný `pnpm test:integration` PASS; nezávislá review bez blockerů. To nenahrazuje plnou testovací sadu ani úspěšný GPU start. Dřívější nezelené fullsuite výsledky zůstávají níže zachované.
+
+[Přímý CPU profil](performance/evidence/render-next-20261102/startup-cpu-first/report.md) zaznamenal v candidate5 synchronní WGSL delta12 227,6ms/390 dvojic; nové čítače skutečně prošly privacy filtrem a uložením. Původní candidate4 ztratil pole `profile` při sanitizaci a zůstává označený jako neúspěšná diagnostika. Oprava používá `timing` a zachovává ochranu soukromí. Následující child profiler v candidate6 odlišil malé náklady pojmenovaných metod od dominantní generic cesty.
+
+[Izolovaný CPU kernel](performance/evidence/shader-cpu-kernel-20261103/README.md) má plnou WGSL/binding-context paritu32 případů a oddělené includes39,38%, parse32,23%, walk14,12% instrumentovaného kernelu. Po odstranění duplicitních Effectů sdílí48 evaluací24 různých Effectů šest přesných vstupů parseru. Jde o reprezentativní syntetické nativní kontrakty, nikoli celý herní shaderový inventář či FPS. Vybraná další optimalizace je omezená cache parsovaného stromu; **dosud není implementovaná**. Všechny dosavadní browser pokusy stále skončily timeoutem přípravy Low.
+
+## Kontrolované startup A/B na stejném buildu · 3. listopadu 2026
+
+Candidate3 source/test`a55cd239d0884f86ccdeff4a1e997b6443d11fa75f0508a968a3f4adaf0aaaac` porovnal native/queued/queued/native se stejnou ochranou materiálů a pomocných renderů. **Všechny čtyři starty skončily timeoutem Low.** Ve shodných prvních sedmi dokončených variantách měla fronta v této sérii průměrně o25,7% delší čas, o89,8% více renderů a o51,2% více kontrol objektů; maxima jednotlivých renderů naopak klesla. Tato podoba fronty se nepřijímá jako dokončená optimalizace. Počty aktivních objektů byly v odpovídajících fázích shodné; dřívější candidate2 s924–928 objekty není tento A/B pár.
+
+[Report, výsledky a meze](performance/evidence/render-next-20261102/candidate3/report.md) a [souhrn s úplnými gzip logy, systémovou telemetrií a hashi](performance/evidence/render-next-20261102/candidate3/summary.json) oddělují čtyři běžné pokusy od pátého instrumentovaného. Všechny měly předherní cadence59,9Hz, bez dalšího vlastního3D běhu; žádný Game.ready nebo FPS/SDK přejímka nevznikl. Takty a cache nebyly řízené, jen2+2 pokusy nejsou obecný statistický závěr. Sampler/API/karta ukončené, viewport resetovaný, inputsRevalidated=true. Následuje užší profil synchronní tvorby shaderů před nativním API.
+
+## Produkční znalostní báze KEY-72 · 3. listopadu 2026
+
+Původní provozní vlastník dokončil přepnutí8080 na ověřený game image z`c82c6b33` a bootstrap tools z`d05c893e`; přepnutí dokládá`2b11a563`. [Závěrečný report vydání](rag-ingestion/20261103-discord/release-verification.md) uvádí skutečnou DB migraci, zachování původních dat/cache, HTTP health a produkční AI dotaz s novými citacemi. Renderovací WIP tohoto výkonového úkolu nebyl součástí image. Nebyla tím ověřena3D hra ani FPS.
+
+Původní úplná sada tohoto samostatného artefaktu zůstává **2 896 PASS / 2 FAIL / 5 SKIP**. Přesné izolované opakování obou setup selhání prošlo2/2 na stejném artefaktu, bez změny aplikace nebo timeoutů; není to zpětně zelený fullsuite. Podrobnosti a rozdíl mezi runtime a tools artefaktem zachovává uvedený report.
+
+## Neúspěšné WebGPU starty · rozbor logů 3. listopadu 2026
+
+[Forenzní rozbor](performance/evidence/render-next-20261102/startup-forensics.md) a [vybrané původní záznamy s hashi celých logů](performance/evidence/render-next-20261102/forensics.json) oddělují dvě příčiny ukončení. Candidate1 skutečně selhal na validační chybě světelného bufferu80B proti shaderu očekávajícímu96B. Candidate2 s materiálovou ochranou v jednom pokusu tuto chybu nezopakoval, ale Low příprava skončila timeoutem30 466,8ms. Přímá tvorba shaderových modulů zde trvala152,6ms; přípravné renderovací volání13 117,2ms a kontroly objektů4 514,9ms. Neatributovaný zbytek není označený za GPU čekání.
+
+Materiálová ochrana a související startup/lifecycle regrese114/114 PASS; následný build PASS. Starší úplná sada2877 PASS/1 FAIL/5 SKIP, přičemž nezměněný řadičový případ timeoutoval i izolovaně. Shaderová fronta i ochrana jsou rozpracované na main, **bez praktického přijetí, úspěšného Game.ready a FPS důkazu**. Tyto výsledky nenahrazují dokončení výkonové optimalizace. Produkční switch KEY-72 zajišťuje jiný vlastník z vlastního neměnného Git artefaktu, bez tohoto render WIP.
+
+Neaktivní původní Edge karta byla později prokázaná přes browser management. Přesun vlastní karty do aktivního okna obnovil předherní cadence59,9–60,2Hz. Dřívější neaktivní pokusy zůstávají neplatné pro FPS srovnání. Před dalším GPU během je nutná koordinace stabilních vstupů po produkčním switchi; dnešní rozbor pouze přečetl existující logy.
+
+## Profil celé hry · konsolidovaný checkpoint 2. listopadu 2026
+
+Na `main` nad `fdc7b919` je zachovaný izolovaný produkční build/serve/SDK harness, manifest včetně testů a částečné důkazy prvního WebGPU startu. Harness 7/7 cílených testů PASS; neměnný Vite build a skutečný API/preview start/STOP/revalidace PASS. Hra skončila timeoutem přípravy světel po 30 051,6 ms; nedošlo k ready, SDK peers ani platným desetisekundovým FPS vzorkům. Příčina řídkých RAF callbacků není potvrzená. Computer Use při následném ověřování okna zastavilo ovládání kvůli neurčitelné URL.
+
+**FPS profil a volba další optimalizace zůstávají nedokončené.** Zdroj/test SHA `a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904`; [report, meze a pokračování](performance/evidence/render-profile-20261102/report.md), [hashe a strojový souhrn](performance/evidence/render-profile-20261102/summary.json). Vlastní procesy ukončené bez chyb, porty 2568/4179 volné, dočasný viewport resetován; Docker8080 zachovaný. Herní runtime/API se nemění. Předchozí nezelené plné testy se nepřeznačují podle úspěchu nástrojů.
+
+## CPU snapshoty trávy a květin · 2. listopadu 2026
+
+PhotoGrassBatch převádí pouze změněné číselné sloty a při vlastním reboundu neopakuje nativní převody. Zůstává přesná shoda všech16 hodnot matic, fade/slot/count, bounds a GPU uploadů; nová metadata mají5B/kapacitní slot zahrnutých do allocatedBytes. Refaktor oddělil malý idle guard od synchronizační práce. [Výzkum a výsledky](performance/evidence/grass-matrix-20261102/results.md), [úplná evidence](performance/evidence/grass-matrix-20261102/validation.json).
+
+CPU A/B na i7-8750H/Node24.22.1/Babylon9.30: finální sparse1/32 operace při256/2048/8192 instancích rychlejší5/5párů, mediány celkového mutate+flush času nižší o52,6–89,4%. Úplná obměna/rebound mají smíšené výsledky včetně kladných mediánů nad10%; nesplnily však předem definované kritérium stabilní regrese4/5párů. Původní neúspěšná série a následná korekce idle cesty jsou zachované. **Nejde o GPU ani FPS celé hry.**
+
+Cíleně58/58 PASS, TypeScript, `pnpm build`, SDK `pnpm test:integration` PASS; nezávislé review bez nálezu. Celé testy: první běh2858 PASS/2 FAIL/5 SKIP (RAG30ms deadline), druhý s6procesy2859 PASS/1 FAIL/5 SKIP (nespuštěný verification worker po chybě heartbeat). Oba dotčené nezměněné testy izolovaně prošly (67/67,1/1); plná sada zůstává nezelená a není přeznačena na PASS. Source/test hash `a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904`,945 vstupů. Změna se uchovává přímo na main s otevřenou celoprojektovou přejímkou.
+
+## Úsporné stromové LOD · 2. listopadu 2026
+
+Na kanonickém `main` je implementován kandidát dřívějšího FAR pro `low` + `full-coverage`:45 normalizovaných metrů místo75. Blízký detail, Medium/High, historické profily, skutečná projekce, kamera–hráč, sezóny a kolize zůstávají zachované. [Výzkum, varianty, výsledky a meze](performance/evidence/low-tree-lod-20261102/results.md), [strojový souhrn](performance/evidence/low-tree-lod-20261102/validation.json).
+
+Cílené testy36/36 PASS; celý `pnpm test`2 848 PASS /0 FAIL /5 SKIP; TypeScript, `pnpm build`, samostatný kandidátní produkční build i izolovaný `pnpm test:integration` PASS. Integrace zahrnuje12 skutečných SDK peers; není GPU důkazem. První TypeScript průchod našel dvě readonly fixture přiřazení, opravená před zelenou plnou sadou. Nezávislé čtecí review bez nálezu.
+
+**GPU FPS a obrazová přejímka zůstávají neověřené:** Computer Use hlásí vypnuté `Local browser use` v nastavení Work; terminálové spuštění Edge automatická kontrola odmítla. Žádný FPS/p95/p99 zisk se netvrdí, KEY-5 se neuzavírá. Přesný kandidátní source/test hash `0786606868a5fa20259935ad315ea57c7a540136fcdcfea5ed1ddc74fd887bbe`; baseline i kandidát jsou pouze build výstupy v `.cache/low-tree-lod-20261102/`, bez kopií zdrojů či dalších worktrees. Původní Docker8080 zůstal nezměněný.
+
 ## Přijaté výsledky · 28. října 2026
 
 Společná přijatá runtime baseline je `801b2d07c884c51e42b0fc1a890e7a0f9dbc0196`. Následující přehled uzavírá dřívější pracovní checkpointy pro konkrétní funkce; jejich původní lokální FAIL, timeouty a incidenty níže zůstávají zachované.
@@ -887,3 +943,31 @@ Finální actual Actor/E report má **264/264 místnostních tras a návratů**,
 Frozen source-v11 `7637aac280069053bb76c5c67d79b83f04844405db72277f7be535bec777fee1` má **117/117** navazujících CAD/world/door/network/transit testů PASS, produkční `pnpm build` s konfigurací bez kopírování public PASS a úplnou izolovanou multiplayerovou integraci PASS. V11 obsahuje všechny změněné testy. První v10 pokus správně selhal na neaktualizovaném recipe pinu; očekávaný hash je nyní čten z jediné verzované autoritativní B6 alignment položky s64hex validací. Skutečné Babylon obálky B1 i B6 pak prošly; guard se neoslabil.
 
 Skutečná v11 WebGL2 hra: souvislé WASD od spawnu kolem sportoviště k B6, hlavní schody, otevřeníE, spodní schodiště, chodba a pokoj11. Dřívější bílé cikcak hrany jsou při pohybu čisté, podlahy a nábytek zůstávají načtené; ready/renderErrorCount0. Snímky `revision2/frame-r6/b6-frames-final.webp` a `b6-room11-final.webp` byly stažené z místního náhledu a formulář zrušen bez odeslání. Nejde o nové FPS měření. Neměnná testovací verze **http://127.0.0.1:2592/**, bezHMR; původní2591 beze změny. Logy `revision2/frame-r6/{runtime-tests-v11,build-v11,integration-v11}.log` a native audit. Přesné PR-head CI a main integraci zachycuje navazující PR/Linear evidence.
+
+### Měřicí postup bez opakovaných slepých startů · 3. 11. 2026
+
+AGENTS a aktuální výkonový návod vyžadují předem hypotézu, metriku, podmínky správnosti a rozhodnutí. Existující render-next harness má `--experiment` se skutečnou kontrolou nové diagnostické identity, přírůstků/rotace JSONL, čerstvosti systémového sběru a cleanupu. Monitor 19/19 cílených testů PASS; harness identita/časné zrušení 3/3 PASS; syntaktická kontrola, místní odkazy a katalog PASS. Nezávislé review odhalilo backlog před falešným success a STOP před mkdir; obojí opraveno a ověřeno regresí. Výstupní limit sampleru nesmí projít jako úspěšný cleanup. [Přesné předání](agents/handoffs/render-experiment-monitor-20261103.md) rozlišuje technickou kontrolu nástroje od GPU přejímky; tato změna neprohlašuje shaderovou cache ani herní FPS za přijaté. Historické výsledky výkonového návodu zůstaly zachované.
+
+### Uzavřená syntax cache · 3. 11. 2026
+
+Native v4 a engine-owned controller jsou integrované jako výchozíOFF loopback experiment. [Předem stanovená C9 série a závěr](performance/evidence/shader-syntax-cache-20261103/final-campaign.md) nepřijímají zapnutí: ON1 timeout, OFF1 timeout, OFF2 timeout s nestabilní kadencí, ON2ready78,6774s. Jediný úspěšný ON není splněním přejímky. Tři10s Medium vzorky se dvěma SDK peers (3relace), CSS/render1280×720:24,1/23,1/22,5FPS, p9566,6–68,6ms a p99 až224,4ms. Žádný FPS gain ani plný B6/car/night profil se netvrdí. Všechny4 cleanup/source revalidace PASS; úplné původní logy, systémová telemetrie a benchmarky mají archivované hashe.
+
+Cache native/controller/Game70/70 PASS; plná sada3029:3023PASS/1FAIL/5SKIP. Nezměněný `rag-pdf-extraction` případ `an immediately resolving endless stream cannot starve the deadline` selhal na cancelled0vs1, přesný izolovaný rerun1/1PASS; původní FAIL zůstává. Produkční build po opravě runtime importu monitor testu a SDK integrace PASS. Pozdější samostatný5min limit úklidu pouze čeká na rehash assetů (pozorováno128s); readiness hry nemění. Monitor finálně20/20 + scoped TypeScript, harness3/3 a následný neměnný C9 build PASS. Nezávislé review integrace a závěru bez blockerů. Zelená celoprojektová přejímka se netvrdí.
+
+## 4. 11. 2026 · renderovací atribuce a předání uživatelského testu
+
+Samostatný buildový adapter stávajícího osmiframového profileru: C12 i C13 skutečně ready v Edge/WebGPU, každý3×8 dokončených snímků, obnovené hooky a explicitní scope. V2 má6/6 cílených testů, syntax, build a nezávislé review bez nálezů; opravené trvalé ukládání dodatečné kontroly vstupů. Jde o měřicí nástroj, žádná nová gameplay optimalizace ani FPS zisk se netvrdí. C13 peers po odchodu hlavního hráče nahlásili změnu populace; není to čistý PASS celého multiplayerového běhu. Následující NCM experiment byl zastaven na přímé zadání uživatele před benchmarky. [Přesné výsledky, raw evidence a aktuální uživatelský test C11](agents/handoffs/gameplay-frame-cost-20261103-root.md). Plná sada/integrace v této dokumentační a buildové instrumentační etapě neběžely; dřívější PDF omezení zůstává samostatné.
+
+## 4. 11. 2026 · skutečné přejímkové meze
+
+[Specifikace](../_bmad-output/implementation-artifacts/gameplay-frame-cost-20261103/ACCEPTANCE.md): společný snímkový evaluator pro HUD a offline/live gameplay přejímka podle recorderu. 35/35 helper/CLI/monitor,11/11 presentation,18/18 fixture-manifest/replay,10/10 i18n PASS. Celý TypeScript před finálním review doplněním a následný scoped TypeScript konečného helperu/testů PASS. Obě review mezery (hranice časového pokrytí; stale authority bez resync odpovědi) opravené a nezávisle znovu ověřené bez dalších nálezů. Source manifest nově zahrnuje externí gzip regresní fixture.
+
+Původní [hráčský archiv](performance/evidence/gameplay-frame-cost-20261103/user-playtest-20261104/README.md) dává strojově [failed](performance/evidence/gameplay-frame-cost-20261103/user-playtest-20261104/acceptance.json), nativní Node exit2. Zároveň přiznává neúplnost tří časových oken při změně kvality; souvislé seq nezaručuje úplné frame-time pokrytí. Výkonový cíl nebyl změkčen, herní renderer/protokol v této etapě nezměněny. Browserový vzhled a plné runtime ověření budou společné s následujícím stabilním opravným checkpointem; samotný testgate neznamená lepší FPS.
+
+## 4. 11. 2026 · idempotentní V15 obnova vstupní epochy
+
+[Výsledek, screenshot, raw logy a limity](performance/evidence/gameplay-frame-cost-20261103/resync-epoch-20261104/README.md). Stejný trigger proti původnímu serverovému handleru vytvořil2resetty a zahodil nový vstup; oprava vytvoří1reset a vstup zachová.107 cílených testů a nezávislé review PASS, produkční `pnpm build` včetně TypeScriptu a úplná izolovaná SDK integrace PASS. ProtokolV15 je společný pro klienta a server; timeouty/fyzika se tím nemění.
+
+Plná sada běžela jednou se souběžností4:3082celkem,3074PASS,3FAIL,5SKIP. Dvě zastaralé30s aserce z předchozího rozpočtového updatu opraveny samostatně v7c82be41 (35/35cílenýchPASS), řadičový `blind authority repair never dispatches while an original native reviewer is live` timeoutoval a následně izolovaně1/1PASS. Nejde o zelený opakovaný full-suite výsledek. Následná percentilová konzistence benchmarku36255bdf má47/47cílenýchPASS.
+
+C14 source/test31a14cdda855eef4486ac82c63778db13d2f614676c88bb22dbd104d6da99827: první WebGPU start timeout Medium60 058,3ms; jediný opravný start ve vlastním ověřeném okně ready. Proběhla skutečná chůze,2SDKpeers, celýHUD, Medium2040×986. Krátký vzorek31,9FPS/p9546,2ms/p9968,4ms byl novým HUD správně označen nevyhovující. Celková gameplay přejímka zůstala FAILED; nejde o důkaz obecného FPS zlepšení. Peers/API/viewport/karta uklizené, vstupy revalidované, porty volné. Zbývající startup/renderové prodlevy nejsou uzavřené tímto síťovým fixem.

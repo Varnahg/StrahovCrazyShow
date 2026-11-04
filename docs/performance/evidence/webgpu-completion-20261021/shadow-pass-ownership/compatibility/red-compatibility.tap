@@ -1,0 +1,624 @@
+TAP version 13
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: pinned baseline: a ready shadow effect retains HEMI96 while current Light0 binds sun80
+ok 1 - pinned baseline: a ready shadow effect retains HEMI96 while current Light0 binds sun80
+  ---
+  duration_ms: 29.2583
+  type: 'test'
+  ...
+# Subtest: guard rejects stale type and missing LightN even when a material says it is ready
+not ok 2 - guard rejects stale type and missing LightN even when a material says it is ready
+  ---
+  duration_ms: 8.2822
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\webgpu-shadow-freshness.test.ts:1:4845'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\webgpu-shadow-freshness.test.ts:110:12)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: guard covers the production four-to-three slot transition without fabricating a missing buffer
+ok 3 - guard covers the production four-to-three slot transition without fabricating a missing buffer
+  ---
+  duration_ms: 4.9166
+  type: 'test'
+  ...
+# Subtest: guard refreshes base readiness before selecting depth effect and preserves pass/override
+ok 4 - guard refreshes base readiness before selecting depth effect and preserves pass/override
+  ---
+  duration_ms: 2.6644
+  type: 'test'
+  ...
+# Subtest: guard follows material/device light caps and disabled-light binding policy
+not ok 5 - guard follows material/device light caps and disabled-light binding policy
+  ---
+  duration_ms: 2.4963
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\webgpu-shadow-freshness.test.ts:1:7666'
+  failureType: 'testCodeFailure'
+  error: |-
+    third unused light is outside the shader cap
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\webgpu-shadow-freshness.test.ts:172:12)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: guard fails closed on unknown light class/define layout and after disposal
+not ok 6 - guard fails closed on unknown light class/define layout and after disposal
+  ---
+  duration_ms: 3.4487
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\webgpu-shadow-freshness.test.ts:1:8420'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\webgpu-shadow-freshness.test.ts:189:12)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: standalone and instancing are forwarded once; readiness failures keep their identity
+not ok 7 - standalone and instancing are forwarded once; readiness failures keep their identity
+  ---
+  duration_ms: 3.2347
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\webgpu-shadow-freshness.test.ts:1:9222'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\webgpu-shadow-freshness.test.ts:216:12)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: factory preserves native WebGL and custom ShaderMaterial wrapper contracts
+ok 8 - factory preserves native WebGL and custom ShaderMaterial wrapper contracts
+  ---
+  duration_ms: 2.3805
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual standard refreshes shadow-only light changes across two stable generator passes
+ok 9 - actual standard refreshes shadow-only light changes across two stable generator passes
+  ---
+  duration_ms: 204.4217
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual standard hot-swapped old effect cannot hide pending shadow replacement
+ok 10 - actual standard hot-swapped old effect cannot hide pending shadow replacement
+  ---
+  duration_ms: 18.6146
+  type: 'test'
+  ...
+# Subtest: actual pbr refreshes shadow-only light changes across two stable generator passes
+ok 11 - actual pbr refreshes shadow-only light changes across two stable generator passes
+  ---
+  duration_ms: 180.7737
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual pbr hot-swapped old effect cannot hide pending shadow replacement
+ok 12 - actual pbr hot-swapped old effect cannot hide pending shadow replacement
+  ---
+  duration_ms: 29.6387
+  type: 'test'
+  ...
+# Subtest: pinned baseline: fewer current lights leave a required old shadow LightN unbound
+ok 13 - pinned baseline: fewer current lights leave a required old shadow LightN unbound
+  ---
+  duration_ms: 2.4116
+  type: 'test'
+  ...
+# Subtest: pinned cache forwards its original undefined buffer entry when required LightN is absent
+ok 14 - pinned cache forwards its original undefined buffer entry when required LightN is absent
+  ---
+  duration_ms: 1.1992
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: same actual base/source/ABI shares real engine Effect while draw/material contexts remain separate
+ok 15 - same actual base/source/ABI shares real engine Effect while draw/material contexts remain separate
+  ---
+  duration_ms: 47.3288
+  type: 'test'
+  ...
+# Subtest: depth replacement balances real cache references and failed acquisition preserves old entry
+ok 16 - depth replacement balances real cache references and failed acquisition preserves old entry
+  ---
+  duration_ms: 8.1357
+  type: 'test'
+  ...
+# Subtest: base replacement releases only its owner and disposed wrappers cannot recreate entries
+ok 17 - base replacement releases only its owner and disposed wrappers cannot recreate entries
+  ---
+  duration_ms: 42.1702
+  type: 'test'
+  ...
+# Subtest: complete source and ordered ABI/index parameters isolate actual engine programs
+    # Subtest: vertex source
+    ok 1 - vertex source
+      ---
+      duration_ms: 6.5699
+      type: 'test'
+      ...
+    # Subtest: fragment source
+    ok 2 - fragment source
+      ---
+      duration_ms: 6.8587
+      type: 'test'
+      ...
+    # Subtest: attribute order
+    ok 3 - attribute order
+      ---
+      duration_ms: 164.0079
+      type: 'test'
+      ...
+    # Subtest: uniform order
+    ok 4 - uniform order
+      ---
+      duration_ms: 2.5245
+      type: 'test'
+      ...
+    # Subtest: UBO order
+    ok 5 - UBO order
+      ---
+      duration_ms: 3.7173
+      type: 'test'
+      ...
+    # Subtest: sampler order
+    ok 6 - sampler order
+      ---
+      duration_ms: 9.4321
+      type: 'test'
+      ...
+    # Subtest: index value
+    ok 7 - index value
+      ---
+      duration_ms: 2.6871
+      type: 'test'
+      ...
+    # Subtest: index primitive type
+    ok 8 - index primitive type
+      ---
+      duration_ms: 55.1236
+      type: 'test'
+      ...
+    # Subtest: index property order
+    ok 9 - index property order
+      ---
+      duration_ms: 3.6922
+      type: 'test'
+      ...
+    1..9
+ok 18 - complete source and ordered ABI/index parameters isolate actual engine programs
+  ---
+  duration_ms: 258.3004
+  type: 'test'
+  ...
+# Subtest: generator entries share only within the wrapper; distinct wrapper and original Effect identities remain isolated
+not ok 19 - generator entries share only within the wrapper; distinct wrapper and original Effect identities remain isolated
+  ---
+  duration_ms: 2.3981
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\shadow-share.test.mjs:47:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of null (reading 'isReady')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    ready (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/fixture.mjs:8:64)
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/shadow-share.test.mjs:49:114)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: injected source and remapping options are compared exactly; language has its own token namespace
+ok 20 - injected source and remapping options are compared exactly; language has its own token namespace
+  ---
+  duration_ms: 3.2294
+  type: 'test'
+  ...
+# Subtest: unsupported index descriptors retain unique legacy per-entry tokens without coercing descriptor values
+ok 21 - unsupported index descriptors retain unique legacy per-entry tokens without coercing descriptor values
+  ---
+  duration_ms: 1.5072
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: retirement during synchronous engine creation releases its acquired Effect and cannot revive maps
+ok 22 - retirement during synchronous engine creation releases its acquired Effect and cannot revive maps
+  ---
+  duration_ms: 11.4816
+  type: 'test'
+  ...
+# Subtest: forced engine release does not double-decrement revoked leases; a disposed base is refused
+ok 23 - forced engine release does not double-decrement revoked leases; a disposed base is refused
+  ---
+  duration_ms: 1.6221
+  type: 'test'
+  ...
+# Subtest: WebGL keeps historical unique tokens and replacement/wrapper-disposal behavior
+ok 24 - WebGL keeps historical unique tokens and replacement/wrapper-disposal behavior
+  ---
+  duration_ms: 2.9622
+  type: 'test'
+  ...
+# Subtest: notified main base cannot evict an independent canonical shadow pass; cached readiness need not renotify
+ok 25 - notified main base cannot evict an independent canonical shadow pass; cached readiness need not renotify
+  ---
+  duration_ms: 1.4204
+  type: 'test'
+  ...
+# Subtest: same notified Effect in two canonical passes owns two acquires even when the engine program is shared
+ok 26 - same notified Effect in two canonical passes owns two acquires even when the engine program is shared
+  ---
+  duration_ms: 1.9093
+  type: 'test'
+  ...
+# Subtest: getEffect aliases acquire contexts only; becoming canonical and pass retirement leave original owner intact
+ok 27 - getEffect aliases acquire contexts only; becoming canonical and pass retirement leave original owner intact
+  ---
+  duration_ms: 1.1478
+  type: 'test'
+  ...
+# Subtest: actual ObjectRenderer first-create undefined release events cannot retire another prepared pass
+ok 28 - actual ObjectRenderer first-create undefined release events cannot retire another prepared pass
+  ---
+  duration_ms: 1.7537
+  type: 'test'
+  ...
+# Subtest: released pass rejects late notifications and cannot revive entries; zero remains a real pass
+ok 29 - released pass rejects late notifications and cannot revive entries; zero remains a real pass
+  ---
+  duration_ms: 1.3361
+  type: 'test'
+  ...
+# Subtest: notified pending hot-swap base stays authoritative over an installed old-ready drawWrapper
+ok 30 - notified pending hot-swap base stays authoritative over an installed old-ready drawWrapper
+  ---
+  duration_ms: 1.4654
+  type: 'test'
+  ...
+# Subtest: actual ShadowGenerator RTT resize retires only the old pass and can prepare its new live pass
+ok 31 - actual ShadowGenerator RTT resize retires only the old pass and can prepare its new live pass
+  ---
+  duration_ms: 55.146
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: reentrant notify-current during original create releases its acquired Effect and cannot install stale ownership
+ok 32 - reentrant notify-current during original create releases its acquired Effect and cannot install stale ownership
+  ---
+  duration_ms: 8.8081
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: reentrant release-current during original create releases its acquired Effect and cannot install stale ownership
+ok 33 - reentrant release-current during original create releases its acquired Effect and cannot install stale ownership
+  ---
+  duration_ms: 12.1044
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: reentrant dispose-mesh during original create releases its acquired Effect and cannot install stale ownership
+ok 34 - reentrant dispose-mesh during original create releases its acquired Effect and cannot install stale ownership
+  ---
+  duration_ms: 6.2602
+  type: 'test'
+  ...
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: reentrant dispose-wrapper during original create releases its acquired Effect and cannot install stale ownership
+ok 35 - reentrant dispose-wrapper during original create releases its acquired Effect and cannot install stale ownership
+  ---
+  duration_ms: 6.9778
+  type: 'test'
+  ...
+# Subtest: reentrant unrelated main notify preserves the in-flight shadow acquire and original ready ownership
+ok 36 - reentrant unrelated main notify preserves the in-flight shadow acquire and original ready ownership
+  ---
+  duration_ms: 2.4279
+  type: 'test'
+  ...
+# Subtest: best-effort release balances every acquired entry/context and preserves a first falsy cleanup error
+ok 37 - best-effort release balances every acquired entry/context and preserves a first falsy cleanup error
+  ---
+  duration_ms: 2.1452
+  type: 'test'
+  ...
+# Subtest: pass cleanup is reentrant and independent scene owners remain untouched
+ok 38 - pass cleanup is reentrant and independent scene owners remain untouched
+  ---
+  duration_ms: 2.4972
+  type: 'test'
+  ...
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:24]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual nonstandalone ShaderMaterial main notification prepares native ShadowGenerator RTT with production remaps
+not ok 39 - actual nonstandalone ShaderMaterial main notification prepares native ShadowGenerator RTT with production remaps
+  ---
+  duration_ms: 135.5248
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:18:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    nonstandalone may use its legitimate main source without shadow-pass base notification
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:48:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: public alias current0/request2 owns source0 and target-only retirement cannot release its acquire
+not ok 40 - public alias current0/request2 owns source0 and target-only retirement cannot release its acquire
+  ---
+  duration_ms: 1.233
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:57:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of null (reading 'isReady')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    ready (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/fixture.mjs:8:64)
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:60:24)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: known pending or disposed requested source cannot borrow another ready notified pass
+ok 41 - known pending or disposed requested source cannot borrow another ready notified pass
+  ---
+  duration_ms: 1.0697
+  type: 'test'
+  ...
+# Subtest: binding chooses the same source as readiness rather than the first older target alias
+not ok 42 - binding chooses the same source as readiness rather than the first older target alias
+  ---
+  duration_ms: 0.8994
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:84:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of null (reading 'isReady')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    ready (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/fixture.mjs:8:64)
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:86:54)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: promotion of an alias target to its own canonical pass detaches only the foreign context
+not ok 43 - promotion of an alias target to its own canonical pass detaches only the foreign context
+  ---
+  duration_ms: 0.8658
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:98:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of null (reading 'isReady')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    ready (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/fixture.mjs:8:64)
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:100:54)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: same-Effect notification order follows latest real notify, and released latest source falls back only to a live tuple
+not ok 44 - same-Effect notification order follows latest real notify, and released latest source falls back only to a live tuple
+  ---
+  duration_ms: 0.9357
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:109:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of null (reading 'isReady')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    ready (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/fixture.mjs:8:64)
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:114:24)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: two actual RTTs can borrow one main source; resize/target disposal retire aliases and source disposal releases both acquires
+not ok 45 - two actual RTTs can borrow one main source; resize/target disposal retire aliases and source disposal releases both acquires
+  ---
+  duration_ms: 2.8022
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:123:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of null (reading 'isReady')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    ready (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/fixture.mjs:8:64)
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:129:24)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: reentrant different-fallback rejects an in-flight alias acquire without installing stale source/target ownership
+not ok 46 - reentrant different-fallback rejects an in-flight alias acquire without installing stale source/target ownership
+  ---
+  duration_ms: 1.186
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:143:3'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading '_refCount')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:157:27)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: reentrant same-effect-other-source rejects an in-flight alias acquire without installing stale source/target ownership
+not ok 47 - reentrant same-effect-other-source rejects an in-flight alias acquire without installing stale source/target ownership
+  ---
+  duration_ms: 1.0825
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:143:3'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading '_refCount')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:157:27)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: reentrant promote-target rejects an in-flight alias acquire without installing stale source/target ownership
+not ok 48 - reentrant promote-target rejects an in-flight alias acquire without installing stale source/target ownership
+  ---
+  duration_ms: 0.9553
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:143:3'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading '_refCount')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:157:27)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: reentrant release-source rejects an in-flight alias acquire without installing stale source/target ownership
+not ok 49 - reentrant release-source rejects an in-flight alias acquire without installing stale source/target ownership
+  ---
+  duration_ms: 0.9478
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:143:3'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading '_refCount')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:157:27)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: reentrant release-target rejects an in-flight alias acquire without installing stale source/target ownership
+not ok 50 - reentrant release-target rejects an in-flight alias acquire without installing stale source/target ownership
+  ---
+  duration_ms: 0.9824
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-shadow-sharing\\nonstandalone.test.mjs:143:3'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading '_refCount')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-shadow-sharing/nonstandalone.test.mjs:157:27)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..50
+# tests 59
+# suites 0
+# pass 43
+# fail 16
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2232.4398

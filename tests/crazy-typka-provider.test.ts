@@ -47,10 +47,10 @@ test("provider receives institution and legal interval for each actual selected 
     safetyIdentifier: "fake",
     signal: new AbortController().signal,
     onGenerationStart() {},
-    now: Date.parse("2026-10-29T00:45:00.000Z"),
+    now: Date.parse("2026-11-03T00:45:00.000Z"),
   });
   const content = supplied.input.at(-1).content;
-  assert.match(supplied.instructions, /2026-10-29T00:45:00.000Z/);
+  assert.match(supplied.instructions, /2026-11-03T00:45:00.000Z/);
   assert.match(supplied.instructions, /Europe\/Prague/);
   assert.match(supplied.instructions, /"scope":\{"kind":"current"\}/);
   const payload = JSON.parse(
@@ -98,7 +98,7 @@ const safe = {
 const evidence = retrieveKnowledge(
   "kancelář SH",
   4,
-  Date.parse("2026-10-27T12:00:00Z"),
+  Date.parse("2026-11-03T12:00:00Z"),
 );
 function complete(text = "Kancelář je na bloku 1.", sourceIds = ["sh-office"]) {
   return {
@@ -192,7 +192,7 @@ test("provider rejects oversized evidence before admission and bounds history wi
     onGenerationStart() {
       starts++;
     },
-    now: Date.parse("2026-10-29T00:45:00.000Z"),
+    now: Date.parse("2026-11-03T00:45:00.000Z"),
     scope: { kind: "archive" as const },
   };
   await assert.rejects(

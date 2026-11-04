@@ -1,0 +1,13 @@
+# Předání: render-process-guide-20261103
+
+- Vlastník: `render-guide-20261103-author`; příjemce: koordinátor `/root`.
+- Checkout: `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`, `main`; výchozí commit `6c31b9a99c29ffe06a093f033f15394bb250bfd8`.
+- Výsledek: aktuální [výkonový návod](../../performance/README.md) sjednocuje práci na main, neměnné výstupy v `.cache`, existující render-next harness a rozhodování podle důkazů. Nahrazuje pokyny ke kopírování projektu a zastaralé údaje o backendu/protokolu. Neprohlašuje runtime experimenty za přijaté optimalizace.
+- Soubory: `docs/performance/README.md`, tento handoff. Cizí WIP nebyl převzat ani změněn; root souběžně vlastní změny AGENTS a harnessu.
+- Podklady: aktuální AGENTS, BMAD policy a koordinace; `client/render-fallback.ts`, `shared/netcode.ts`, render-next `run.mjs`/`common.mjs`/`peers.mjs`, původní harness README a sdílené helpery; finální kontrakt `scripts/performance-experiment.mjs` přečten 3. 11. 2026.
+- Refaktoring dokumentace: jeden aktuální postup, šest položek v plánu s odkazem z jednoho handoffu, logs-first, rozhodnutí po 30 minutách bez nového důkazu, zachovaná plánovaná opakování i podmínky správnosti. Automatický sběr/cleanup je oddělen od ovládání browseru a spuštění HUD benchmarků.
+- Statické ověření: `git diff --check` bez nálezu; všech 10 místních odkazů výkonového návodu existuje. Build/serve/peers/STOP příkazy, `--experiment` dispatch, jméno proměnné plánu, jeho šest polí/limity, systémový sampler a výstup souhrnu ověřeny čtením kódu. Příklad `candidate8` je výslovně nahraditelné dosud nepoužité číslo; plán musí operátor před během vytvořit podle README harnessu.
+- Identita návodu: SHA-256 `7e2ebeac88991921c807b0cccf75a00dc4a171941a79e55e99e0a038ea6aa904`. Historický suffix od `## Historický kontext` zůstal beze změny, SHA-256 `bd30cdb49e05e9485aeaa2dd38547b2dc0ca589563d5c778a320c0175464e63b`; původní měřená čísla nejsou přepsána.
+- Procesy a zdroje: žádný server, build, GPU běh ani test nebyl spuštěn; pouze krátké čtecí/statické kontroly a editace přidělených dokumentů. Žádný vlastní pomocný proces nezůstává běžet.
+- Omezení: jde o ověření návodu, nikoli praktickou validaci nového experimentálního monitoru, jeho systémového sampleru nebo výkonu hry. Tu a finální shodu s README harnessu zajišťuje root ve vlastním tasku.
+- Předání a rezervace: autor předává oba soubory a následně uvolňuje `render-process-guide-20261103`; živý stav určuje registr. Nic nestagováno ani necommitováno. Integrátor zkontroluje společný finální checkpoint, označí stav tasku a commitne pouze vlastní ověřený celek na main.

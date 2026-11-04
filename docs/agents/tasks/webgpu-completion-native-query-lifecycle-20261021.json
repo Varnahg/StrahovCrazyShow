@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-native-query-lifecycle-20261021",
+  "title": "KEY-22: uzavřít pending query readbacks po skutečné device loss bez unhandled Promise",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "client/webgpu-validation.ts",
+    "client/render-health.ts",
+    "tests/webgpu-validation.test.ts",
+    "tests/render-health.test.ts",
+    "tests/render-startup.test.ts",
+    "tests/startup-preparation-loop.test.ts",
+    "tests/webgpu-query-lifecycle.test.ts",
+    "tests/fixtures/webgpu-query-lifecycle/",
+    "docs/performance/evidence/webgpu-completion-20261021/native-query-lifecycle/",
+    ".cache/webgpu-completion-native-query-lifecycle-20261021/",
+    "docs/agents/handoffs/webgpu-completion-native-query-lifecycle-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před code zachovat root skutečný lifecycle source6 device-loss nález: render-fault2/gen1 device destroyed19:21:08 následovaný34 originalunhandled-rejection; přesnépřiřazenívšech34konkrétnímquerynenídoložené. Zachovat rendererpeerův cold actualTimestamp→Duration→QuerySet inlinewitness, query.dispose-onlyfailure i fake0sample při engine.isDisposed. Source/varianty/rozhodnutí zapsatpředzměnou.",
+    "Zvolen úzký kompletní native query lifecycle+explicitní error channel. Shared device→loss-state WeakMap má nejvýše1lostPromise callback/device a nedrží retiredQuerySets/enginy. QuerySet má vlastníretirement/epoch a borrowed ownership od okamžikuzískáníbufferu předencode; všechny3publicread API kryjí sync resolve/copy/finish/submit i asyncmap/getRange/unmap a engine/device/ownerreplacement.",
+    "Dispose je idempotentní, oddělí pool/pending ownership PŘEDcleanup, zkusívšechny vlastnícleanup i při chybě a late settlement neuvolníbufferznovu/nevrátído retiredpool. Původní aktivní error včetněfalsyidentity nesmí být přepsán cleanup chybou. Preserve buffer/map počty, publicread result typy a canUseMultipleBuffers=false backpressure. Partial constructorfailure uklidí svéjižvytvořenéresources.",
+    "Retired/lost/no-data vrací explicitnínull; validněnaměřená0 zůstává0. Timestamp frame/pass i occlusion consumers mají rejecthandler a vlastněné epoch/current-query guards pro dispose/disable/re-enable/replacement; latecallback nesmípsát novýcounter/lastBuffer/resetovatnovýcycle. Nullnepřidáfake0sample, missingwriteTimestampbezskutečnéhoměřenínenínulovýměření. Per-pass timing zůstává zapnutý.",
+    "Map rejection před/po skutečném device.lost musíkončit bezunhandledchildPromise: známýretired/lost seuklidí, aktivníunexpectederror pravdivěinvalidujerenderer. PřímépublicQuerySetliveAPI nadále odmítápůvodníerror. Žádný globalunhandledfilter, onEffectErrorsemantika, syntheticuncapturederror, fullearlyEngine.dispose, vypnutíměření, delšítimer/fence/sleep či změna shader/readiness/timeoutů.",
+    "WebGPUEngine.pure.js/.d.ts vlastní úzký onQueryReadErrorObservable<{error:unknown,source:timestamp-frame|timestamp-pass|occlusion}> vytvořený předqueryownery a uklizenýpřidispose; dle skutečnéhopinu uklidit takévlastníocclusionquery předbuffer sweepem. Nový structuralwatchWebGpuQueryReadErrors vclient/webgpu-validation.ts zachová původníwatchWebGpuValidation signature. RenderHealth mapujeactualevent.error doexistujícího render kanálu+boundedsource, beznového schema/channel/UI/Game/server/shared API.",
+    "WebGL watcher okamžitýnoop bezčteníqueryproperty. WebGPU chybějící/neplatnýobservable či registrace jednou nahlásí unavailable→renderinvalid, nikolivsilentnoop/testbypass. PlatnéfakeWebGPUenginy dostanou skutečnýObservable v přesněpřidělenýchfixtures; absence mánegativnítest. Observer/report/cleanup throw nesmí vytvořitdalšíunhandledPromise nebozměnitpůvodníqueryerror.",
+    "Native patch pouze QuerySet.js/.d.ts, TimestampQuery.js/.d.ts, OcclusionQuery.js/.d.ts aWebGPUEngine.pure.js/.d.ts, případný nutný novýmalý @internal sharedhelper předemkonkretizovatrootovi. Všech10původníchpatchsekcí včetněMesh7ceb byteexact, lockpouzesouvisejícíhashrefs/inverse. Baselinečíst zrootfreshsource6Core7ceb; rootsharedinstalledMeshjejee9dd a597becpatch na něj nelzereverzovat. Nikdyneměnit žádnéinstalled/frozen/rootnode_modules, config/version/Game/UI/assets/measurementhelper.",
+    "Portable defaulttests používajípinnedinstallednativebezoverlay/env; leafův red/green overlayjejenvevlastnícache. Fullnativequery/consumer/errorchannel→actualRenderHealthfixtures, actualmicrotaskNodeunhandledlistener bezglobalfilter, valid0/null/pool/release/constructor/throw/disposal/re-enable/occlusionreplacement/WebGL/availability. ScopedTS+relevantnílightCPU předat společněsrefaktorem, hashiproof a čitelnýmhandoffem; žádnýchildfullsuite/install/build/server/GPU/commit/rekurzivníBMAD."
+  ],
+  "verification": [
+    "Červený exactsource6cold actualQuerySet/Timestamp chain zachovat; greenoběordering mapReject/deviceLost, dispose/reconfigure/rejoin/contextreplacement a activeunexpectederror doRenderHealth bezunhandled/no fake0. Native readValues/readValue/readTwo counts/maprange semantics zachované.",
+    "Originální erroridentity a cleanupfailure ordering; borrowedbuffers přesnějednourelease, no poolingpoownerretirement, pending mapafterdispose a latefulfilled oldcallback, constructorpartialallocationfail, availabilityunavailable a WebGL unreadpropertynegativecases. SourceSHA/pin/hash stable před/po actualCPU.",
+    "Complete old10section reverse/newpatch forward ve vlastnífixture zfreshsource6 read-only copy; alloldsections/lockinversebyteexact, clientwatcher/render-healthtargetedTS/CPU i relevantnístartup/prep regressions. Rootteprve provede novoufreshinstall/fullchecks/actualdeviceLoss/recovery v dalšímfrozen source."
+  ],
+  "notes": [
+    "Root vede explicitníuserKEY22goal a souhlasí s toutoúzkou native API+clientadapter změnou. Tento leaf nepoužívá dalšíBMAD workflow. Read-onlyresearch userAGENT vyžaduje předkaždoufunkcí ajižproběhlo; rozhodnutí jevýše, dalšíscopepředemdomluvit.",
+    "Root resources heavy-validation/gpu/ports zůstávají jeho. Vlive ownBrowser je source6/build968003ac/helperf79 neměnný, root právěchodípoareálupoobnově. CPU targetedjelevné, žádnéheavy/GPU. Freshsource6snapshot .cache/performance-snapshot/webgpu-completion-20261021-candidate-6 má vlastnínode_modulesMesh7ceb; číst/kopírovat, neměnit. Rootworktree oldnode_modules e9ddbydesign.",
+    "RawdiagnosticAPI3server/shared je92byteidentickýsesource6, currentclientSession6bac2f61-f001-485e-87f7-2b3554bb317e a lifecycle-run-1/*.json/pngjsourootvlastněnéread-only evidence. Žádnécredentialsnenehledat/nečíst/nevypisovat. QA ownDevice.destroyjeinstrumentálnítrigger, nikolivsámGPUrecoveryproof."
+  ]
+}

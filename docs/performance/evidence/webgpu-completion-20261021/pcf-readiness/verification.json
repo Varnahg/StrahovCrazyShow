@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "checkedAtUTC": "2026-10-21T14:29:31.704Z",
+  "node": "v24.19.0",
+  "babylon": "9.30.0",
+  "command": "node --import tsx --test --test-reporter=tap tests/webgpu-shadow-pcf-state.test.ts tests/webgpu-shadow-freshness.test.ts tests/webgpu-shadow-depth-wrapper.test.ts",
+  "exitCode": 0,
+  "tests": 37,
+  "pass": 37,
+  "fail": 0,
+  "skipped": 0,
+  "logSha256": "9001d96fd9c4afe33a3df0b3d2009a902c10c1128d44d5164f56af029da76c7e",
+  "sourceBefore": {
+    "client/webgpu-shadow-readiness.ts": "9bf2f9ba307685920a18ca4e31a9db7f25c61f452ab9454d0c89b90d21236965",
+    "tests/webgpu-shadow-freshness.test.ts": "ab8e15b10426d6a873dd601088fb59e763c4b2aebed4e5cf287248289de8068f",
+    "tests/webgpu-shadow-pcf-state.test.ts": "9a1c53d8b1ea2d543f21533662bb70c1450b241b6dcbc69c3c7d09bf3d098a4b",
+    "docs/performance/evidence/webgpu-completion-20261021/pcf-readiness/README.md": "046a9ca0b2d22b973365be0c84523445f046cfcc624eb060c51029d61d676c8b"
+  },
+  "sourceAfter": {
+    "client/webgpu-shadow-readiness.ts": "9bf2f9ba307685920a18ca4e31a9db7f25c61f452ab9454d0c89b90d21236965",
+    "tests/webgpu-shadow-freshness.test.ts": "ab8e15b10426d6a873dd601088fb59e763c4b2aebed4e5cf287248289de8068f",
+    "tests/webgpu-shadow-pcf-state.test.ts": "9a1c53d8b1ea2d543f21533662bb70c1450b241b6dcbc69c3c7d09bf3d098a4b",
+    "docs/performance/evidence/webgpu-completion-20261021/pcf-readiness/README.md": "046a9ca0b2d22b973365be0c84523445f046cfcc624eb060c51029d61d676c8b"
+  },
+  "sourceStable": true,
+  "sourceManifestSha256": "52d93444b3acadd914700ded532c1e5aea2ca578a4866a2a7eb3ded0eb2d1d9e",
+  "pinBefore": {
+    "node_modules/@babylonjs/core/package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79",
+    "node_modules/@babylonjs/core/Lights/Shadows/shadowGenerator.js": "2c094f0c900a6cffd385a17fe8e0ceafe04b801d0e4bb460784ca22223bd62ac",
+    "node_modules/@babylonjs/core/Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "node_modules/@babylonjs/core/Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "node_modules/@babylonjs/core/Materials/PBR/pbrBaseMaterial.pure.js": "fc3a71a18055e31c9e222a81294ad352d5d8a2088d97a65b04b208402302fbf5",
+    "node_modules/@babylonjs/core/Materials/effect.pure.js": "8bffd8b31a0ef5afd663c8c2234ed7064f87c617d22de5a1933a34e566aa0539",
+    "node_modules/@babylonjs/core/Materials/drawWrapper.js": "ecf5bc98dda701b691bc4e2ea0fe4a9a37a5dd82e2c4bd5c18c4a830aed6d297",
+    "node_modules/@babylonjs/core/Materials/material.pure.js": "57ea7fa9a4c31d7cefa2fbbfa5c7c53db85f1ea783447f0146b8b9b101343676"
+  },
+  "pinAfter": {
+    "node_modules/@babylonjs/core/package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79",
+    "node_modules/@babylonjs/core/Lights/Shadows/shadowGenerator.js": "2c094f0c900a6cffd385a17fe8e0ceafe04b801d0e4bb460784ca22223bd62ac",
+    "node_modules/@babylonjs/core/Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "node_modules/@babylonjs/core/Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "node_modules/@babylonjs/core/Materials/PBR/pbrBaseMaterial.pure.js": "fc3a71a18055e31c9e222a81294ad352d5d8a2088d97a65b04b208402302fbf5",
+    "node_modules/@babylonjs/core/Materials/effect.pure.js": "8bffd8b31a0ef5afd663c8c2234ed7064f87c617d22de5a1933a34e566aa0539",
+    "node_modules/@babylonjs/core/Materials/drawWrapper.js": "ecf5bc98dda701b691bc4e2ea0fe4a9a37a5dd82e2c4bd5c18c4a830aed6d297",
+    "node_modules/@babylonjs/core/Materials/material.pure.js": "57ea7fa9a4c31d7cefa2fbbfa5c7c53db85f1ea783447f0146b8b9b101343676"
+  },
+  "pinStable": true,
+  "untouchedInputBefore": {
+    "client/game.ts": "c3ad05b05d8d64e7a5b0033303a4fa7e330f793ea8bb54a8a0fec976a1384395",
+    "client/vegetation.ts": "af9a785adcd09b3c9173d9793e75e3165859c1ad73fb1fb2904d1108d9eb4a3b",
+    "client/tree-appearance.ts": "cdbb418181563e62c542fafdc7829b3160cf0072d5d29395cc1d618d5c44392a",
+    "client/tree-wind.ts": "7ecfdb5570a86a00c727f8578e3c6d1ccd70491179375933cd28b0dbaf34f558",
+    "client/strict-material-preparation.ts": "a1c384e975ddd5d4d5f7d6fcb917f916e37b82c7a4d00a79b10aa5a99d12019a"
+  },
+  "untouchedInputAfter": {
+    "client/game.ts": "c3ad05b05d8d64e7a5b0033303a4fa7e330f793ea8bb54a8a0fec976a1384395",
+    "client/vegetation.ts": "af9a785adcd09b3c9173d9793e75e3165859c1ad73fb1fb2904d1108d9eb4a3b",
+    "client/tree-appearance.ts": "cdbb418181563e62c542fafdc7829b3160cf0072d5d29395cc1d618d5c44392a",
+    "client/tree-wind.ts": "7ecfdb5570a86a00c727f8578e3c6d1ccd70491179375933cd28b0dbaf34f558",
+    "client/strict-material-preparation.ts": "a1c384e975ddd5d4d5f7d6fcb917f916e37b82c7a4d00a79b10aa5a99d12019a"
+  },
+  "untouchedInputsStable": true,
+  "typecheck": {
+    "api": "TypeScript createProgram(roots, current tsconfig options plus noEmit)",
+    "roots": [
+      "client/webgpu-shadow-readiness.ts",
+      "tests/webgpu-shadow-freshness.test.ts",
+      "tests/webgpu-shadow-pcf-state.test.ts"
+    ],
+    "diagnostics": 0,
+    "logSha256": "8129b1e29882d6f936f0896c94ba2396dc3cc149d3dc73fbdc9f9dfceccb4388",
+    "scope": "Exactly three source/test roots and imports; not pnpm build"
+  },
+  "red": {
+    "file": "red-verification.json",
+    "sha256": "8fadf82941142e7d8a1e3cecc9205951f10249e3202be8586c73c063a08acf7f",
+    "exitCode": 1,
+    "expectedRegressionFailure": true,
+    "runtimeSha256": "d1ed280ecc3c6530c1bef75ea49de34c65034dd41e9f3f0814333b9e7729ae9d",
+    "testSha256": "5b2378f0dd7bead1afb7a019ca45f1b00b3ebaca88ea8068bfcf60cb8fad660f",
+    "logSha256": "119c5a5c5e5bcff56cb7e616ec06600601cbced6ef9a91db845887f2cb108316"
+  },
+  "actualEvidence": {
+    "receipt": "7416b596-82e2-4f28-ba31-5ae53c8b8b28",
+    "source": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+    "finalValidationJobs": 812,
+    "newDerivedEffects": 406,
+    "material": 507,
+    "pass": 9,
+    "generator": 5,
+    "mesh": "tree__ipr-crown-029__lod1__leaves",
+    "actualColorWriteFlagObserved": false
+  },
+  "scope": "Actual CPU Scene/Mesh/PBR/Effect/Fresh/pinned ShadowDepthWrapper with native PCF getter and terminal NullEngine IO. Red/green fixed pass, base/depth identity, scalar state, full base+super+layout context, no-op/nested/filter/guard/false/throw/dispose, pending alpha texture and alpha/light freshness. No actual GPU/device image or startup/performance gain.",
+  "priorDevelopmentFailure": "First20/21 failed only because NullEngine raw texture upload never sets InternalTexture.isReady; fixture now first proves false, then supplies terminal upload-ready bit while retaining real PBR/texture readiness. Alpha-only and retirement-only passes succeeded.",
+  "runtimeDelta": "PCF-only original bool scope around entire existing readiness body; native getter, synchronous finally restore, zero setters for already-false/non-PCF/early guards; shared retirement/pass helper, no new permanent state or closure/cache policy.",
+  "actualGpuCausalityAccepted": false,
+  "rootRequired": "Fresh snapshot5 same-source before/after actual startup/health/owner churn/clear-shadow-alpha-light image and comparable performance. Receipt lacks actual colorWrite flag; CPU mechanism + actual owner flip is candidate evidence only.",
+  "testEnumRepair": "Previous37/37 run had one TS2339 due nonexistent test FILTER_ESM, so that item tested undefined. Replaced with actual pinned exponential/blur/close enum constants and integer guard; native non-PCF targeted pass then succeeded. This final source/log replaces that unaccepted compiler proof; runtime unchanged."
+}

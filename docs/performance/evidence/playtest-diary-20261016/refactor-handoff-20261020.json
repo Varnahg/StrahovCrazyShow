@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUTC": "2026-10-20T07:10:33.835Z",
+  "sender": "diary-01a141c7-root",
+  "receiver": "refactor-01a15658-audit",
+  "receiverThreadId": "01a15658-1415-7d41-9efe-6d3be9dd9f34",
+  "authorization": "Human explicitly approved safe handoff/narrowing of protected reservations in source thread; root verified user message with read_thread.",
+  "phase": "released-and-remaining-scope-reclaimed",
+  "scope": "Four unused diary reservations only; no product source or foreign main WIP transfer.",
+  "sourceRoot": "C:\\Users\\rezac\\.codex\\worktrees\\playtest-diary\\StrahovCrazyShow",
+  "sourceHead": "9d98ffc582ff5af148aa4b91ab64a031d88904ff",
+  "sourceBranch": "codex/playtest-diary",
+  "releasePaths": [
+    {
+      "path": "client/game.ts",
+      "bytes": 87780,
+      "sha256": "9b0b03f5b671f8d7a388ec538758e4890f52e23f29c8271df151605b601d69f7",
+      "workingBlob": "a9e28ac7abd73664050d8604186f9a385644d07e",
+      "headBlob": "a9e28ac7abd73664050d8604186f9a385644d07e"
+    },
+    {
+      "path": "client/ui.tsx",
+      "bytes": 104921,
+      "sha256": "4d6c1dc2203f25059c1d16de6355df71692de349437708d44a62ea6f4ba2433c",
+      "workingBlob": "9dc35d873151baa7de992b26bea3112782aea579",
+      "headBlob": "9dc35d873151baa7de992b26bea3112782aea579"
+    },
+    {
+      "path": "client/session-diagnostics.ts",
+      "bytes": 32253,
+      "sha256": "87ceadf7be528b9e7210bba6415880c2dc37706c6b6118cd51d25183b3a1ad4c",
+      "workingBlob": "f30c5910f9d358f3190db389589989c7b97c3c21",
+      "headBlob": "f30c5910f9d358f3190db389589989c7b97c3c21"
+    },
+    {
+      "path": "scripts/performance-snapshot.mjs",
+      "bytes": 6445,
+      "sha256": "3c8ebe999d51a83b70aaf664aaae2753fc3d2e13850563c98579e4a2a30d4efa",
+      "workingBlob": "1a7e7ea0cb31c00b3cd06afd6287e01717a712fb",
+      "headBlob": "1a7e7ea0cb31c00b3cd06afd6287e01717a712fb"
+    }
+  ],
+  "sourceDiff": {
+    "staged": "",
+    "unstaged": "",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "previousWritePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/session-diagnostics.ts",
+    "scripts/performance-snapshot.mjs",
+    "client/playtest-diary.ts",
+    "client/playtest-controls.tsx",
+    "tests/playtest-game.test.ts",
+    "tests/playtest-ui.test.ts",
+    "docs/agents/handoffs/playtest-diary-integration-20261016.md",
+    "docs/performance/evidence/playtest-diary-20261016/",
+    ".cache/playtest-diary-validation/"
+  ],
+  "remainingWritePaths": [
+    "client/playtest-diary.ts",
+    "client/playtest-controls.tsx",
+    "tests/playtest-game.test.ts",
+    "tests/playtest-ui.test.ts",
+    "docs/agents/handoffs/playtest-diary-integration-20261016.md",
+    "docs/performance/evidence/playtest-diary-20261016/",
+    ".cache/playtest-diary-validation/"
+  ],
+  "preservedDiaryWip": [
+    {
+      "path": "client/playtest-diary.ts",
+      "bytes": 11192,
+      "sha256": "26d2332e0b0f843efde1436aceaa58999ae677b5f61141ce8513f076f16654c8"
+    },
+    {
+      "path": "shared/playtest-diary.ts",
+      "bytes": 19028,
+      "sha256": "818d55aff03e4eadc98155dd7f72f7dcf11e2dff807b4f602bec3edce6a7ad6f"
+    },
+    {
+      "path": "client/playtest-timeline.ts",
+      "bytes": 23526,
+      "sha256": "86231fb098d8b6829efe7a0066eca0389b2b544f998c56a4cea049e6d32b1979"
+    },
+    {
+      "path": "client/playtest-capture.ts",
+      "bytes": 21613,
+      "sha256": "cf408483376eaa0303b2fcab9027305354a9d89c74d654954d693a2a08a164c8"
+    },
+    {
+      "path": "server/playtest-artifacts.ts",
+      "bytes": 20284,
+      "sha256": "d3f37fad4c5e0b13a98237ca9946516149840073e3863b4423d9d3f3ae0714ce"
+    },
+    {
+      "path": "tests/playtest-capture.test.ts",
+      "bytes": 12126,
+      "sha256": "bc779a567ab8a927bd0eb2d20ec3e68633adcdad7f266eaebe6855de4b94a880"
+    },
+    {
+      "path": "tests/playtest-artifacts.test.ts",
+      "bytes": 11703,
+      "sha256": "fda9308cbc0f4518c7ce54935d487a9bbf3a54c7c4815d1a8a65ca666f7d0969"
+    },
+    {
+      "path": "shared/playtest-scenarios.ts",
+      "bytes": 8000,
+      "sha256": "004de5d255b336e7ef11fa0c798794767e987d6e40ba125b4214045f1b99c7a8"
+    },
+    {
+      "path": "scripts/playtest-report.mjs",
+      "bytes": 29896,
+      "sha256": "7d70fba6f131eab747e7aabb313f6aebf02c308206f4436bdb728d2d4614032b"
+    },
+    {
+      "path": "scripts/playtest-review.mjs",
+      "bytes": 11677,
+      "sha256": "4ec1f7d6c7ff05a2858d5e61b80cd795823c0fa24344875659e202cde4eb25f3"
+    },
+    {
+      "path": "tests/playtest-scenarios.test.ts",
+      "bytes": 3478,
+      "sha256": "2ace85f87183b3ba3f1b78beecac4901d7dad8e38cc05e7efe1684cffb8170e3"
+    },
+    {
+      "path": "tests/playtest-report.test.ts",
+      "bytes": 13794,
+      "sha256": "873ed89accfa9a8128b2a13275ad05d2995daed59f1764b8e5f0982f8a4fbc26"
+    }
+  ],
+  "mainCheckoutObservation": {
+    "root": "C:/Users/rezac/Documents/GitHub/StrahovCrazyShow",
+    "head": "22de9054f8151227efab12b807f4d9c3ade079d3",
+    "files": [
+      {
+        "path": "client/game.ts",
+        "sha256": "388caed28049fd41b70d485446de2db65978c75de264949677e6ce486373dd68",
+        "unstagedNumstat": "468\t159\tclient/game.ts",
+        "stagedNumstat": ""
+      },
+      {
+        "path": "client/ui.tsx",
+        "sha256": "f417a1466c0ec321c0e0753d365384a0ad8a1554e31e3771d00eab4897aabe36",
+        "unstagedNumstat": "118\t18\tclient/ui.tsx",
+        "stagedNumstat": ""
+      },
+      {
+        "path": "client/session-diagnostics.ts",
+        "sha256": "87ceadf7be528b9e7210bba6415880c2dc37706c6b6118cd51d25183b3a1ad4c",
+        "unstagedNumstat": "",
+        "stagedNumstat": ""
+      },
+      {
+        "path": "scripts/performance-snapshot.mjs",
+        "sha256": "3c8ebe999d51a83b70aaf664aaae2753fc3d2e13850563c98579e4a2a30d4efa",
+        "unstagedNumstat": "",
+        "stagedNumstat": ""
+      }
+    ],
+    "ownership": "Separate existing main Game/UI WIP is not accepted, transferred, changed, or committed here."
+  },
+  "independentAudit": {
+    "agent": "/root/handoff_check",
+    "result": "Confirmed four empty staged/unstaged diffs and matching HEAD blobs; warned about separate main Game/UI WIP."
+  },
+  "verification": {
+    "newTestsRun": false,
+    "newBuildRun": false,
+    "newGpuRun": false,
+    "sourceWipChanged": false,
+    "retainedWipCount": 12,
+    "tests": "Historical partial reports only; see integration handoff. No completed diary production acceptance."
+  },
+  "startupEvidenceFromReceiver": {
+    "status": "reported-not-reproduced-by-diary",
+    "baseline": "db23fff9",
+    "baselineSnapshotPrefix": "336a9b1d",
+    "candidateSnapshotPrefix": "aa3feebd",
+    "description": "Receiver reports baseline and candidate light-preparation timeouts; no causal or GPU/FPS conclusion made by diary.",
+    "reference": "C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/refactor-20261020/docs/refactoring/20261020/world-visual/"
+  },
+  "preparedCommit": "9ebf7bcce23de1e0b759a54010d79b56ced6e716",
+  "confirmation": {
+    "atUTC": "2026-10-20T07:13:02.983Z",
+    "scopeMatches": true,
+    "remainingPaths": 7,
+    "resources": [],
+    "preservedWipUnchanged": 12,
+    "releasedFilesUnchanged": 4,
+    "catalogCopiesEqual": true,
+    "taskSha256": "bd1ce3c7ab248d78ae011814abfb7cd35191b577df988039e8b51948d28337ff",
+    "moduleClaimsRetained": true
+  }
+}

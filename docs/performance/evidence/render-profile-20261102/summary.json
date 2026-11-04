@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "status": "partial-blocked",
+  "consolidatedAtUTC": "2026-11-02T16:30:42.015Z",
+  "runtimeChanges": false,
+  "baseline": {
+    "gitHead": "fdc7b91911e1ef0ca655bddce7b6a8e077c907e2",
+    "sourceTestHash": "a03e0c635074c656ad73259b1626d3dafbe9e79ebd0a6e843f22c01fb684f904",
+    "sourceFiles": 945,
+    "publicHash": "45f088a91dbdc53456e8cfebb6fc50a2d3cd6914e9eba8ed197a946e947d2416",
+    "publicFiles": 8064,
+    "dependencyHash": "0cd7b6f311e9a568e2e51192f1e3924936597c51e90456f5d72444a43f78cb2c",
+    "harnessHash": "8fd35b5ef1f663ee858c34554435becb9cbc4d3c1f88db6843fa643e2982b4d8",
+    "clientBuildId": "\"sha256-b4c07eefee294169b54d51f3a6afcb523196b828fba7eb68fce54de9b9987f6f\""
+  },
+  "campaign": {
+    "plannedStarts": 3,
+    "attemptedStarts": 1,
+    "gameReadyStarts": 0,
+    "validSteadyIntervals": 0,
+    "realSdkPeersStarted": 0,
+    "requestedBackend": "webgpu",
+    "observedBackend": "webgpu",
+    "requestedQuality": "medium",
+    "requestedTargetFps": 60,
+    "qualityTargetConfirmedInGame": false,
+    "cssViewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "finalInternalResolution": {
+      "width": 1280,
+      "height": 720
+    },
+    "preparationLowResolution": {
+      "width": 984,
+      "height": 553
+    },
+    "daySummerPresetApplied": false,
+    "fullHudGameplayMeasured": false
+  },
+  "hardware": {
+    "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0",
+    "webgpuAdapter": {
+      "vendor": "nvidia",
+      "architecture": "pascal",
+      "driver": "unknown in browser"
+    },
+    "systemGpu": {
+      "name": "NVIDIA GeForce GTX 1060",
+      "driver": "582.28",
+      "memoryTotalMiB": 6144
+    },
+    "logicalProcessors": 12
+  },
+  "outcome": {
+    "startup": "light-preparation-timeout",
+    "lightPreparationMs": 30051.599999904633,
+    "diagnosticRecords": 153,
+    "firstSeq": 0,
+    "lastSeq": 152,
+    "missingSeq": [],
+    "sessionEndRecorded": false,
+    "fps": null,
+    "p95Ms": null,
+    "p99Ms": null,
+    "maxFrameMs": null,
+    "causeConfirmed": false,
+    "nextOptimization": null,
+    "networkLeftReason": "identity-change",
+    "campaignSessionEndComplete": false
+  },
+  "limitations": [
+    "One incomplete startup, no steady gameplay or three-player GPU proof.",
+    "Cold means new page/renderer; browser and driver caches were not cleared.",
+    "Native Edge window was observed minimized after failure; association with game tab and causality were not established. Browser events reported visible/focused.",
+    "Computer Use stopped the turn because it could not reliably validate the physical Edge window URL.",
+    "No successful full-game CPU sampling profile or GPU execution attribution. Async compilation latency sums overlap; do not sum nested CPU scopes.",
+    "System samples describe whole system/card, not game-only frame costs. Full raw telemetry and live-process metadata remain local.",
+    "Known unrelated full-suite failures remain unresolved; no new full-suite or pnpm test:integration run is claimed."
+  ],
+  "validation": {
+    "harnessTests": {
+      "pass": 7,
+      "fail": 0,
+      "log": "artifacts/harness-tests.log"
+    },
+    "productionBuild": {
+      "passed": true,
+      "log": "artifacts/build.log",
+      "method": "Unmodified production bootstrap, canonical main, build artifacts only; public assets served read-only"
+    },
+    "serverCleanup": "passed",
+    "systemCleanup": "passed",
+    "sdkLiveLifecycle": "not-run",
+    "catalogValidation": "581 definitions valid",
+    "syntax": "five mjs files passed node --check",
+    "finalReadOnlyReview": {
+      "blockers": []
+    },
+    "evidenceIntegrity": "Original hashes, committed index hashes and exact gzip roundtrip passed",
+    "whitespace": "Source/docs check passed with raw build.log and harness-tests.log excluded; exact log CRLF and original reporter trailing space deliberately preserved."
+  },
+  "evidence": {
+    "rawOriginals": [
+      {
+        "path": ".cache/render-profile-20261102/build/identity.json",
+        "bytes": 3458676,
+        "sha256": "9a12c49ad38d501a99eb9c0b9a69998ac80e3475f0ea5c92a2f4c48bc0ba2148"
+      },
+      {
+        "path": ".cache/render-profile-20261102/build/inputs-before.json",
+        "bytes": 3301714,
+        "sha256": "46d7cb009052e9ac09ef4c75462a2c3c621d13674b836afe66dee0e3dc7e64b2"
+      },
+      {
+        "path": ".cache/render-profile-20261102/build.log",
+        "bytes": 4020,
+        "sha256": "c3dfda36f02df12c06d1340c6359d42bff59463b8fdb5ced1e0135d0322db70f"
+      },
+      {
+        "path": ".cache/render-profile-20261102/consolidation-tests.log",
+        "bytes": 725,
+        "sha256": "a9f44aa76a71ffd8a3303730039828df2f71fb53d234a93248ad2ce51e616379"
+      },
+      {
+        "path": ".cache/render-profile-20261102/weather.json",
+        "bytes": 1003,
+        "sha256": "8c0ac330de88f58d0e8714cc662602d4f1e698cf2d81e09a7c3c149b22fe87af"
+      },
+      {
+        "path": ".cache/render-profile-20261102/runs/run1/start.json",
+        "bytes": 475,
+        "sha256": "75d1906c7f7741b20911b96f805b7422eb3a8e7453f2533a418889cee322f411"
+      },
+      {
+        "path": ".cache/render-profile-20261102/runs/run1/runtime.json",
+        "bytes": 766,
+        "sha256": "f2eaf37f9bf490fb996e1400b081f55651bc7b11a6ff1e8297524ce4992401c3"
+      },
+      {
+        "path": ".cache/render-profile-20261102/runs/run1/cleanup.json",
+        "bytes": 264,
+        "sha256": "3dea71aca6ce33d7bbd7ebd7fdc908056943bbecc4320274cff2d13200289f4f"
+      },
+      {
+        "path": ".cache/render-profile-20261102/runs/run1/system/runtime.json",
+        "bytes": 1324,
+        "sha256": "0435872ab39fa906d3322a55ce8ac531923cf890a7ddd8e841df4f9530dc4e9b"
+      },
+      {
+        "path": ".cache/render-profile-20261102/runs/run1/system/samples.jsonl",
+        "bytes": 28628920,
+        "sha256": "d2c93d5f517fdac55090a1cec2b31e2703a57754c0198ceb85603b1f29fbbed3"
+      },
+      {
+        "path": ".cache/render-profile-20261102/runs/run1/screenshots/startup-timeout.jpg",
+        "bytes": 37882,
+        "sha256": "e75d71ebaec6c86e031776351fe7ffcec659831af9b5aafad72ea9645cc704c9"
+      },
+      {
+        "path": ".cache/game-diagnostics/60df969b-8a9e-4cb4-80be-e2558f17880c.jsonl",
+        "bytes": 72477,
+        "sha256": "a95d023307990c750479d51a41e4d85fc0e2dff1b155347342ea504b5c026fad"
+      }
+    ],
+    "committedArtifacts": [
+      {
+        "path": "artifacts/build-identity.json.gz",
+        "bytes": 905629,
+        "sha256": "fc00eef441b0919c2898fb2052916e794e1264cef0c391aaa78a0311ec47cd9b"
+      },
+      {
+        "path": "artifacts/build.log",
+        "bytes": 4020,
+        "sha256": "c3dfda36f02df12c06d1340c6359d42bff59463b8fdb5ced1e0135d0322db70f"
+      },
+      {
+        "path": "artifacts/cleanup-result.json",
+        "bytes": 662,
+        "sha256": "46aba680e583d1e729c3d9144eaba73a580a47e484267fcd3461cf842d6861e4"
+      },
+      {
+        "path": "artifacts/harness-tests.log",
+        "bytes": 725,
+        "sha256": "a9f44aa76a71ffd8a3303730039828df2f71fb53d234a93248ad2ce51e616379"
+      },
+      {
+        "path": "artifacts/startup-events.json",
+        "bytes": 12138,
+        "sha256": "9c10f190b3c68f2b6d171d980e0088664003cdca0f4efb9d40f8d169f1dd1c3a"
+      },
+      {
+        "path": "artifacts/startup-timeout.jpg",
+        "bytes": 37882,
+        "sha256": "e75d71ebaec6c86e031776351fe7ffcec659831af9b5aafad72ea9645cc704c9"
+      },
+      {
+        "path": "artifacts/weather.json",
+        "bytes": 1003,
+        "sha256": "8c0ac330de88f58d0e8714cc662602d4f1e698cf2d81e09a7c3c149b22fe87af"
+      }
+    ]
+  },
+  "cleanupBrowser": {
+    "viewportReset": true,
+    "own4179TabsRemaining": 0,
+    "verifiedAtUTC": "2026-11-02T16:33:23.795Z",
+    "method": "CUA viewport.reset and browser3 tab inventory"
+  }
+}

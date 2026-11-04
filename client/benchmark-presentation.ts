@@ -1,3 +1,26 @@
+import { assessFrameSample } from "../shared/gameplay-acceptance";
+
+/** A frame-sample verdict never establishes smooth movement or networking. */
+export function assessBenchmarkFrames(result: {
+  frameIntervalsMs?: unknown;
+  frames?: number;
+  rendering?: { targetFps?: number };
+  renderErrorCount?: number;
+  assetLoadErrorCount?: number;
+  renderHealth?: { valid: boolean };
+}) {
+  const target = result.rendering?.targetFps;
+  const supportedTarget = target === 60 || target === 120 || target === 144;
+  const complete = Array.isArray(result.frameIntervalsMs) &&
+    result.frameIntervalsMs.length === result.frames;
+  const healthy = result.renderErrorCount === 0 &&
+    result.assetLoadErrorCount === 0 && result.renderHealth?.valid === true;
+  return assessFrameSample(
+    complete && healthy && supportedTarget ? result.frameIntervalsMs : undefined,
+    supportedTarget ? { targetFps: target } : undefined,
+  );
+}
+
 /** Keep frame samples and diagnostic counters inspectable without placing the
  * per-mesh inventory into one enormous DOM/accessibility text node. The original
  * result remains intact for the explicit full-record download and local save. */

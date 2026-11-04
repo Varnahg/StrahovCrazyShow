@@ -1,0 +1,151 @@
+diff --git a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/common.mjs b/.cache/webgpu-completion-20261021/entry-render/helper/v11/common.mjs
+index 6d189b08..10f6a77c 100644
+--- a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/common.mjs
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v11/common.mjs
+@@ -52,7 +52,7 @@ export async function directoryHashes(directory) {
+ }
+ export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
+   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
+-  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'README.md'];
++  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'README.md'];
+ export function parseBuildOptions(args) {
+   const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false, lifecycleControls: false };
+   let loadingSeen = false;
+diff --git a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/harness.mjs b/.cache/webgpu-completion-20261021/entry-render/helper/v11/harness.mjs
+index 2082e897..cbc73699 100644
+--- a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/harness.mjs
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v11/harness.mjs
+@@ -147,6 +147,8 @@ export async function run(command, input, output, label, option = 'original', ..
+     const transitClock = await readFile(join(helperDirectory, 'transit-clock.mjs'), 'utf8');
+     const startupLatency = await readFile(join(helperDirectory, 'startup-latency.mjs'), 'utf8');
+     const lifecycleControls = await readFile(join(helperDirectory, 'lifecycle-controls.mjs'), 'utf8');
++    const entryRender = await readFile(join(helperDirectory, 'entry-render-cost.mjs'), 'utf8');
++    const entryClasses = 'export { Game } from ' + JSON.stringify(join(snapshot, 'client/game.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { Scene } from "@babylonjs/core/scene.js";export { GltfLightBudget } from ' + JSON.stringify(join(snapshot, 'client/gltf-light-budget.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { StableLightState } from ' + JSON.stringify(join(snapshot, 'client/stable-light-state.ts').replaceAll(String.fromCharCode(92), '/')) + ';';
+     const routineCore = await readFile(join(helperDirectory, 'routine-cost-core.mjs'), 'utf8');
+     const routineCost = (await readFile(join(helperDirectory, 'routine-cost.mjs'), 'utf8'))
+       .replace("'./routine-cost-core.mjs'", "'virtual:webgpu-completion-routine-core'");
+@@ -186,6 +188,8 @@ export async function run(command, input, output, label, option = 'original', ..
+       build: { outDir: join(directory, 'dist'), emptyOutDir: false, copyPublicDir: false, sourcemap: true },
+       plugins: [{ name: 'explicit-webgpu-completion-qa', enforce: 'pre',
+         resolveId(id) {
++          if (id === 'virtual:webgpu-completion-entry-render') return '\0virtual:webgpu-completion-entry-render';
++          if (id === 'virtual:webgpu-completion-entry-classes') return '\0virtual:webgpu-completion-entry-classes';
+           if (id === 'virtual:webgpu-completion-qa') return virtual;
+           if (id === 'virtual:webgpu-completion-observer') return virtualObserver;
+           if (id === 'virtual:webgpu-completion-attempts') return virtualAttempts;
+@@ -202,6 +206,8 @@ export async function run(command, input, output, label, option = 'original', ..
+           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
+         },
+         load(id) {
++          if (id === '\0virtual:webgpu-completion-entry-render') return entryRender;
++          if (id === '\0virtual:webgpu-completion-entry-classes') return entryClasses;
+           if (id === virtual) return overlay;
+           if (id === virtualObserver) return observer;
+           if (id === virtualAttempts) return attempts;
+diff --git a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/qa-overlay.mjs b/.cache/webgpu-completion-20261021/entry-render/helper/v11/qa-overlay.mjs
+index ad714508..89840fdb 100644
+--- a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/qa-overlay.mjs
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v11/qa-overlay.mjs
+@@ -5,6 +5,8 @@ import { createPlannedBenchmark } from 'virtual:webgpu-completion-clock';
+ import { observeStartupLatency } from 'virtual:webgpu-completion-startup-latency';
+ import { createShaderAttributionWindow, projectShaderInventory } from 'virtual:webgpu-completion-shader-attribution';
+ import { captureRoutineCost } from 'virtual:webgpu-completion-routine-cost';
++import { captureEntryRenderCost } from 'virtual:webgpu-completion-entry-render';
++import { Game, Scene, GltfLightBudget, StableLightState } from 'virtual:webgpu-completion-entry-classes';
+ import { observeBufferLifecycle } from 'virtual:webgpu-completion-buffer-lifecycle';
+ import { createLifecycleControls, createVisibilityAnchor } from 'virtual:webgpu-completion-lifecycle-controls';
+ 
+@@ -139,7 +141,7 @@ export async function observeStartup(game, canvas, start) {
+   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
+   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
+   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
+-  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, routineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
++  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, routineOwner, entryOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
+   const clockAbort = new AbortController();
+   const samples = [], observerErrors = [], buttons = [];
+   const ownerId = crypto.randomUUID();
+@@ -315,6 +317,27 @@ export async function observeStartup(game, canvas, start) {
+     }
+     await persist(raw);
+   });
++  if (identity.routineCost) {
++    const expected = { classes: { Game, Scene, GltfLightBudget, StableLightState }, methods: {
++      prepareFrame: GltfLightBudget.prototype.prepareFrame, update: StableLightState.prototype.update, render: Scene.prototype.render } };
++    action('Diagnostic · první vstup do auta /8 framů /3 render fáze', async () => {
++      controls.open = false;
++      const raw = { ...envelope('vehicle-entry-cost'), completed: false, before: snapshot(), after: null, entryProfile: null, validationErrors: [],
++        scope: 'First observed foot-to-vehicle after explicit arm; coldness requires fresh Game/session evidence. Original prelude/Scene CPU only, never GPU/submission/FPS.' };
++      try {
++        entryOwner = captureEntryRenderCost(gameRef, { enabled: identity.routineCost, expected, signal: clockAbort.signal,
++          isCurrent: () => !disposed && gameRef === game });
++        raw.entryProfile = await entryOwner.done;
++        raw.completed = raw.entryProfile.complete;
++        if (!raw.completed) raw.validationErrors.push('Entry diagnostic incomplete: ' + raw.entryProfile.reason);
++      } catch (error) { raw.failure = errorText(error); raw.validationErrors.push(raw.failure.message); }
++      finally {
++        entryOwner?.dispose(); raw.entryProfile ??= entryOwner?.snapshot() ?? null; entryOwner = undefined;
++        raw.after = snapshot(); raw.observerErrors = [...observerErrors];
++      }
++      await persist(raw);
++    });
++  }
+   if (identity.clock?.config.benchmarkAtUTC !== undefined) action('Naplánovat jediný 10s benchmark UTC', async () => {
+     const armedBefore = snapshot(), config = identity.clock.config;
+     const invalid = plan => persist({ ...envelope('benchmark'), completed: false, plannedStart: plan,
+@@ -371,7 +394,7 @@ export async function observeStartup(game, canvas, start) {
+     if (!clockAbort.signal.aborted) {
+       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
+     }
+-    attributionWindow?.dispose(); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
++    attributionWindow?.dispose(); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
+     lifecycleOwner?.dispose(); preparationOwner?.dispose();
+     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
+   };
+diff --git a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/receipt.mjs b/.cache/webgpu-completion-20261021/entry-render/helper/v11/receipt.mjs
+index a544d70b..cdd29416 100644
+--- a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/receipt.mjs
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v11/receipt.mjs
+@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
+ import { join } from 'node:path';
+ import { sha256 } from './common.mjs';
+ import { validateRoutineProfile } from './routine-cost-core.mjs';
++import { validateEntryRenderProfile } from './entry-render-cost.mjs';
+ import { validateBufferTrace } from './buffer-lifecycle-core.mjs';
+ 
+ export const MAX_RECEIPT_BYTES = 2 * 1024 * 1024;
+@@ -10,7 +11,7 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{1
+ export function validateReceipt(value, identity) {
+   if (!value || value.schemaVersion !== 1 || !uuid.test(value.attemptId ?? '') ||
+       value.buildId !== identity.buildId || value.sourceSnapshotId !== identity.sourceSnapshotId ||
+-      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle'].includes(value.kind) ||
++      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle','vehicle-entry-cost'].includes(value.kind) ||
+       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
+   if (typeof identity.lifecycleControls !== 'boolean' || value.lifecycleControls !== identity.lifecycleControls ||
+       (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
+@@ -34,6 +35,12 @@ export function validateReceipt(value, identity) {
+     if(identity.bufferLifecycle!==true||value.bufferLifecycle!==true||value.mode!=='diagnostic'||!value.bufferTrace||value.bufferTrace.active!==false)throw new Error('Buffer lifecycle diagnostic identity/evidence missing');
+     validateBufferTrace(value.bufferTrace);
+   }
++  if (value.kind === 'vehicle-entry-cost') {
++    if (identity.routineCost !== true || value.routineCost !== true || value.mode !== 'diagnostic' || !value.before || !value.after ||
++        !Array.isArray(value.validationErrors) || value.validationErrors.length > 16 || typeof value.completed !== 'boolean') throw new Error('Entry diagnostic identity/evidence missing');
++    if (value.entryProfile) validateEntryRenderProfile(value.entryProfile);
++    if (value.completed && value.entryProfile?.complete !== true) throw new Error('Entry completion missing');
++  }
+   if (value.kind === 'routine-cost') {
+     if (identity.routineCost !== true || value.routineCost !== true || value.mode !== 'diagnostic' || !value.before || !value.after ||
+         !Array.isArray(value.validationErrors) || typeof value.completed !== 'boolean') throw new Error('Routine diagnostic identity/evidence missing');
+diff --git a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/README.md b/.cache/webgpu-completion-20261021/entry-render/helper/v11/README.md
+index 82590dda..70ad60f2 100644
+--- a/.cache/webgpu-completion-20261021/preparation-summary/helper/v10/README.md
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v11/README.md
+@@ -1,3 +1,9 @@
++# V11 entry/prelude diagnostic
++
++Existing --routine-cost additionally offers a separate first-observed-entry button. It waits for the original accepted Actor false→true at outer prepareFrame and captures8 original prepare→stable→Scene chains under one30s deadline. First/cold is a fresh-session claim, never inferred from this observer alone. Original eight-routine button/modules are unchanged. New vehicle-entry-cost receipt records per-frame wall timestamps, engine and scene IDs, vehicle flags, three outer scopes, overlapping nested work and explicit failure/restoration evidence. glTF direct refresh inside Scene is included in Scene only. Engine ID stays unchanged inside render; Scene progresses1. No product/GPU/readiness/input/network calls are added. Exact snapshot singleton classes/methods, lifecycle and foreign-descriptor guards; defaultoff no hooks or Game reads. Only one installed attempt per Game.
++
++Use a fresh immutable helper build. Root alone runs actual first-entry capture. CPU fixtures are not GPU image, submission, performance or cold-entry acceptance. Public entry-render-helper evidence records research/variants, all source/protected hashes and exact verification.
++
+ Native Promise observation is restricted to the original vanilla native-prototype/constructor/species shape; exotic constructor/species accessors are not invoked and produce truthful unsupported-promise evidence. Original return is still untouched. Missing own renderer/generation identity refuses observation. CPU fixtures use deliberately synthetic scalar timing values; they are not recovered source10 timings.
+ 
+ # QA v10: bounded original preparation result

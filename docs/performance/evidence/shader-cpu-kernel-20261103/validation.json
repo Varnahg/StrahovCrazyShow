@@ -1,0 +1,211 @@
+{
+  "createdAt": "2026-11-03T14:59:57.804Z",
+  "task": "shader-cpu-kernel-20261103",
+  "owner": "shader-kernel-20261103-cpu",
+  "status": "CPU kernel research complete; no production optimization",
+  "tests": [
+    {
+      "log": ".cache/shader-cpu-kernel-20261103/tests-1.log",
+      "pass": 2,
+      "fail": 0,
+      "exitCode": 0
+    },
+    {
+      "log": ".cache/shader-cpu-kernel-20261103/tests-2.log",
+      "pass": 2,
+      "fail": 0,
+      "exitCode": 0,
+      "durationMs": 2055.97
+    }
+  ],
+  "review": {
+    "finding": "v1 statistical classifier attributed generic conversion callback to includes",
+    "resolution": "v2 conversion/callback precedence and synthetic regression; same raw profile reanalyzed; exact bracket instrumentation unchanged",
+    "v1Superseded": true
+  },
+  "preflight": [
+    {
+      "attempt": 1,
+      "exitCode": 1,
+      "issue": "Wrong harness assumption: actual standard material had processCodeAfterIncludes callback. Tool output captured; no disk log existed yet.",
+      "resolution": "Actual callback preserved; no production code changed"
+    },
+    {
+      "attempt": 2,
+      "exitCode": 1,
+      "issue": "Shadow shader dynamic import not settled",
+      "resolution": "Await actual _initShaderSourceAsync(false)"
+    },
+    {
+      "attempt": 3,
+      "exitCode": 1,
+      "issue": "Fake final Effect lacked getEngine for deferred disposal",
+      "resolution": "Stub supplies owning NullEngine; kernel smoke and both test runs passed"
+    }
+  ],
+  "sources": [
+    {
+      "path": "docs/performance/evidence/shader-cpu-kernel-20261103/fixtures.mjs",
+      "bytes": 6264,
+      "sha256": "4745414d7c626cd01141ff5ecbeedbe364d518b93fc625bd219ab92e227dc5fd"
+    },
+    {
+      "path": "docs/performance/evidence/shader-cpu-kernel-20261103/kernel.mjs",
+      "bytes": 7885,
+      "sha256": "213822ecec096b936f23744447a62e79712106af340d83f244031369eab949e1"
+    },
+    {
+      "path": "docs/performance/evidence/shader-cpu-kernel-20261103/harness.mjs",
+      "bytes": 8780,
+      "sha256": "bdafc0b1c6ea14feb39717128b1a5764a494ac180dee322a4b0fa78fbba2e853"
+    },
+    {
+      "path": "docs/performance/evidence/shader-cpu-kernel-20261103/profile-summary.mjs",
+      "bytes": 2987,
+      "sha256": "f8c563cbb7337dfb1da5869e0e9bd016a7017480283ba8d1ab9c99701863ccc2"
+    },
+    {
+      "path": "docs/performance/evidence/shader-cpu-kernel-20261103/survey.mjs",
+      "bytes": 6182,
+      "sha256": "857a0d55dc1fe1322038d4c5bb157b1eb4f349504ecc266ae03c09d49b842e88"
+    },
+    {
+      "path": "docs/performance/evidence/shader-cpu-kernel-20261103/kernel.test.mjs",
+      "bytes": 3373,
+      "sha256": "71f9e404b279c01f61a226cc476b61b82bb1ab08298a7a2e997d23ddb1d7c5ff"
+    },
+    {
+      "path": "docs/performance/evidence/shader-cpu-kernel-20261103/README.md",
+      "bytes": 9741,
+      "sha256": "dbe3ae376d2dd5945ecc911032b4fcbaca225f0a9039012d231eb8c8dddb051b"
+    }
+  ],
+  "archives": [
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/run1/results.json",
+      "originalBytes": 1151339,
+      "originalSha256": "bde798974c54cefdfb0fd26c58562efb2e1408540597e4d3a68ab77e7494359a",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\paired-results.json.gz",
+      "artifactBytes": 60823,
+      "artifactSha256": "79266ac7b7b55847395ddd58522ceac26670c114ebc0dd068dd8eee3de8e8e19",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/native-profile/results.json",
+      "originalBytes": 690795,
+      "originalSha256": "3dbb16b088a0ffa8569f133f484d3efc3f487b9e2b1ea00aaa7242b60eebc153",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\native-results.json.gz",
+      "artifactBytes": 26673,
+      "artifactSha256": "64a902c2739044545e7aa916cf748c2aa7d3c0318b9894a9a3d7385e095d12cf",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/profile1/kernel.cpuprofile",
+      "originalBytes": 456639,
+      "originalSha256": "9e95bf74881306d1cf250fe9a7b09a258df4599fbb242d16417935c98f75abf8",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\kernel.cpuprofile.gz",
+      "artifactBytes": 43988,
+      "artifactSha256": "8794469fc6370b393b5f8bb263abbe68f769efec779fb94ae79545f80e7ef36c",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/survey2/survey.json",
+      "originalBytes": 43984,
+      "originalSha256": "5a0343cdfdb0453238f3633e4efd269f7ab93077f27afbbea8d41c7f53cc8782",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\first-sweep.json.gz",
+      "artifactBytes": 4486,
+      "artifactSha256": "b7be0d5ed6a22fefe23007113682baf7e7de53d043279049cd8a40f5b3e0a059",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/tests-1.log",
+      "originalBytes": 372,
+      "originalSha256": "270b0a96b531061fd67dd863e54ee6448146f3be79cfd9bc310f0716e268be5c",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\tests-1.log.gz",
+      "artifactBytes": 287,
+      "artifactSha256": "87c2426275b39d9f8b860e93ec3de38aee557fc3292eccac8f3a501eeaccf0ab",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/tests-2.log",
+      "originalBytes": 371,
+      "originalSha256": "94dfc01b631a8f5bcefa63d9e8add5fe823269659daf964e7e434a822d6bb1ac",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\tests-2.log.gz",
+      "artifactBytes": 284,
+      "artifactSha256": "ba264c64baa0b88115dbd7a877a30e1a230094df5059ed9a6accbee15e391a82",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/corpus-smoke-2.log",
+      "originalBytes": 905,
+      "originalSha256": "7a3b952424e70bc58aba6f2f17d68c0e6a1813a64e4c09c5f50e758131a57a6c",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\preflight-2.log.gz",
+      "artifactBytes": 517,
+      "artifactSha256": "4cd78a3c4eeab9d21257b413b0c6a2db7b023d28b12a2d141c21daf693613413",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/corpus-smoke-3.log",
+      "originalBytes": 6094,
+      "originalSha256": "5d50653ff43fbad19a1de65d8e6917bd97de7a5c5f393cb50c95d95a2fbe658c",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\preflight-3.log.gz",
+      "artifactBytes": 740,
+      "artifactSha256": "69c2ee2d1357f2c3ec93d0e30a34b82035e6ffa38088b600f02f811600ab82aa",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/kernel-smoke-1.log",
+      "originalBytes": 4036,
+      "originalSha256": "7a775ec7227db9778df1c35cd71c0291e673a2bbf9bd0966dc2d2d7100e278bc",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\kernel-smoke.log.gz",
+      "artifactBytes": 527,
+      "artifactSha256": "16d7c72f061862f4ea0706182a61a942684c9f73b2a8b98aac5a320042f22bc5",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/run1.log",
+      "originalBytes": 790,
+      "originalSha256": "747ff1a2b8fef5f69cf9fe3d24fd0b175191e8a2c9ae60ea336d70e7a61e0ac1",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\paired.log.gz",
+      "artifactBytes": 372,
+      "artifactSha256": "7c1f9b95ac7ae69aa3cb6be4b15a760b5cdc89f45594682122dd2327672868e0",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/native-profile.log",
+      "originalBytes": 301,
+      "originalSha256": "1de76818346fa7dd1311be5692bf8ce46a0acb44dba2ed69c324724213077d5b",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\native-profile.log.gz",
+      "artifactBytes": 254,
+      "artifactSha256": "844461b17e7e12f122f11449efef5b34e0ab454821695f29da447c98fd93f5ee",
+      "decompressionParity": true
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/profile1/summary-v2.json",
+      "originalSha256": "0039a097bf4f44176bb1b1a8dcb8a1840453b16f8f62365a602f15cddc5dd423",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\profile-summary-v2.json",
+      "artifactBytes": 7609,
+      "artifactSha256": "0039a097bf4f44176bb1b1a8dcb8a1840453b16f8f62365a602f15cddc5dd423"
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/profile1/summary.json",
+      "originalSha256": "e958bd493f5cd0a53c2eed1014197b4a8467c27a6595837d4b7aa8ec34a8c7dc",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\profile-summary-v1-superseded.json",
+      "artifactBytes": 7388,
+      "artifactSha256": "e958bd493f5cd0a53c2eed1014197b4a8467c27a6595837d4b7aa8ec34a8c7dc"
+    },
+    {
+      "original": ".cache/shader-cpu-kernel-20261103/profile1/classifier-v1.mjs",
+      "originalSha256": "cfededdc066868ef2f673cd6f19459f90ee78f1faae0bd645f71534956fb9d1a",
+      "artifact": "docs\\performance\\evidence\\shader-cpu-kernel-20261103\\artifacts\\classifier-v1-superseded.mjs",
+      "artifactBytes": 2873,
+      "artifactSha256": "cfededdc066868ef2f673cd6f19459f90ee78f1faae0bd645f71534956fb9d1a"
+    }
+  ],
+  "limitations": [
+    "Synthetic selected native material contracts, not full browser corpus or real GPU acceptance",
+    "Repeated timed kernel calls localize work; distinct-Effect first-sweep census is the cache-reuse evidence",
+    "No production cache, dependency edit, GPU, full build or full test suite"
+  ],
+  "processes": "All spawned CPU commands completed; no server/ports started"
+}

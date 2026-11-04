@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createEmbeddingProfile, createOpenAIEmbedder } from "../server/rag-embeddings";
 import { createVectorKnowledgeStore, migrateRagSchema } from "../server/rag-vector-store";
-import { importRagCorpus, importDocumentChanges, parseDocumentChangeSet, type RagDocumentChangeSet } from "../server/rag-ingest";
+import { importRagCorpus, importDocumentChanges, parseDocumentChangeSet, previewDocumentChanges, type RagDocumentChangeSet } from "../server/rag-ingest";
 
 export const RAG_CURRENT_FILES = ["server/data/silicon-hill-knowledge.json", "server/data/rag/silicon-hill.json", "server/data/rag/suz.json"] as const;
 export const RAG_ARCHIVE_FILES = ["server/data/rag/silicon-hill-archive.json", "server/data/rag/suz-archive.json"] as const;
@@ -52,7 +52,7 @@ export async function loadDocumentChangeFile(path: string): Promise<RagDocumentC
 }
 export async function ragImportMain(args = process.argv.slice(2), env: NodeJS.ProcessEnv = process.env) {
   const [command] = args, connectionString = env.RAG_DATABASE_URL;
-  if (!connectionString || !["migrate", "status", "import", "import-documents"].includes(command)) throw new Error("rag-configuration-required");
+  if (!connectionString || !["migrate", "status", "import", "import-documents", "preview-documents"].includes(command)) throw new Error("rag-configuration-required");
   const controller = new AbortController();
   const cancel = () => controller.abort(); process.once("SIGINT", cancel); process.once("SIGTERM", cancel);
   try {
@@ -60,7 +60,7 @@ export async function ragImportMain(args = process.argv.slice(2), env: NodeJS.Pr
       argumentsOnly(args, ["--reader-role", "--ingester-role"]);
       await migrateRagSchema({ connectionString, readerRole: option(args, "--reader-role") ?? (env.RAG_READER_ROLE?.trim() || undefined),
         ingesterRole: option(args, "--ingester-role") ?? (env.RAG_INGESTER_ROLE?.trim() || undefined) }, controller.signal);
-      return { schemaVersion: 2, migrated: true };
+      return { schemaVersion: 3, migrated: true };
     }
     if (command === "status") {
       argumentsOnly(args, ["--scope", "--as-of"]);
@@ -71,6 +71,13 @@ export async function ragImportMain(args = process.argv.slice(2), env: NodeJS.Pr
         return scope === undefined ? { active: await store.captureActive(controller.signal) }
           : { search: await store.captureSearch(scope === "current" ? { kind: "current" } : { kind: "archive", ...(asOf === undefined ? {} : { asOf }) }, controller.signal) };
       } finally { await store.close(); }
+    }
+    if (command === "preview-documents") {
+      argumentsOnly(args, ["--input"]);
+      const path = option(args, "--input"); if (!path) throw new Error("document-change-file-required");
+      const profile = createEmbeddingProfile({ model: env.OPENAI_EMBEDDING_MODEL?.trim() || undefined,
+        dimensions: env.OPENAI_EMBEDDING_DIMENSIONS === undefined ? undefined : Number(env.OPENAI_EMBEDDING_DIMENSIONS), inputVersion: "title-heading-text-v2" });
+      return await previewDocumentChanges({ connectionString, changes: await loadDocumentChangeFile(path), profile, signal: controller.signal });
     }
     const maxEmbeddingInputs = budget(args, "--max-inputs"), maxEmbeddingBytes = budget(args, "--max-bytes");
     argumentsOnly(args, ["--max-inputs", "--max-bytes", ...(command === "import-documents" ? ["--input"] : [])], ["--retry-uncertain"]);

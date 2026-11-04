@@ -30,6 +30,29 @@ const controls = (seq: number) => ({
   vehicle: false,
 });
 
+test("recovery epoch follows validated receipts independently of application and is cleared by lifecycle", () => {
+  const buffer = new AuthorityBuffer();
+  assert.equal(buffer.inputEpoch, null);
+  assert.equal(buffer.offer({ ...packet(0), inputEpoch: NaN }, 0).kind, "rejected");
+  assert.equal(buffer.inputEpoch, null);
+  buffer.offer(packet(0, 4, 100), 1);
+  assert.equal(buffer.inputEpoch, 4);
+  buffer.offer(packet(1, 4, 100), 2);
+  buffer.takeLatest();
+  assert.equal(buffer.inputEpoch, 4, "draining cannot erase the validated frontier");
+  buffer.offer(packet(0, 5, 102), 3);
+  buffer.offer(packet(104, 4), 4);
+  assert.equal(buffer.inputEpoch, 5, "rejected old epochs cannot replace the token");
+  buffer.reset();
+  assert.equal(buffer.inputEpoch, null);
+  buffer.offer(packet(0), 5);
+  assert.equal(buffer.inputEpoch, 1);
+  buffer.dispose();
+  assert.equal(buffer.inputEpoch, null);
+  assert.equal(buffer.offer(packet(0, 6), 6).kind, "rejected");
+  assert.equal(buffer.inputEpoch, null);
+});
+
 test("80 queued snapshots become one ordinary reconciliation with the original receipt time", () => {
   const buffer = new AuthorityBuffer(),
     timeline = new NetworkTimeline();

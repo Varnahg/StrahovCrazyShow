@@ -1,0 +1,443 @@
+TAP version 13
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:28]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual native preview rejects absent query producer and releases its initialized engine
+ok 1 - actual native preview rejects absent query producer and releases its initialized engine
+  ---
+  duration_ms: 11.9796
+  type: 'test'
+  ...
+# Subtest: preview ready follows begin/render/end, submitted work and shader compilation info
+ok 2 - preview ready follows begin/render/end, submitted work and shader compilation info
+  ---
+  duration_ms: 6.2637
+  type: 'test'
+  ...
+# Subtest: the last profile selected during engine initialization and submission wins
+ok 3 - the last profile selected during engine initialization and submission wins
+  ---
+  duration_ms: 2.4786
+  type: 'test'
+  ...
+# Subtest: abort before init creates nothing and a late initialized engine is disposed
+ok 4 - abort before init creates nothing and a late initialized engine is disposed
+  ---
+  duration_ms: 3.0013
+  type: 'test'
+  ...
+# Subtest: abort after init or during pending submission clears owners and ignores late completion
+ok 5 - abort after init or during pending submission clears owners and ignores late completion
+  ---
+  duration_ms: 3.9726
+  type: 'test'
+  ...
+# Subtest: surface constructor failure and detached canvas release the initialized engine
+ok 6 - surface constructor failure and detached canvas release the initialized engine
+  ---
+  duration_ms: 2.249
+  type: 'test'
+  ...
+# Subtest: native scope and module errors reject preparation without marking ready
+ok 7 - native scope and module errors reject preparation without marking ready
+  ---
+  duration_ms: 4.5762
+  type: 'test'
+  ...
+# Subtest: render failure skips pinned end/flush/submit and never leaves a live preview
+ok 8 - render failure skips pinned end/flush/submit and never leaves a live preview
+  ---
+  duration_ms: 1.3076
+  type: 'test'
+  ...
+# Subtest: preview rejects truthy and falsy render failures before never-settling GPU work and consumes late scope rejection
+ok 9 - preview rejects truthy and falsy render failures before never-settling GPU work and consumes late scope rejection
+  ---
+  duration_ms: 4.2341
+  type: 'test'
+  ...
+# Subtest: preview preserves source error before throwing scope cleanup and state observers
+ok 10 - preview preserves source error before throwing scope cleanup and state observers
+  ---
+  duration_ms: 1.4765
+  type: 'test'
+  ...
+# Subtest: preview abort inside render closes its scope without submitting the disposed owner
+ok 11 - preview abort inside render closes its scope without submitting the disposed owner
+  ---
+  duration_ms: 1.1999
+  type: 'test'
+  ...
+# Subtest: preview engine-dispose inside render closes its scope without submitting the disposed owner
+ok 12 - preview engine-dispose inside render closes its scope without submitting the disposed owner
+  ---
+  duration_ms: 0.723
+  type: 'test'
+  ...
+# Subtest: hidden preparation pauses budget and RAF, then resumes with current DPR
+ok 13 - hidden preparation pauses budget and RAF, then resumes with current DPR
+  ---
+  duration_ms: 0.8733
+  type: 'test'
+  ...
+# Subtest: unsupported is distinct from device failure and never constructs a surface
+ok 14 - unsupported is distinct from device failure and never constructs a surface
+  ---
+  duration_ms: 0.7248
+  type: 'test'
+  ...
+# Subtest: scene readiness needs a prepared frame after the progress render
+ok 15 - scene readiness needs a prepared frame after the progress render
+  ---
+  duration_ms: 1.11
+  type: 'test'
+  ...
+# Subtest: a lost preview generation cannot become ready when its pending GPU work finishes
+ok 16 - a lost preview generation cannot become ready when its pending GPU work finishes
+  ---
+  duration_ms: 0.9782
+  type: 'test'
+  ...
+# Subtest: visible preparation has a bounded deadline and cleans a never-ready scene
+ok 17 - visible preparation has a bounded deadline and cleans a never-ready scene
+  ---
+  duration_ms: 1.0438
+  type: 'test'
+  ...
+# Subtest: visible deadline is checked without dispatching the late timer after before-frame
+ok 18 - visible deadline is checked without dispatching the late timer after before-frame
+  ---
+  duration_ms: 0.8512
+  type: 'test'
+  ...
+# Subtest: visible deadline is checked without dispatching the late timer after render
+ok 19 - visible deadline is checked without dispatching the late timer after render
+  ---
+  duration_ms: 0.6345
+  type: 'test'
+  ...
+# Subtest: visible deadline is checked without dispatching the late timer after submission
+ok 20 - visible deadline is checked without dispatching the late timer after submission
+  ---
+  duration_ms: 0.6193
+  type: 'test'
+  ...
+# Subtest: a throwing latest-profile getter still releases its initialized engine
+ok 21 - a throwing latest-profile getter still releases its initialized engine
+  ---
+  duration_ms: 0.3912
+  type: 'test'
+  ...
+# Subtest: editor cancels a late import and never substitutes a different canvas
+ok 22 - editor cancels a late import and never substitutes a different canvas
+  ---
+  duration_ms: 1.1933
+  type: 'test'
+  ...
+# Subtest: editor disposes late controller without clearing a newer preview owner
+ok 23 - editor disposes late controller without clearing a newer preview owner
+  ---
+  duration_ms: 0.784
+  type: 'test'
+  ...
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Skeleton "known-peer continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [22:40:29]: Skeleton "self continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:40:29]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual native Game rejects absent query error monitoring before any preparation work
+ok 24 - actual native Game rejects absent query error monitoring before any preparation work
+  ---
+  duration_ms: 10.8697
+  type: 'test'
+  ...
+# Subtest: actual Game start cannot become playable until the submitted-frame gate succeeds
+ok 25 - actual Game start cannot become playable until the submitted-frame gate succeeds
+  ---
+  duration_ms: 4.3222
+  type: 'test'
+  ...
+# Subtest: actual Game rejects an incomplete light preparation instead of announcing ready
+ok 26 - actual Game rejects an incomplete light preparation instead of announcing ready
+  ---
+  duration_ms: 1.3589
+  type: 'test'
+  ...
+# Subtest: actual Game retains async scope through final gate, rejects incomplete draws and retries object targets
+ok 27 - actual Game retains async scope through final gate, rejects incomplete draws and retries object targets
+  ---
+  duration_ms: 1.4221
+  type: 'test'
+  ...
+# Subtest: actual Game final-gate fault releases async scope and never starts gameplay
+ok 28 - actual Game final-gate fault releases async scope and never starts gameplay
+  ---
+  duration_ms: 1.6125
+  type: 'test'
+  ...
+# Subtest: actual Game final gate checks pending native effects after the variants were restored
+ok 29 - actual Game final gate checks pending native effects after the variants were restored
+  ---
+  duration_ms: 1.8837
+  type: 'test'
+  ...
+# Subtest: actual whole Game startup waits for both preparation validation and its last queue fence
+ok 30 - actual whole Game startup waits for both preparation validation and its last queue fence
+  ---
+  duration_ms: 1.4629
+  type: 'test'
+  ...
+# Subtest: actual whole Game startup preserves a preparation queue rejection and never reaches the final gate
+ok 31 - actual whole Game startup preserves a preparation queue rejection and never reaches the final gate
+  ---
+  duration_ms: 1.4991
+  type: 'test'
+  ...
+# Subtest: actual whole Game abort rejects a pending preparation fence and late completion stays retired
+ok 32 - actual whole Game abort rejects a pending preparation fence and late completion stays retired
+  ---
+  duration_ms: 2.2869
+  type: 'test'
+  ...
+# Subtest: actual whole Game device-loss rejects a pending preparation fence and late completion stays retired
+ok 33 - actual whole Game device-loss rejects a pending preparation fence and late completion stays retired
+  ---
+  duration_ms: 2.8164
+  type: 'test'
+  ...
+# Subtest: device loss during physics loading promptly rejects and cannot restart the Game loop
+ok 34 - device loss during physics loading promptly rejects and cannot restart the Game loop
+  ---
+  duration_ms: 0.9289
+  type: 'test'
+  ...
+# Subtest: late asset controllers from a failed Game are disposed without changing a replacement canvas
+ok 35 - late asset controllers from a failed Game are disposed without changing a replacement canvas
+  ---
+  duration_ms: 0.968
+  type: 'test'
+  ...
+# Subtest: one stuck loader cannot retain other abandoned controllers
+ok 36 - one stuck loader cannot retain other abandoned controllers
+  ---
+  duration_ms: 1.1844
+  type: 'test'
+  ...
+# Subtest: loss after submitted-gate settlement cannot resume a new gameplay loop
+ok 37 - loss after submitted-gate settlement cannot resume a new gameplay loop
+  ---
+  duration_ms: 1.2466
+  type: 'test'
+  ...
+# Subtest: actual Game health callback retires a ready renderer on validation and render faults
+ok 38 - actual Game health callback retires a ready renderer on validation and render faults
+  ---
+  duration_ms: 2.2546
+  type: 'test'
+  ...
+# Subtest: render fault rejects pending Game startup and releases late assets
+ok 39 - render fault rejects pending Game startup and releases late assets
+  ---
+  duration_ms: 0.8515
+  type: 'test'
+  ...
+# Subtest: failure teardown attempts every owned stage and delivers UI despite cleanup errors
+ok 40 - failure teardown attempts every owned stage and delivers UI despite cleanup errors
+  ---
+  duration_ms: 1.4353
+  type: 'test'
+  ...
+# Subtest: retired Game cannot resize, change GPU quality, or create remote/profile avatars
+ok 41 - retired Game cannot resize, change GPU quality, or create remote/profile avatars
+  ---
+  duration_ms: 0.8282
+  type: 'test'
+  ...
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+ok 42 - actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+  ---
+  duration_ms: 33.6829
+  type: 'test'
+  ...
+# {"status":"ready","failure":null,"simulatedVisibleMs":100,"draws":2,"submits":2,"acceptedPackets":2,"scope":"controlled CPU scheduling, not GPU/performance data"}
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+ok 43 - actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+  ---
+  duration_ms: 3.9719
+  type: 'test'
+  ...
+# {"status":"ready","failure":null,"simulatedVisibleMs":100,"draws":2,"submits":2,"acceptedPackets":2,"scope":"controlled CPU scheduling, not GPU/performance data"}
+# Subtest: remote submitted-frame gate retries real scene-visibility change during a fence
+ok 44 - remote submitted-frame gate retries real scene-visibility change during a fence
+  ---
+  duration_ms: 4.208
+  type: 'test'
+  ...
+# Subtest: remote submitted-frame gate retries real membership change during a fence
+ok 45 - remote submitted-frame gate retries real membership change during a fence
+  ---
+  duration_ms: 4.1267
+  type: 'test'
+  ...
+# Subtest: remote submitted-frame gate retries real profile change during a fence
+ok 46 - remote submitted-frame gate retries real profile change during a fence
+  ---
+  duration_ms: 3.8322
+  type: 'test'
+  ...
+# Subtest: actual AvatarLodController scene registration change inside a fence requires another validated rendered snapshot
+ok 47 - actual AvatarLodController scene registration change inside a fence requires another validated rendered snapshot
+  ---
+  duration_ms: 54.3587
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original queue-error during an asynchronous fence
+ok 48 - remote frame latch preserves original queue-error during an asynchronous fence
+  ---
+  duration_ms: 2.7437
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original validation-error during an asynchronous fence
+ok 49 - remote frame latch preserves original validation-error during an asynchronous fence
+  ---
+  duration_ms: 2.8125
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original abort during an asynchronous fence
+ok 50 - remote frame latch preserves original abort during an asynchronous fence
+  ---
+  duration_ms: 2.5422
+  type: 'test'
+  ...
+# Subtest: actual whole Game prepares accepted B6 camera/roster while Actor and authority queue remain untouched through delayed UI handoff
+ok 51 - actual whole Game prepares accepted B6 camera/roster while Actor and authority queue remain untouched through delayed UI handoff
+  ---
+  duration_ms: 11.9255
+  type: 'test'
+  ...
+# Subtest: late exact pose/epoch/known roster gets original gate coverage within remaining budget, without queue drain
+ok 52 - late exact pose/epoch/known roster gets original gate coverage within remaining budget, without queue drain
+  ---
+  duration_ms: 2.0233
+  type: 'test'
+  ...
+# Subtest: late accepted yaw and contact require another exact submitted view without changing the spatial stage key
+ok 53 - late accepted yaw and contact require another exact submitted view without changing the spatial stage key
+  ---
+  duration_ms: 1.9445
+  type: 'test'
+  ...
+# Subtest: known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+ok 54 - known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+  ---
+  duration_ms: 118.402
+  type: 'test'
+  ...
+# Subtest: shared original gate budget pauses hidden and expires instead of giving handshake fresh30s
+ok 55 - shared original gate budget pauses hidden and expires instead of giving handshake fresh30s
+  ---
+  duration_ms: 1.6965
+  type: 'test'
+  ...
+# Subtest: retired startup view owner cannot release fresh ownership; unsupported vehicle keeps original preparation path
+ok 56 - retired startup view owner cannot release fresh ownership; unsupported vehicle keeps original preparation path
+  ---
+  duration_ms: 3.157
+  type: 'test'
+  ...
+# Subtest: a synchronous observer stall cannot bypass the shared deadline through the unchanged vehicle branch
+ok 57 - a synchronous observer stall cannot bypass the shared deadline through the unchanged vehicle branch
+  ---
+  duration_ms: 1.6577
+  type: 'test'
+  ...
+# Subtest: submillimetre doorway/zone and interior-light changes remain independent real presentation coverage
+ok 58 - submillimetre doorway/zone and interior-light changes remain independent real presentation coverage
+  ---
+  duration_ms: 2.15
+  type: 'test'
+  ...
+# Subtest: startup view held loop is retired on renderer failure, and repeated start cannot replace an active presentation owner
+ok 59 - startup view held loop is retired on renderer failure, and repeated start cannot replace an active presentation owner
+  ---
+  duration_ms: 1.5897
+  type: 'test'
+  ...
+# Subtest: an observer that never hands back cannot retain the visible startup view beyond the original remaining budget
+ok 60 - an observer that never hands back cannot retain the visible startup view beyond the original remaining budget
+  ---
+  duration_ms: 1.6082
+  type: 'test'
+  ...
+1..60
+# tests 60
+# suites 0
+# pass 60
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4394.2943

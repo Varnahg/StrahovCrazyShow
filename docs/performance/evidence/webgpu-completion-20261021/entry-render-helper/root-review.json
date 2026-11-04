@@ -1,0 +1,25 @@
+{
+  "reviewedAtUTC": "2026-10-23T20:10:29.254Z",
+  "helperSha256": "a3017cc0a0a6066ddc56d57cc32d3e119310c112540e7a82a40c23f90db4d01c",
+  "authorManifestSha256": "4b2d78354cc8f1bfeae83bcbc46257e2f17f58d63ff7423864702bc8be13018b",
+  "rootVerifiedFiles": 52,
+  "decision": "Not accepted for GPU build until bounded reentry and coverage-wording follow-up",
+  "findings": [
+    {
+      "reviewer": "webgpu_renderer_audit",
+      "priority": 2,
+      "file": "entry-render-cost.mjs",
+      "mechanism": "depth[2] && index!==2 accepts recursive nested prepareFrame while depth[index]>0; inclusive nested sums can exceed Scene wall. Observer emits complete=true, but validator rejects nested.wallMs>Scene.wallMs.",
+      "counterexample": "Five nested prepare calls with2ms own bodies produce inclusive nested wall30ms inside Scene18ms. Source/fixture counterexample only, no actual GPU reproduction.",
+      "required": "Reproduce RED then reject same-index reentry as phase-error while preserving exactly one original Reflect.apply/throw and bounded cleanup. Wider inclusive-recursion support is unnecessary."
+    },
+    {
+      "reviewer": "webgpu_editor_audit",
+      "priority": 3,
+      "file": "README.md / handoff coverage wording",
+      "mechanism": "New donor replacement checks donor SHA and two internal Mesh.render orders; it omits original version9.30.0/eight descriptors/two outer order assertions. Calling it fully equivalent overstates coverage.",
+      "required": "Explicitly correct historical coverage description in a new follow-up record, and restore missing meaningful original assertions in the new fixture or describe its bounded subset. Preserve original sealed artifacts."
+    }
+  ],
+  "limits": "87 PASS is truthful for executed cases. Initial clean runtime lenses missed these final adversarial findings. No v11 GPU build/capture exists. Original v11 and all52 author seals remain byteexact."
+}

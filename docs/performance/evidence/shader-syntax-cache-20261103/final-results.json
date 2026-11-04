@@ -1,0 +1,1123 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-11-03T19:58:41.503Z",
+  "decision": "not-accepted-default-remains-off",
+  "reason": "Only one of two enabled starts reached Game.ready; both controls timed out, off2 had unstable idle cadence. No valid paired startup speed estimate.",
+  "plan": "final-campaign.md",
+  "runs": [
+    {
+      "label": "on1",
+      "run": "run1",
+      "sourceHash": "157e275e124aa354b242d13db2baf521b1b37f6383a4f2ab33475bc1d668cfb1",
+      "decision": "startup-failed",
+      "checks": {
+        "runtimeIdentity": true,
+        "clientIdentity": true,
+        "presentation": true,
+        "systemTelemetry": "observed",
+        "startupReady": false,
+        "cleanup": true
+      },
+      "timings": {
+        "wallMs": 187742,
+        "serverPreparationObservedMs": 44348,
+        "startupClientMs": null,
+        "startupObservedMs": null,
+        "measuredMs": 0,
+        "remainingMs": 187742,
+        "scope": "Observed wall phases; startup from first saved client log to saved ready. Remaining includes server preparation, UI, settling, observation and cleanup; it is not pure operator overhead."
+      },
+      "presentation": {
+        "observedBrowserHz": 142.9,
+        "reliable": true,
+        "samples": 189,
+        "p10FrameMs": 6.799999999999272,
+        "medianFrameMs": 7,
+        "p95FrameMs": 7.19999999999709,
+        "reason": "ok",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "renderer": {
+        "durationMs": 332.69999980926514,
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "backend": "webgpu",
+        "selection": {
+          "requested": "webgpu",
+          "backend": "webgpu",
+          "automatic": false,
+          "fallbackReason": null
+        }
+      },
+      "qualities": [
+        {
+          "quality": "low",
+          "finalPass": false,
+          "status": "timeout",
+          "failureStep": null,
+          "elapsedMs": 31371.200000047684,
+          "activeElapsedMs": 31371.200000047684,
+          "pausedMs": 0,
+          "stageCount": 12
+        }
+      ],
+      "preparationMs": 31371.299999952316,
+      "lastStage": "day-0-on",
+      "cache": {
+        "stage": "startup-end",
+        "rendererId": 2,
+        "syntaxCache": {
+          "active": true,
+          "activityKnown": true,
+          "supported": true,
+          "requestedEnabled": true,
+          "inert": false,
+          "disposed": false,
+          "reason": "running",
+          "statsCurrent": true,
+          "cleanupIncomplete": false,
+          "errors": {
+            "factory": 0,
+            "observer": 0,
+            "operation": 0,
+            "snapshot": 0,
+            "cleanup": 0
+          },
+          "stats": {
+            "enabled": true,
+            "disposed": false,
+            "generation": 1,
+            "requests": 582,
+            "hits": 382,
+            "misses": 200,
+            "evictions": 123,
+            "oversized": 0,
+            "parseErrors": 0,
+            "entries": 12,
+            "sourceUnits": 2790710,
+            "nodeStringUnits": 1389100,
+            "textUnits": 4179810,
+            "nodes": 40314,
+            "operators": 10576,
+            "peakEntries": 25,
+            "peakTextUnits": 4191656,
+            "peakNodes": 57940,
+            "peakOperators": 15390,
+            "maxEntries": 32,
+            "maxTextUnits": 4194304,
+            "maxNodes": 65536,
+            "maxOperators": 16384,
+            "unsupported": 0,
+            "probationEntries": 5,
+            "residentEntries": 7,
+            "bypassEntries": 0,
+            "deferred": 135,
+            "promotions": 65,
+            "promotionSkips": 0,
+            "bypasses": 0
+          }
+        }
+      },
+      "errors": [
+        {
+          "seq": 414,
+          "atMs": 78217.8,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 417,
+          "atMs": 78449.6,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at Eh.start (http://127.0.0.1:4179/assets/game-B0ipWFN3.js:878:28816)\n    at async http://127.0.0.1:4179/assets/index-BXsdLbd2.js:16:4497531"
+          }
+        }
+      ],
+      "benchmarkResults": [],
+      "diagnosticRecordCount": 421
+    },
+    {
+      "label": "off1",
+      "run": "run2",
+      "sourceHash": "157e275e124aa354b242d13db2baf521b1b37f6383a4f2ab33475bc1d668cfb1",
+      "decision": "startup-failed",
+      "checks": {
+        "runtimeIdentity": true,
+        "clientIdentity": true,
+        "presentation": true,
+        "systemTelemetry": "observed",
+        "startupReady": false,
+        "cleanup": true
+      },
+      "timings": {
+        "wallMs": 197002,
+        "serverPreparationObservedMs": 41953,
+        "startupClientMs": null,
+        "startupObservedMs": null,
+        "measuredMs": 0,
+        "remainingMs": 197002,
+        "scope": "Observed wall phases; startup from first saved client log to saved ready. Remaining includes server preparation, UI, settling, observation and cleanup; it is not pure operator overhead."
+      },
+      "presentation": {
+        "observedBrowserHz": 144.9,
+        "reliable": true,
+        "samples": 173,
+        "p10FrameMs": 6.800000000001091,
+        "medianFrameMs": 6.900000000001455,
+        "p95FrameMs": 7.200000000000728,
+        "reason": "ok",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "renderer": {
+        "durationMs": 76.70000004768372,
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "backend": "webgpu",
+        "selection": {
+          "requested": "webgpu",
+          "backend": "webgpu",
+          "automatic": false,
+          "fallbackReason": null
+        }
+      },
+      "qualities": [
+        {
+          "quality": "low",
+          "finalPass": false,
+          "status": "timeout",
+          "failureStep": null,
+          "elapsedMs": 30251.60000014305,
+          "activeElapsedMs": 30251.60000014305,
+          "pausedMs": 0,
+          "stageCount": 6
+        }
+      ],
+      "preparationMs": 30251.700000047684,
+      "lastStage": "night-0-on",
+      "cache": {
+        "stage": "startup-end",
+        "rendererId": 2,
+        "syntaxCache": {
+          "active": false,
+          "activityKnown": true,
+          "supported": true,
+          "requestedEnabled": false,
+          "inert": false,
+          "disposed": false,
+          "reason": "running",
+          "statsCurrent": true,
+          "cleanupIncomplete": false,
+          "errors": {
+            "factory": 0,
+            "observer": 0,
+            "operation": 0,
+            "snapshot": 0,
+            "cleanup": 0
+          },
+          "stats": {
+            "enabled": false,
+            "disposed": false,
+            "generation": 1,
+            "requests": 0,
+            "hits": 0,
+            "misses": 0,
+            "evictions": 0,
+            "oversized": 0,
+            "parseErrors": 0,
+            "entries": 0,
+            "sourceUnits": 0,
+            "nodeStringUnits": 0,
+            "textUnits": 0,
+            "nodes": 0,
+            "operators": 0,
+            "peakEntries": 0,
+            "peakTextUnits": 0,
+            "peakNodes": 0,
+            "peakOperators": 0,
+            "maxEntries": 32,
+            "maxTextUnits": 4194304,
+            "maxNodes": 65536,
+            "maxOperators": 16384,
+            "unsupported": 0,
+            "probationEntries": 0,
+            "residentEntries": 0,
+            "bypassEntries": 0,
+            "deferred": 0,
+            "promotions": 0,
+            "promotionSkips": 0,
+            "bypasses": 0
+          }
+        }
+      },
+      "errors": [
+        {
+          "seq": 326,
+          "atMs": 77809,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 329,
+          "atMs": 78238.7,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at Eh.start (http://127.0.0.1:4179/assets/game-B0ipWFN3.js:878:28816)\n    at async http://127.0.0.1:4179/assets/index-BXsdLbd2.js:16:4497531"
+          }
+        }
+      ],
+      "benchmarkResults": [],
+      "diagnosticRecordCount": 333
+    },
+    {
+      "label": "off2",
+      "run": "run3",
+      "sourceHash": "157e275e124aa354b242d13db2baf521b1b37f6383a4f2ab33475bc1d668cfb1",
+      "decision": "startup-failed",
+      "checks": {
+        "runtimeIdentity": true,
+        "clientIdentity": true,
+        "presentation": false,
+        "systemTelemetry": "observed",
+        "startupReady": false,
+        "cleanup": true
+      },
+      "timings": {
+        "wallMs": 201426,
+        "serverPreparationObservedMs": 57963,
+        "startupClientMs": null,
+        "startupObservedMs": null,
+        "measuredMs": 0,
+        "remainingMs": 201426,
+        "scope": "Observed wall phases; startup from first saved client log to saved ready. Remaining includes server preparation, UI, settling, observation and cleanup; it is not pure operator overhead."
+      },
+      "presentation": {
+        "observedBrowserHz": null,
+        "reliable": false,
+        "samples": 167,
+        "p10FrameMs": 6.799999999999272,
+        "medianFrameMs": 7,
+        "p95FrameMs": 13.799999999999272,
+        "reason": "unstable-cadence",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "renderer": {
+        "durationMs": 135,
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "backend": "webgpu",
+        "selection": {
+          "requested": "webgpu",
+          "backend": "webgpu",
+          "automatic": false,
+          "fallbackReason": null
+        }
+      },
+      "qualities": [
+        {
+          "quality": "low",
+          "finalPass": false,
+          "status": "timeout",
+          "failureStep": null,
+          "elapsedMs": 31229.39999985695,
+          "activeElapsedMs": 31229.39999985695,
+          "pausedMs": 0,
+          "stageCount": 13
+        }
+      ],
+      "preparationMs": 31229.39999985695,
+      "lastStage": "day-1-off",
+      "cache": {
+        "stage": "startup-end",
+        "rendererId": 2,
+        "syntaxCache": {
+          "active": false,
+          "activityKnown": true,
+          "supported": true,
+          "requestedEnabled": false,
+          "inert": false,
+          "disposed": false,
+          "reason": "running",
+          "statsCurrent": true,
+          "cleanupIncomplete": false,
+          "errors": {
+            "factory": 0,
+            "observer": 0,
+            "operation": 0,
+            "snapshot": 0,
+            "cleanup": 0
+          },
+          "stats": {
+            "enabled": false,
+            "disposed": false,
+            "generation": 1,
+            "requests": 0,
+            "hits": 0,
+            "misses": 0,
+            "evictions": 0,
+            "oversized": 0,
+            "parseErrors": 0,
+            "entries": 0,
+            "sourceUnits": 0,
+            "nodeStringUnits": 0,
+            "textUnits": 0,
+            "nodes": 0,
+            "operators": 0,
+            "peakEntries": 0,
+            "peakTextUnits": 0,
+            "peakNodes": 0,
+            "peakOperators": 0,
+            "maxEntries": 32,
+            "maxTextUnits": 4194304,
+            "maxNodes": 65536,
+            "maxOperators": 16384,
+            "unsupported": 0,
+            "probationEntries": 0,
+            "residentEntries": 0,
+            "bypassEntries": 0,
+            "deferred": 0,
+            "promotions": 0,
+            "promotionSkips": 0,
+            "bypasses": 0
+          }
+        }
+      },
+      "errors": [
+        {
+          "seq": 424,
+          "atMs": 91051.7,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 427,
+          "atMs": 92780.7,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at Eh.start (http://127.0.0.1:4179/assets/game-B0ipWFN3.js:878:28816)\n    at async http://127.0.0.1:4179/assets/index-BXsdLbd2.js:16:4497531"
+          }
+        }
+      ],
+      "benchmarkResults": [],
+      "diagnosticRecordCount": 431
+    },
+    {
+      "label": "on2",
+      "run": "run1-attempt2",
+      "sourceHash": "157e275e124aa354b242d13db2baf521b1b37f6383a4f2ab33475bc1d668cfb1",
+      "decision": "measurement-complete",
+      "checks": {
+        "runtimeIdentity": true,
+        "clientIdentity": true,
+        "presentation": true,
+        "systemTelemetry": "observed",
+        "startupReady": true,
+        "cleanup": true
+      },
+      "timings": {
+        "wallMs": 459994,
+        "serverPreparationObservedMs": 40171,
+        "startupClientMs": 78677.40000000001,
+        "startupObservedMs": 83751,
+        "measuredMs": 30090,
+        "remainingMs": 346153,
+        "scope": "Observed wall phases; startup from first saved client log to saved ready. Remaining includes server preparation, UI, settling, observation and cleanup; it is not pure operator overhead."
+      },
+      "presentation": {
+        "observedBrowserHz": 142.9,
+        "reliable": true,
+        "samples": 203,
+        "p10FrameMs": 6.899999999999636,
+        "medianFrameMs": 7,
+        "p95FrameMs": 7,
+        "reason": "ok",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "renderer": {
+        "durationMs": 71.90000009536743,
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "backend": "webgpu",
+        "selection": {
+          "requested": "webgpu",
+          "backend": "webgpu",
+          "automatic": false,
+          "fallbackReason": null
+        }
+      },
+      "qualities": [
+        {
+          "quality": "low",
+          "finalPass": false,
+          "status": "complete",
+          "failureStep": null,
+          "elapsedMs": 27762.099999904633,
+          "activeElapsedMs": 27762.099999904633,
+          "pausedMs": 0,
+          "stageCount": 15
+        },
+        {
+          "quality": "high",
+          "finalPass": false,
+          "status": "complete",
+          "failureStep": null,
+          "elapsedMs": 23672.799999952316,
+          "activeElapsedMs": 23672.799999952316,
+          "pausedMs": 0,
+          "stageCount": 13
+        },
+        {
+          "quality": "medium",
+          "finalPass": true,
+          "status": "complete",
+          "failureStep": null,
+          "elapsedMs": 3617.399999856949,
+          "activeElapsedMs": 3617.399999856949,
+          "pausedMs": 0,
+          "stageCount": 13
+        }
+      ],
+      "preparationMs": 55052.5,
+      "lastStage": "restore",
+      "cache": {
+        "stage": "startup-end",
+        "rendererId": 2,
+        "syntaxCache": {
+          "active": true,
+          "activityKnown": true,
+          "supported": true,
+          "requestedEnabled": true,
+          "inert": false,
+          "disposed": false,
+          "reason": "running",
+          "statsCurrent": true,
+          "cleanupIncomplete": false,
+          "errors": {
+            "factory": 0,
+            "observer": 0,
+            "operation": 0,
+            "snapshot": 0,
+            "cleanup": 0
+          },
+          "stats": {
+            "enabled": true,
+            "disposed": false,
+            "generation": 1,
+            "requests": 912,
+            "hits": 615,
+            "misses": 297,
+            "evictions": 181,
+            "oversized": 0,
+            "parseErrors": 0,
+            "entries": 13,
+            "sourceUnits": 2896047,
+            "nodeStringUnits": 1071240,
+            "textUnits": 3967287,
+            "nodes": 31173,
+            "operators": 8128,
+            "peakEntries": 25,
+            "peakTextUnits": 4193157,
+            "peakNodes": 57940,
+            "peakOperators": 15390,
+            "maxEntries": 32,
+            "maxTextUnits": 4194304,
+            "maxNodes": 65536,
+            "maxOperators": 16384,
+            "unsupported": 0,
+            "probationEntries": 7,
+            "residentEntries": 6,
+            "bypassEntries": 0,
+            "deferred": 194,
+            "promotions": 103,
+            "promotionSkips": 0,
+            "bypasses": 0
+          }
+        }
+      },
+      "errors": [],
+      "benchmarkResults": [
+        {
+          "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\render-next-20261102\\candidate9\\runs\\run1-attempt2\\benchmarks\\f91e273c-6a85-422b-b2ab-7e9e372491b3.json",
+          "durationSeconds": 10.01,
+          "frames": 241,
+          "fps": 24.1,
+          "p95Ms": 66.59999990463257,
+          "p99Ms": 102.89999985694885,
+          "quality": "medium",
+          "avatars": 3,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "renderResolution": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        {
+          "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\render-next-20261102\\candidate9\\runs\\run1-attempt2\\benchmarks\\4388fa7f-325b-4e48-ab24-f85621143b17.json",
+          "durationSeconds": 10.05,
+          "frames": 232,
+          "fps": 23.1,
+          "p95Ms": 66.69999980926514,
+          "p99Ms": 101.20000004768372,
+          "quality": "medium",
+          "avatars": 3,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "renderResolution": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        {
+          "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\render-next-20261102\\candidate9\\runs\\run1-attempt2\\benchmarks\\a894d958-038f-4e63-ad2c-b98c1f4b92f0.json",
+          "durationSeconds": 10.03,
+          "frames": 226,
+          "fps": 22.5,
+          "p95Ms": 68.60000014305115,
+          "p99Ms": 224.40000009536743,
+          "quality": "medium",
+          "avatars": 3,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "renderResolution": {
+            "width": 1280,
+            "height": 720
+          }
+        }
+      ],
+      "diagnosticRecordCount": 1692
+    }
+  ],
+  "artifacts": [
+    {
+      "source": ".cache/game-diagnostics/1fb80d91-a570-4403-b33b-d52954b14b58.jsonl",
+      "archive": "final-artifacts/on1-1fb80d91-a570-4403-b33b-d52954b14b58.jsonl.gz",
+      "bytes": 157344,
+      "sha256": "9668a6281d9e3895237e85043247ad34efb69cac991f95ddec3b674f0d9d2c4e",
+      "gzipBytes": 20239,
+      "gzipSha256": "5ef72874c9128fc241836649db0aea26e739ddf342fa4da370ab21bcce9d753b"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/cleanup.json",
+      "archive": "final-artifacts/on1-cleanup.json.gz",
+      "bytes": 173,
+      "sha256": "254603e600989d7298e6d5072258dcdcabb7cff626f290c9f5f57910437e0ff9",
+      "gzipBytes": 154,
+      "gzipSha256": "720832b0178fd60b34d100109b91fb7fe127a1532b759f3c5247ca1982136c1f"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/experiment-plan.json",
+      "archive": "final-artifacts/on1-experiment-plan.json.gz",
+      "bytes": 935,
+      "sha256": "18b5dfa1580c85100e0baec47be8b1fce3d75ae2b687aa2f6a4c326dfed07742",
+      "gzipBytes": 683,
+      "gzipSha256": "fb22f3381fb5fa768dc155b6ca10ee598ce42e1fe89f581830393464c0fb605c"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/experiment-summary.json",
+      "archive": "final-artifacts/on1-experiment-summary.json.gz",
+      "bytes": 25350,
+      "sha256": "c68822020e302c7ef5f24745fb7de3406f73dc542793bb254a2363e8feb86c31",
+      "gzipBytes": 4918,
+      "gzipSha256": "8417e03e2e0625d31eec5c2d1d7896074f94e4310cb64d5883d805a62fc3d7c2"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/runtime.json",
+      "archive": "final-artifacts/on1-runtime.json.gz",
+      "bytes": 876,
+      "sha256": "98c0346a1d8db7bd819b6c725d8b782ddc1605b27d23f0e78991c0b1ec4961dd",
+      "gzipBytes": 460,
+      "gzipSha256": "934479922b0c9740b4e0b21f498da3d4983ad58725bf44f88baf60b9a633b247"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/start.json",
+      "archive": "final-artifacts/on1-start.json.gz",
+      "bytes": 484,
+      "sha256": "1fb4366d6450dd90de4ab444620eae97396d23695c9e99677c90c60109bb7cb6",
+      "gzipBytes": 354,
+      "gzipSha256": "3667bc5600dfe63af53ddd9b131630903fb2e03cb657152f55b55d3364f6ed8b"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/weather.json",
+      "archive": "final-artifacts/on1-weather.json.gz",
+      "bytes": 1023,
+      "sha256": "493ede82bd5a3608ae53d893d02d14cc0d9929f54d95bdd6954f890a134fda8f",
+      "gzipBytes": 472,
+      "gzipSha256": "314f4b485fefe9ee0613ab888390e2388d780173a557380e06b77d6fa3962b06"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/system/runtime.json",
+      "archive": "final-artifacts/on1-system-runtime.json.gz",
+      "bytes": 1351,
+      "sha256": "27a5cc73a3cfd72a1ba74f488dea963a3701ed9d9a6a2bc9294d71edcfd04aa9",
+      "gzipBytes": 536,
+      "gzipSha256": "f51b000c278e542d9a186bbdb788d100d7257722173b0b8de5d47a4b35d26b3e"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1/system/samples.jsonl",
+      "archive": "final-artifacts/on1-system-samples.jsonl.gz",
+      "bytes": 3967675,
+      "sha256": "41b4c4631f7343ab6701a681f7ea4fb19af61c602635cc720641c0fc41e0e586",
+      "gzipBytes": 339956,
+      "gzipSha256": "a9d0bb3fe1cc01d342a0f3664006e99474ee183051757afb32fb40e32c7a8c7b"
+    },
+    {
+      "source": ".cache/game-diagnostics/04edeb73-efb9-468a-b6ed-bbb4edfc32ca.jsonl",
+      "archive": "final-artifacts/off1-04edeb73-efb9-468a-b6ed-bbb4edfc32ca.jsonl.gz",
+      "bytes": 129975,
+      "sha256": "45b79d1ac7c6d61480005e4d281115052fdb85ff9e7ca856461b87863a1cb09b",
+      "gzipBytes": 16960,
+      "gzipSha256": "4e27280c55caf367790fc59e6cb0b601951e524246fff82831201e9749e81681"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/cleanup.json",
+      "archive": "final-artifacts/off1-cleanup.json.gz",
+      "bytes": 173,
+      "sha256": "f96d27dcbc0584796ec84a698e2a2ea10dc7982a1c4885e111ab2a21bdfdcc37",
+      "gzipBytes": 154,
+      "gzipSha256": "9964d44b01968f7bda9c4c3afc90861ae9c3ae991d4d747e4b8e640bae18d60b"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/experiment-plan.json",
+      "archive": "final-artifacts/off1-experiment-plan.json.gz",
+      "bytes": 929,
+      "sha256": "edcdb47391b694f81be169a652d072189c3a9728d456a7030c00b546712e8dc9",
+      "gzipBytes": 677,
+      "gzipSha256": "dbbaeeeca52f99a6582888ca7c02c765e6dece5d72d5554f6406613e2ccc6f2a"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/experiment-summary.json",
+      "archive": "final-artifacts/off1-experiment-summary.json.gz",
+      "bytes": 17992,
+      "sha256": "9c7fe0fa66b6a601d192d6c06ff505016162dbbd95d6cdd8cbfbb262eda18bc8",
+      "gzipBytes": 4331,
+      "gzipSha256": "fa7c6e0424b3567533fbbe650201166bb1d3bac0febb80e958648817bf496cf6"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/runtime.json",
+      "archive": "final-artifacts/off1-runtime.json.gz",
+      "bytes": 875,
+      "sha256": "be23f3e948f14bece484897d4bf560a9079da53af60c24b37caadcd3e791ecfd",
+      "gzipBytes": 460,
+      "gzipSha256": "072930736467bb3f82eefe7f66f15ae304b8a46a98fc6c91d1081dd9ee4deff6"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/start.json",
+      "archive": "final-artifacts/off1-start.json.gz",
+      "bytes": 483,
+      "sha256": "e4384d4dff821f6b1a9efd842fba84549a7052863ae897f91674d32d0babac7b",
+      "gzipBytes": 354,
+      "gzipSha256": "058e19ef5f6f94dd0c0d42ddf05f6e1e8f0d2f20a5e5886b80ab051bdd957c7f"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/weather.json",
+      "archive": "final-artifacts/off1-weather.json.gz",
+      "bytes": 1023,
+      "sha256": "493ede82bd5a3608ae53d893d02d14cc0d9929f54d95bdd6954f890a134fda8f",
+      "gzipBytes": 472,
+      "gzipSha256": "314f4b485fefe9ee0613ab888390e2388d780173a557380e06b77d6fa3962b06"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/system/runtime.json",
+      "archive": "final-artifacts/off1-system-runtime.json.gz",
+      "bytes": 1350,
+      "sha256": "c7239d4601f276ef704125c08aad9e1bc7ea46f7060f6a875a93bcb8ada25b50",
+      "gzipBytes": 532,
+      "gzipSha256": "0bc263e3818ae1c5d83358ca59894e9aef154faa988eb21edf2c8682e48db430"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run2/system/samples.jsonl",
+      "archive": "final-artifacts/off1-system-samples.jsonl.gz",
+      "bytes": 3942430,
+      "sha256": "4874ec7598a2d1e2a20f5d45493e0c8e91cdab32ddf22bb1a5c0b5ceb199a28c",
+      "gzipBytes": 336444,
+      "gzipSha256": "aa372f1b1c5758cf32dd948dd02ae6101336d477d0d71b344ba08e5f6c930be2"
+    },
+    {
+      "source": ".cache/game-diagnostics/c2172756-3c3a-4ff5-b0c6-17e27bebd056.jsonl",
+      "archive": "final-artifacts/off2-c2172756-3c3a-4ff5-b0c6-17e27bebd056.jsonl.gz",
+      "bytes": 165100,
+      "sha256": "57401f7146bbb0e46ddf1e3f2ca586010c89de59c43da75dc79dc7b79df2a50f",
+      "gzipBytes": 20542,
+      "gzipSha256": "ffd44edf74e915e995238aab91209c8b28416231283c7227cda257cdaaa9e341"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/cleanup.json",
+      "archive": "final-artifacts/off2-cleanup.json.gz",
+      "bytes": 173,
+      "sha256": "36089470b971f01b0bf21052e71babdc440a315e7dc14f0110e76ae3ae3d21f9",
+      "gzipBytes": 154,
+      "gzipSha256": "aa5d1b30a830fb9ff1a51727cb8af23158f7c850ead7a7dbb98846e23fd3b51b"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/experiment-plan.json",
+      "archive": "final-artifacts/off2-experiment-plan.json.gz",
+      "bytes": 929,
+      "sha256": "fa1ccb7e0ffc0720f1c2a13894b7ab38bd6f113b4b084a4bebdd963f6ca30fd6",
+      "gzipBytes": 673,
+      "gzipSha256": "af3707c4341bba54352e36da7acc784edee6eeef582f2a506bb92ffb59af3ed9"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/experiment-summary.json",
+      "archive": "final-artifacts/off2-experiment-summary.json.gz",
+      "bytes": 26530,
+      "sha256": "6ced852bfb421a2af6e1ac843a853d55d38e1fd492582e3b9ec947186fad36fd",
+      "gzipBytes": 4940,
+      "gzipSha256": "80aaf4e8e2c035327f41a6f7687e59edd3f152aa30ccf2ad3ae61623c7a196f8"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/runtime.json",
+      "archive": "final-artifacts/off2-runtime.json.gz",
+      "bytes": 875,
+      "sha256": "7e7ea78cad3a5cd312b3261b9d924ba6251a8b7dda6620721b103b4c27064ced",
+      "gzipBytes": 459,
+      "gzipSha256": "e599ea6cf8d1b2b2242af16ae7c63f51fc3f5fa58e2217580548d93472224291"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/start.json",
+      "archive": "final-artifacts/off2-start.json.gz",
+      "bytes": 483,
+      "sha256": "ac4075b433ac5af046a53facce027f90ff4b99f4a117e5caff5cac708f631ffa",
+      "gzipBytes": 354,
+      "gzipSha256": "ae3e94595b2e5b4595f466d7599932665169beebbd40520f7c3db7816a0c28b1"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/weather.json",
+      "archive": "final-artifacts/off2-weather.json.gz",
+      "bytes": 1023,
+      "sha256": "493ede82bd5a3608ae53d893d02d14cc0d9929f54d95bdd6954f890a134fda8f",
+      "gzipBytes": 472,
+      "gzipSha256": "314f4b485fefe9ee0613ab888390e2388d780173a557380e06b77d6fa3962b06"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/system/runtime.json",
+      "archive": "final-artifacts/off2-system-runtime.json.gz",
+      "bytes": 1350,
+      "sha256": "925b81663e29f73ba5aa3eea441155be01f9c494beedbf8430842e91581d4c86",
+      "gzipBytes": 537,
+      "gzipSha256": "c04483d83fb1700de8be14e5aa82485f51a75d0f56b5844ae6194ffd2eea3a87"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run3/system/samples.jsonl",
+      "archive": "final-artifacts/off2-system-samples.jsonl.gz",
+      "bytes": 3833501,
+      "sha256": "e89a217ccfc975b3381130fbaa9a921f1bdeea0e1bec93a539dea98e923ba2dc",
+      "gzipBytes": 286368,
+      "gzipSha256": "9af94acad973bdfebdeb32d321e7287b0a81ff38ca6ab8db311b1540ca9e1274"
+    },
+    {
+      "source": ".cache/game-diagnostics/4ad8bf3e-0fd3-4eeb-ac46-255e18259234.jsonl",
+      "archive": "final-artifacts/on2-4ad8bf3e-0fd3-4eeb-ac46-255e18259234.jsonl.gz",
+      "bytes": 3205355,
+      "sha256": "d9c9592d9be205a8d4ffde6b0c2d1e5076ff24a9b115b0a6a89c9beeeddf25d5",
+      "gzipBytes": 278131,
+      "gzipSha256": "310848d4d27365be08dd4ec96d0ba1815f166f141ec5ff220b021d9ea1799f20"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/cleanup.json",
+      "archive": "final-artifacts/on2-cleanup.json.gz",
+      "bytes": 173,
+      "sha256": "f18818f878570ff7b134424b0b7455722d78ca2876d1ccf705a957da2e5a3873",
+      "gzipBytes": 155,
+      "gzipSha256": "1ddb49cff529b69109ae84b7eb547e41f9c768ab82ad7264d70a17fcf1a34c21"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/experiment-plan.json",
+      "archive": "final-artifacts/on2-experiment-plan.json.gz",
+      "bytes": 935,
+      "sha256": "06bc41634ccda563b9b345c1137667bd13f1d10d5f4ac4fa205a1fa437545878",
+      "gzipBytes": 683,
+      "gzipSha256": "c4792b04774c6bc85221a5d8e916f53fb343acc85b438765fa3ae10bca513972"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/experiment-summary.json",
+      "archive": "final-artifacts/on2-experiment-summary.json.gz",
+      "bytes": 64598,
+      "sha256": "cbcb5eeaf4d766069e9391083e17b2ba4360ef91d1a71308560ef83bbef067d8",
+      "gzipBytes": 7866,
+      "gzipSha256": "6df22ca43b5a18368b94e56a4a948ee9944c5c15552f74c7e0be36367e9e7cd9"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/peers-cleanup.json",
+      "archive": "final-artifacts/on2-peers-cleanup.json.gz",
+      "bytes": 885,
+      "sha256": "c8415b9be1ed23d029dda328314983f35e27aaa2298adaeea00fa28d612507f8",
+      "gzipBytes": 461,
+      "gzipSha256": "f75eb46d3153ee0d41bcda10421184aec7431ff43ec9c05b7cbc3488b3666f5b"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/peers-ready.json",
+      "archive": "final-artifacts/on2-peers-ready.json.gz",
+      "bytes": 1390,
+      "sha256": "162edc1f8f53828907c1ad44c39a9599569f0af8c811abe65850c34897f70645",
+      "gzipBytes": 539,
+      "gzipSha256": "42f480b69996ba107a8335022508b9251eca0a862f2c96d093e239cd22cf0e2f"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/peers-samples.jsonl",
+      "archive": "final-artifacts/on2-peers-samples.jsonl.gz",
+      "bytes": 23145,
+      "sha256": "6201160790476efd799f18fdda171a610adca010fc0bda767aae0bb90e3e0ea7",
+      "gzipBytes": 1303,
+      "gzipSha256": "4abd2e77bf862b182fcad264819c93a97db2f0f5448d5a3d2e497ba3569b7996"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/peers-start.json",
+      "archive": "final-artifacts/on2-peers-start.json.gz",
+      "bytes": 303,
+      "sha256": "fcd2bd0ac6dee6c6fa6510fa2e4973ccff5a0def74f37aca55665d86884ba860",
+      "gzipBytes": 246,
+      "gzipSha256": "805eb0ef96e3d7514c5c385a5d626ca5dd6cdf36ae5671bfb9028b9afe1b99ee"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/runtime.json",
+      "archive": "final-artifacts/on2-runtime.json.gz",
+      "bytes": 893,
+      "sha256": "c6d6842b87ac40b1fc6ee83445abd8f25c27ea90bb7dc3f6da7a3afff757db0a",
+      "gzipBytes": 468,
+      "gzipSha256": "880203021c03f498208a95873377a096163fe6a35df1494ed05277c36cd8716f"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/start.json",
+      "archive": "final-artifacts/on2-start.json.gz",
+      "bytes": 501,
+      "sha256": "c556a2057d0ad9f7e7df6dad7ae2170e6fc9b46359e555d10a59490b845715f1",
+      "gzipBytes": 360,
+      "gzipSha256": "59ee10864a36a611f0116bc352111e96c37e0b7cf174f1a43a2aa03f8c202e07"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/weather.json",
+      "archive": "final-artifacts/on2-weather.json.gz",
+      "bytes": 1023,
+      "sha256": "493ede82bd5a3608ae53d893d02d14cc0d9929f54d95bdd6954f890a134fda8f",
+      "gzipBytes": 472,
+      "gzipSha256": "314f4b485fefe9ee0613ab888390e2388d780173a557380e06b77d6fa3962b06"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/system/runtime.json",
+      "archive": "final-artifacts/on2-system-runtime.json.gz",
+      "bytes": 1378,
+      "sha256": "cdca9daa056bb4daa013e44bf1d36b52957fa716341c27a80fa359ead213fca0",
+      "gzipBytes": 547,
+      "gzipSha256": "6349f08b59e1dfdbd8d69022d06eb1db6e0c4c8bb30e410991be63775684d490"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/system/samples.jsonl",
+      "archive": "final-artifacts/on2-system-samples.jsonl.gz",
+      "bytes": 15248690,
+      "sha256": "5472efc6a86726c17cf2b8e0a7d2aeb210bfd7de9a7181a139f2d3309fc19918",
+      "gzipBytes": 1053871,
+      "gzipSha256": "cd9dbb6517e84a1acf7f4243e809867f9f8e7cced0972c8a53aa0914098c451f"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/benchmarks/f91e273c-6a85-422b-b2ab-7e9e372491b3.json",
+      "archive": "final-artifacts/on2-benchmark-f91e273c-6a85-422b-b2ab-7e9e372491b3.json.gz",
+      "bytes": 6579,
+      "sha256": "aa9d97639212c4333a29968fc208ff68ffd53029c3cb587d4d6f3f47b326afa6",
+      "gzipBytes": 2265,
+      "gzipSha256": "0fc1a5cdcaca51f27417272d2c1766a2daf9cac11bc685597807e3c3d70c8271"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/benchmarks/4388fa7f-325b-4e48-ab24-f85621143b17.json",
+      "archive": "final-artifacts/on2-benchmark-4388fa7f-325b-4e48-ab24-f85621143b17.json.gz",
+      "bytes": 6594,
+      "sha256": "bc4d43058549529bd6d602d4180a798bca5c302dba25f33cea1ecdb9f48fdee6",
+      "gzipBytes": 2265,
+      "gzipSha256": "299fc8c3da909bd049c7a093e0bba47acd48a6e0890c982a5af73d3dcea9df1f"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/runs/run1-attempt2/benchmarks/a894d958-038f-4e63-ad2c-b98c1f4b92f0.json",
+      "archive": "final-artifacts/on2-benchmark-a894d958-038f-4e63-ad2c-b98c1f4b92f0.json.gz",
+      "bytes": 6592,
+      "sha256": "69ef4602e21ab2925b510b7ffcdfe84d74fb375e40516475692af24178316171",
+      "gzipBytes": 2255,
+      "gzipSha256": "038a4f8307f724b0ad3942b2e53d9b30793236f485491561ddf79974b67b021a"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/build/identity.json",
+      "archive": "final-artifacts/candidate9-build-identity.json.gz",
+      "bytes": 3462159,
+      "sha256": "fba5fe59c4de2f403232b16e352bb4e00b8a8b84e6b33c00de7f6b23f01e462c",
+      "gzipBytes": 925518,
+      "gzipSha256": "71769ad2d5ba4a2fb79317d5e98efe0630bf2cb6f2325ea35b47e36ee1ec17b5"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/plan-on1.json",
+      "archive": "final-artifacts/plan-on1.json.gz",
+      "bytes": 950,
+      "sha256": "a0496f364b45b46eee8b09aa5096896f5b5e42c3d8e8e316ea758d3f918a7743",
+      "gzipBytes": 688,
+      "gzipSha256": "88283a782d5e82423224691cb9374a2ff8557b09125448ea1b11aa4c8cc4cfbf"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/plan-off1.json",
+      "archive": "final-artifacts/plan-off1.json.gz",
+      "bytes": 944,
+      "sha256": "7a922583c0097036999c628631c98070439ed5d7fa59deaa7be798381c2c44c9",
+      "gzipBytes": 682,
+      "gzipSha256": "2ad9264695651d0b4e406a7e81de56dcc17374afd610f2c382f9f40466a389d7"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/plan-off2.json",
+      "archive": "final-artifacts/plan-off2.json.gz",
+      "bytes": 944,
+      "sha256": "a9ea8dc298ed4503ab6d524452cd98b3e2fb85f82bf528f30501e7d11bfdd2f9",
+      "gzipBytes": 678,
+      "gzipSha256": "7398a98d130a11c0aaab6608fb8cd7671ba43161b4998b96df527f7123c753e7"
+    },
+    {
+      "source": ".cache/render-next-20261102/candidate9/plan-on2.json",
+      "archive": "final-artifacts/plan-on2.json.gz",
+      "bytes": 950,
+      "sha256": "721d377d7455ac5032c9247e6a4c71d91a33cf98f8315e93075a8b1d1b7da2d3",
+      "gzipBytes": 686,
+      "gzipSha256": "ab2b76fa7d121c2346b835893d8044b4b8d7fc4a028af1f65e916d840ac3ed23"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/final-full-tests.log",
+      "archive": "final-artifacts/final-full-tests.log.gz",
+      "bytes": 405655,
+      "sha256": "bf8b64aa2ee7854e25072d6f9404da0b4e0aa53cf3540e853f272c762ab6023b",
+      "gzipBytes": 122828,
+      "gzipSha256": "3022bab84a82a151f298d63f5561ae4a89e69ef87512db187628931c203a3906"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/pdf-isolated.log",
+      "archive": "final-artifacts/pdf-isolated.log.gz",
+      "bytes": 205,
+      "sha256": "61d2b1d3e718aa408a4d041aad16c7b2172426cdfff1d861e52d509f50683bf1",
+      "gzipBytes": 163,
+      "gzipSha256": "e6d8d4de4bcf787d248962892711417d97ae53dfca9f6e0a0f999b6d6a2d3f83"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/final-targeted.log",
+      "archive": "final-artifacts/final-targeted.log.gz",
+      "bytes": 10756,
+      "sha256": "79f7b734773bd66d1e4b6542e25c5c240613ae603ea80ad8451800eae1972326",
+      "gzipBytes": 3207,
+      "gzipSha256": "abf17544017767a2d017ccb509dbb7042c4bc3e5f2f3a2ed258c28fa3aee9c77"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/final-build.log",
+      "archive": "final-artifacts/final-build.log.gz",
+      "bytes": 338,
+      "sha256": "e6b302a90c3da0ed2692c82268b665cb862b8327f059e59eaaaaa5bee1102fec",
+      "gzipBytes": 250,
+      "gzipSha256": "ccff6ba5fe98370ebbdbf72e9da7ade3d5c02b2ce8fbff198ee55a546c985d5e"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/final-build-2.log",
+      "archive": "final-artifacts/final-build-2.log.gz",
+      "bytes": 3244,
+      "sha256": "f85ab92fde187eb60c7898850ecf6fae54bc11b02cf3542ae614eb012fd979d0",
+      "gzipBytes": 1330,
+      "gzipSha256": "4b71e22ab969e24783d7bb12e6a91767bc8dcb428178d9ef014ce75555115318"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/final-integration.log",
+      "archive": "final-artifacts/final-integration.log.gz",
+      "bytes": 2445,
+      "sha256": "7ce4c34f9ca2eb2f373a91c3b2df205fcc207954a30ad3116562b71acb097e22",
+      "gzipBytes": 1247,
+      "gzipSha256": "78ec9a5a3e5f4464eecc1ccb3a9a8db18bdde5601e07ac1494990f8929741dcd"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/monitor-import-fix.log",
+      "archive": "final-artifacts/monitor-import-fix.log.gz",
+      "bytes": 1735,
+      "sha256": "6e6d471f5c79d315b7d123b83c3a95dcf4992524406a88d42f37587bcf373f76",
+      "gzipBytes": 978,
+      "gzipSha256": "50483f08a71c5786fb37169f6cdcc8b7bfe0056f35c25d34baec9c51ef292d88"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/monitor-revalidation-budget.log",
+      "archive": "final-artifacts/monitor-revalidation-budget.log.gz",
+      "bytes": 1832,
+      "sha256": "d663ed160ab6dd239f62ca57efd5f96322c861530c23d93b549ecd7cf02e7bce",
+      "gzipBytes": 1024,
+      "gzipSha256": "5e188788d640c338fa2d9b2e0fd0741f9a776eba8a638ed64a1fad7b60893a99"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/dependency-v4-audit.json",
+      "archive": "final-artifacts/dependency-v4-audit.json.gz",
+      "bytes": 965,
+      "sha256": "74e7a50712392283b1f0101bc340eac05d75ed36df0ae9f2e2371e5ee22835c6",
+      "gzipBytes": 487,
+      "gzipSha256": "cbb09f6ebc9a5b33c7e0fa84a61a5ad395f9ed842e8e2c1416068db29f482cd5"
+    },
+    {
+      "source": ".cache/shader-syntax-cache-integration-20261103/install-v4.log",
+      "archive": "final-artifacts/install-v4.log.gz",
+      "bytes": 719,
+      "sha256": "cdae93954f5949c2302a618e5fc361aca55ef010d09cb6225abfe730abbbf938",
+      "gzipBytes": 324,
+      "gzipSha256": "0ea5a69bc262c6f914cc13e2838d88ab8ffc8cba4c0b1149037de37c3b55dcb1"
+    },
+    {
+      "archive": "final-artifacts/three-player-medium.jpg",
+      "bytes": 84722,
+      "sha256": "7405b041e429e9b7f525e9ac60732166a6baefc22adbae4385427ca725847ca6"
+    }
+  ],
+  "validation": {
+    "fullTests": {
+      "total": 3029,
+      "pass": 3023,
+      "fail": 1,
+      "skipped": 5,
+      "failed": "rag-pdf-extraction: an immediately resolving endless stream cannot starve the deadline",
+      "isolatedRerun": "1/1 PASS"
+    },
+    "cacheTargeted": "70/70 PASS",
+    "monitor": "20/20 PASS",
+    "harness": "3/3 PASS",
+    "productionBuild": "PASS after TS7016 runtime-import repair",
+    "sdkIntegration": "PASS"
+  },
+  "limitations": [
+    "No accepted gameplay FPS gain",
+    "No full B6/car/night route acceptance",
+    "No driver-cache purge or fixed clocks",
+    "Settings panel open in three spawn samples; two SDK peers, not three humans",
+    "Remaining wall time includes verification, UI, settling and cleanup",
+    "startupClientMs uses client mode-change to game-ready; startupObservedMs uses saved-log observations"
+  ]
+}

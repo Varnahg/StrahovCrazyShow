@@ -1,0 +1,437 @@
+diff --git a/client/authored-light-preparation.ts b/client/authored-light-preparation.ts
+index cf71c13a..7e8269e3 100644
+--- a/client/authored-light-preparation.ts
++++ b/client/authored-light-preparation.ts
+@@ -1,88 +1,203 @@
+ import { Mesh } from "@babylonjs/core/Meshes/mesh";
++import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
++import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+ import type { Material } from "@babylonjs/core/Materials/material";
+ import type { Scene } from "@babylonjs/core/scene";
+ 
+-/** Temporary main-pass visibility of authored non-instanced receivers only.
+- * No geometry, light, camera or material is created or changed. Unsupported
+- * instance/skinned/morph paths remain explicitly outside this narrow scope. */
++type Lease = {
++  mesh: AbstractMesh;
++  source: Mesh;
++  parent: AbstractMesh["parent"];
++  attachment?: { attached: boolean };
++  flag: boolean;
++  registered: boolean;
++  registrationOwned: boolean;
++  enabledOwned: boolean;
++  writingEnabled: boolean;
++  detach?: () => void;
++};
++
++/** Temporary main-pass draw coverage of declared, existing world receivers.
++ * No proxy, transform, material, geometry, camera or light is changed. */
+ export class AuthoredLightPreparation {
+   private generation = 0;
+   private disposed = false;
+   private stop?: () => void;
++  /** Concrete startup mutation ownership, including synchronous release handoff. */
++  private readonly leases = new Map<AbstractMesh, Lease>();
+   readonly selection = { selected: 0, unsupported: 0 };
+ 
+   constructor(private readonly scene: Scene) {}
+ 
+   begin(): () => void {
+-    this.stop?.();
++    const previous = this.stop;
++    previous?.();
++    // A callback from that release can install a newer request. Do not replace
++    // it again after returning to the older begin call.
++    if (this.stop && this.stop !== previous) return () => {};
+     if (this.disposed || this.scene.isDisposed) return () => {};
+-    const generation = ++this.generation;
+-    const changed: Mesh[] = [];
++    const generation = ++this.generation, changed: Lease[] = [];
++    const records = new Map<AbstractMesh, Lease>();
++    let active = true, writingRegistration: AbstractMesh | undefined;
++    let detachRemoved: (() => void) | undefined;
++    const current = () => active && this.generation === generation && !this.disposed && !this.scene.isDisposed;
+     const release = () => {
+-      if (this.generation !== generation) return;
+-      this.generation++;
+-      this.stop = undefined;
++      if (!active) return;
++      active = false;
++      if (this.stop === release) { this.stop = undefined; this.generation++; }
+       let hasError = false, failure: unknown;
+-      for (const mesh of changed.splice(0)) {
+-        try {
+-          // A later external false write wins. A true flag present before this
+-          // lease was never changed or added to this list in the first place.
+-          if (!mesh.isDisposed() && mesh.alwaysSelectAsActiveMesh === true)
+-            mesh.alwaysSelectAsActiveMesh = false;
+-        } catch (error) { if (!hasError) { hasError = true; failure = error; } }
++      const attempt = (work: () => void) => { try { work(); } catch (error) { if (!hasError) { hasError = true; failure = error; } } };
++      attempt(() => detachRemoved?.()); detachRemoved = undefined;
++      for (const lease of changed.splice(0)) {
++        attempt(() => lease.detach?.()); lease.detach = undefined;
++        const mesh = lease.mesh, owns = () => this.leases.get(mesh) === lease;
++        if (!mesh.isDisposed()) {
++          // Transfer the original baseline if begin reenters from any setter.
++          // No old write may run after a newer concrete lease claimed this mesh.
++          if (owns() && lease.flag && mesh.alwaysSelectAsActiveMesh === true) {
++            lease.flag = false;
++            attempt(() => { mesh.alwaysSelectAsActiveMesh = false; });
++          }
++          const sameOwner = () => owns() && mesh.parent === lease.parent &&
++            (!(mesh instanceof InstancedMesh) || mesh.sourceMesh === lease.source) &&
++            !lease.parent?.isDisposed() && !lease.source.isDisposed() && !mesh.isDisposed();
++          const takenOver = () => lease.attachment?.attached === true;
++          const oneRegistration = () => this.scene.meshes.indexOf(mesh) !== -1 &&
++            this.scene.meshes.indexOf(mesh) === this.scene.meshes.lastIndexOf(mesh);
++          if (sameOwner() && !takenOver() && lease.enabledOwned &&
++              (lease.registered || (lease.registrationOwned && oneRegistration())) && mesh.isEnabled(false) === true) {
++            lease.enabledOwned = false;
++            attempt(() => mesh.setEnabled(false));
++          }
++          // The native setter above dispatches observers synchronously. A new
++          // lease or actual B6 controller takeover must be checked afterwards.
++          if (sameOwner() && !takenOver() && lease.registrationOwned && oneRegistration() && !this.scene.isDisposed) {
++            lease.registrationOwned = false;
++            attempt(() => { this.scene.removeMesh(mesh); });
++          }
++        }
++        if (owns()) this.leases.delete(mesh);
+       }
++      records.clear();
+       if (hasError) throw failure;
+     };
+     this.stop = release;
+     this.selection.selected = this.selection.unsupported = 0;
+-    const seen = new Map<Material, Set<string>>();
++    const seen = new Map<Material, Set<string>>(), nodes = [...this.scene.meshes];
+     const camera = this.scene.activeCamera;
+-    const pass = camera?.renderPassId ?? this.scene.getEngine().currentRenderPassId;
++    const engine = this.scene.getEngine();
++    const pass = camera?.renderPassId ?? engine.currentRenderPassId;
++    const drawable = (node: AbstractMesh) => !node.isDisposed() && node.isVisible && node.visibility > 0 &&
++      !node.scaling.hasAZeroComponent && (!camera || !!(node.layerMask & camera.layerMask));
++    const acquire = (mesh: AbstractMesh, source: Mesh, attachment?: Lease["attachment"]) => {
++      const registered = this.scene.meshes.includes(mesh), previous = this.leases.get(mesh);
++      const previousOwner = previous?.source === source && previous.parent === mesh.parent ? previous : undefined;
++      const takenOver = attachment?.attached === true;
++      const registrationOwned = !takenOver && registered && previousOwner?.registrationOwned === true;
++      const lease: Lease = { mesh, source, parent: mesh.parent, attachment,
++        flag: !mesh.alwaysSelectAsActiveMesh || previousOwner?.flag === true,
++        registered: registrationOwned ? previousOwner!.registered : registered,
++        registrationOwned, enabledOwned: !takenOver && previousOwner?.enabledOwned === true, writingEnabled: false };
++      changed.push(lease); records.set(mesh, lease); this.leases.set(mesh, lease);
++      this.selection.selected++;
++      if (lease.flag && !mesh.alwaysSelectAsActiveMesh) mesh.alwaysSelectAsActiveMesh = true;
++      if (!current()) return;
++      if (!registered) {
++        lease.registrationOwned = true; writingRegistration = mesh;
++        try { this.scene.addMesh(mesh); } finally { writingRegistration = undefined; }
++        if (!current()) return;
++        if (!this.scene.meshes.includes(mesh)) throw new Error("Declared receiver could not enter the main-pass Scene");
++      }
++      const enable = !mesh.isEnabled(false);
++      if (enable || lease.enabledOwned) {
++        lease.enabledOwned = true;
++        const observer = mesh.onEnabledStateChangedObservable.add(value => {
++          // A prior notification can still be dispatching while a reentrant
++          // begin installs this observer. Ignore an outer stale true/false.
++          if (!lease.writingEnabled && value === false && mesh.isEnabled(false) === false) lease.enabledOwned = false;
++        });
++        lease.detach = () => mesh.onEnabledStateChangedObservable.remove(observer);
++        if (enable) {
++          lease.writingEnabled = true;
++          try { mesh.setEnabled(true); } finally { lease.writingEnabled = false; }
++        }
++      }
++      if (current() && (!mesh.isEnabled() || !this.scene.meshes.includes(mesh)))
++        throw new Error("Declared receiver changed during acquisition");
++    };
+     try {
+-      for (const node of this.scene.meshes) {
++      const observer = this.scene.onMeshRemovedObservable.add(mesh => {
++        if (writingRegistration !== mesh && !this.scene.meshes.includes(mesh)) { const lease = records.get(mesh); if (lease) lease.registrationOwned = false; }
++      });
++      detachRemoved = () => this.scene.onMeshRemovedObservable.remove(observer);
++      for (const node of nodes) {
++        if (!current()) break;
++        const declaration = node.metadata?.authoredLightReceiver;
++        const instanced = declaration === "b6-prop-source" || declaration === "road-sign-face";
++        const declared = instanced || declaration === "stadium-glass";
+         const pack = node.metadata?.sourcePack;
+-        if (pack !== "architecture-reality" && pack !== "outdoor-artifacts") continue;
+-        if (node.isDisposed() || !node.isEnabled() || !node.isVisible || node.visibility <= 0) continue;
+-        // alwaysSelect bypasses frustum culling only, not these actual draw gates.
+-        if (node.scaling.hasAZeroComponent || (camera && !(node.layerMask & camera.layerMask))) continue;
++        if (!declared && pack !== "architecture-reality" && pack !== "outdoor-artifacts") continue;
++        if (node.isDisposed() || !node.isEnabled()) continue;
++        if (!instanced && !drawable(node)) continue;
+         const material = node.getMaterialForRenderPass(pass) ?? node.material;
+-        if (pack === "architecture-reality") {
++        if (declared) { if (!(material instanceof PBRMaterial)) { this.selection.unsupported++; continue; } }
++        else if (pack === "architecture-reality") {
+           if (!(material instanceof StandardMaterial) || material.metadata?.exteriorOnlyGlass !== true) continue;
+         } else if (!(material instanceof PBRMaterial) || material.metadata?.sourcePack !== "outdoor-artifacts") continue;
+         if (!(node instanceof Mesh) || node.getClassName() !== "Mesh" || !node.geometry ||
+-            node.skeleton || node.morphTargetManager || node.bakedVertexAnimationManager ||
+-            node.hasThinInstances || node.instances.length) {
++            node.skeleton || node.morphTargetManager || node.bakedVertexAnimationManager || node.hasThinInstances ||
++            node.getLODLevels().length || (!instanced && node.instances.length) ||
++            (instanced && !engine.getCaps().instancedArrays) ||
++            (instanced && node.instancedBuffers && Object.keys(node.instancedBuffers).length)) {
+           this.selection.unsupported++; continue;
+         }
+         const attributes = node.getVerticesDataKinds().sort().map(kind => {
+           const buffer = node.getVertexBuffer(kind)!;
+           return [kind, buffer.getSize(), buffer.type, buffer.normalized, buffer.byteStride, buffer.byteOffset, buffer.getInstanceDivisor()];
+         });
+-        if (attributes.some(attribute => attribute[6] !== 0)) {
+-          this.selection.unsupported++; continue;
++        if (attributes.some(attribute => attribute[6] !== 0)) { this.selection.unsupported++; continue; }
++        const sign = node.computeWorldMatrix().determinant() < 0;
++        let candidate: AbstractMesh = node;
++        let attachment: Lease["attachment"];
++        if (instanced) {
++          const found = node.instances.find(instance => {
++            if (!(instance instanceof InstancedMesh) || instance.getScene() !== this.scene ||
++                instance.sourceMesh !== node || !drawable(instance) || instance.parent?.isEnabled() === false ||
++                (instance.computeWorldMatrix().determinant() < 0) !== sign ||
++                (instance.getMaterialForRenderPass(pass) && instance.getMaterialForRenderPass(pass) !== material)) return false;
++            const registered = this.scene.meshes.includes(instance), producer = instance.metadata?.b6PreparationAttachment;
++            if (declaration === "b6-prop-source") {
++              const previous = this.leases.get(instance);
++              const pendingBorrow = previous?.source === node && previous.parent === instance.parent && previous.registrationOwned && registered;
++              if (typeof producer?.attached !== "boolean" ||
++                  (producer.attached ? !registered || !instance.isEnabled(false) :
++                    (registered && !pendingBorrow) || (instance.isEnabled(false) && !pendingBorrow))) return false;
++              attachment = producer;
++              return true;
++            }
++            return registered && instance.isEnabled();
++          });
++          if (!found) { this.selection.unsupported++; continue; }
++          candidate = found;
+         }
+         const layout = JSON.stringify([attributes, node.receiveShadows, node.useVertexColors, node.hasVertexAlpha,
+-          node.applyFog, node.sideOrientation, node.nonUniformScaling, node.visibility, node.isUnIndexed,
+-          node.getWorldMatrix().determinant() < 0, node.geometry.getIndexBuffer()?.is32Bits ?? false,
+-          // Conservative identity/order coverage: equal material and buffers do
+-          // not imply equal shader slots when light membership differs by mesh.
+-          node.lightSources.map(light => light.uniqueId)]);
++          node.applyFog, node.sideOrientation, node.nonUniformScaling, node.visibility, node.isUnIndexed, sign,
++          node.geometry.getIndexBuffer()?.is32Bits ?? false, node.lightSources.map(light => light.uniqueId),
++          // New source groups keep actual geometry/source identity and draw mode.
++          // Old architecture/outdoor deduplication retains its original meaning.
++          declared ? [node.uniqueId, node.geometry.uniqueId, instanced] : null]);
+         let layouts = seen.get(material);
+         if (!layouts) { layouts = new Set(); seen.set(material, layouts); }
+         if (layouts.has(layout)) continue;
+         layouts.add(layout);
+-        this.selection.selected++;
+-        if (!node.alwaysSelectAsActiveMesh) {
+-          changed.push(node);
+-          node.alwaysSelectAsActiveMesh = true;
+-        }
++        acquire(candidate, node, attachment);
+       }
+       return release;
+     } catch (error) {
+       try { release(); } finally { throw error; }
+-    }
++    } finally { seen.clear(); nodes.length = 0; }
+   }
+ 
+   dispose() {
+diff --git a/client/b6-reality.ts b/client/b6-reality.ts
+index 7db946e8..00eaca67 100644
+--- a/client/b6-reality.ts
++++ b/client/b6-reality.ts
+@@ -134,6 +134,7 @@ type Managed = {
+   prop: boolean;
+   visibilityGroup: "exterior-entry" | "opaque-envelope" | "interior-detail";
+   attached: boolean;
++  preparationAttachment?: { attached: boolean };
+ };
+ export type B6RealityInput = { player: Vec3; quality: string; floor?: number };
+ export type B6RealityOptions = {
+@@ -513,6 +514,7 @@ export class B6RealityController {
+           );
+           if (!source) continue;
+           source.name = "b6 shared asset " + asset.id;
++          source.metadata = { ...source.metadata, authoredLightReceiver: "b6-prop-source" };
+           source.isVisible = false;
+           source.isPickable = false;
+           sources.push(source);
+@@ -532,7 +534,9 @@ export class B6RealityController {
+             instance.rotation.y = placement.yaw;
+             instance.isVisible = true;
+             instance.isPickable = false;
++            const preparationAttachment = { attached: false };
+             instance.metadata = {
++              b6PreparationAttachment: preparationAttachment,
+               b6Reality: true,
+               visibilityGroup:"interior-detail",
+               sourceId: placement.id,
+@@ -550,6 +554,7 @@ export class B6RealityController {
+               prop: true,
+               visibilityGroup:"interior-detail",
+               attached: false,
++              preparationAttachment,
+             });
+           }
+         this.stats.loadedAssets++;
+@@ -614,13 +619,16 @@ export class B6RealityController {
+         (!entry.prop || Math.hypot(entry.x - p.x, entry.z - p.z) < range);
+       if (visible !== entry.attached) {
+         if (visible) {
+-          this.scene.addMesh(entry.mesh);
++          // A preparation lease can already have registered this exact world
++          // instance. The controller commits ownership without duplicating it.
++          if (!this.scene.meshes.includes(entry.mesh)) this.scene.addMesh(entry.mesh);
+           entry.mesh.setEnabled(true);
+         } else {
+           entry.mesh.setEnabled(false);
+           this.scene.removeMesh(entry.mesh);
+         }
+         entry.attached = visible;
++        if (entry.preparationAttachment) entry.preparationAttachment.attached = visible;
+       }
+       if (visible) this.stats.activeMeshes++;
+     }
+diff --git a/client/landmark-reality.ts b/client/landmark-reality.ts
+index 71e34801..b2b2da11 100644
+--- a/client/landmark-reality.ts
++++ b/client/landmark-reality.ts
+@@ -67,6 +67,7 @@ export function buildLandmarkReality(options: {
+       m.metadata = {
+         sourcePack: "landmark-reality",
+         landmarkGlass: kind === "stadium-glass",
++        ...(kind === "stadium-glass" ? { authoredLightReceiver: "stadium-glass" } : {}),
+         sourceMeasured: false,
+         sourceDetail:
+           "OSM/IPR/photo exterior; interior closure is a pilot adaptation",
+@@ -192,6 +193,7 @@ export function buildLandmarkReality(options: {
+           ? false
+           : "opaque",
+       sourcePack: "landmark-reality",
++      ...(part.material === "stadium-glass" ? { authoredLightReceiver: "stadium-glass" } : {}),
+       landmark: part.group,
+       lod: part.lod,
+       sourceMeasured: false,
+diff --git a/client/road-details.ts b/client/road-details.ts
+index d5f91345..4147cd80 100644
+--- a/client/road-details.ts
++++ b/client/road-details.ts
+@@ -297,7 +297,7 @@ export function buildRoadDetails(scene: Scene) {
+       m.roughness = 0.65;
+       face.material = m;
+       face.isVisible = false;
+-      face.metadata = { depthCaster: false };
++      face.metadata = { depthCaster: false, authoredLightReceiver: "road-sign-face" };
+       templates.set(key, face);
+     }
+     let back = backs.get(sign.kind);
+diff --git a/tests/b6-reality.test.ts b/tests/b6-reality.test.ts
+index 2ab6d1a5..ac82a3b8 100644
+--- a/tests/b6-reality.test.ts
++++ b/tests/b6-reality.test.ts
+@@ -1,3 +1,4 @@
++import { AuthoredLightPreparation } from "../client/authored-light-preparation";
+ import test from "node:test";
+ import type { PointLight } from "@babylonjs/core/Lights/pointLight";
+ import assert from "node:assert/strict";
+@@ -14,7 +15,7 @@ import {
+   b6StairRoute,
+   B6_ENTRY_PACK,
+ } from "../shared/b6-interior";
+-import { B6_PROP_COLLISIONS, B6_ASSET_MANIFEST } from "../shared/b6-props";
++import { B6_PROP_COLLISIONS, B6_ASSET_MANIFEST, B6_PROP_PLACEMENTS } from "../shared/b6-props";
+ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+ import { Scene } from "@babylonjs/core/scene";
+ import { Ray } from "@babylonjs/core/Culling/ray";
+@@ -494,6 +495,7 @@ test("walking around B6 only resynchronizes scene lighting when crossing its int
+ 
+ test("exterior B6 entry stays visible from the north approach at every quality before and after actual GLB loading and root attachment",async()=>{
+   const engine=new NullEngine(),scene=new Scene(engine);
++  engine.getCaps().instancedArrays=true; // Terminal CPU fixture capability, not GPU acceptance.
+   scene.useRightHandedSystem=true;
+   const camera=new FreeCamera("approach test",new Vector3(-4.85,1.7,-110),scene);
+   camera.setTarget(new Vector3(-4.85,2,-77));
+@@ -535,6 +537,37 @@ test("exterior B6 entry stays visible from the north approach at every quality b
+     check();
+     assert.ok(Vector3.Distance(before,entryMeshes[0].getBoundingInfo().boundingBox.minimumWorld)<1e-5,"attachment must preserve entry world geometry");
+     assert.ok(scene.meshes.filter(mesh=>mesh.metadata?.visibilityGroup==="opaque-envelope").every(mesh=>mesh.isEnabled()),"outside floor−1 cannot hide upper opaque floors/roof");
++    const sources=scene.meshes.filter((mesh):mesh is Mesh=>mesh instanceof Mesh&&mesh.metadata?.authoredLightReceiver==="b6-prop-source");
++    assert.ok(sources.length>=B6_ASSET_MANIFEST.assets.length,"each real material-merged GLB source declares receiver coverage");
++    for(const source of sources){assert.equal(source.isVisible,false);for(const node of source.instances)assert.equal(typeof node.metadata.b6PreparationAttachment?.attached,"boolean");}
++    assert.ok(sources.some(source=>source.instances.length>0),"actual placed resources exist alongside unused retained source recipes");
++    controller.update({player:{x:110,y:0,z:12},quality:"medium"});
++    const preparation=new AuthoredLightPreparation(scene),release=preparation.begin();
++    try{
++      const borrowed=sources.flatMap(source=>source.instances).find(node=>node.alwaysSelectAsActiveMesh&&node.metadata.b6PreparationAttachment.attached===false)!;
++      assert.ok(borrowed,"actual disabled/removed B6 prop is borrowed, not just its hidden source");
++      const producer=borrowed.metadata.b6PreparationAttachment;
++      const placement=B6_PROP_PLACEMENTS.find(p=>borrowed.name==="b6 prop "+p.id)!;assert.ok(placement);
++      borrowed.metadata={externalReplacement:true};controller.attachToBuilding(root);
++      assert.equal(producer.attached,false,"common metadata copy does not commit the producer carrier");
++      controller.update({player:{x:placement.x,y:placement.y+B6_LAYOUT.foundationOffset+.82,z:placement.z},quality:"medium",floor:placement.level});
++      assert.equal(producer.attached,true);assert.equal(scene.meshes.filter(mesh=>mesh===borrowed).length,1,"normal takeover must not duplicate borrowed registration");
++      release();assert.equal(borrowed.isEnabled(),true);assert.equal(scene.meshes.filter(mesh=>mesh===borrowed).length,1);
++      assert.equal(borrowed.metadata.externalReplacement,true);assert.equal(borrowed.alwaysSelectAsActiveMesh,false);
++      controller.update({player:{x:110,y:0,z:12},quality:"medium"});
++      assert.equal(producer.attached,false);assert.equal(borrowed.isEnabled(false),false);assert.ok(!scene.meshes.includes(borrowed));
++      const releaseFromCallback=preparation.begin();
++      const callbackNode=sources.flatMap(source=>source.instances).find(node=>node.alwaysSelectAsActiveMesh&&node.metadata.b6PreparationAttachment?.attached===false)!;
++      assert.ok(callbackNode);const callbackProducer=callbackNode.metadata.b6PreparationAttachment;
++      const callbackPlacement=B6_PROP_PLACEMENTS.find(p=>callbackNode.name==="b6 prop "+p.id)!;let tookOver=false;
++      const observer=callbackNode.onEnabledStateChangedObservable.add(enabled=>{
++        if(!enabled&&!tookOver){tookOver=true;controller.update({player:{x:callbackPlacement.x,y:callbackPlacement.y+B6_LAYOUT.foundationOffset+.82,z:callbackPlacement.z},quality:"high",floor:callbackPlacement.level});}
++      });
++      try{releaseFromCallback();assert.equal(tookOver,true);assert.equal(callbackProducer.attached,true);assert.equal(callbackNode.isEnabled(),true);assert.equal(scene.meshes.filter(mesh=>mesh===callbackNode).length,1,"native release callback takeover retains controller registry agreement");}
++      finally{callbackNode.onEnabledStateChangedObservable.remove(observer);releaseFromCallback();}
++
++    }finally{release();preparation.dispose();}
++
+   }finally{if(renderTimer)clearInterval(renderTimer);controller.dispose();scene.dispose();engine.dispose();}
+ });
+ 
+diff --git a/tests/landmark-reality.test.ts b/tests/landmark-reality.test.ts
+index 87a0c6e0..4b9133ab 100644
+--- a/tests/landmark-reality.test.ts
++++ b/tests/landmark-reality.test.ts
+@@ -226,3 +226,13 @@ test("the actual game capsule continuously climbs B2's twelve exterior steps on
+   assert.ok(maxStep < 0.25, "no sudden teleport-like vertical step");
+   sim.dispose();
+ });
++
++test("stadium glass producer declares exact near/far PBR receivers without changing tier visibility, alpha or geometry",()=>{
++  const engine=new NullEngine(),scene=new Scene(engine),controller=buildLandmarkReality({scene,plan});
++  try{
++    const receivers=controller.meshes.filter(mesh=>mesh.metadata.authoredLightReceiver==="stadium-glass");assert.ok(receivers.length>=2);
++    assert.deepEqual(new Set(receivers.map(mesh=>mesh.metadata.lod)),new Set(["near","far"]));
++    for(const mesh of receivers){assert.equal(mesh.metadata.landmark,"stadium");assert.equal(mesh.metadata.sourcePack,"landmark-reality");assert.equal(mesh.material!.metadata.authoredLightReceiver,"stadium-glass");assert.equal(mesh.material!.metadata.landmarkGlass,true);assert.equal(mesh.material!.alpha,1);assert.equal(mesh.metadata.depthCaster,false);assert.ok(mesh.getTotalIndices()>0);assert.equal(mesh.isEnabled(),mesh.metadata.lod==="far");}
++    for(const mesh of controller.meshes.filter(mesh=>!receivers.includes(mesh)))assert.equal(mesh.metadata.authoredLightReceiver,undefined);
++  }finally{controller.dispose();scene.dispose();engine.dispose();}
++});
+diff --git a/tests/road-details.test.ts b/tests/road-details.test.ts
+index a7dea0b1..c3f82b1c 100644
+--- a/tests/road-details.test.ts
++++ b/tests/road-details.test.ts
+@@ -216,3 +216,14 @@ test("Right-handed camera reads sign UVs left to right and pole stays behind the
+   scene.dispose();
+   engine.dispose();
+ });
++
++test("road face producers declare only actual shared PBR face sources, retaining real instances and original sign resources",()=>{
++  const engine=new NullEngine(),scene=new Scene(engine),built=buildRoadDetails(scene);
++  try{
++    const sources=scene.meshes.filter(mesh=>mesh.metadata?.authoredLightReceiver==="road-sign-face");
++    const recipes=new Set(built.signs.map(sign=>sign.kind+":"+sign.name+":"+sign.routes));
++    assert.equal(sources.length,recipes.size);
++    for(const source of sources){assert.equal(source.isVisible,false);assert.ok(source.material);assert.ok(source.getTotalVertices()>0);assert.ok(source.metadata.depthCaster===false);const instances=(source as import("@babylonjs/core/Meshes/mesh").Mesh).instances;assert.ok(instances.length>0);for(const node of instances){assert.equal(node.material,source.material);assert.equal(node.sourceMesh,source);assert.equal(node.metadata.depthCaster,false);assert.equal(node.parent?.metadata.roadSign,true);}}
++    for(const mesh of scene.meshes.filter(mesh=>mesh.name.startsWith("sign source back")||mesh.name==="sign source pole"||mesh.metadata?.roadPaint))assert.equal(mesh.metadata.authoredLightReceiver,undefined);
++  }finally{scene.dispose();engine.dispose();}
++});

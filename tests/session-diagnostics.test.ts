@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 // @ts-expect-error JavaScript CLI module has no separate declaration file.
 import { summarizeDiagnosticFiles } from "../scripts/diagnostics-report.mjs";
 import {
@@ -222,10 +224,9 @@ test("the offline report cannot bridge room counters when their lifecycle marker
   f.recorder.recordFrame(frame, () => context(900));
   f.recorder.resetFrameContext();
   await f.recorder.flush();
-  const directory = new URL(
-    "../.cache/recorder-context-feature/",
-    import.meta.url,
-  );
+  const directory = process.env.GAME_DIAGNOSTICS_TEST_CACHE
+    ? pathToFileURL(resolve(process.env.GAME_DIAGNOSTICS_TEST_CACHE) + "/")
+    : new URL("../.cache/recorder-context-feature/", import.meta.url);
   const path = new URL(`room-counters-${process.pid}.jsonl`, directory);
   await mkdir(directory, { recursive: true });
   try {
@@ -568,6 +569,148 @@ test("a hitch attributes the preceding interval to previous work and bounds cost
   assert.ok(
     f.records().filter((record) => record.kind === "frame-hitch").length <= 4,
   );
+  f.recorder.dispose();
+});
+
+test("completed callback pairs with previous work and keeps legacy/current scopes distinct", async () => {
+  const f = fixture();
+  f.recorder.start(); await settle();
+  f.time(100);
+  f.recorder.recordFrame({ frameStartedAtMs: 90, frameMs: 16, cpuMs: 10, gpuMs: null, phases: { render: 10 } }, () => ({}));
+  const completed = { frameStartedAtMs: 90, cpuMs: 25, token: "PRIVATE-CALLBACK" };
+  f.time(180);
+  f.recorder.recordFrame({ frameStartedAtMs: 175, frameMs: 85, cpuMs: 5, gpuMs: null, phases: { render: 5 }, previousCallback: completed }, () => ({}));
+  completed.cpuMs = 9999;
+  f.time(2200); f.tick(); await f.recorder.flush();
+  const hitch = f.records().find(r => r.kind === "frame-hitch")!;
+  const previous = hitch.data.previousFrame as any;
+  assert.equal(previous.frameStartedAtMs, 90);
+  assert.equal(previous.cpuMs, 10); assert.equal(hitch.data.currentCpuMs, 5);
+  assert.equal(previous.callbackCpuMs, 25); assert.equal(previous.callbackTailMs, 15);
+  const window = f.records().find(r => r.kind === "frame-window")!;
+  assert.deepEqual(window.data.cpuMs, [10, 5]);
+  assert.deepEqual(window.data.previousCallbackCpuMs, [null, 25]);
+  assert.deepEqual(window.data.previousCallbackTailMs, [null, 15]);
+  assert.equal((window.data.summary as any).previousCallbackSamples, 1);
+  assert.equal((window.data.summary as any).previousCallbackCpuMeanMs, 25);
+  assert.equal((window.data.summary as any).previousCallbackTailMeanMs, 15);
+  assert.equal(JSON.stringify(f.posts).includes("PRIVATE-CALLBACK"), false);
+  for (const body of f.bodies) assert.ok(validateDiagnosticsBatch(JSON.parse(body)));
+  f.recorder.dispose();
+});
+
+test("unknown, invalid or mismatched completed callbacks remain null without imputing timestamps", async () => {
+  for (const change of [
+    { previousCallback: undefined },
+    { previousCallback: { frameStartedAtMs: 89, cpuMs: 20 } },
+    { previousCallback: { frameStartedAtMs: NaN, cpuMs: 20 } },
+    { previousCallback: { frameStartedAtMs: -1, cpuMs: 20 }, previousStart: -1 },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: NaN } },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: Infinity } },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: -1 } },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: 9.999 } },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: 86 } },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: 20 }, currentStart: undefined },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: 20 }, currentStart: 90 },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: 20 }, previousStart: undefined },
+    { previousCallback: { frameStartedAtMs: 90, cpuMs: 20 }, previousCpu: NaN },
+  ]) {
+    const f = fixture(); f.recorder.start(); await settle();
+    f.time(100);
+    f.recorder.recordFrame({ frameStartedAtMs: "previousStart" in change ? change.previousStart : 90,
+      frameMs: 16, cpuMs: "previousCpu" in change ? change.previousCpu! : 10, gpuMs: null, phases: {} }, () => ({}));
+    f.time(180);
+    f.recorder.recordFrame({ frameStartedAtMs: "currentStart" in change ? change.currentStart : 175,
+      frameMs: 85, cpuMs: 5, gpuMs: null, phases: {}, previousCallback: change.previousCallback }, () => ({}));
+    f.time(2200); f.tick(); await f.recorder.flush();
+    const windows = f.records().filter(r => r.kind === "frame-window");
+    assert.deepEqual(windows.flatMap(r => r.data.previousCallbackCpuMs as any[]), [null, null]);
+    assert.deepEqual(windows.flatMap(r => r.data.previousCallbackTailMs as any[]), [null, null]);
+    const previous = f.records().find(r => r.kind === "frame-hitch")!.data.previousFrame as any;
+    assert.equal(previous.callbackCpuMs ?? null, null);
+    assert.equal(previous.callbackTailMs ?? null, null);
+    f.recorder.dispose();
+  }
+});
+
+test("callback tail is subtracted before rounding either parent interval", async () => {
+  const f = fixture(); f.recorder.start(); await settle();
+  f.recorder.recordFrame({ frameStartedAtMs: 90, frameMs: 16, cpuMs: 10.004, gpuMs: null, phases: {} }, () => ({}));
+  f.time(180);
+  f.recorder.recordFrame({ frameStartedAtMs: 175, frameMs: 85, cpuMs: 5, gpuMs: null, phases: {},
+    previousCallback: { frameStartedAtMs: 90, cpuMs: 10.006 } }, () => ({}));
+  f.time(2200); f.tick(); await f.recorder.flush();
+  const previous = f.records().find(r => r.kind === "frame-hitch")!.data.previousFrame as any;
+  assert.equal(previous.cpuMs, 10); assert.equal(previous.callbackCpuMs, 10.01);
+  assert.equal(previous.callbackTailMs, 0, "round the true .002ms tail, not the .01 difference between displayed parents");
+  f.recorder.dispose();
+});
+
+test("completed callback pairing is invalidated by context boundaries including reset during context capture", async () => {
+  for (const boundary of [...frameContextBoundaries, "capture-reset"]) {
+    const f = fixture(); f.recorder.start(); await settle();
+    f.time(100);
+    f.recorder.recordFrame({ frameStartedAtMs: 90, frameMs: 16, cpuMs: 10, gpuMs: null, phases: {} }, () => ({}));
+    if (boundary !== "capture-reset") f.recorder.event(boundary);
+    f.time(500);
+    f.recorder.recordFrame({ frameStartedAtMs: 490, frameMs: 400, cpuMs: 10, gpuMs: null, phases: {},
+      previousCallback: { frameStartedAtMs: 90, cpuMs: 20 } }, () => {
+      if (boundary === "capture-reset") f.recorder.resetFrameContext();
+      return {};
+    });
+    f.time(2200); f.tick(); await f.recorder.flush();
+    const hitch = f.records().find(r => r.kind === "frame-hitch")!;
+    assert.equal(hitch.data.previousFrame, null, boundary);
+    assert.ok(f.records().filter(r => r.kind === "frame-window").every(r =>
+      (r.data.previousCallbackCpuMs as any[]).every(value => value === null)), boundary);
+    f.recorder.dispose();
+  }
+});
+
+test("completed callback arrays stay bounded, aligned and complete across high-refresh window boundaries", async () => {
+  const f = fixture(); f.recorder.start(); await settle();
+  for (let index = 0; index < 1025; index++) {
+    const start = 100 + index * .5;
+    f.time(start + .1);
+    f.recorder.recordFrame({ frameStartedAtMs: start, frameMs: .5, cpuMs: .1, gpuMs: null, phases: { render: .1 },
+      previousCallback: index ? { frameStartedAtMs: start - .5, cpuMs: .2 } : undefined }, () => ({}));
+  }
+  f.time(2200); f.tick(); await f.recorder.flush();
+  const windows = f.records().filter(r => r.kind === "frame-window");
+  assert.ok(windows.every(r => (r.data.frameMs as any[]).length <= 512));
+  const full = windows.flatMap(r => r.data.previousCallbackCpuMs as any[]);
+  const tail = windows.flatMap(r => r.data.previousCallbackTailMs as any[]);
+  assert.equal(full.length, 1025); assert.equal(tail.length, full.length);
+  assert.equal(full[0], null); assert.equal(tail[0], null);
+  assert.ok(full.slice(1).every(value => value === .2));
+  assert.ok(tail.slice(1).every(value => value === .1));
+  assert.equal(windows.reduce((n, r) => n + (r.data.summary as any).previousCallbackSamples, 0), 1024);
+  for (const body of f.bodies) assert.ok(validateDiagnosticsBatch(JSON.parse(body)));
+  assert.equal(f.recorder.status().dropped, 0);
+  f.recorder.dispose();
+});
+
+test("visibility transitions discard the old callback pair and resume pairing only after a new frame", async () => {
+  const f = fixture();
+  const documentTarget = new EventTarget() as EventTarget & { visibilityState: string; hasFocus: () => boolean };
+  documentTarget.visibilityState = "visible"; documentTarget.hasFocus = () => true;
+  f.environment.document = documentTarget as unknown as Document;
+  f.recorder.start(); await settle();
+  f.recorder.recordFrame({ frameStartedAtMs: 90, frameMs: 16, cpuMs: 10, gpuMs: null, phases: {}, previousCallback: undefined }, () => ({}));
+  f.time(200); documentTarget.visibilityState = "hidden";
+  documentTarget.dispatchEvent(new Event("visibilitychange"));
+  f.time(10000); documentTarget.visibilityState = "visible";
+  documentTarget.dispatchEvent(new Event("visibilitychange"));
+  f.recorder.recordFrame({ frameStartedAtMs: 10000, frameMs: 9800, cpuMs: 2, gpuMs: null, phases: {},
+    previousCallback: { frameStartedAtMs: 90, cpuMs: 50 } }, () => ({}));
+  f.time(10019);
+  f.recorder.recordFrame({ frameStartedAtMs: 10016, frameMs: 16, cpuMs: 2, gpuMs: null, phases: {},
+    previousCallback: { frameStartedAtMs: 10000, cpuMs: 3 } }, () => ({}));
+  f.time(22000); f.tick(); await f.recorder.flush();
+  assert.equal(f.records().find(r => r.kind === "frame-hitch")!.data.previousFrame, null);
+  const windows = f.records().filter(r => r.kind === "frame-window");
+  assert.deepEqual(windows.flatMap(r => r.data.previousCallbackCpuMs as any[]), [null, null, 3]);
+  assert.deepEqual(windows.flatMap(r => r.data.previousCallbackTailMs as any[]), [null, null, 1]);
   f.recorder.dispose();
 });
 
@@ -922,6 +1065,7 @@ test("healthy automatic transport drains sustained production-sized hitches and 
         cpuMs: 30,
         gpuMs: 15,
         phases: { render: 26, vegetation: 3 },
+        previousCallback: index ? { frameStartedAtMs: now - 50, cpuMs: 35 } : undefined,
       },
       () => context,
     );

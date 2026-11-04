@@ -1,0 +1,216 @@
+TAP version 13
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:11:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: explicit ready-generation revalidation still submits and waits for scope/fence/pending readiness without another state transition
+ok 1 - explicit ready-generation revalidation still submits and waits for scope/fence/pending readiness without another state transition
+  ---
+  duration_ms: 11.3029
+  type: 'test'
+  ...
+# Subtest: ready revalidation refuses foreign generation and a generation changed while the original fence is pending
+ok 2 - ready revalidation refuses foreign generation and a generation changed while the original fence is pending
+  ---
+  duration_ms: 3.2133
+  type: 'test'
+  ...
+# Subtest: ready revalidation preserves original validation error and the caller's remaining deadline
+ok 3 - ready revalidation preserves original validation error and the caller's remaining deadline
+  ---
+  duration_ms: 2.4006
+  type: 'test'
+  ...
+# Subtest: final submission waits for diagnostic-only shader work created by that same frame
+ok 4 - final submission waits for diagnostic-only shader work created by that same frame
+  ---
+  duration_ms: 3.7079
+  type: 'test'
+  ...
+# Subtest: late fulfilled compilation errors reject final acceptance after a successful submission
+ok 5 - late fulfilled compilation errors reject final acceptance after a successful submission
+  ---
+  duration_ms: 1.268
+  type: 'test'
+  ...
+# Subtest: diagnostic-only pending work cannot extend the final visible deadline
+ok 6 - diagnostic-only pending work cannot extend the final visible deadline
+  ---
+  duration_ms: 1.5817
+  type: 'test'
+  ...
+# Subtest: startup needs an actual ready submitted frame, then removes all idle work
+ok 7 - startup needs an actual ready submitted frame, then removes all idle work
+  ---
+  duration_ms: 1.4226
+  type: 'test'
+  ...
+# Subtest: readiness must hold before and after the frame and tracked compilation must finish
+ok 8 - readiness must hold before and after the frame and tracked compilation must finish
+  ---
+  duration_ms: 1.5865
+  type: 'test'
+  ...
+# Subtest: initially hidden time does not consume the startup budget or submit frames
+ok 9 - initially hidden time does not consume the startup budget or submit frames
+  ---
+  duration_ms: 13.3779
+  type: 'test'
+  ...
+# Subtest: hiding during a pending submission pauses the timer and requires a visible ready frame
+ok 10 - hiding during a pending submission pauses the timer and requires a visible ready frame
+  ---
+  duration_ms: 6.729
+  type: 'test'
+  ...
+# Subtest: a pending submission cannot hide the visible deadline and late success cannot mark ready
+ok 11 - a pending submission cannot hide the visible deadline and late success cannot mark ready
+  ---
+  duration_ms: 2.6029
+  type: 'test'
+  ...
+# Subtest: a synchronous render stall loses to the deadline before the overdue timer task runs
+ok 12 - a synchronous render stall loses to the deadline before the overdue timer task runs
+  ---
+  duration_ms: 2.1997
+  type: 'test'
+  ...
+# Subtest: native device loss promptly cancels a pending submission without Babylon restoration
+ok 13 - native device loss promptly cancels a pending submission without Babylon restoration
+  ---
+  duration_ms: 4.5936
+  type: 'test'
+  ...
+# Subtest: renderer disposal promptly rejects a pending queue and late completion stays disposed
+ok 14 - renderer disposal promptly rejects a pending queue and late completion stays disposed
+  ---
+  duration_ms: 2.5502
+  type: 'test'
+  ...
+# Subtest: abort before startup schedules no frame and is not a render fault
+ok 15 - abort before startup schedules no frame and is not a render fault
+  ---
+  duration_ms: 2.4462
+  type: 'test'
+  ...
+# Subtest: abort during render closes only the scope and never flushes or submits
+ok 16 - abort during render closes only the scope and never flushes or submits
+  ---
+  duration_ms: 1.4172
+  type: 'test'
+  ...
+# Subtest: abort during a never-settling submission releases every health waiter
+ok 17 - abort during a never-settling submission releases every health waiter
+  ---
+  duration_ms: 1.2189
+  type: 'test'
+  ...
+# Subtest: a readiness check that faults the owner cannot render the invalid scene
+ok 18 - a readiness check that faults the owner cannot render the invalid scene
+  ---
+  duration_ms: 0.8042
+  type: 'test'
+  ...
+# Subtest: a fault between a guard settlement and its continuation cannot render
+ok 19 - a fault between a guard settlement and its continuation cannot render
+  ---
+  duration_ms: 0.8584
+  type: 'test'
+  ...
+# Subtest: queue rejection keeps its original error and cannot produce ready
+ok 20 - queue rejection keeps its original error and cannot produce ready
+  ---
+  duration_ms: 0.8131
+  type: 'test'
+  ...
+# Subtest: GPU scope validation fails the owner once even when queue submission succeeds
+ok 21 - GPU scope validation fails the owner once even when queue submission succeeds
+  ---
+  duration_ms: 0.7152
+  type: 'test'
+  ...
+# Subtest: render exceptions skip pinned end/flush/submit and consume the closed scope's late rejection
+ok 22 - render exceptions skip pinned end/flush/submit and consume the closed scope's late rejection
+  ---
+  duration_ms: 1.1469
+  type: 'test'
+  ...
+# Subtest: manual startup retains falsy source throws before scope or reporter failures
+ok 23 - manual startup retains falsy source throws before scope or reporter failures
+  ---
+  duration_ms: 2.6857
+  type: 'test'
+  ...
+# Subtest: manual startup disposal inside render cannot flush the disposed owner
+ok 24 - manual startup disposal inside render cannot flush the disposed owner
+  ---
+  duration_ms: 0.671
+  type: 'test'
+  ...
+# Subtest: synchronous startup source error wins over an already fulfilled scope validation error
+ok 25 - synchronous startup source error wins over an already fulfilled scope validation error
+  ---
+  duration_ms: 2.6621
+  type: 'test'
+  ...
+# Subtest: native startup does not silently fall back when submission validation is absent
+ok 26 - native startup does not silently fall back when submission validation is absent
+  ---
+  duration_ms: 0.6276
+  type: 'test'
+  ...
+# Subtest: WebGL still needs an actual frame and never reads a native device
+ok 27 - WebGL still needs an actual frame and never reads a native device
+  ---
+  duration_ms: 0.8133
+  type: 'test'
+  ...
+# Subtest: owned resource failure promptly cancels even a never-settling queue
+ok 28 - owned resource failure promptly cancels even a never-settling queue
+  ---
+  duration_ms: 0.9438
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1222.825

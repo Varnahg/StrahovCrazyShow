@@ -992,6 +992,168 @@ test("batch append uploads the new count, compaction keeps native matrix snapsho
   }
 });
 
+function batchSnapshotFixture(t: TestContext) {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  const batches: PhotoGrassBatch[] = [];
+  t.after(() => {
+    for (const batch of batches) batch.dispose();
+    scene.dispose(); engine.dispose();
+  });
+  return () => {
+    let radius = 0;
+    const batch = new PhotoGrassBatch("far", {
+      clone: (_level, name) => {
+        const mesh = MeshBuilder.CreateBox(name, { width: .2, height: .4, depth: .2 }, scene);
+        radius = Math.max(...mesh.getBoundingInfo().boundingBox.vectors.map(v => v.length())) + .02;
+        return mesh;
+      },
+    });
+    batches.push(batch);
+    const expected: { root: GrassRootState; matrix: Float32Array }[] = [];
+    const add = (id: number, recycled?: GrassRootState) => {
+      const source = new Float32Array(32);
+      source.set(Matrix.RotationYawPitchRoll(id * .17, id * .03, id * -.07).m, 16);
+      source[28] = id * .13; source[29] = id % 7 * .21; source[30] = id * -.31;
+      const tileX = 110, tileZ = -34;
+      const matrix = source.slice(16);
+      matrix[12] += tileX; matrix[14] += tileZ;
+      const root = recycled ?? { fade: { from: 0, to: 1, startedAt: 0 } } as GrassRootState;
+      Object.assign(root, { id, tileId: "snapshot-test", x: matrix[12], y: matrix[13], z: matrix[14],
+        seed: id * .001, level: "far", slot: -1 });
+      Object.assign(root.fade, { from: .25, to: 1, startedAt: id * .01 });
+      expected.push({ root, matrix });
+      batch.add(root, source, 16, tileX, tileZ);
+      return root;
+    };
+    const remove = (index: number) => {
+      const removed = expected[index].root;
+      const last = expected.pop()!;
+      if (index < expected.length) expected[index] = last;
+      batch.remove(removed);
+      return removed;
+    };
+    const verify = () => {
+      assert.equal(batch.mesh.thinInstanceCount, expected.length);
+      assert.equal(batch.mesh.isEnabled(), expected.length > 0);
+      assert.equal(batch.roots.length, expected.length);
+      const snapshots = batch.mesh.thinInstanceGetWorldMatrices();
+      assert.equal(snapshots.length, expected.length);
+      const fades = batch.mesh.getVertexBuffer("photoGrassFade")!.getData()!;
+      assert.ok(fades instanceof Float32Array);
+      const data = (batch.mesh as any)._thinInstanceDataStorage.matrixData as Float32Array;
+      for (let slot = 0; slot < expected.length; slot++) {
+        const { root, matrix } = expected[slot];
+        assert.equal(root.slot, slot); assert.equal(batch.roots[slot], root);
+        assert.deepEqual(Array.from(snapshots[slot].m), Array.from(matrix));
+        assert.deepEqual(Array.from(data.subarray(slot * 16, slot * 16 + 16)), Array.from(matrix));
+        assert.deepEqual(Array.from(fades.slice(slot * 4, slot * 4 + 4)),
+          Array.from(new Float32Array([root.fade.from, root.fade.to, root.fade.startedAt, root.seed])));
+      }
+      if (expected.length) {
+        const bounds = batch.mesh.getBoundingInfo().boundingBox;
+        for (const axis of ["x", "y", "z"] as const) {
+          const coordinates = expected.map(({ root }) => root[axis]);
+          assert.equal(bounds.minimumWorld[axis], Math.min(...coordinates) - radius);
+          assert.equal(bounds.maximumWorld[axis], Math.max(...coordinates) + radius);
+        }
+      }
+    };
+    let conversions = 0;
+    const fromArray = Matrix.FromArrayToRef;
+    t.mock.method(Matrix, "FromArrayToRef", <T extends Matrix>(array: Parameters<typeof fromArray>[0], offset: number, result: T) => {
+      if (array === (batch.mesh as any)._thinInstanceDataStorage.matrixData) conversions++;
+      return fromArray(array, offset, result);
+    });
+    const flush = (count?: number) => {
+      conversions = 0;
+      batch.flush();
+      if (count !== undefined) assert.equal(conversions, count, "actual native + application snapshot conversions");
+      verify();
+    };
+    return { batch, expected, add, remove, verify, flush };
+  };
+}
+
+test("batch snapshots convert only changed numerical slots through compaction, tail reuse and fade-only frames", t => {
+  const f = batchSnapshotFixture(t)();
+  for (let id = 0; id < 32; id++) f.add(id);
+  f.flush(32);
+  const snapshots = f.batch.mesh.thinInstanceGetWorldMatrices(), first = snapshots[0], movedSlot = snapshots[3];
+  f.add(32); f.flush(1);
+  assert.equal(f.batch.mesh.thinInstanceGetWorldMatrices(), snapshots);
+  assert.equal(snapshots[0], first);
+  f.remove(3); f.flush(1);
+  assert.equal(snapshots[3], movedSlot, "compaction updates the existing slot Matrix object");
+  f.remove(f.expected.length - 1); f.flush(0);
+  f.remove(3); f.remove(3); f.remove(3); f.flush(1);
+  // Reusing one tail repeatedly must not enqueue duplicate slots or overflow.
+  for (let id = 40; id < 1040; id++) { f.add(id); f.remove(f.expected.length - 1); }
+  f.add(1040); f.flush(1);
+  const root = f.expected[0].root;
+  root.fade.to = 0; root.fade.startedAt += 1;
+  f.batch.updateFade(root); f.flush(0); f.flush(0);
+  while (f.expected.length) f.remove(f.expected.length - 1);
+  f.flush(0);
+  f.add(1041); f.flush(1);
+  assert.equal(f.batch.allocatedBytes, 64 * 85, "matrix, fade and 5 bookkeeping bytes per capacity slot");
+  f.batch.dispose();
+  assert.equal(f.batch.allocatedBytes, 0);
+  assert.equal(f.batch.mesh.isDisposed(), true);
+});
+
+test("batch snapshot rebound performs one native conversion and reserve-only or unexpected caches recover completely", t => {
+  const f = batchSnapshotFixture(t)();
+  for (let id = 0; id < 64; id++) f.add(id);
+  f.flush(64);
+  const original = f.batch.mesh.thinInstanceGetWorldMatrices();
+  f.remove(2); f.add(64); f.add(65);
+  f.flush(65);
+  assert.notEqual(f.batch.mesh.thinInstanceGetWorldMatrices(), original);
+  assert.equal(f.batch.allocatedBytes, 128 * 85);
+  f.batch.reserve(256);
+  f.flush(0); // verify() is the external reader that builds the new native cache.
+  f.add(66); f.flush(66);
+  const storage = (f.batch.mesh as any)._thinInstanceDataStorage;
+  f.batch.mesh.thinInstanceSetBuffer("matrix", storage.matrixData, 16, false);
+  f.batch.mesh.thinInstanceCount = f.expected.length;
+  const externalCache = f.batch.mesh.thinInstanceGetWorldMatrices();
+  f.add(67); f.flush(67);
+  assert.equal(f.batch.mesh.thinInstanceGetWorldMatrices(), externalCache);
+  externalCache.length = 1;
+  f.add(68); f.flush(68);
+  assert.equal(f.batch.allocatedBytes, 256 * 85);
+});
+
+test("batch snapshots retain pending changes after a failed flush and root pooling across batches", t => {
+  const create = batchSnapshotFixture(t), a = create(), b = create();
+  for (let id = 0; id < 8; id++) a.add(id);
+  a.flush(8);
+  const recycled = a.remove(2);
+  b.add(20, recycled);
+  a.add(30);
+  let fail = true;
+  const setBounds = a.batch.mesh.setBoundingInfo.bind(a.batch.mesh);
+  t.mock.method(a.batch.mesh, "setBoundingInfo", (bounds: Parameters<typeof setBounds>[0]) => {
+    if (fail) { fail = false; throw Error("intentional bounds failure"); }
+    return setBounds(bounds);
+  });
+  assert.throws(() => a.batch.flush(), /intentional bounds failure/);
+  a.remove(2); a.add(31);
+  a.flush(); b.flush(1);
+  const pooledAgain = b.remove(0);
+  a.add(32, pooledAgain);
+  b.flush(0); a.flush(1);
+  // Independent operation trace covers multiple swaps/appends between flushes.
+  let state = 19;
+  for (let turn = 0; turn < 160; turn++) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    if (a.expected.length && state % 3 === 0) a.remove(state % a.expected.length);
+    else a.add(100 + turn);
+    if (turn % 7 === 0) a.flush();
+  }
+  a.flush();
+});
+
 test("production renderer batches many world tiles, retains meshes/roots and stays under caps through movement and high→low", (t) => {
   fixedPreparationClock(t);
   const f = fixture();

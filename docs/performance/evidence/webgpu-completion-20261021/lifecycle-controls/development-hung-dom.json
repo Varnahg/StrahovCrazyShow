@@ -1,0 +1,305 @@
+{
+  "capturedAtUTC": "2026-10-21T18:32:09.301Z",
+  "scope": "QA helper CPU/syntax/TSX only; no GPU/build/server/install/full project suite",
+  "command": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe --import tsx --test --test-reporter=tap C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\helper.test.mjs C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\clock.test.mjs C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\weather-latency.test.mjs C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\shader-attribution.test.mjs C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\shader-lifetime.test.mjs C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\routine-cost.test.mjs C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\buffer-lifecycle.test.mjs C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\lifecycle-controls.test.mjs",
+  "exit": 1,
+  "tests": 146,
+  "before": {
+    "helper": {
+      "sha256": "a42f0312c8f014ce02c5867420db02658af3e24a941c56bf630bfbdfbc184d92",
+      "files": {
+        "common.mjs": "3743bc651171fb73333bd5ce67e9d00263915015edd5fd938b3f4d85283b3755",
+        "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+        "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+        "receipt.mjs": "f43ae7ac74c0493b3a268d855337c6494f60bbc4459ec3401809b0253999e87d",
+        "harness.mjs": "3d1bbbf38b42197a934de2296337d584160e046b0857a2f8cb060310ddcfa6a0",
+        "qa-overlay.mjs": "bcdf2d9223a16415e34e8f28762629b3a2dd1d7cefc6fea045ddfc3355ff560d",
+        "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+        "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+        "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+        "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+        "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+        "shader-attribution.mjs": "364d803eadd5f1ce8ba1cadca13cbac01e3249e396db02db09a2ae844870def1",
+        "shader-lifetime.mjs": "b317683af353e59e67a065585da0614c168ec3a24ad1eb65c5557ec3afda8163",
+        "routine-cost-core.mjs": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+        "routine-cost.mjs": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+        "routine-cost.test.mjs": "cc37ab5c7d826f9dd67b4db50f536faf2f86675f7d58a0c9a3d79e58bc21347f",
+        "buffer-lifecycle-core.mjs": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+        "buffer-lifecycle.mjs": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+        "buffer-lifecycle.test.mjs": "d39e5c9fa4906f22b5b91d944fdc7cb8d6c97808f30239bcf194602154bf7a46",
+        "lifecycle-controls.mjs": "6160084777338953babbd7012f314ff2abd69789938c585453399a06c6dfd845",
+        "lifecycle-controls.test.mjs": "9b5e05c3a75b534dc2bb87d87909c5e7fa162cd5796346568eae9506dc92575b",
+        "helper.test.mjs": "04f8dace82d8e46d9cd50b70cce97ee24f234363c0f3f1cd90c5487c15e32a2d",
+        "clock.test.mjs": "b459a005783686fbef5e8c0abce1369f88dc251d0285bff8dbf54ffc7eee0638",
+        "weather-latency.test.mjs": "50980c1ed7224c9aa67e48c436b7b1a2d874dab0859790c534c34146f01c17f9",
+        "shader-attribution.test.mjs": "59e0fa30437d5b6103666ef599aa5cfc350084a5ebd28412f36236b20b337761",
+        "shader-lifetime.test.mjs": "5dbac5438fb8583860b1816f8857c4f211c047b9e4566b568765be7b08fdaba7",
+        "README.md": "a12a9088718f7b4562a59d1247142f867b949c00922f2c689e3f495eeb128ad9"
+      }
+    },
+    "protected": {
+      "client/game.ts": "b8f1cc7daec8f05655f7bbcd2e3338aaad768789cc25dfa76e842be0d3a11190",
+      "client/ui.tsx": "b01b114c2ef1f2076d80d7e81bf232449e1c3003fa9818bf70e40714cbb8b3f9",
+      "client/render-startup.ts": "bd15587d199abce9f9c7833309d175041ca4ef389b8a1803499400b105db0661",
+      "client/render-health.ts": "7a5027922feb2292e9238917a7af58a2371187446d8cc36f0324562e49d583a4",
+      "client/render-engine.ts": "d7d2ff94ba1cd628817cdae2e748c7f59a60f3f0af5199ae120b50db1ef97858",
+      "client/webgpu-validation.ts": "f0804292f54bb2121b813edfade18dd19af8949111b532db258860532b25645e",
+      "server/index.ts": "aeb24b6f42a1b1a4a70e5c47a62b7b6e52365bdbf70940aa398a06e08ae963d6",
+      "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+      "package.json": "52c317376b3fa3c0d9fe64614adc52adff6caab52a9d6b35f611ca026d7743ee",
+      "pnpm-lock.yaml": "d91d6f2cdc70196ee1a44b7ae9b1adab8b8bd48f2092b138a4def94a12c668df",
+      "vite.config.ts": "cc47fe99d9b5dbe6a3e8de884f65f6eaca7b497f5b4761a189b7b4ce70db5a4e",
+      "patches/@babylonjs__core@9.30.0.patch": "597beca732c25cbb128271fad6681fd0176726962ede3218db41057359ea9b72",
+      "node_modules/@babylonjs/core/Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+      "node_modules/@babylonjs/core/Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16"
+    },
+    "frozen": {
+      "common.mjs": "f1d1a33140045c22762cd11b9f741518fe855e5217dd303dffb3ec863faa037a",
+      "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+      "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+      "receipt.mjs": "1fbb6ef8bbd59a5af2f381dc1b18d180714732a123d7bbbdc36d8ea6e4082e42",
+      "harness.mjs": "a355b66bcc1d1315dd429088db01f201a3189a2c0128892d39f5192d8417a75d",
+      "qa-overlay.mjs": "a29dda9dde5ff702496f777fc876a0ff98cf22f0a5ccef9775844f192fdeef9b",
+      "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+      "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+      "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+      "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+      "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+      "shader-attribution.mjs": "364d803eadd5f1ce8ba1cadca13cbac01e3249e396db02db09a2ae844870def1",
+      "shader-lifetime.mjs": "b317683af353e59e67a065585da0614c168ec3a24ad1eb65c5557ec3afda8163",
+      "routine-cost-core.mjs": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+      "routine-cost.mjs": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+      "routine-cost.test.mjs": "cc37ab5c7d826f9dd67b4db50f536faf2f86675f7d58a0c9a3d79e58bc21347f",
+      "buffer-lifecycle-core.mjs": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+      "buffer-lifecycle.mjs": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+      "buffer-lifecycle.test.mjs": "da3ca9c09462b7b6c6c1135e2b214183338d0e44ca64f031e7a716941599a7da",
+      "helper.test.mjs": "c6be59616b33d393eb28b418596a01fb2da5f8017534881426865aac7eb68903",
+      "clock.test.mjs": "67031042ca1fce5ecfc377dc1320e0d74f91dd87eebbe2926eaf41a60196d08b",
+      "weather-latency.test.mjs": "f30ee0dbc1a44cbb37857d596d2cae71c0603281ed3e358ba226a31785c1e426",
+      "shader-attribution.test.mjs": "c77e9148491872c65c9c542719ececc4bea8cc648b2e82f12fa7c0e5d2c43141",
+      "shader-lifetime.test.mjs": "5dbac5438fb8583860b1816f8857c4f211c047b9e4566b568765be7b08fdaba7",
+      "README.md": "a12a9088718f7b4562a59d1247142f867b949c00922f2c689e3f495eeb128ad9"
+    }
+  },
+  "after": {
+    "helper": {
+      "sha256": "a42f0312c8f014ce02c5867420db02658af3e24a941c56bf630bfbdfbc184d92",
+      "files": {
+        "common.mjs": "3743bc651171fb73333bd5ce67e9d00263915015edd5fd938b3f4d85283b3755",
+        "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+        "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+        "receipt.mjs": "f43ae7ac74c0493b3a268d855337c6494f60bbc4459ec3401809b0253999e87d",
+        "harness.mjs": "3d1bbbf38b42197a934de2296337d584160e046b0857a2f8cb060310ddcfa6a0",
+        "qa-overlay.mjs": "bcdf2d9223a16415e34e8f28762629b3a2dd1d7cefc6fea045ddfc3355ff560d",
+        "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+        "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+        "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+        "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+        "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+        "shader-attribution.mjs": "364d803eadd5f1ce8ba1cadca13cbac01e3249e396db02db09a2ae844870def1",
+        "shader-lifetime.mjs": "b317683af353e59e67a065585da0614c168ec3a24ad1eb65c5557ec3afda8163",
+        "routine-cost-core.mjs": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+        "routine-cost.mjs": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+        "routine-cost.test.mjs": "cc37ab5c7d826f9dd67b4db50f536faf2f86675f7d58a0c9a3d79e58bc21347f",
+        "buffer-lifecycle-core.mjs": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+        "buffer-lifecycle.mjs": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+        "buffer-lifecycle.test.mjs": "d39e5c9fa4906f22b5b91d944fdc7cb8d6c97808f30239bcf194602154bf7a46",
+        "lifecycle-controls.mjs": "6160084777338953babbd7012f314ff2abd69789938c585453399a06c6dfd845",
+        "lifecycle-controls.test.mjs": "9b5e05c3a75b534dc2bb87d87909c5e7fa162cd5796346568eae9506dc92575b",
+        "helper.test.mjs": "04f8dace82d8e46d9cd50b70cce97ee24f234363c0f3f1cd90c5487c15e32a2d",
+        "clock.test.mjs": "b459a005783686fbef5e8c0abce1369f88dc251d0285bff8dbf54ffc7eee0638",
+        "weather-latency.test.mjs": "50980c1ed7224c9aa67e48c436b7b1a2d874dab0859790c534c34146f01c17f9",
+        "shader-attribution.test.mjs": "59e0fa30437d5b6103666ef599aa5cfc350084a5ebd28412f36236b20b337761",
+        "shader-lifetime.test.mjs": "5dbac5438fb8583860b1816f8857c4f211c047b9e4566b568765be7b08fdaba7",
+        "README.md": "a12a9088718f7b4562a59d1247142f867b949c00922f2c689e3f495eeb128ad9"
+      }
+    },
+    "protected": {
+      "client/game.ts": "b8f1cc7daec8f05655f7bbcd2e3338aaad768789cc25dfa76e842be0d3a11190",
+      "client/ui.tsx": "b01b114c2ef1f2076d80d7e81bf232449e1c3003fa9818bf70e40714cbb8b3f9",
+      "client/render-startup.ts": "bd15587d199abce9f9c7833309d175041ca4ef389b8a1803499400b105db0661",
+      "client/render-health.ts": "7a5027922feb2292e9238917a7af58a2371187446d8cc36f0324562e49d583a4",
+      "client/render-engine.ts": "d7d2ff94ba1cd628817cdae2e748c7f59a60f3f0af5199ae120b50db1ef97858",
+      "client/webgpu-validation.ts": "f0804292f54bb2121b813edfade18dd19af8949111b532db258860532b25645e",
+      "server/index.ts": "aeb24b6f42a1b1a4a70e5c47a62b7b6e52365bdbf70940aa398a06e08ae963d6",
+      "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+      "package.json": "52c317376b3fa3c0d9fe64614adc52adff6caab52a9d6b35f611ca026d7743ee",
+      "pnpm-lock.yaml": "d91d6f2cdc70196ee1a44b7ae9b1adab8b8bd48f2092b138a4def94a12c668df",
+      "vite.config.ts": "cc47fe99d9b5dbe6a3e8de884f65f6eaca7b497f5b4761a189b7b4ce70db5a4e",
+      "patches/@babylonjs__core@9.30.0.patch": "597beca732c25cbb128271fad6681fd0176726962ede3218db41057359ea9b72",
+      "node_modules/@babylonjs/core/Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+      "node_modules/@babylonjs/core/Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16"
+    },
+    "frozen": {
+      "common.mjs": "f1d1a33140045c22762cd11b9f741518fe855e5217dd303dffb3ec863faa037a",
+      "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+      "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+      "receipt.mjs": "1fbb6ef8bbd59a5af2f381dc1b18d180714732a123d7bbbdc36d8ea6e4082e42",
+      "harness.mjs": "a355b66bcc1d1315dd429088db01f201a3189a2c0128892d39f5192d8417a75d",
+      "qa-overlay.mjs": "a29dda9dde5ff702496f777fc876a0ff98cf22f0a5ccef9775844f192fdeef9b",
+      "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+      "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+      "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+      "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+      "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+      "shader-attribution.mjs": "364d803eadd5f1ce8ba1cadca13cbac01e3249e396db02db09a2ae844870def1",
+      "shader-lifetime.mjs": "b317683af353e59e67a065585da0614c168ec3a24ad1eb65c5557ec3afda8163",
+      "routine-cost-core.mjs": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+      "routine-cost.mjs": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+      "routine-cost.test.mjs": "cc37ab5c7d826f9dd67b4db50f536faf2f86675f7d58a0c9a3d79e58bc21347f",
+      "buffer-lifecycle-core.mjs": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3",
+      "buffer-lifecycle.mjs": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4",
+      "buffer-lifecycle.test.mjs": "da3ca9c09462b7b6c6c1135e2b214183338d0e44ca64f031e7a716941599a7da",
+      "helper.test.mjs": "c6be59616b33d393eb28b418596a01fb2da5f8017534881426865aac7eb68903",
+      "clock.test.mjs": "67031042ca1fce5ecfc377dc1320e0d74f91dd87eebbe2926eaf41a60196d08b",
+      "weather-latency.test.mjs": "f30ee0dbc1a44cbb37857d596d2cae71c0603281ed3e358ba226a31785c1e426",
+      "shader-attribution.test.mjs": "c77e9148491872c65c9c542719ececc4bea8cc648b2e82f12fa7c0e5d2c43141",
+      "shader-lifetime.test.mjs": "5dbac5438fb8583860b1816f8857c4f211c047b9e4566b568765be7b08fdaba7",
+      "README.md": "a12a9088718f7b4562a59d1247142f867b949c00922f2c689e3f495eeb128ad9"
+    }
+  },
+  "stable": true,
+  "syntax": [
+    {
+      "file": "common.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "startup-observer.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "attempt-queue.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "receipt.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "harness.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "qa-overlay.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "transit-clock.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "browser-clock.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "server-bootstrap.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "weather-fixture.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "startup-latency.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "shader-attribution.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "shader-lifetime.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "routine-cost-core.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "routine-cost.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "routine-cost.test.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "buffer-lifecycle-core.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "buffer-lifecycle.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "buffer-lifecycle.test.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "lifecycle-controls.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "lifecycle-controls.test.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "helper.test.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "clock.test.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "weather-latency.test.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "shader-attribution.test.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "shader-lifetime.test.mjs",
+      "exit": 0,
+      "output": ""
+    }
+  ],
+  "uiDiagnostics": [],
+  "transform": {
+    "before": "b01b114c2ef1f2076d80d7e81bf232449e1c3003fa9818bf70e40714cbb8b3f9",
+    "after": "03c21f57ada3f291cbed33f33bc5ebe25eceeb768afaced3f3b72680c60ec842"
+  },
+  "diff": {
+    "exit": 0,
+    "output": ""
+  },
+  "logSha256": "9d35500839bfddb2c909ae0e38646c249414b134c8018cced6839324b599098d",
+  "passed": false
+}

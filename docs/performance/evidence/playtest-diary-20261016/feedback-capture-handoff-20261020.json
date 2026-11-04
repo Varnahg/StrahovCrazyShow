@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUTC": "2026-10-20T20:14:55.040Z",
+  "sender": "diary-01a141c7-root",
+  "sourceTask": "playtest-diary-media-20261016",
+  "sourceOwner": "diary-01a141c7-media",
+  "sourceRoot": "C:\\Users\\rezac\\.codex\\worktrees\\playtest-diary\\StrahovCrazyShow",
+  "sourceHead": "0a598a6a5db4bb4e81469543c72b96b5d88720ed",
+  "sourceState": "Uncommitted paused WIP; not an accepted runtime feature.",
+  "receiver": "feedback-impl-01a15a3e-root",
+  "receiverThread": "01a15a3e-59e3-73f1-9173-357f36b3985a",
+  "receiverIssue": "KEY-52",
+  "receiverTask": "feedback-capture-20261020",
+  "receiverRoot": "C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020",
+  "authorization": "Human explicitly requested complete feedback implementation linked to KEY-21 and approved narrow handoff; verified via read_thread. No credentials or unrelated conversation content retained.",
+  "decision": "Authorize read-only derivation of the one-shot existing-rendered-frame capture primitive into the separately reserved new module. No original diary writes, release, transfer, integration or resume.",
+  "sourceFiles": [
+    {
+      "path": "client/playtest-capture.ts",
+      "bytes": 21613,
+      "sha256": "cf408483376eaa0303b2fcab9027305354a9d89c74d654954d693a2a08a164c8",
+      "gitStatus": "?? client/playtest-capture.ts"
+    },
+    {
+      "path": "tests/playtest-capture.test.ts",
+      "bytes": 12126,
+      "sha256": "bc779a567ab8a927bd0eb2d20ec3e68633adcdad7f266eaebe6855de4b94a880",
+      "gitStatus": "?? tests/playtest-capture.test.ts"
+    },
+    {
+      "path": "shared/playtest-diary.ts",
+      "bytes": 19028,
+      "sha256": "818d55aff03e4eadc98155dd7f72f7dcf11e2dff807b4f602bec3edce6a7ad6f",
+      "gitStatus": "?? shared/playtest-diary.ts"
+    }
+  ],
+  "destinationPaths": [
+    "client/rendered-frame-capture.ts",
+    "tests/rendered-frame-capture.test.ts",
+    "docs/agents/handoffs/feedback-capture-20261020.md"
+  ],
+  "includedMechanisms": [
+    "Restricted end-frame observer/canvas adapter",
+    "Fresh actual-frame metadata validation and private immutable snapshot before asynchronous encoding",
+    "Copy existing rendering canvas through a single owned 2D staging canvas, without scene.render/RTT/context changes",
+    "Single encoder, bounded pending request, explicit no-frame/null/MIME failures",
+    "Logical cancellation, late-result guards and observer/staging resource lifecycle"
+  ],
+  "excludedMechanisms": [
+    "Diary identity/schema/event protocol",
+    "Travel/zone/turn triggers and bursts",
+    "Transport, headers, hashing, retries, upload queue, retention and save receipts",
+    "server/playtest-artifacts.ts",
+    "Timeline/report integration or any protected original source modification"
+  ],
+  "sourceAnchors": [
+    {
+      "path": "client/playtest-capture.ts",
+      "lines": "29-40,98,106-127,135-144,154-162,177-215,229,300-312"
+    },
+    {
+      "path": "shared/playtest-diary.ts",
+      "lines": "77-118,231-268,354-376",
+      "note": "Read-only contract/validation reference; extract only minimal generic fields, not the full diary schema."
+    }
+  ],
+  "testEvidence": {
+    "newTestsRun": false,
+    "historicalReport": "Original agent reported 10 client and 8 server targeted tests passed before subsequent narrow TS errors/fixes; no final accepted current-hash TS/production/GPU result.",
+    "currentFileContainsTenCaptureTests": true,
+    "relevantInspectedTests": [
+      "copies only the rendered end-frame canvas, snapshots metadata before async encode, validates receipt",
+      "PNG is exact source size and overlapping encodes are dropped instead of queued",
+      "unsupported MIME/null encoding, stale dimensions and hidden frames have explicit failures",
+      "performance mode waits for noncancellable encoding and suppresses upload until resumed",
+      "dispose settles pending work and ignores a late encode callback"
+    ],
+    "scope": "Mock CPU lifecycle tests only; no real framebuffer pixels or GPU overhead proof."
+  },
+  "independentReadOnlyReview": {
+    "agent": "/root/capture_handoff_check",
+    "findings": [
+      "Frame-wait timeout is cleared before encoding; no encode timeout can leave idle unresolved.",
+      "No individual cancellation API; browser encoding itself is not cancellable.",
+      "submitFrame retains input reference until end-frame.",
+      "Detached metadata is not deeply frozen; the same object is exposed to callbacks and async code.",
+      "External copied event fires before encoding ownership flag; synchronous disposal may be followed by encoding.",
+      "Canvas-only omits DOM HUD, not canvas-rendered overlays."
+    ]
+  },
+  "requiredReceiverValidation": [
+    "Fresh frame identity/camera/matrices/dimensions remain immutable across delayed encoding and consumer mutation.",
+    "No-frame and never-callback encode timeout; single-request cancel, synchronous callback disposal, late callback after new generation.",
+    "No overlapping encoder and bounded resources on rapid open/close/retry.",
+    "Real browser capture of active canvas without HUD, correct dimensions/orientation/postprocessing and no extra render or preserveDrawingBuffer change.",
+    "Document actual copy/encoding costs; no inherited GPU/FPS claim."
+  ],
+  "claimsChanged": false,
+  "originalWipChanged": false
+}

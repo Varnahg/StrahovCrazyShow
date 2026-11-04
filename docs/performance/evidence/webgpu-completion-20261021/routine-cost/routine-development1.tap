@@ -1,0 +1,105 @@
+TAP version 13
+# BJS - [17:23:05]: Babylon.js v9.30.0 - Null engine
+# Subtest: donor source identity, pin9.30 own methods and precise readiness observer order
+ok 1 - donor source identity, pin9.30 own methods and precise readiness observer order
+  ---
+  duration_ms: 12.9372
+  type: 'test'
+  ...
+# Subtest: donor nested timing preserves receiver/return/false/throw/Promise with selected-only self
+ok 2 - donor nested timing preserves receiver/return/false/throw/Promise with selected-only self
+  ---
+  duration_ms: 3.7559
+  type: 'test'
+  ...
+# Subtest: foreign receiver bypasses all clocks/phase checks, stale disposal and faulty clocks preserve primary result
+ok 3 - foreign receiver bypasses all clocks/phase checks, stale disposal and faulty clocks preserve primary result
+  ---
+  duration_ms: 0.5212
+  type: 'test'
+  ...
+# Subtest: transaction bounds/unsupported descriptors/ownership and foreign descriptor restoration
+ok 4 - transaction bounds/unsupported descriptors/ownership and foreign descriptor restoration
+  ---
+  duration_ms: 0.478
+  type: 'test'
+  ...
+# Subtest: stack32 and call budgets are bounded, explicit and do not suppress original calls
+ok 5 - stack32 and call budgets are bounded, explicit and do not suppress original calls
+  ---
+  duration_ms: 18.8675
+  type: 'test'
+  ...
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# BJS - [17:23:07]: Babylon.js v9.30.0 - Null engine
+# Subtest: defaultoff touches no game/descriptor and actual scene captures exactly8 native frames then restores
+ok 6 - defaultoff touches no game/descriptor and actual scene captures exactly8 native frames then restores
+  ---
+  duration_ms: 2359.3207
+  type: 'test'
+  ...
+# Subtest: actual native material readiness false early return is timed without retry/readiness injection
+not ok 7 - actual native material readiness false early return is timed without retry/readiness injection
+  ---
+  duration_ms: 5.3018
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\routine-cost.test.mjs:113:1'
+  failureType: 'testCodeFailure'
+  error: 'Cannot set property isSync of #<UniformBuffer> which has only a getter'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/docs/performance/evidence/webgpu-completion-20261021/measurement/routine-cost.test.mjs:117:33)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: actual receiver filtering excludes a second scene sharing native prototypes
+ok 8 - actual receiver filtering excludes a second scene sharing native prototypes
+  ---
+  duration_ms: 28.0232
+  type: 'test'
+  ...
+# Subtest: actual ObjectRenderer public phase scopes distinguish RTT/active/main/other and detect unbalanced bounds
+ok 9 - actual ObjectRenderer public phase scopes distinguish RTT/active/main/other and detect unbalanced bounds
+  ---
+  duration_ms: 27.8151
+  type: 'test'
+  ...
+# Subtest: original render throw, scene dispose, abort, retirement and rejoin retain failed evidence and restore ownership
+ok 10 - original render throw, scene dispose, abort, retirement and rejoin retain failed evidence and restore ownership
+  ---
+  duration_ms: 29.7932
+  type: 'test'
+  ...
+# Subtest: foreign render/prototype replacement survives cleanup and marks evidence incomplete
+ok 11 - foreign render/prototype replacement survives cleanup and marks evidence incomplete
+  ---
+  duration_ms: 4.1191
+  type: 'test'
+  ...
+# Subtest: new flag is defaultoff, strict explicit CLI, canonical/sealed/browser identity and receipt bounds
+ok 12 - new flag is defaultoff, strict explicit CLI, canonical/sealed/browser identity and receipt bounds
+  ---
+  duration_ms: 2.6377
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 11
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4882.3505

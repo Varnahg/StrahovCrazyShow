@@ -42,6 +42,12 @@ export type LightPreparationResult = {
     checks: number;
     renders: number;
     restarts: number;
+    /** Last executed operation and queue state, before restoration. Not an
+     * inferred blocking GPU cause; timeout can arrive between callbacks. */
+    lastState?: {
+      operation: NonNullable<LightPreparationResult["failureStep"]>;
+      queueLength: number; cursor: number; retryCount: number; readyRenders: number;
+    };
   }[];
 };
 type ReadyMesh = {
@@ -189,6 +195,7 @@ export function prepareLightVariants(
           checks,
           renders,
           restarts,
+          lastState: { operation, queueLength: queue.length, cursor, retryCount: retry.length, readyRenders },
         });
       }
     };

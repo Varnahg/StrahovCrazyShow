@@ -1,0 +1,7 @@
+# Převzetí PR37 do místního main · 29. 10. 2026
+
+Vlastník rag-main-sync-root-01a16b37. GitHub potvrdil merge PR37 na `8d3e69eccbce326ea198351507b5ea3a52e7cf82`; accepted head `632c61c1825d589799d7afb5174855aedb193786`, společný tree `23aa5a8c2d8a55aaa638634cb9f283c9d7f22f1c`. Fresh ls-remote a celý git diff accepted-head/merge potvrzují shodu. [Project acceptance](https://github.com/Varnahg/StrahovCrazyShow/pull/37#issuecomment-6495366994); verify40862637490 a oba secret checks success na přesném headu. Původní CI failure zůstává v PR evidované.
+
+Po skutečném release RAG integračního okna získán vlastní heavy claim. `D:/CodexWorkspaces/StrahovCrazyShow-main-20261027` byl čistý main3644d773, bez WIP. Preflight nejdříve zastavil před zápisem kvůli nalezenému post-merge hooku; jeho čtení potvrdilo pouze standardní git-lfs post-merge. Hook se neměnil ani neobcházel. Následný `git merge --ff-only 8d3e69eccbce326ea198351507b5ea3a52e7cf82` exit0, konečný HEAD/tree přesně odpovídá přijatému výsledku, Gitclean a ahead/behind0/0.
+
+Převzaty výhradně publikované bloby. Žádné autorské source úpravy, C checkout sync, dependency instalace, build, hra, prohlížeč, DB ani placené API. Vlastní pomocné procesy nezůstávají. Root admin následně označil tento sync a přijatý test-only wait fix done, odblokoval UI source task po skutečném merge a zaregistroval samostatné UI vizuální okno4290. Katalog446PASS v C RAG. UI práce teprve navazuje; celýKEY67 katalog/crawler/deployment a KEY31 nejsou dokončené.

@@ -1,0 +1,1054 @@
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/common.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/common.mjs
+index ed365362..c48463d5 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/common.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/common.mjs
+@@ -52,7 +52,7 @@ export async function directoryHashes(directory) {
+ }
+ export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
+   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
+-  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'pipeline-input-window.mjs', 'pipeline-input-window.test.mjs', 'README.md'];
++  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'pipeline-input-window.mjs', 'pipeline-input-window.test.mjs', 'entry-effect-cost-core.mjs', 'entry-effect-cost.mjs', 'entry-effect-cost.test.mjs', 'README.md'];
+ export function parseBuildOptions(args) {
+   const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false, lifecycleControls: false };
+   let loadingSeen = false;
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/receipt.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/receipt.mjs
+index 803b9d8f..c6a3fe77 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/receipt.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/receipt.mjs
+@@ -8,18 +8,20 @@ import { validateEntryRenderProfile } from './entry-render-cost.mjs';
+ import { validateEntryTrigger } from './entry-routine-cost.mjs';
+ import { validateBufferTrace } from './buffer-lifecycle-core.mjs';
+ import { validatePreparationStages } from './startup-observer.mjs';
++import { validateEntryEffectProfile } from './entry-effect-cost-core.mjs';
+ 
+ export const MAX_RECEIPT_BYTES = 2 * 1024 * 1024;
+ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+ export function validateReceipt(value, identity) {
+   if (!value || value.schemaVersion !== 1 || !uuid.test(value.attemptId ?? '') ||
+       value.buildId !== identity.buildId || value.sourceSnapshotId !== identity.sourceSnapshotId ||
+-      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle','vehicle-entry-cost','pipeline-inputs'].includes(value.kind) ||
++      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle','vehicle-entry-cost','pipeline-inputs','entry-effect-cost'].includes(value.kind) ||
+       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
+   if (typeof identity.lifecycleControls !== 'boolean' || value.lifecycleControls !== identity.lifecycleControls ||
+       (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
+   if (value.pipelineInputs !== undefined && value.kind !== 'pipeline-inputs') throw new Error('Pipeline inputs kind mismatch');
+-  if (value.entryTrigger !== undefined && value.kind !== 'routine-cost') throw new Error('Entry trigger kind mismatch');
++  if (value.entryTrigger !== undefined && value.kind !== 'routine-cost' && value.kind !== 'entry-effect-cost') throw new Error('Entry trigger kind mismatch');
++  if (value.entryEffectProfile !== undefined && value.kind !== 'entry-effect-cost') throw new Error('Entry effect kind mismatch');
+   if (value.preparationStages !== undefined) {
+     if(value.kind!=='startup')throw new Error('Preparation stages kind mismatch');
+     validatePreparationStages(value.preparationStages);
+@@ -74,6 +76,15 @@ export function validateReceipt(value, identity) {
+       }
+     }
+   }
++  if (value.kind === 'entry-effect-cost') {
++    if(identity.routineCost!==true||value.routineCost!==true||value.mode!=='diagnostic'||!value.before||!value.after||
++        !Array.isArray(value.validationErrors)||value.validationErrors.length>16||typeof value.completed!=='boolean'||value.entryTrigger===undefined||value.entryEffectProfile===undefined)throw new Error('Entry effect diagnostic identity/evidence');
++    if(value.entryEffectProfile!==null)validateEntryEffectProfile(value.entryEffectProfile);
++    if(value.entryTrigger===null){if(value.completed||!value.failure||!value.validationErrors.length)throw new Error('Entry effect refusal missing');}
++    else{validateEntryTrigger(value.entryTrigger,value.entryEffectProfile);if(value.completed!==value.entryTrigger.complete)throw new Error('Entry effect completion differs');
++      if(value.entryEffectProfile&&(value.entryTrigger.rendererId!==value.entryEffectProfile.rendererId||value.entryTrigger.generation!==value.entryEffectProfile.generation))throw new Error('Entry effect renderer correlation');}
++    if(value.completed&&value.entryEffectProfile?.complete!==true)throw new Error('Entry effect completion missing');
++  }
+   if (value.kind === 'benchmark') {
+     if (!Array.isArray(value.rawGameFrameMs) || !Array.isArray(value.rawRafFrameMs) ||
+         value.rawGameFrameMs.length > 20000 || value.rawRafFrameMs.length > 20000 ||
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/harness.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/harness.mjs
+index 3cb987b3..42446dfa 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/harness.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/harness.mjs
+@@ -20,7 +20,7 @@ async function dependencyIdentity(snapshot) {
+     '@babylonjs/core/Materials/shadowDepthWrapper.js', '@babylonjs/core/Materials/Textures/texture.pure.js',
+     '@babylonjs/core/Materials/drawWrapper.js', '@babylonjs/core/Materials/material.pure.js', '@babylonjs/core/Materials/effect.pure.js',
+     '@babylonjs/core/Materials/multiMaterial.pure.js', '@babylonjs/core/Materials/effect.functions.js',
+-    '@babylonjs/core/Engines/webgpuEngine.pure.js', '@babylonjs/core/Engines/WebGPU/webgpuPipelineContext.js',
++    '@babylonjs/core/Engines/webgpuEngine.pure.js', '@babylonjs/core/Engines/thinEngine.pure.js', '@babylonjs/core/Engines/WebGPU/webgpuPipelineContext.js',
+     '@babylonjs/core/Lights/Shadows/shadowGenerator.js', '@babylonjs/core/Lights/light.js', '@babylonjs/core/Engines/abstractEngine.pure.js',
+     '@babylonjs/core/scene.pure.js', '@babylonjs/core/Meshes/mesh.pure.js', '@babylonjs/core/Meshes/transformNode.pure.js',
+     '@babylonjs/core/Materials/PBR/pbrBaseMaterial.pure.js', '@babylonjs/core/Materials/standardMaterial.pure.js',
+@@ -149,6 +149,9 @@ export async function run(command, input, output, label, option = 'original', ..
+     const lifecycleControls = await readFile(join(helperDirectory, 'lifecycle-controls.mjs'), 'utf8');
+     const pipelineInputs = await readFile(join(helperDirectory, 'pipeline-input-window.mjs'), 'utf8');
+     const entryRoutine = await readFile(join(helperDirectory, 'entry-routine-cost.mjs'), 'utf8');
++    const entryEffectCore = await readFile(join(helperDirectory, 'entry-effect-cost-core.mjs'), 'utf8');
++    const entryEffect = (await readFile(join(helperDirectory, 'entry-effect-cost.mjs'), 'utf8'))
++      .replace("'./entry-effect-cost-core.mjs'", "'virtual:webgpu-completion-entry-effect-core'");
+     const entryRender = await readFile(join(helperDirectory, 'entry-render-cost.mjs'), 'utf8');
+     const entryClasses = 'export { Game } from ' + JSON.stringify(join(snapshot, 'client/game.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { Scene } from "@babylonjs/core/scene.js";export { GltfLightBudget } from ' + JSON.stringify(join(snapshot, 'client/gltf-light-budget.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { StableLightState } from ' + JSON.stringify(join(snapshot, 'client/stable-light-state.ts').replaceAll(String.fromCharCode(92), '/')) + ';';
+     const routineCore = await readFile(join(helperDirectory, 'routine-cost-core.mjs'), 'utf8');
+@@ -192,6 +195,8 @@ export async function run(command, input, output, label, option = 'original', ..
+         resolveId(id) {
+           if (id === 'virtual:webgpu-completion-pipeline-inputs') return '\0virtual:webgpu-completion-pipeline-inputs';
+           if (id === 'virtual:webgpu-completion-entry-routine') return '\0virtual:webgpu-completion-entry-routine';
++          if (id === 'virtual:webgpu-completion-entry-effects') return '\0virtual:webgpu-completion-entry-effects';
++          if (id === 'virtual:webgpu-completion-entry-effect-core') return '\0virtual:webgpu-completion-entry-effect-core';
+           if (id === 'virtual:webgpu-completion-entry-render') return '\0virtual:webgpu-completion-entry-render';
+           if (id === 'virtual:webgpu-completion-entry-classes') return '\0virtual:webgpu-completion-entry-classes';
+           if (id === 'virtual:webgpu-completion-qa') return virtual;
+@@ -212,6 +217,8 @@ export async function run(command, input, output, label, option = 'original', ..
+         load(id) {
+           if (id === '\0virtual:webgpu-completion-pipeline-inputs') return pipelineInputs;
+           if (id === '\0virtual:webgpu-completion-entry-routine') return entryRoutine;
++          if (id === '\0virtual:webgpu-completion-entry-effects') return entryEffect;
++          if (id === '\0virtual:webgpu-completion-entry-effect-core') return entryEffectCore;
+           if (id === '\0virtual:webgpu-completion-entry-render') return entryRender;
+           if (id === '\0virtual:webgpu-completion-entry-classes') return entryClasses;
+           if (id === virtual) return overlay;
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/qa-overlay.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/qa-overlay.mjs
+index 32d46b25..cbe20fa6 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/qa-overlay.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/qa-overlay.mjs
+@@ -14,6 +14,7 @@ import { createShaderAttributionWindow, projectShaderInventory } from 'virtual:w
+ import { captureRoutineCost } from 'virtual:webgpu-completion-routine-cost';
+ import { captureEntryRenderCost } from 'virtual:webgpu-completion-entry-render';
+ import { captureEntryRoutineCost } from 'virtual:webgpu-completion-entry-routine';
++import { captureEntryEffects } from 'virtual:webgpu-completion-entry-effects';
+ import { Game, Scene, GltfLightBudget, StableLightState } from 'virtual:webgpu-completion-entry-classes';
+ import { observeBufferLifecycle } from 'virtual:webgpu-completion-buffer-lifecycle';
+ import { createLifecycleControls, createVisibilityAnchor } from 'virtual:webgpu-completion-lifecycle-controls';
+@@ -149,7 +150,7 @@ export async function observeStartup(game, canvas, start) {
+   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
+   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
+   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
+-  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, pipelineOwner, routineOwner, entryOwner, entryRoutineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
++  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, pipelineOwner, routineOwner, entryOwner, entryRoutineOwner,entryEffectOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
+   const clockAbort = new AbortController();
+   const samples = [], observerErrors = [], buttons = [];
+   const ownerId = crypto.randomUUID();
+@@ -368,6 +369,21 @@ export async function observeStartup(game, canvas, start) {
+       await persist(raw);
+     });
+   }
++  if (identity.routineCost) action('Diagnostic · první vstup do auta /8 framů /10 effect rutin', async () => {
++    controls.open = false;
++    const raw = { ...envelope('entry-effect-cost'), completed:false, before:snapshot(), after:null, entryTrigger:null, entryEffectProfile:null, validationErrors:[],
++      scope:'Accepted first entry; one ten-target stack. Selected inclusive wall time is not GPU duration or cache hit/miss evidence.' };
++    try {
++      entryEffectOwner = captureEntryRoutineCost(gameRef, { enabled:identity.routineCost,
++        expected:{classes:{Game,Scene,GltfLightBudget,StableLightState},methods:{prepareFrame:GltfLightBudget.prototype.prepareFrame,render:Scene.prototype.render}},
++        startCapture:captureEntryEffects, signal:clockAbort.signal, isCurrent:()=>!disposed&&gameRef===game });
++      const result=await entryEffectOwner.done;raw.entryTrigger=result.entryTrigger;raw.entryEffectProfile=result.routineProfile;raw.completed=result.entryTrigger.complete;
++      if(!raw.completed)raw.validationErrors.push('Entry effect incomplete: '+result.entryTrigger.reason);
++    }catch(error){raw.failure=errorText(error);raw.validationErrors.push(raw.failure.message);}
++    finally{entryEffectOwner?.dispose();const result=entryEffectOwner?.snapshot();raw.entryTrigger??=result?.entryTrigger??null;raw.entryEffectProfile??=result?.routineProfile??null;
++      entryEffectOwner=undefined;raw.after=snapshot();raw.observerErrors=[...observerErrors];}
++    await persist(raw);
++  });
+   if (identity.clock?.config.benchmarkAtUTC !== undefined) action('Naplánovat jediný 10s benchmark UTC', async () => {
+     const armedBefore = snapshot(), config = identity.clock.config;
+     const invalid = plan => persist({ ...envelope('benchmark'), completed: false, plannedStart: plan,
+@@ -440,7 +456,7 @@ export async function observeStartup(game, canvas, start) {
+     if (!clockAbort.signal.aborted) {
+       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
+     }
+-    attributionWindow?.dispose(); pipelineOwner?.dispose('owner-stopped'); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped'); entryRoutineOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
++    attributionWindow?.dispose(); pipelineOwner?.dispose('owner-stopped'); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped'); entryRoutineOwner?.dispose('owner-stopped');entryEffectOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
+     lifecycleOwner?.dispose(); preparationOwner?.dispose();
+     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
+   };
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/helper.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/helper.test.mjs
+index 9ae215b2..795e3440 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/helper.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/helper.test.mjs
+@@ -208,7 +208,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
+       export {StableLightState} from ${JSON.stringify(pathToFileURL(join(root, 'client/stable-light-state.ts')).href)};
+       export class Game { constructor() { throw Error('Old DOM fixture does not construct an entry Game'); } }`;
+     source = source.replace("'virtual:webgpu-completion-entry-classes'", JSON.stringify('data:text/javascript;base64,' + Buffer.from(entryClasses).toString('base64')));
+-    for (const [virtual, file] of [['pipeline-inputs', 'pipeline-input-window.mjs'], ['entry-render', 'entry-render-cost.mjs'], ['entry-routine', 'entry-routine-cost.mjs']])
++    for (const [virtual, file] of [['pipeline-inputs', 'pipeline-input-window.mjs'], ['entry-render', 'entry-render-cost.mjs'], ['entry-routine', 'entry-routine-cost.mjs'], ['entry-effects', 'entry-effect-cost.mjs']])
+       source = source.replace("'virtual:webgpu-completion-" + virtual + "'", JSON.stringify(pathToFileURL(join(directory, file)).href));
+     source = source.replace("'virtual:webgpu-completion-observer'", JSON.stringify(pathToFileURL(join(directory, 'startup-observer.mjs')).href));
+     source = source.replace("'virtual:webgpu-completion-attempts'", JSON.stringify(pathToFileURL(join(directory, 'attempt-queue.mjs')).href));
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/preparation-summary.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/preparation-summary.test.mjs
+index 7e8b085e..e1bd2641 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/preparation-summary.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/preparation-summary.test.mjs
+@@ -374,6 +374,6 @@ test('actual source UI exact once transform parses and preserves original bytes;
+   assert.equal(transformed.split('await observeStartup(g, startupCanvas, () => g.start());').length, 2);
+   assert.equal(ts.createSourceFile('qa-ui.tsx', transformed, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX).parseDiagnostics.length, 0);
+   assert.equal(sha256(await readFile(path)), before); assert.throws(() => transformUI(transformed));
+-  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 36);
++  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 39);
+   assert.equal(identity.files['preparation-summary.test.mjs'], sha256(await readFile(fileURLToPath(import.meta.url))));
+ });
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/entry-render-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-render-cost.test.mjs
+index 050f9518..652ca8df 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/entry-render-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-render-cost.test.mjs
+@@ -168,7 +168,7 @@ test('actual QA entry button owns standby, original accepted transition, receipt
+ test('v10 routine modules/original button are byte-exact and UI transform remains exact once',async()=>{
+  const old=join(root,'.cache/webgpu-completion-20261021/preparation-summary/helper/v10');for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from="../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz",to="../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}
+  const oldOverlay=await readFile(join(old,'qa-overlay.mjs'),'utf8'),overlay=await readFile(join(directory,'qa-overlay.mjs'),'utf8');const block=s=>s.slice(s.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),s.indexOf("  if (identity.clock?.config.benchmarkAtUTC"));assert.ok(overlay.includes(block(oldOverlay)));
+- const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);
++ const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,39);
+ });
+ test('donor/pin selected8 method descriptors and all four original Mesh observer ordering assertions',async()=>{
+  const donor=gunzipSync(await readFile(join(root,'docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz')));assert.equal(sha256(donor),'ee3c3280de69ee61dcbf433dcf2a259d07a4efa80a711f822056da331168289f');
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/entry-routine-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-routine-cost.test.mjs
+index 11ef328d..0ebd5169 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/entry-routine-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-routine-cost.test.mjs
+@@ -76,9 +76,9 @@ test('optional entryTrigger is strict while old standard routine receipts remain
+  assert.throws(()=>validateReceipt({...raw,kind:'state',state:{},compilation:{}},identity));
+ });
+ test('old8/three-scope modules and both old button blocks remain exact; new34 inputs and UI parse sealed',async()=>{
+- const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[["../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz","../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz"]]:f==='entry-render-cost.test.mjs'?[["for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}","for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));"],["assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);","assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}
++ const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[["../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz","../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz"]]:f==='entry-render-cost.test.mjs'?[["for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}","for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));"],["assert.equal(Object.keys((await helperIdentity(directory)).files).length,39);","assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}
+  const before=await readFile(join(original,'qa-overlay.mjs'),'utf8'),after=await readFile(join(directory,'qa-overlay.mjs'),'utf8'),from=before.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=before.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(after.includes(before.slice(from,to)));
+- const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);
++ const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,39);
+ });
+ test('actual new QA action gates startupACK then owns native-entry waiter/core receipt without clicking either old action',async()=>{
+  const f=fixture(),elements=[],requests=[],intervals=new Set();class Element{constructor(tag){this.tag=tag;this.style={};elements.push(this);}append(){}setAttribute(){}remove(){}}
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/pipeline-input-window.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/pipeline-input-window.test.mjs
+index eb6ce747..8a50b118 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/pipeline-input-window.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/pipeline-input-window.test.mjs
+@@ -36,7 +36,7 @@ test('strict projection and receipt negative cases, standard routine receipts un
+ });
+ test('pinned actual signature/emptykey/SHADER_NAME AST contract and36sealed inputs preserve old modules/buttons',async()=>{const native=join(root,'.cache/performance-snapshot/webgpu-completion-20261023-candidate-12/node_modules/@babylonjs/core'),source=await readFile(join(native,'Engines/webgpuEngine.pure.js'),'utf8'),ast=ts.createSourceFile('engine.js',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),klass=ast.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='WebGPUEngine'),method=klass.members.find(n=>n.name?.getText(ast)==='_preparePipelineContextAsync');assert.deepEqual(method.parameters.map(p=>p.name.getText(ast)),['pipelineContext','vertexSourceCode','fragmentSourceCode','createAsRaw','rawVertexSourceCode','rawFragmentSourceCode','_rebuildRebind','defines','_transformFeedbackVaryings','_key','onReady']);
+  const effect=await readFile(join(native,'Materials/effect.functions.js'),'utf8');assert.match(effect,/pipelineContext\._name = options\.name/);assert.match(effect,/_preparePipelineContext\(pipelineContext, options\.vertex, options\.fragment, !!options\.createAsRaw, "", "", options\.rebuildRebind, options\.defines, options\.transformFeedbackVaryings, "",/);assert.match(effect,/#define SHADER_NAME vertex:/);assert.match(effect,/#define SHADER_NAME fragment:/);assert.equal(JSON.parse(await readFile(join(native,'package.json'),'utf8')).version,'9.30.0');
+- const old=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v14');for(const f of['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs','lifecycle-controls.mjs'])assert.deepEqual(await readFile(join(dir,f)),await readFile(join(old,f)));const a=await readFile(join(old,'qa-overlay.mjs'),'utf8'),b=await readFile(join(dir,'qa-overlay.mjs'),'utf8'),from=a.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=a.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(b.includes(a.slice(from,to)));assert.equal(Object.keys((await helperIdentity(dir)).files).length,36);const ui=await readFile(join(root,'client/ui.tsx'));assert.equal(ts.createSourceFile('qa.tsx',transformUI(ui.toString()),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),sha256(ui));
++ const old=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v14');for(const f of['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs','lifecycle-controls.mjs'])assert.deepEqual(await readFile(join(dir,f)),await readFile(join(old,f)));const a=await readFile(join(old,'qa-overlay.mjs'),'utf8'),b=await readFile(join(dir,'qa-overlay.mjs'),'utf8'),from=a.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=a.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(b.includes(a.slice(from,to)));assert.equal(Object.keys((await helperIdentity(dir)).files).length,39);const ui=await readFile(join(root,'client/ui.tsx'));assert.equal(ts.createSourceFile('qa.tsx',transformUI(ui.toString()),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),sha256(ui));
+ });
+ 
+ test('actual native processed PBR WGSL inputs pass unchanged through pinned WebGPU compiler with terminal GPU IO substituted',async()=>{
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost-core.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost-core.mjs
+new file mode 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost-core.mjs
+@@ -0,0 +1,138 @@
++/** Fixed ten-routine diagnostic; independent of the immutable eight-routine schema. */
++export const EFFECT_LIMITS = Object.freeze({ routines: 10, frames: 8, stack: 32, callsPerFrame: 100000, phaseEvents: 128, renderers: 64, bytes: 256*1024 });
++export const EFFECT_REASONS = Object.freeze(['complete','disposed','owner-stopped','external-dispose','aborted','observer-error','retired','foreign-routine','original-render-threw','no-native-frame-progress','installation-failed',
++  'clock-error','deadline','foreign-prepare','foreign-render','routine-rejected','routine-incomplete','waiter-restore-failed','late-owner','factory-error','original-prepare-threw','prepare-reentry','standby-overflow','invalid-vehicle']);
++export const EFFECT_PHASES = Object.freeze(['active', 'main', 'rtt', 'other']);
++export const EFFECT_IDS = Object.freeze(['scene.getActiveMeshCandidates', 'Scene._activeMesh', 'TransformNode.computeWorldMatrix', 'Mesh.getLOD',
++  'PBRBaseMaterial.isReadyForSubMesh', 'StandardMaterial.isReadyForSubMesh', 'PBRBaseMaterial.bindForSubMesh', 'StandardMaterial.bindForSubMesh',
++  'PBRBaseMaterial._prepareEffect', 'engine.createEffect']);
++export const EFFECT_SCOPE = Object.freeze({
++  clock: 'Selected synchronous wall time including observer/JIT/GC/scheduling, not GPU execution.',
++  nesting: 'One shared ten-target stack; selfSelected subtracts selected children only. Inclusive rows overlap.',
++  engine: 'Own engine createEffect only under a selected own-scene material readiness or PBR prepare ancestor. No cache/key inspection or hit/miss claim.',
++  residual: 'PBR prepare includes defines/ABI/serialization; readiness residual includes unselected notifications/hot-swap/setEffect. Standard internals are not explained by PBR.',
++});
++const owners = new WeakMap();
++const flags = (a,b) => !!a === !!b && (!a || ['value','get','set','writable','configurable','enumerable'].every(k => a[k] === b[k]));
++const rows = () => EFFECT_IDS.flatMap(id => EFFECT_PHASES.map(phase => ({ id, phase, calls: 0, inclusiveMs: 0, selfSelectedMs: 0, falseReturns: 0, nullReturns: 0, throws: 0 })));
++
++export class EffectCallProfile {
++  hooks = []; frame; disposed = false; errors = 0; restoreConflicts = 0;
++  constructor(targets, { now = () => performance.now(), phase = () => 'other' } = {}) {
++    if (!Array.isArray(targets) || targets.length !== 10 || targets.some((t,i) => t.id !== EFFECT_IDS[i])) throw Error('Exact ten effect targets required');
++    this.now = now; this.phase = phase;
++    const checked = targets.map(({target,key,expected,accepts = () => true,allowInherited=false}, i) => {
++      const descriptor = Object.getOwnPropertyDescriptor(target,key);
++      let resolved=descriptor,prototype=Object.getPrototypeOf(target);
++      while(!resolved&&prototype){resolved=Object.getOwnPropertyDescriptor(prototype,key);prototype=Object.getPrototypeOf(prototype);}
++      if ((!descriptor&&(!allowInherited||!Object.isExtensible(target))) || !resolved || !Object.hasOwn(resolved,'value') || typeof resolved.value !== 'function' ||
++          (descriptor&&!descriptor.configurable&&!descriptor.writable) || resolved.value !== expected || owners.get(target)?.has(key) ||
++          targets.slice(0,i).some(t=>t.target===target && t.key===key)) throw Error('Effect native descriptor drift/ownership: '+EFFECT_IDS[i]);
++      return {target,key,descriptor,original:resolved.value,accepts};
++    });
++    try {
++      checked.forEach(({target,key,descriptor,original,accepts}, index) => {
++        const profile=this;
++        const wrapper=function(){ return profile.invoke(index,original,this,arguments,accepts); };
++        this.hooks.push({target,key,descriptor,wrapper});
++        const keys=owners.get(target)??new Map();keys.set(key,this);owners.set(target,keys);
++        Object.defineProperty(target,key,{...(descriptor??{configurable:true,writable:true,enumerable:false}),value:wrapper});
++      });
++    } catch(error) { this.dispose(); throw error; }
++  }
++  fail(frame) { frame.errors++;this.errors++; }
++  clock(frame) { try { const t=this.now();if(typeof t==='number'&&Number.isFinite(t)&&t>=0)return t; }catch{} this.fail(frame); }
++  invoke(index, original, receiver, args, accepts) {
++    const frame=this.frame;
++    if (!frame || this.disposed) return Reflect.apply(original,receiver,args);
++    let accepted=false;try{accepted=accepts(receiver,args);}catch{this.fail(frame);}
++    if(index===9) accepted=accepted && frame.foreignMaterialDepth===0 && frame.stack.some(n=>n.index===4||n.index===5||n.index===8);
++    if(!accepted){
++      // A foreign material nested in a callback cannot borrow an outer own
++      // material's engine association. No diagnostic clock/row for passthrough.
++      const barrier=index===4||index===5||index===8;
++      if(barrier)frame.foreignMaterialDepth++;
++      try{return Reflect.apply(original,receiver,args);}finally{if(barrier)frame.foreignMaterialDepth--;}
++    }
++    if(frame.calls++>=EFFECT_LIMITS.callsPerFrame){frame.callsSkipped++;return Reflect.apply(original,receiver,args);}
++    let phase;try{phase=EFFECT_PHASES.indexOf(this.phase());}catch{phase=-1;}
++    if(phase<0){this.fail(frame);phase=3;}
++    const row=frame.rows[index*4+phase];row.calls++;
++    if(frame.stack.length>=EFFECT_LIMITS.stack){frame.depthSkipped++;return Reflect.apply(original,receiver,args);}
++    const start=this.clock(frame);if(start===undefined)return Reflect.apply(original,receiver,args);
++    const node={index,childMs:0};frame.stack.push(node);let returned=false,result;
++    try{result=Reflect.apply(original,receiver,args);returned=true;return result;}
++    finally{if(this.frame===frame&&!this.disposed){
++      if(!returned)row.throws++;else if(result===false)row.falseReturns++;else if(result===null)row.nullReturns++;
++      frame.stack.pop();const end=this.clock(frame);
++      if(end!==undefined){if(end<start||end-start<node.childMs)this.fail(frame);const elapsed=Math.max(0,end-start);
++        row.inclusiveMs+=elapsed;row.selfSelectedMs+=Math.max(0,elapsed-node.childMs);const parent=frame.stack.at(-1);if(parent)parent.childMs+=elapsed;}
++    }}
++  }
++  beginFrame(frameId) {
++    if(this.disposed)return;
++    if(this.frame?.stack.length)this.fail(this.frame);
++    this.frame={frameId,rows:rows(),errors:0,depthSkipped:0,callsSkipped:0,calls:0,stack:[],foreignMaterialDepth:0};
++  }
++  ownsHooks() {
++    if(this.disposed)return false;
++    try{return this.hooks.every(h=>flags(Object.getOwnPropertyDescriptor(h.target,h.key),{...(h.descriptor??{configurable:true,writable:true,enumerable:false}),value:h.wrapper}));}
++    catch{return false;}
++  }
++  endFrame() {
++    const f=this.frame;this.frame=undefined;if(!f)return null;
++    if(f.stack.length||f.foreignMaterialDepth)this.fail(f);
++    return {frameId:f.frameId,rows:f.rows,errors:f.errors,depthSkipped:f.depthSkipped,callsSkipped:f.callsSkipped};
++  }
++  dispose() {
++    if(this.disposed)return;
++    this.disposed=true;if(this.frame?.stack.length)this.fail(this.frame);this.frame=undefined;
++    for(const h of this.hooks.slice().reverse()){
++      try{const d=Object.getOwnPropertyDescriptor(h.target,h.key);
++        if(flags(d,{...(h.descriptor??{configurable:true,writable:true,enumerable:false}),value:h.wrapper})){
++          if(h.descriptor)Object.defineProperty(h.target,h.key,h.descriptor);else delete h.target[h.key];
++        }
++        else if(!flags(d,h.descriptor))this.restoreConflicts++;
++      }catch{this.errors++;this.restoreConflicts++;}
++      const keys=owners.get(h.target);if(keys?.get(h.key)===this)keys.delete(h.key);
++    }
++    this.hooks.length=0;this.now=this.phase=null;
++  }
++}
++
++const invalid=Symbol('invalid');
++function data(o,k){try{const d=o&&Object.getOwnPropertyDescriptor(o,k);return d&&Object.hasOwn(d,'value')?d.value:invalid;}catch{return invalid;}}
++function exact(o,keys){if(!o||typeof o!=='object'||Array.isArray(o))throw Error('Effect object');const proto=Object.getPrototypeOf(o);if(proto!==Object.prototype&&proto!==null)throw Error('Effect object prototype');const names=Reflect.ownKeys(o);
++  if(names.length!==keys.length||names.some(k=>!keys.includes(k)))throw Error('Effect closed fields');
++  const r={};for(const k of keys){const v=data(o,k);if(v===invalid)throw Error('Effect own data');r[k]=v;}return r;}
++function array(o,max){const n=data(o,'length');if(!Array.isArray(o)||!Number.isSafeInteger(n)||n<0||n>max)throw Error('Effect array bounds');
++  const proto=Object.getPrototypeOf(o);if(proto!==Array.prototype&&proto!==null)throw Error('Effect array prototype');
++  const keys=Reflect.ownKeys(o);if(keys.length!==n+1)throw Error('Effect sparse/extra array');const a=[];
++  for(let i=0;i<n;i++){const v=data(o,String(i));if(v===invalid)throw Error('Effect array own data');a.push(v);}return a;}
++const count=x=>Number.isSafeInteger(x)&&x>=0;
++export function validateEntryEffectProfile(value) {
++  const p=exact(value,['schemaVersion','scope','limits','targets','engineOrigin','rendererId','generation','frames','complete','reason','errors','phaseErrors','restoreConflicts','installedRoutineHooks','remainingRoutineHooks','active']);
++  if(p.schemaVersion!==1||!['webgpu-own','thinengine-inherited'].includes(p.engineOrigin)||!count(p.rendererId)||p.rendererId<1||!count(p.generation)||p.generation<1||p.active!==false||typeof p.complete!=='boolean'||
++      !EFFECT_REASONS.includes(p.reason)||['errors','phaseErrors','restoreConflicts','installedRoutineHooks','remainingRoutineHooks'].some(k=>!count(p[k]))||p.installedRoutineHooks>10||p.remainingRoutineHooks>10)throw Error('Effect profile scalar');
++  const scope=exact(p.scope,Object.keys(EFFECT_SCOPE)),limits=exact(p.limits,Object.keys(EFFECT_LIMITS));
++  for(const[k,v]of Object.entries(EFFECT_SCOPE))if(scope[k]!==v)throw Error('Effect scope');
++  for(const[k,v]of Object.entries(EFFECT_LIMITS))if(limits[k]!==v)throw Error('Effect limits');
++  const targets=array(p.targets,10);if(targets.length!==10||targets.some((x,i)=>x!==EFFECT_IDS[i]))throw Error('Effect targets');
++  const frames=array(p.frames,8);
++  let previousAfter;const safeFrames=[];
++  for(const raw of frames){const f=exact(raw,['frameId','rows','errors','depthSkipped','callsSkipped','nativeFrameIdAfter','progressed','threw']);
++    if(['frameId','errors','depthSkipped','callsSkipped'].some(k=>!count(f[k]))||!(f.nativeFrameIdAfter===null||count(f.nativeFrameIdAfter))||typeof f.progressed!=='boolean'||typeof f.threw!=='boolean')throw Error('Effect frame');
++    const rs=array(f.rows,40);if(rs.length!==40)throw Error('Effect row count');
++    const safeRows=[];
++    for(let i=0;i<40;i++){const r=exact(rs[i],['id','phase','calls','inclusiveMs','selfSelectedMs','falseReturns','nullReturns','throws']);
++      if(r.id!==EFFECT_IDS[Math.floor(i/4)]||r.phase!==EFFECT_PHASES[i%4]||['calls','falseReturns','nullReturns','throws'].some(k=>!count(r[k])||r[k]>EFFECT_LIMITS.callsPerFrame)||
++          ['inclusiveMs','selfSelectedMs'].some(k=>typeof r[k]!=='number'||!Number.isFinite(r[k])||r[k]<0)||r.selfSelectedMs>r.inclusiveMs||r.falseReturns+r.nullReturns+r.throws>r.calls)throw Error('Effect row');safeRows.push(r);}
++    if(p.complete&&(!f.progressed||f.nativeFrameIdAfter!==f.frameId+1||(previousAfter!==undefined&&f.frameId!==previousAfter)||f.threw||f.errors||f.depthSkipped||f.callsSkipped))throw Error('Effect incomplete frame');
++    previousAfter=f.nativeFrameIdAfter;
++    f.rows=safeRows;safeFrames.push(f);
++  }
++  if(p.complete&&(frames.length!==8||p.reason!=='complete'||p.errors||p.phaseErrors||p.restoreConflicts||p.remainingRoutineHooks||p.installedRoutineHooks!==10))throw Error('Effect incomplete profile');
++  p.scope=scope;p.limits=limits;p.targets=targets;p.frames=safeFrames;
++  if(JSON.stringify(p).length>EFFECT_LIMITS.bytes)throw Error('Effect byte bound');
++  return value;
++}
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.mjs
+new file mode 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.mjs
+@@ -0,0 +1,90 @@
++import { Scene } from '@babylonjs/core/scene.js';
++import { Mesh } from '@babylonjs/core/Meshes/mesh.js';
++import { TransformNode } from '@babylonjs/core/Meshes/transformNode.js';
++import { PBRBaseMaterial } from '@babylonjs/core/Materials/PBR/pbrBaseMaterial.js';
++import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial.js';
++import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine.pure.js';
++import { ThinEngine } from '@babylonjs/core/Engines/thinEngine.pure.js';
++import { EffectCallProfile, EFFECT_IDS, EFFECT_LIMITS, EFFECT_SCOPE, EFFECT_REASONS } from './entry-effect-cost-core.mjs';
++
++const sceneOwners=new WeakMap(),nativeRender=Scene.prototype.render;
++const methods=[[Scene.prototype,'_activeMesh'],[TransformNode.prototype,'computeWorldMatrix'],[Mesh.prototype,'getLOD'],
++  [PBRBaseMaterial.prototype,'isReadyForSubMesh'],[StandardMaterial.prototype,'isReadyForSubMesh'],
++  [PBRBaseMaterial.prototype,'bindForSubMesh'],[StandardMaterial.prototype,'bindForSubMesh'],[PBRBaseMaterial.prototype,'_prepareEffect']]
++  .map(([target,key])=>({target,key,expected:Object.getOwnPropertyDescriptor(target,key)?.value}));
++const origins=[{prototype:WebGPUEngine.prototype,method:WebGPUEngine.prototype.createEffect,name:'webgpu-own'},
++  {prototype:ThinEngine.prototype,method:ThinEngine.prototype.createEffect,name:'thinengine-inherited'}];
++const same=(a,b)=>!!a===!!b&&(!a||['value','get','set','writable','configurable','enumerable'].every(k=>a[k]===b[k]));
++const sceneOf=receiver=>{try{const d=receiver&&Object.getOwnPropertyDescriptor(receiver,'_scene');return d&&Object.hasOwn(d,'value')?d.value:undefined;}catch{return undefined;}};
++function origin(engine){let p=engine;while(p){const d=Object.getOwnPropertyDescriptor(p,'createEffect');if(d){const match=origins.find(o=>o.prototype===p&&o.method===d.value);
++    if(!match||!Object.hasOwn(d,'value'))throw Error('Effect engine origin/foreign wrapper');return match;}p=Object.getPrototypeOf(p);}throw Error('Effect engine method missing');}
++
++/** Driven exclusively by the original Game Scene.render. No render/readiness call is added. */
++export function captureEntryEffects(game,{enabled=false,now,signal,isRetired=()=>false}={}){
++  if(!enabled)return;
++  const scene=game.scene,engine=game.engine;
++  if(!(scene instanceof Scene)||scene._engine!==engine||sceneOwners.has(scene)||scene.isDisposed||game.disposed||!game.ready||isRetired()||signal?.aborted)throw Error('Effect capture requires ready unowned Game');
++  const engineOrigin=origin(engine),ownEngine=Object.getOwnPropertyDescriptor(engine,'createEffect'),oldRender=Object.getOwnPropertyDescriptor(scene,'render');
++  // The original is inherited from a pinned native class, never a guessed own wrapper.
++  if(ownEngine||scene.render!==nativeRender||(oldRender&&(!Object.hasOwn(oldRender,'value')||(!oldRender.configurable&&!oldRender.writable)))||!Object.isExtensible(engine))throw Error('Effect instance descriptor/ownership');
++  const rendererId=game.renderHealth?.rendererId,generation=game.renderHealth?.generation;
++  if(!Number.isSafeInteger(rendererId)||rendererId<1||!Number.isSafeInteger(generation)||generation<1||game.renderHealth.phase!=='ready'||game.renderHealth.errorCount!==0||
++      game.renderHealth.pendingByKind?.preparation!==0||game.renderHealth.pendingByKind?.['shader-validation']!==0)throw Error('Effect renderer identity/readiness');
++  const state={game,scene,engine,health:game.renderHealth,device:engine._device,startup:game.startupAbort,actor:game.actor,retired:isRetired,signal};game=null;isRetired=null;signal=null;
++  const frames=[],phases=[],detaches=[],renderers=new Map();let core,closed=false,rendering=false,phaseEvents=0,phaseErrors=0,restoreConflicts=0,reason=null,sealed;
++  let resolveDone;const done=new Promise(resolve=>{resolveDone=resolve;});
++  const owner={done,dispose:why=>stop(why??'disposed'),snapshot:()=>sealed??snapshot()};sceneOwners.set(scene,owner);
++  const phase=()=>phases.at(-1)?.phase??'other';
++  function snapshot(){return{schemaVersion:1,scope:EFFECT_SCOPE,limits:EFFECT_LIMITS,targets:[...EFFECT_IDS],engineOrigin:engineOrigin.name,rendererId,generation,frames:structuredClone(frames),
++    complete:closed&&reason==='complete'&&frames.length===8&&!core?.errors&&!phaseErrors&&!restoreConflicts&&!core?.restoreConflicts&&frames.every(f=>f.progressed&&!f.threw&&!f.errors&&!f.depthSkipped&&!f.callsSkipped),
++    reason,errors:core?.errors??0,phaseErrors,restoreConflicts:restoreConflicts+(core?.restoreConflicts??0),installedRoutineHooks:core?10:0,remainingRoutineHooks:core?.hooks.length??0,active:!closed};}
++  function enter(name,token){if(!rendering||closed)return;if(++phaseEvents>EFFECT_LIMITS.phaseEvents||phases.length>=32){phaseErrors++;return;}phases.push({phase:name,token});}
++  function leave(token){if(!rendering||closed)return;if(phases.at(-1)?.token!==token){phaseErrors++;return;}phases.pop();}
++  function observe(observable,callback){const o=observable.add(callback);if(!o)throw Error('Effect phase observer unavailable');detaches.push(()=>observable.remove(o));}
++  function track(renderer){if(closed||renderers.has(renderer))return;if(renderers.size>=EFFECT_LIMITS.renderers){phaseErrors++;return;}
++    let a,b;try{a=renderer.onInitRenderingObservable.add(()=>enter('rtt',renderer));if(!a)throw Error('Effect RTT before observer unavailable');
++      b=renderer.onFinishRenderingObservable.add(()=>leave(renderer));if(!b)throw Error('Effect RTT after observer unavailable');
++      renderers.set(renderer,()=>{try{renderer.onInitRenderingObservable.remove(a);}finally{renderer.onFinishRenderingObservable.remove(b);}});
++    }catch(error){try{if(a)renderer.onInitRenderingObservable.remove(a);}catch{phaseErrors++;}throw error;}}
++  function stop(why){if(closed)return;closed=true;reason=EFFECT_REASONS.includes(why)?why:'external-dispose';core?.dispose();
++    for(const detach of [...detaches.splice(0),...renderers.values()])try{detach();}catch{phaseErrors++;}renderers.clear();phases.length=0;
++    const liveScene=state.scene;
++    try{state.signal?.removeEventListener('abort',aborted);}catch{phaseErrors++;}
++    try{const d=Object.getOwnPropertyDescriptor(liveScene,'render');if(same(d,{...(oldRender??{configurable:true,writable:true,enumerable:false}),value:render})){
++      if(oldRender)Object.defineProperty(liveScene,'render',oldRender);else delete liveScene.render;
++    }else if(!same(d,oldRender))restoreConflicts++;}catch{restoreConflicts++;}
++    if(sceneOwners.get(liveScene)===owner)sceneOwners.delete(liveScene);
++    state.game=state.scene=state.engine=state.health=state.device=state.startup=state.actor=state.retired=state.signal=null;
++    sealed=snapshot();resolveDone(sealed);
++  }
++  const aborted=()=>stop('aborted');
++  function render(){if(closed||this!==state.scene)return Reflect.apply(nativeRender,this,arguments);
++    let retired;try{retired=state.retired()||state.game.disposed||state.scene.isDisposed||state.engine.isDisposed===true||state.game.scene!==state.scene||state.game.engine!==state.engine||
++      state.game.renderHealth!==state.health||state.health.rendererId!==rendererId||state.health.generation!==generation||state.engine._device!==state.device||
++      state.health.phase!=='ready'||state.health.errorCount!==0||state.health.pendingByKind?.preparation!==0||state.health.pendingByKind?.['shader-validation']!==0||
++      state.game.startupAbort!==state.startup||state.startup?.signal.aborted||state.game.actor!==state.actor||state.game.ready!==true||state.game.rendererFailed||state.game.benchmark||state.game.startupPresentationLease||state.game.preparingRenderQuality;}
++    catch{phaseErrors++;stop('observer-error');return Reflect.apply(nativeRender,this,arguments);}
++    if(retired){stop('retired');return Reflect.apply(nativeRender,this,arguments);}
++    if(rendering){phaseErrors++;return Reflect.apply(nativeRender,this,arguments);}
++    if(!core.ownsHooks()){phaseErrors++;stop('foreign-routine');return Reflect.apply(nativeRender,this,arguments);}
++    try{for(const r of state.scene.objectRenderers)track(r);}catch{phaseErrors++;stop('observer-error');return Reflect.apply(nativeRender,this,arguments);}
++    const before=state.scene._frameId;if(!Number.isSafeInteger(before)||before<0){phaseErrors++;stop('no-native-frame-progress');return Reflect.apply(nativeRender,this,arguments);}
++    rendering=true;phaseEvents=0;phases.length=0;core.beginFrame(before);let threw=true;
++    try{const result=Reflect.apply(nativeRender,this,arguments);threw=false;return result;}
++    finally{if(!closed){const f=core.endFrame(),after=state.scene._frameId;f.nativeFrameIdAfter=Number.isSafeInteger(after)&&after>=0?after:null;f.progressed=f.nativeFrameIdAfter===before+1;f.threw=threw;
++      if(phases.length)phaseErrors++;frames.push(f);rendering=false;phases.length=0;
++      if(threw)stop('original-render-threw');else if(!f.progressed)stop('no-native-frame-progress');else if(frames.length===8)stop('complete');}}
++  }
++  try{
++    core=new EffectCallProfile([{id:EFFECT_IDS[0],target:scene,key:'getActiveMeshCandidates',expected:scene.getActiveMeshCandidates,accepts:r=>r===state.scene},
++      ...methods.slice(0,7).map((m,i)=>({...m,id:EFFECT_IDS[i+1],accepts:r=>i===0?r===state.scene:sceneOf(r)===state.scene})),
++      {...methods[7],id:EFFECT_IDS[8],accepts:(r,args)=>sceneOf(r)===state.scene&&sceneOf(args[0])===state.scene},
++      {id:EFFECT_IDS[9],target:engine,key:'createEffect',expected:engineOrigin.method,allowInherited:true,accepts:r=>r===state.engine}],{now,phase});
++    for(const[a,b,name]of [[scene.onBeforeActiveMeshesEvaluationObservable,scene.onAfterActiveMeshesEvaluationObservable,'active'],[scene.onBeforeDrawPhaseObservable,scene.onAfterDrawPhaseObservable,'main']]){observe(a,()=>enter(name,a));observe(b,()=>leave(a));}
++    observe(scene.onNewObjectRendererAddedObservable,r=>{if(closed)return;try{if(state.scene.objectRenderers.includes(r))track(r);}catch{phaseErrors++;stop('observer-error');}});
++    observe(scene.onObjectRendererRemovedObservable,r=>{if(closed)return;try{renderers.get(r)?.();renderers.delete(r);}catch{phaseErrors++;stop('observer-error');}});
++    observe(scene.onDisposeObservable,()=>stop('scene-disposed'));state.signal?.addEventListener('abort',aborted,{once:true});
++    Object.defineProperty(scene,'render',{...(oldRender??{configurable:true,writable:true,enumerable:false}),value:render});
++  }catch(error){stop('installation-failed');throw error;}
++  return owner;
++}
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.test.mjs
+@@ -0,0 +1,269 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import { dirname,resolve,join } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { NullEngine } from '@babylonjs/core/Engines/nullEngine.js';
++import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine.js';
++import { ThinEngine } from '@babylonjs/core/Engines/thinEngine.js';
++import { Scene } from '@babylonjs/core/scene.js';
++import { FreeCamera } from '@babylonjs/core/Cameras/freeCamera.js';
++import { Vector3 } from '@babylonjs/core/Maths/math.vector.js';
++import { CreateBox } from '@babylonjs/core/Meshes/Builders/boxBuilder.js';
++import { PBRMaterial } from '@babylonjs/core/Materials/PBR/pbrMaterial.js';
++import { PBRBaseMaterial } from '@babylonjs/core/Materials/PBR/pbrBaseMaterial.js';
++import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight.js';
++import { GltfLightBudget } from '../../../../../client/gltf-light-budget.ts';
++import { StableLightState } from '../../../../../client/stable-light-state.ts';
++import { observeOperation,observePreparationResult } from './startup-observer.mjs';
++import { createAttemptQueue } from './attempt-queue.mjs';
++import { observeStartupLatency } from './startup-latency.mjs';
++import { observeBufferLifecycle } from './buffer-lifecycle.mjs';
++import { createHash,webcrypto } from 'node:crypto';
++import { Observable } from '@babylonjs/core/Misc/observable.js';
++import ts from 'typescript';
++import { EffectCallProfile,EFFECT_IDS,EFFECT_SCOPE,EFFECT_LIMITS,validateEntryEffectProfile } from './entry-effect-cost-core.mjs';
++import { captureEntryEffects } from './entry-effect-cost.mjs';
++import { captureEntryRoutineCost,validateEntryTrigger } from './entry-routine-cost.mjs';
++import { validateReceipt } from './receipt.mjs';
++import { helperIdentity,parseBuildOptions,sourceFiles,transformUI } from './common.mjs';
++const directory=dirname(fileURLToPath(import.meta.url)),root=resolve(directory,'../../../../..');
++const donorDirectory=join(root,'docs/performance/evidence/webgpu-completion-20261021/entry-effect-cost/donor-v17');
++const turn=()=>new Promise(r=>setImmediate(r));
++const row=(f,id,phase='main')=>f.rows.find(r=>r.id===id&&r.phase===phase);
++const gameText=fs.readFileSync(join(root,'client/game.ts'),'utf8'),gameTree=ts.createSourceFile('game.ts',gameText,ts.ScriptTarget.Latest,true);
++const gameClass=gameTree.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='Game'),actualFrame=gameClass?.members.find(n=>n.name?.getText(gameTree)==='frame');
++assert.ok(actualFrame&&ts.isMethodDeclaration(actualFrame)&&actualFrame.body,'original Game.frame method');
++const preludeNames=['this.gltfLightBudget.prepareFrame();','this.stableLights.update();','this.scene.render();'];
++const preludeIndices=preludeNames.map(name=>actualFrame.body.statements.findIndex(n=>n.getText(gameTree)===name));
++assert.ok(preludeIndices[0]>=0);assert.equal(preludeIndices[1],preludeIndices[0]+1);assert.equal(preludeIndices[2],preludeIndices[1]+1);
++const actualPrelude=new Function(preludeIndices.map(i=>actualFrame.body.statements[i].getText(gameTree)).join('\n'));
++function targets(){return EFFECT_IDS.map(id=>{const target={run(){}};return{id,target,key:'run',expected:target.run};});}
++function nativeFixture(t){
++  const engine=new NullEngine(),scene=new Scene(engine);scene.texturesEnabled=false;
++  const camera=new FreeCamera('actual CPU camera',new Vector3(0,0,-5),scene);camera.setTarget(Vector3.Zero());scene.activeCamera=camera;
++  const light=new HemisphericLight('actual CPU lamp',Vector3.Up(),scene),mesh=CreateBox('actual CPU receiver',{},scene),material=new PBRMaterial('actual CPU PBR',scene);mesh.material=material;
++  const game={scene,engine,ready:true,disposed:false,renderHealth:{rendererId:7,generation:2,phase:'ready',errorCount:0,pendingByKind:{preparation:0,'shader-validation':0}}};
++  t.after(()=>{scene.dispose();engine.dispose();});return{engine,scene,camera,light,mesh,material,game};
++}
++async function warm(f){for(let i=0;i<20;i++){f.scene.render();await turn();if(f.material.isReadyForSubMesh(f.mesh,f.mesh.subMeshes[0],false))return;}assert.fail('Actual native PBR ready');}
++function entryFixture(t){
++  const f=nativeFixture(t);class Game{}Object.setPrototypeOf(f.game,Game.prototype);
++  const budget=new GltfLightBudget(f.scene),stable=new StableLightState(f.scene);t.after(()=>{budget.dispose();stable.dispose();});
++  Object.assign(f.game,{gltfLightBudget:budget,stableLights:stable,actor:{vehicle:false},startupAbort:new AbortController()});
++  Object.assign(f.game.renderHealth,{phase:'ready',errorCount:0,pendingByKind:{preparation:0,'shader-validation':0}});
++  f.game.renderHealth.snapshot=()=>({rendererId:7,generation:2,phase:'ready',valid:true,errorCount:0,pendingOperations:0,firstErrors:[]});
++  const expected={classes:{Game,Scene,GltfLightBudget,StableLightState},methods:{prepareFrame:GltfLightBudget.prototype.prepareFrame,render:Scene.prototype.render}};
++  let time=100,timer=null,factories=0;
++  const options={enabled:true,expected,now:()=>time,setTimer:cb=>(timer=cb),clearTimer(){timer=null;},startCapture(g,o){factories++;assert.equal(g.gltfLightBudget.prepareFrame,expected.methods.prepareFrame);return captureEntryEffects(g,o);}};
++  const frame=()=>{f.engine.beginFrame();actualPrelude.call(f.game);f.engine.endFrame();};
++  return{...f,expected,options,frame,advance:ms=>{time+=ms;},factories:()=>factories,timer:()=>timer};
++}
++
++test('default-off returns without even reading Game',()=>{
++  const game=new Proxy({},{get(){assert.fail('disabled Game read');}});assert.equal(captureEntryEffects(game),undefined);
++});
++test('one ten-target hierarchy subtracts prepare/create children and counts clean null',()=>{
++  let time=0;const ts=targets();
++  ts[9].target.run=function(){time+=3;return {};};ts[9].expected=ts[9].target.run;
++  ts[8].target.run=function(){time+=1;ts[9].target.run();time+=1;return null;};ts[8].expected=ts[8].target.run;
++  ts[4].target.run=function(){time+=1;ts[8].target.run();time+=1;return true;};ts[4].expected=ts[4].target.run;
++  const p=new EffectCallProfile(ts,{now:()=>time,phase:()=> 'main'});p.beginFrame(20);assert.equal(ts[4].target.run(),true);const f=p.endFrame();p.dispose();
++  assert.deepEqual([row(f,EFFECT_IDS[4]).inclusiveMs,row(f,EFFECT_IDS[4]).selfSelectedMs],[7,2]);
++  assert.deepEqual([row(f,EFFECT_IDS[8]).inclusiveMs,row(f,EFFECT_IDS[8]).selfSelectedMs,row(f,EFFECT_IDS[8]).nullReturns],[5,2,1]);
++  assert.deepEqual([row(f,EFFECT_IDS[9]).inclusiveMs,row(f,EFFECT_IDS[9]).selfSelectedMs],[3,3]);
++  assert.equal(f.errors,0);assert.equal(row(f,EFFECT_IDS[4]).selfSelectedMs+row(f,EFFECT_IDS[8]).selfSelectedMs+row(f,EFFECT_IDS[9]).selfSelectedMs,7);
++});
++for(const value of [undefined,null,false,0,'',Promise.resolve(3)])test('original return identity '+String(value),()=>{
++  const ts=targets(),args=[{},2],receiver=ts[8].target;ts[8].target.run=function(...a){assert.equal(this,receiver);assert.deepEqual(a,args);return value;};ts[8].expected=ts[8].target.run;
++  const p=new EffectCallProfile(ts,{now:()=>0});p.beginFrame(1);assert.equal(receiver.run(...args),value);const f=p.endFrame();p.dispose();assert.equal(row(f,EFFECT_IDS[8],'other').nullReturns,Number(value===null));
++});
++for(const error of [undefined,null,false,0,'',new Error('original')])test('original falsy/error throw '+String(error),()=>{
++  const ts=targets();ts[8].target.run=()=>{throw error;};ts[8].expected=ts[8].target.run;const p=new EffectCallProfile(ts,{now:()=>0});p.beginFrame(1);
++  assert.throws(()=>ts[8].target.run(),x=>x===error);const f=p.endFrame();p.dispose();assert.equal(row(f,EFFECT_IDS[8],'other').throws,1);
++});
++test('foreign material barrier and standalone engine calls do not borrow an own parent association',()=>{
++  const ts=targets();let calls=0;ts[9].target.run=()=>++calls;ts[9].expected=ts[9].target.run;
++  ts[8].target.run=()=>ts[9].target.run();ts[8].expected=ts[8].target.run;ts[8].accepts=()=>false;
++  ts[4].target.run=()=>ts[8].target.run();ts[4].expected=ts[4].target.run;
++  const p=new EffectCallProfile(ts,{now:()=>0});p.beginFrame(0);ts[9].target.run();ts[4].target.run();const f=p.endFrame();p.dispose();
++  assert.equal(calls,2);assert.equal(f.rows.filter(r=>r.id===EFFECT_IDS[9]).reduce((n,r)=>n+r.calls,0),0);
++});
++test('transaction rejects drift before writes and rolls back a late defineProperty failure exactly',()=>{
++  const ts=targets(),originals=ts.map(t=>t.target.run);ts[9].expected=()=>{};assert.throws(()=>new EffectCallProfile(ts));ts.forEach((t,i)=>assert.equal(t.target.run,originals[i]));
++  ts[9].expected=originals[9];const target=ts[9].target;ts[9].target=new Proxy(target,{defineProperty(){throw false;}});
++  assert.throws(()=>new EffectCallProfile(ts),x=>x===false);ts.slice(0,9).forEach((t,i)=>assert.equal(t.target.run,originals[i]));
++});
++test('retained method references pass through after dispose and foreign replacement is never clobbered',()=>{
++  let clocks=0;const ts=targets();ts[8].target.run=()=>9;ts[8].expected=ts[8].target.run;const p=new EffectCallProfile(ts,{now:()=>++clocks});const saved=ts[8].target.run;
++  const foreign=()=>12;ts[9].target.run=foreign;p.dispose();const before=clocks;assert.equal(saved.call(ts[8].target),9);assert.equal(clocks,before);assert.equal(ts[9].target.run,foreign);assert.equal(p.restoreConflicts,1);
++});
++test('native PBR dirty/cache reuse and clean-null branches use actual inherited ThinEngine API',async t=>{
++  const f=nativeFixture(t);await warm(f);const old=f.mesh.subMeshes[0].effect;
++  const owner=captureEntryEffects(f.game,{enabled:true});t.after(()=>owner.dispose());
++  f.light.setEnabled(false);f.light.setEnabled(true);
++  for(let i=0;i<8;i++){f.scene.render();await turn();}
++  const p=await owner.done;validateEntryEffectProfile(p);assert.equal(p.complete,true);assert.equal(p.engineOrigin,'thinengine-inherited');
++  assert.equal(p.frames[0].frameId+8,p.frames.at(-1).nativeFrameIdAfter);assert.equal(f.mesh.subMeshes[0].effect,old,'actual native cache returns same Effect');
++  assert.ok(p.frames.flatMap(f=>f.rows).some(r=>r.id===EFFECT_IDS[8]&&r.nullReturns>0),'clean native prepare returns null');
++  assert.ok(p.frames.flatMap(f=>f.rows).some(r=>r.id===EFFECT_IDS[9]&&r.calls>0),'dirty native path reaches cached createEffect');
++  assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(f.engine.createEffect,ThinEngine.prototype.createEffect);assert.equal(f.material._prepareEffect,PBRBaseMaterial.prototype._prepareEffect);
++  assert.equal(p.remainingRoutineHooks,0);assert.equal(p.errors,0);
++});
++test('native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback',()=>{
++  const record={_refCount:1,isReady:()=>true},host=Object.create(WebGPUEngine.prototype);host._compiledEffects={'v+f@#define TEST':record};host._getGlobalDefines=()=>'';
++  let callback=0;const result=Reflect.apply(WebGPUEngine.prototype.createEffect,host,[{vertex:'v',fragment:'f'},{attributes:[],defines:'#define TEST'},host,undefined,undefined,undefined,e=>{assert.equal(e,record);callback++;}]);
++  assert.equal(result,record);assert.equal(record._refCount,2);assert.equal(callback,1);
++  // No browser/device: this test invokes the original native cache-hit method
++  // against an explicit terminal cached record, not a real GPU Effect.
++});
++test('engine own/foreign origin refuses before prototype mutation; abort restores live hooks',async t=>{
++  const f=nativeFixture(t),old=PBRBaseMaterial.prototype._prepareEffect;f.engine.createEffect=function(){};
++  assert.throws(()=>captureEntryEffects(f.game,{enabled:true}),/origin/);assert.equal(PBRBaseMaterial.prototype._prepareEffect,old);delete f.engine.createEffect;
++  const abort=new AbortController(),owner=captureEntryEffects(f.game,{enabled:true,signal:abort.signal});abort.abort();const p=await owner.done;
++  assert.equal(p.complete,false);assert.equal(p.reason,'aborted');assert.equal(p.remainingRoutineHooks,0);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
++  assert.equal(PBRBaseMaterial.prototype._prepareEffect,old);assert.equal(Object.hasOwn(f.scene,'render'),false);
++});
++test('actual WebGPU own prototype origin can be installed/retired without device work',t=>{
++  const f=nativeFixture(t),nativeEngine=f.engine,host=Object.create(WebGPUEngine.prototype);f.scene._engine=host;f.game.engine=host;
++  try{const owner=captureEntryEffects(f.game,{enabled:true});assert.ok(Object.hasOwn(host,'createEffect'));assert.equal(owner.snapshot().engineOrigin,'webgpu-own');
++    owner.dispose();assert.equal(Object.hasOwn(host,'createEffect'),false);assert.equal(owner.snapshot().remainingRoutineHooks,0);
++  }finally{f.scene._engine=nativeEngine;f.game.engine=nativeEngine;}
++});
++test('receipt is distinct/strict while original schema and default-off identity remain unchanged',async t=>{
++  const f=nativeFixture(t);await warm(f);const owner=captureEntryEffects(f.game,{enabled:true});for(let i=0;i<8;i++)f.scene.render();const profile=await owner.done;
++  const identity={buildId:'build',sourceSnapshotId:'source',helperSha256:'helper',routineCost:true,lifecycleControls:false};
++  const raw={schemaVersion:1,...identity,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'entry-effect-cost',mode:'diagnostic',atMs:1,timeOrigin:1,observerErrors:[],completed:false,before:{},after:{},entryTrigger:null,entryEffectProfile:profile,failure:{message:'explicit refusal'},validationErrors:['refused']};
++  validateReceipt(raw,identity);assert.throws(()=>validateReceipt({...raw,kind:'routine-cost'},identity),/kind/);assert.throws(()=>validateReceipt(raw,{...identity,routineCost:false}));
++  for(const alter of [p=>p.targets.pop(),p=>p.frames[0].rows[0].nullReturns=-1,p=>p.frames[0].rows[0].extra='raw',p=>p.remainingRoutineHooks=1,p=>p.frames[0].nativeFrameIdAfter+=1,p=>{p.frames[1].frameId+=10;p.frames[1].nativeFrameIdAfter+=10;}]){
++    const p=structuredClone(profile);alter(p);assert.throws(()=>validateEntryEffectProfile(p));}
++  let reads=0;const p=structuredClone(profile);Object.defineProperty(p.frames[0].rows[0],'inclusiveMs',{get(){reads++;return 0;}});assert.throws(()=>validateEntryEffectProfile(p));assert.equal(reads,0);
++  assert.equal(parseBuildOptions([]).routineCost,false);assert.equal((await helperIdentity(directory)).sha256.length,64);assert.equal(sourceFiles.length,39);
++  for(const name of ['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs'])assert.deepEqual(fs.readFileSync(join(directory,name)),fs.readFileSync(join(donorDirectory,name)));
++});
++
++test('actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger',async t=>{
++  const f=entryFixture(t);await warm(f);const owner=captureEntryRoutineCost(f.game,f.options),saved=f.game.gltfLightBudget.prepareFrame;t.after(()=>owner.dispose());
++  f.frame();assert.equal(f.factories(),0);const first=f.scene._frameId;f.game.actor.vehicle=true;f.frame();
++  const trigger=owner.snapshot().entryTrigger;assert.equal(Reflect.apply(saved,f.game.gltfLightBudget,[]),undefined);assert.equal(f.factories(),1);
++  assert.deepEqual(owner.snapshot().entryTrigger,trigger);for(let i=0;i<7;i++)f.frame();const result=await owner.done;
++  validateEntryTrigger(result.entryTrigger,result.routineProfile);validateEntryEffectProfile(result.routineProfile);
++  assert.equal(result.entryTrigger.complete,true);assert.equal(result.entryTrigger.sceneFrameIdAtTrigger,first);assert.equal(result.routineProfile.frames[0].frameId,first);
++  assert.equal(result.entryTrigger.sceneFrameIdAtTerminal,first+8);assert.equal(result.routineProfile.remainingRoutineHooks,0);assert.equal(f.timer(),null);
++  assert.equal(Object.hasOwn(f.game.gltfLightBudget,'prepareFrame'),false);assert.equal(Object.hasOwn(f.scene,'render'),false);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
++  const identity={buildId:'b',sourceSnapshotId:'s',helperSha256:'h',routineCost:true,lifecycleControls:false};
++  const raw={schemaVersion:1,...identity,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'entry-effect-cost',mode:'diagnostic',atMs:1,timeOrigin:1,observerErrors:[],completed:true,before:{},after:{},entryTrigger:result.entryTrigger,entryEffectProfile:result.routineProfile,validationErrors:[]};
++  validateReceipt(raw,identity);const drift=structuredClone(raw);drift.entryEffectProfile.rendererId++;assert.throws(()=>validateReceipt(drift,identity),/renderer correlation/);
++});
++test('unchanged single deadline includes a long original eighth native frame',async t=>{
++  const f=entryFixture(t);await warm(f);const owner=captureEntryRoutineCost(f.game,f.options);t.after(()=>owner.dispose());f.game.actor.vehicle=true;
++  for(let i=0;i<7;i++)f.frame();f.scene.onBeforeRenderObservable.addOnce(()=>f.advance(30000));f.frame();const result=await owner.done;
++  assert.equal(result.routineProfile.frames.length,8);assert.equal(result.routineProfile.complete,true);assert.equal(result.entryTrigger.complete,false);assert.equal(result.entryTrigger.reason,'deadline');
++  validateEntryTrigger(result.entryTrigger,result.routineProfile);assert.equal(f.timer(),null);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
++});
++for(const [name,change]of Object.entries({generation:f=>f.game.renderHealth.generation++,engine:f=>f.game.engine={},actor:f=>f.game.actor={},device:f=>f.engine._device={},pending:f=>f.game.renderHealth.pendingByKind.preparation++}))
++  test('native capture retires replaced '+name,async t=>{
++    const f=nativeFixture(t),owner=captureEntryEffects(f.game,{enabled:true});change(f);f.scene.render();const p=await owner.done;
++    assert.equal(p.complete,false);assert.equal(p.reason,'retired');assert.equal(p.remainingRoutineHooks,0);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
++  });
++test('depth/call caps and diagnostic clock failure never repair or repeat original calls',()=>{
++  const ts=targets();let originals=0;ts[8].target.run=function(depth){originals++;if(depth)this.run(depth-1);return 7;};ts[8].expected=ts[8].target.run;
++  const p=new EffectCallProfile(ts,{now:()=>0});p.beginFrame(0);assert.equal(ts[8].target.run(40),7);const f=p.endFrame();p.dispose();assert.equal(originals,41);assert.ok(f.depthSkipped>0);
++  const qs=targets();let count=0;qs[4].target.run=()=>++count;qs[4].expected=qs[4].target.run;const q=new EffectCallProfile(qs,{now:()=>0});q.beginFrame(1);
++  for(let i=0;i<100001;i++)qs[4].target.run();const capped=q.endFrame();q.dispose();assert.equal(count,100001);assert.equal(capped.callsSkipped,1);
++  const xs=targets();let calls=0;xs[8].target.run=()=>++calls;xs[8].expected=xs[8].target.run;const x=new EffectCallProfile(xs,{now(){throw false;}});x.beginFrame(1);assert.equal(xs[8].target.run(),1);assert.equal(calls,1);assert.ok(x.endFrame().errors>0);x.dispose();
++});
++test('same-scene recursive render remains original work and is explicitly incomplete',async t=>{
++  const f=nativeFixture(t);await warm(f);let entered=false;const owner=captureEntryEffects(f.game,{enabled:true});
++  f.scene.onBeforeRenderObservable.add(()=>{if(!entered){entered=true;f.scene.render();}});f.scene.render();const p=await owner.done;
++  assert.equal(entered,true);assert.equal(p.complete,false);assert.ok(p.phaseErrors>0);assert.equal(p.remainingRoutineHooks,0);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
++});
++test('foreign same-engine Scene materials are passthrough, not attributed to the selected Scene',async t=>{
++  const f=nativeFixture(t);await warm(f);const other=new Scene(f.engine);other.texturesEnabled=false;
++  new FreeCamera('foreign CPU camera',new Vector3(0,0,-5),other);new HemisphericLight('foreign CPU light',Vector3.Up(),other);
++  const mesh=CreateBox('foreign actual mesh',{},other),material=new PBRMaterial('foreign actual material',other);mesh.material=material;let notifications=0;material.onEffectCreatedObservable.add(()=>notifications++);
++  const owner=captureEntryEffects(f.game,{enabled:true});
++  try{f.scene.onBeforeRenderObservable.addOnce(()=>other.render());for(let i=0;i<8;i++){f.scene.render();await turn();}const p=await owner.done;
++    assert.equal(p.complete,true);assert.ok(notifications>0,'foreign native method still runs');
++    assert.equal(p.frames[0].rows.filter(r=>r.id===EFFECT_IDS[4]).reduce((n,r)=>n+r.calls,0),1,'only actual own PBR readiness counted');
++  }finally{owner.dispose();other.dispose();}
++});
++test('native QA ten-routine button uses the actual waiter/factory/receipt and no old action',async t=>{
++  const f=entryFixture(t);await warm(f);const elements=[],requests=[],intervals=new Set();class Element{constructor(){this.style={};elements.push(this);}append(){}setAttribute(){}remove(){}}
++  Object.assign(f.game,{avatars:new Map(),adaptive:{state:{mode:'medium',quality:'medium'}},quality:'medium',camera:f.camera,gpu:{},trafficInstant:()=>0,compilationProfile:{snapshot:()=>({})},
++    async prepareLighting(){return{status:'complete',elapsedMs:0,activeElapsedMs:0,pausedMs:0,failureStep:null,stages:[],qualities:[]};}});
++  const identity={label:'CPU-only',buildId:'build',sourceSnapshotId:'source',helperSha256:'helper',routineCost:true,lifecycleControls:false,startupLatency:false,bufferLifecycle:false,shaderAttribution:false,loading:'original',clock:null};
++  const document={createElement:()=>new Element(),body:new Element(),visibilityState:'visible',hasFocus:()=>true};
++  const URLFixture=class extends URL{static createObjectURL(){return'blob:CPU';}static revokeObjectURL(){}};
++  const hash=b=>createHash('sha256').update(b).digest('hex');
++  const deps={...f.expected.classes,PBRBaseMaterial,
++    captureEntryRoutineCost:(g,o)=>captureEntryRoutineCost(g,{...o,now:f.options.now,setTimer:f.options.setTimer,clearTimer:f.options.clearTimer}),captureEntryEffects,
++    captureRoutineCost(){throw Error('old8 must not run');},captureEntryRenderCost(){throw Error('old3 must not run');},observeOperation,observePreparationResult,createAttemptQueue,observeStartupLatency,observeBufferLifecycle,
++    installBrowserClock:async()=>undefined,createPlannedBenchmark(){throw Error('no clock');},createShaderAttributionWindow(){throw Error('no shader window');},projectShaderInventory(){return{};},createLifecycleControls(){throw Error('no lifecycle');},createVisibilityAnchor(){throw Error('no lifecycle');},
++    document,window:{addEventListener(){},removeEventListener(){}},location:{hostname:'127.0.0.1',search:''},navigator:{userAgent:'CPU'},crypto:{randomUUID:()=>webcrypto.randomUUID(),subtle:{digest:async(_a,b)=>Buffer.from(hash(b),'hex')}},URL:URLFixture,URLSearchParams,Blob,TextEncoder,performance,innerWidth:2040,innerHeight:986,devicePixelRatio:1,
++    setInterval:cb=>{intervals.add(cb);return cb;},clearInterval:cb=>intervals.delete(cb),setTimeout(){throw Error('extra QA deadline');},clearTimeout(){},fetch:async(_url,o)=>{const raw=JSON.parse(o.body);requests.push(raw);return{ok:true,json:async()=>({persisted:true,attemptId:raw.attemptId,sha256:hash(o.body),bytes:Buffer.byteLength(o.body)})};},__WEBGPU_COMPLETION_IDENTITY__:identity};
++  const source=fs.readFileSync(join(directory,'qa-overlay.mjs'),'utf8').replace(/^import .*;\r?\n/gm,'').replace('export async function observeStartup','async function observeStartup');
++  const observe=new Function(...Object.keys(deps),source+';return observeStartup;')(...Object.values(deps));
++  assert.equal(await observe(f.game,{dataset:{}},async()=>{await f.game.prepareLighting();return 42;}),42);
++  for(let i=0;i<20;i++)await Promise.resolve();const button=elements.find(x=>x.textContent==='Diagnostic · první vstup do auta /8 framů /10 effect rutin');assert.ok(button);assert.equal(button.disabled,false);
++  const operation=button.onclick();f.frame();assert.equal(Object.hasOwn(f.engine,'createEffect'),false);f.game.actor.vehicle=true;
++  for(let i=0;i<8;i++)f.frame();await operation;for(let i=0;i<20;i++)await Promise.resolve();
++  const raw=requests.find(r=>r.kind==='entry-effect-cost');assert.ok(raw);validateReceipt(raw,identity);assert.equal(raw.completed,true);assert.equal(raw.before.vehicle,false);assert.equal(raw.after.vehicle,true);
++  assert.equal(raw.entryTrigger.sceneFrameIdAtTrigger,raw.entryEffectProfile.frames[0].frameId);assert.equal(raw.entryEffectProfile.targets.length,10);
++  assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(f.timer(),null);assert.equal(intervals.size,0);
++});
++test('copied fixture compatibility edits reverse exactly to immutable V17 bytes',()=>{
++  const edits=[['entry-render-cost.test.mjs','helperIdentity(directory)).files).length,36)','helperIdentity(directory)).files).length,39)',1],
++    ['entry-routine-cost.test.mjs','helperIdentity(directory)).files).length,36)','helperIdentity(directory)).files).length,39)',2],
++    ['preparation-summary.test.mjs','Object.keys(identity.files).length, 36','Object.keys(identity.files).length, 39',1],
++    ['pipeline-input-window.test.mjs','helperIdentity(dir)).files).length,36)','helperIdentity(dir)).files).length,39)',1],
++    ['helper.test.mjs',"['entry-routine', 'entry-routine-cost.mjs']]","['entry-routine', 'entry-routine-cost.mjs'], ['entry-effects', 'entry-effect-cost.mjs']]",1]];
++  for(const[file,before,after,count]of edits){let text=fs.readFileSync(join(directory,file),'utf8');assert.equal(text.split(after).length-1,count);text=text.split(after).join(before);
++    assert.equal(text,fs.readFileSync(join(donorDirectory,file),'utf8'));}
++  const overlay=fs.readFileSync(join(directory,'qa-overlay.mjs'),'utf8'),donor=fs.readFileSync(join(donorDirectory,'qa-overlay.mjs'),'utf8');
++  const a=donor.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),b=donor.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(a>=0&&b>a);assert.ok(overlay.includes(donor.slice(a,b)),'all original three buttons remain byteexact');
++  const harness=fs.readFileSync(join(directory,'harness.mjs'),'utf8');assert.ok(harness.includes("'@babylonjs/core/Engines/thinEngine.pure.js'"));
++  assert.ok(harness.includes("if (id === 'virtual:webgpu-completion-entry-effects')"));assert.ok(harness.includes("if (id === '\\0virtual:webgpu-completion-entry-effect-core')"));
++});
++test('descriptor drift during capture retires without clobbering the foreign engine method',async t=>{
++  const f=nativeFixture(t),owner=captureEntryEffects(f.game,{enabled:true}),foreign=function(){return Reflect.apply(ThinEngine.prototype.createEffect,this,arguments);};
++  f.engine.createEffect=foreign;f.scene.render();const p=await owner.done;assert.equal(p.complete,false);assert.equal(p.reason,'foreign-routine');assert.ok(p.restoreConflicts>0);
++  assert.equal(f.engine.createEffect,foreign);delete f.engine.createEffect;assert.equal(Object.hasOwn(f.scene,'render'),false);
++});
++test('disposed owner snapshots and retained instance wrappers do not query resources again',async t=>{
++  const f=nativeFixture(t);await warm(f);const owner=captureEntryEffects(f.game,{enabled:true}),stale=f.engine.createEffect;owner.dispose();const p=await owner.done;
++  assert.equal(p.remainingRoutineHooks,0);const descriptor=Object.getOwnPropertyDescriptor(f.game,'scene');Object.defineProperty(f.game,'scene',{configurable:true,get(){assert.fail('retired Game query');}});
++  try{owner.dispose();assert.equal(owner.snapshot(),p);const host={_compiledEffects:{'v+f@':{_refCount:1}},_getGlobalDefines:()=>''};
++    assert.equal(Reflect.apply(stale,host,[{vertex:'v',fragment:'f'},{attributes:[],defines:''},host]),host._compiledEffects['v+f@']);
++  }finally{Object.defineProperty(f.game,'scene',descriptor);}
++});
++test('phase registration failure rolls back all ten native descriptors before publishing an owner',t=>{
++  const f=nativeFixture(t),native=PBRBaseMaterial.prototype._prepareEffect,observable=f.scene.onBeforeDrawPhaseObservable,original=observable.add;
++  observable.add=()=>null;
++  try{assert.throws(()=>captureEntryEffects(f.game,{enabled:true}),/observer unavailable/);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(Object.hasOwn(f.scene,'render'),false);assert.equal(PBRBaseMaterial.prototype._prepareEffect,native);}
++  finally{observable.add=original;}
++});
++test('partial RTT observer failure removes its first subscription and does not escape native notification',async t=>{
++  const f=nativeFixture(t),before=new Observable(),after={add(){throw false;},remove(){}},renderer={onInitRenderingObservable:before,onFinishRenderingObservable:after};
++  let removals=0;const remove=before.remove;before.remove=function(o){removals++;return Reflect.apply(remove,this,[o]);};
++  const owner=captureEntryEffects(f.game,{enabled:true});let later=0;f.scene.onNewObjectRendererAddedObservable.add(()=>later++);
++  f.scene.objectRenderers.push(renderer);
++  try{assert.doesNotThrow(()=>f.scene.onNewObjectRendererAddedObservable.notifyObservers(renderer));const p=await owner.done;
++    assert.equal(p.complete,false);assert.equal(p.reason,'observer-error');assert.equal(p.remainingRoutineHooks,0);assert.equal(removals,1);assert.equal(later,1);
++  }finally{f.scene.objectRenderers.splice(f.scene.objectRenderers.indexOf(renderer),1);owner.dispose();}
++});
++for(const failure of [undefined,0])test('native Scene throw preserves exact '+String(failure)+' and restores all descriptors',async t=>{
++  const f=nativeFixture(t),owner=captureEntryEffects(f.game,{enabled:true});f.scene.onBeforeRenderObservable.addOnce(()=>{throw failure;});
++  assert.throws(()=>f.scene.render(),x=>x===failure);const p=await owner.done;assert.equal(p.complete,false);assert.equal(p.reason,'original-render-threw');assert.equal(p.remainingRoutineHooks,0);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);validateEntryEffectProfile(p);
++});
++test('invalid native frame IDs stay explicit partial without adding or repairing a render',async t=>{
++  const f=nativeFixture(t),owner=captureEntryEffects(f.game,{enabled:true});f.scene.onAfterRenderObservable.addOnce(()=>{f.scene._frameId=NaN;});f.scene.render();const p=await owner.done;
++  assert.equal(p.complete,false);assert.equal(p.reason,'no-native-frame-progress');assert.equal(p.frames[0].nativeFrameIdAfter,null);validateEntryEffectProfile(p);
++});
++test('maximal scalar profile remains bounded and validation never invokes inherited toJSON',async t=>{
++  const f=nativeFixture(t);await warm(f);const owner=captureEntryEffects(f.game,{enabled:true});for(let i=0;i<8;i++)f.scene.render();const p=structuredClone(await owner.done);
++  for(const frame of p.frames)for(const r of frame.rows){r.calls=100000;r.inclusiveMs=r.selfSelectedMs=Number.MAX_VALUE;r.falseReturns=r.nullReturns=r.throws=0;}
++  validateEntryEffectProfile(p);assert.ok(Buffer.byteLength(JSON.stringify(p))<EFFECT_LIMITS.bytes);
++  let reads=0;const poisoned=Object.create({get toJSON(){reads++;throw Error('inherited getter');}},Object.getOwnPropertyDescriptors(p));assert.throws(()=>validateEntryEffectProfile(poisoned),/prototype/);assert.equal(reads,0);
++  const invalid=structuredClone(p);invalid.reason='arbitrary caller text';assert.throws(()=>validateEntryEffectProfile(invalid));
++});
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/README.md b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/README.md
+index bfbb246c..f6cd59ed 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-export/helper/v17/README.md
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/README.md
+@@ -1,300 +1,38 @@
+-# V17 bounded startup stage result export
++# První vstup: dvě vnitřní effect hranice
+ 
+-This version adds preparationStages once to the existing startup raw, alongside preparationSummary, using the same original prepareLighting Promise fulfilment side reaction. There is still one native.then call per original operation. No new wrapper, timer, polling, renderer/readiness/GPU call or product change. Original Promise/value/receiver/arguments/falsy errors are unchanged. The owner restores on terminal/abort/rejoin and retains only the closed scalar evidence after disposal.
++Task `webgpu-completion-entry-effect-cost-20261024`; vlastník `webgpu-completion-01a15a3e-entry-effect-cost`. Výchozí754dde6a, vlastní depth5 kopie V18 z neměnného V17/36/helper37646a00. Produkt, native dependency, starý helper a raw se nemění. Pouze cílené lehké CPU kontroly; žádné pnpm, build, server, GPU nebo celý helper corpus.
+ 
+-The closed projection exports original stage names, passQuality, elapsed/active/paused times, tick/check/render/restart counts, original CPU apply/checkBatch/render aggregates, rafGap aggregates and the14 known Game revision reasons plus revision-length. It never exports arbitrary strings, shaders, resources, user data or invented per-stage compiler counters. Limits are16quality passes,304rows and256KiB. Cumulative qualities.stageCount plus each stage.passQuality determines passIndex, including repeated Medium. Missing/invalid/partial/truncated layouts have explicit flags and null indices. Own data descriptors only; getters are not invoked. preparationStages is optional in legacy envelopes, accepted only on startup under the unchanged2MiB receipt cap.
++## Podklady a rozhodnutí před kódem
+ 
+-The two source14 recordings lost their original stage records to the existing recorder cap. This version cannot recover those missing values. A new immutable build and actual startup must supply future evidence; CPU tests are not GPU or performance acceptance.
++Primární podklady: `source15-blocking-costs.md`, `research/source15-blocking-costs-decision.md`, skutečný source15 receipt9487731c (frame6016–6023), původní recorder b7c86834 a before/after compiler bracket. Zásek210,9ms má CPU209,8/render191,3ms; první main PBR readiness62,4 a Standard19,1ms. Nula nových compiler/pipeline požadavků sama neurčuje cache-hit, serializer nebo JIT příčinu. Tento výzkum není performance přijetí.
+ 
+-All36 original V16 files remain immutable. This new36file pack updates only observer/overlay/receipt, this README and copied tests. Copies retain behavioral/pin/order assertions, with explicit version-count/path corrections and exact normalization in historical test-byte guards. Old DOM bindings resolve today's imports; the buffer fixture supplies its missing query-error Observable; explicit post-ready shader-window behavior replaces an obsolete startup-window expectation while preserving original failure/inventory/restoration checks. Temp output is confined to this task. Public startup-stage-export evidence records the exact metadata changes, failures, guards and verification. The sections below document inherited historical capabilities; V10's no-stage projection description applies to V10, not this V17 extension.
++Pinovaný Babylon9.30: PBRBaseMaterial.isReadyForSubMesh921 → _prepareEffect963 → _prepareDefines → dirty gate (čistá větev vrací null) → ABI/fallback/defines.toString1182 → engine.createEffect. WebGPU vlastní metodu1534; WebGL Engine ji dědí z ThinEngine1682. onEffectCreated/SubMesh.setEffect jsou až v readiness po návratu _prepareEffect. Generic cache API může volat positional onCompiled a zvyšuje refCount, PBR však předává callback v options. Effect constructor může zahájit async processing mimo synchronní API span. Žádná z nových metrik není GPU compile čas ani doklad cache hitu.
+ 
+-# V13 accepted-entry original8 routine diagnostic
+-
+-Separate button under existing --routine-cost installs one own Gltf.prepareFrame waiter. At accepted Actor false-to-true it restores the exact waiter descriptor before synchronously starting the original captureRoutineCost, then calls original prepare once. One arm-time30s deadline covers standby+8 frames including a post-done synchronous check. Original3scope and8routine modules/buttons are byte-exact; they are never generally layered. New optional scalar entryTrigger in existing routine-cost receipt records arm/deadline/trigger/install/terminal times and SceneID correlation; install time is not Scene start. Original routineProfile remains truthful even when its eight frames complete after the outer deadline. Invalid/refused/aborted/foreign/error attempts remain evidence. Coldness needs fresh Game/original session, and profiling includes observer/JIT overhead, not FPS/GPU execution. Existing lifecycle-controls behavior is unchanged. New entry-routine-helper evidence contains primary research, hashes, tests and handoff; root alone builds/runs actual capture.
+-
+-# V12 correction
+-
+-Same-index nested recursion under Scene is incomplete phase-error evidence; original calls/return/falsy throws still pass through once. Legitimate first nested prepare/stable remain supported. V11 emitted false complete for five recursive2ms bodies (nested30 vsScene18) and was never built forGPU. The immutable old v11 donor replacement covered SHA+two middle orders only; its equivalence wording was too broad. This v12 fixture adds version9.30.0, all8 selected own-method descriptors and all4 ordering checks. Other29 helper inputs are byte-exact. New reentry-correction evidence retains originalRED and exact byte hashes; no runtime/Game/GPU/performance claim follows.
+-
+-# V11 entry/prelude diagnostic
+-
+-Existing --routine-cost additionally offers a separate first-observed-entry button. It waits for the original accepted Actor false→true at outer prepareFrame and captures8 original prepare→stable→Scene chains under one30s deadline. First/cold is a fresh-session claim, never inferred from this observer alone. Original eight-routine button/modules are unchanged. New vehicle-entry-cost receipt records per-frame wall timestamps, engine and scene IDs, vehicle flags, three outer scopes, overlapping nested work and explicit failure/restoration evidence. glTF direct refresh inside Scene is included in Scene only. Engine ID stays unchanged inside render; Scene progresses1. No product/GPU/readiness/input/network calls are added. Exact snapshot singleton classes/methods, lifecycle and foreign-descriptor guards; defaultoff no hooks or Game reads. Only one installed attempt per Game.
+-
+-Use a fresh immutable helper build. Root alone runs actual first-entry capture. CPU fixtures are not GPU image, submission, performance or cold-entry acceptance. Public entry-render-helper evidence records research/variants, all source/protected hashes and exact verification.
+-
+-Native Promise observation is restricted to the original vanilla native-prototype/constructor/species shape; exotic constructor/species accessors are not invoked and produce truthful unsupported-promise evidence. Original return is still untouched. Missing own renderer/generation identity refuses observation. CPU fixtures use deliberately synthetic scalar timing values; they are not recovered source10 timings.
+-
+-# QA v10: bounded original preparation result
+-
+-This immutable helper observes only this Game instance's original prepareLighting result, with one native Promise.then side reaction per original call. It returns exactly the original Promise/value/receiver/args/throw; no extra await, timer, render, readiness, GPU call or product state. Projection runs once on original fulfilment before Game.start terminal, and only the tiny preparationSummary is attached once to startup raw. Existing periodic snapshots and benchmark paths are unchanged.
+-
+-Own data descriptors whitelist real status/times/failureStep and stages.length, max16 quality scalar rows with true qualityCount/truncation/invalid flags. No stage entry, shader/resource/user data is read or retained. Missing/invalid data stays explicitly unavailable/null. Original rejection remains original and yields no fabricated timing.
+-
+-The instance method is restored before terminal/stop/abort, only if it is still the owned descriptor; owner/renderer/generation/scene/engine/startup abort guards reject late evidence. Raw results, Game and Promise are not retained after projection/retirement. Diagnostic errors cannot replace the original outcome. This adds startup observation overhead and is not an FPS/GPU performance claim. Full research and leaf proof: public preparation-summary-helper evidence. Root alone builds and verifies an actual capture. Original v9/source10/native remain read-only.
+-
+-# Explicitní QA měření skutečné hry pro KEY-22
+-
+-## Volitelné lokální lifecycle ovládání
+-
+-Nový build-only příznak `--lifecycle-controls` je povinně canonical boolean s výchozí hodnotou `false`. Je součástí helper/source sealu, sidecar/build-input/browser identity a každého receipt; absence, typový drift a změna příznaku proti sealed bundle se odmítají. Query parametr jej nezapíná. Příklad explicitního příkazu pouze pro koordinátora s rezervovaným build/GPU:
+-
+-```powershell
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABSOLUTE_SNAPSHOT ABSOLUTE_NEW_BUILD lifecycle original --lifecycle-controls
+-```
+-
+-Celý takový build je diagnostic. Plain/default-off neinstaluje lifecycle owner ani nečte zařízení přes nový helper. Enabled panel nabízí běžný odkaz `about:blank`, `target=_blank`, `rel=noopener`; kliknutí může otevřít aktivní kartu, skutečné hidden→visible musí doložit root. Není přidaná mutace visibility/focus, syntetická událost, browser driver ani správa jiných karet. Po testu se zavírá jen vlastní blank.
+-
+-Druhé tlačítko výslovně zničí pouze zařízení této vlastní dočasné hry; renderer se potom obnovuje původním UI. Před kliknutím/voláním se ověří exact Game/Scene/engine/device/health/generation/abort/current owner, ready-valid/pending0 a nepřítomnost startup lease/quality preparation/benchmarku. Original `device.destroy` se zavolá nejvýše jednou pro dané zařízení, s původním receiverem/return/throw. Není obalen original lost Promise, RenderHealth ani Game/UI/Room failure/recovery. Bounded state receipt zaznamená pouze původní call `returned`/`threw`, nikoliv úspěšnou ztrátu či obnovu. Původní native loss a praktická recovery musí být přijaty zvlášť. Cleanup odstraní vlastní scene/abort pozorování a strong reference; žádný global/per-frame hook nebo nový polling.
+-
+-Nový helper vyžaduje nový immutable build/seal. Frozen helperv6/a5b3 a hráčovy testované buildy se nepřepisují. Průzkum/varianty, výchozí119 CPU a následné nové proofy jsou v `../lifecycle-controls/README.md`; CPU DOM/IO fixtures nejsou GPU/visibility/recovery přejímka. Samotný helper žádný build/server/browser/GPU neprováděl.
+-
+-## Volitelný actual routine CPU diagnostic
+-
+-Nový build-only příznak `--routine-cost` je výchozí `false`, povinně součást canonical build/load/browser identity i helper/dependency SHA. Staré buildy se novým helperem nepřejmenovávají: root uchoval všech19 původních helperc951 souborů ve správné5-level struktuře `validation/helper-runtimes/v4/`. Nová verze vždy potřebuje nový immutable build. Příklad příkazu pro koordinátora, nikoli zde provedený build:
+-
+-```powershell
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABSOLUTE_SNAPSHOT ABSOLUTE_NEW_BUILD routine-cost original --weather ABSOLUTE_WEATHER --routine-cost
+-```
+-
+-Clock/ostatní flagy si zachovávají předchozí explicitní argumenty. Celý tento build a jeho10s benchmark jsou označené diagnostic; vybraných8 rutin se ale obalí **pouze** stiskem `Diagnostic ·8 skutečných framů /8 CPU rutin` po startup ACK. Akce nevolá Game.startBenchmark ani render/readiness/GPU metodu. Pozoruje následujících nejvýše8 původních skutečných `Game.scene.render` volání a native `_frameId` progress, poté automaticky obnoví své vlastněné deskriptory a uloží samostatný immutable `routine-cost` receipt se `routineProfile`. Failure/refusal/abort/rejoin/30s deadline se také uchová a nikdy nevydává za platné FPS.
+-
+-Přesných8 targetů: actual scene.getActiveMeshCandidates, Scene._activeMesh, TransformNode.computeWorldMatrix, Mesh.getLOD, PBRBaseMaterial/StandardMaterial.isReadyForSubMesh a bindForSubMesh. Receiver filter propustí rovnou cizí scény do originálu, bez clock/counter práce. Jediný další wrapper je actualScene render boundary; neinstaluje se žádný observer na jednotlivé meshe. Defaultoff neinstaluje wrapper ani phase observer. Cap8frames/8routines/stack32/100000selectedCallsPerFrame/128phaseEntersPerFrame/64ObjectRenderers; overflow, missing phase end, původní render throw, chybějící frame progress a foreign restoration conflict jsou explicit incomplete evidence.
+-
+-Public active/main/ObjectRenderer init-finish boundaries rozlišují `active/main/rtt/other`; zachová se vnoření. Každá routine×phase row obsahuje původní calls, falseReturns, throws, inclusiveMs a selfSelectedMs. SelfSelected odečte pouze vybrané děti; není univerzální self CPU. Scope časy se mohou překrývat a nesmějí se sčítat jako celý frame. Profil obsahuje režii wrapperů/clock/observerů a není FPS A/B ani GPU execution. Nevybraný frustum/reset/sort/engine/custom-material path zůstává residual. Shader inventory cap32MiB ani runtime cache/LOD/material stav se nemění.
+-
+-Výzkum/varianty, původní donor rawSHA, pinned pozice a oficiální primární odkazy: `../routine-cost/README.md`. Cíleně spustit původních5 test souborů **plus** `routine-cost.test.mjs` pomocí `node --import tsx --test --test-reporter=tap …`. Node strip-only bez loaderu nepodporuje existující Simulation parameter properties; tento chybný počáteční příkaz je zachovaný v důkazním logu. Testy na NullEngine a skutečném Scene/Mesh/PBR/Standard/ObjectRenderer ověřují CPU kontrakt, nikoli výkon ani obraz.
+-
+-Tento malý build/serve helper navazuje na přijatý `transit-calendar-20261020/measurement` Vite postup. Nemění zdrojový snapshot, produkční renderer, readiness, timeout, světla ani stíny. Nemá browser automatizaci, CDP nebo API server. Konkrétní build/GPU výsledky sem nepatří, dokud je koordinátor skutečně neprovede.
+-
+-## Rozhodnutí a hranice
+-
+-Standardní recorder již ukládá `lighting-preparation` a `webgpu-preparation-profile` před kontrolou timeoutu v Game.start. Nejprve použít tyto raw záznamy. Existující transit QA panel vznikal až po ready; tady jediný exact UI transform obalí původní `await g.start()` před startem. Terminální snapshot vznikne před původním UI catch/dispose, původní výsledek nebo stejný thrown objekt se zachová i při chybě observeru. Není přidaný render, readiness check ani pipeline cache zásah. Game/device se nevystavují přes window.
+-
+-Startup sampler pořídí nejvýše 180 technických snapshotů po 1 s. Skončí v obou terminal větvích. Whitelist obsahuje health/generaci/pending operations, backend/rozměry, skutečné avatar konfigurace bez přezdívek, scénové počty a existující compilation counters; shader text inventory se neexportuje. Počasí zachová všechny známé technické Weather hodnoty včetně cloudLayers/cloudWinds, vlhkosti, sněžení, fáze srážek a provenience. Standardní benchmark navíc uchová vlastní nezávislé weatherAtStart/weatherAtEnd, nikoli náhradu pozdějším scene snapshotem. Terminální raw jde do viditelného QA panelu, skrytého textového DOM exportu a download backupu, automaticky také do immutable receipt endpointu. Selhání startupu či neplatný benchmark jsou zachované důkazy, nikdy automatická přejímka výkonu.
+-
+-Po úspěšném startu a přesném server ACK jeho raw záznamu panel volá existující Game metody: `setQuality`, `setTargetFps(60)`, `toggleFlashlight`, `startBenchmark`. UTC input používá stejný `timeOverride` jako vlastní UI. Ovládání je během měření a všech pending/failed transferů zamčené. Standardní Game benchmark trvá 10 s, exportuje původní raw `game.benchmark.frames` a vlastní výsledek; souběžný lehký RAF pozorovatel ukládá doručovací intervaly, nikoli GPU čas. **I plain standardní benchmark obsahuje produkční BenchmarkRenderProfile a běžné compilation/health hooks.** Helper nepřidává další profilovací wrappery. Mezi začátkem a koncem intervalu nedělá 1Hz snapshoty ani profile dumpy. Režim s `profileEnvironment=1` je označený diagnostic a nemíchá se s plain FPS páry. Odmítnutí, throw i dispose během startBenchmark mají vlastní failed raw attempt; cleanup se týká jen skutečně vytvořeného vlastního benchmark objektu a případná cleanup chyba nepřekryje původní chybu.
+-
+-Různé 1Hz RAF startupy nejsou GPU FPS vzorky. Nula shader chyb neprokazuje dokončenou přípravu. Endpoint scene/draw/bundle counters nejsou intervalový průměr. WebGPU GPU timer je main-pass-only, WebGL timer může být whole-frame; nesrovnávat je jako totožný scope.
+-
+-**Traffic clock je výchozí vypnutý.** Osvětlení timeOverride nesjednocuje dopravu; před/po počty nejsou min/max kohorty ani frustum workload. Nepočítat kauzální FPS gain z různých skutečných UTC jízd. Pro volitelný explicitní společný QA transit scénář slouží níže popsaná hashed clock konfigurace. Pohyb, počasí, kamera, teplota/takty a požadované 1/3 skutečné relace stále musí mít samostatný root protokol. Basic sample gates nevydávají celý KEY-22 za přijatý.
+-
+-## Příkazy pro koordinátora
+-
+-Nejprve rezervovat heavy-validation/workspace-build/gpu a porty podle skutečně prováděné akce. Výstupy musí být striktní potomci `.cache/webgpu-completion-20261021/validation/` v této worktree; cílový adresář musí být nový. Snapshot obsahuje testy a materiálované assety. Helper před/po build ověří každý manifestovaný soubor a vlastní helper SHA; native Vite config a původní chunk grouping zůstanou zachované. App/loaders musí používat jeden core. Identity sidecar ukládá helper/transform/dependency SHA a všechny skutečné bundle SHA.
+-
+-```powershell
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABSOLUTE_SNAPSHOT ABSOLUTE_NEW_BUILD key22-original original
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs inspect ABSOLUTE_BUILD
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs serve ABSOLUTE_BUILD ABSOLUTE_NEW_RUN 4213 2597
+-```
+-
+-Serve používá `http://127.0.0.1:PORT`, výchozí4211. První volitelný argument má přednost před `STRAHOV_WEBGPU_QA_PORT`. Druhý volitelný API argument má přednost před `STRAHOV_WEBGPU_QA_API_PORT`, default2596. Oba porty musejí být celá čísla1024..65535 a odlišné. Koordinátor je **před startem** rezervuje a ověří skutečné listenery; existující baseline4211/API2596 a CSS experiment4212 se nepřebírají ani nemění. Host/Origin kontrola receipt endpointu se odvozuje ze skutečně zvoleného preview portu, není hardcoded4211. Proxy `/api` a `/realtime` míří na **již spuštěný vlastní** explicitní API. Readonly public assety bere z přesně ověřeného snapshotu. Nespouští ani neukončuje API, další programy nebo proces podle portu. Ctrl+C/SIGTERM zavře jen svůj preview a vlastní sockets; root ověří cleanup a ukončí svůj API samostatně. Karty otevírá pouze root přes CUA.
+-
+-QA vstup URL nastaví standardní `renderBackend=webgpu`, případně `webgpu-fast` nebo explicitní WebGL reference. `profileEnvironment=1` jen pro oddělenou diagnostiku. Root ověří skutečný backend/identity a foreground. Panel měří až po standardním UI joinu a dokončeném Game.start. Není tady syntetická scéna ani generované výkonové výsledky.
+-
+-`build ... translucent` je samostatný **diagnostický** A/B flag. Exact CSS transform změní pouze `.loading` background z `#eff3e6` na `rgba(239,243,230,.96)`. Default `original` CSS zachová byteově. Sidecar a buildId odliší obě varianty. Experiment testuje hypotézu compositor/canvas occlusion a není přijatou opravou runtime. Žádná browser injekce ani jiný CSS zásah.
+-
+-## Uchování a ověření
+-
+-Browser raw export obsahuje source/helper/buildId; sidecar tento buildId váže na skutečné bundle hashy. Receipt API vyžaduje loopback, přesný Host/Origin, JSON POST a max2MiB. Každý attemptId se zapisuje do vlastního exclusive `wx` stage, po fsync publikuje atomickým exclusive linkem a uklidí jen vlastní stage. Přesné i souběžné opakování je idempotentní, rozdílné bajty stejného ID se odmítnou a původní soubor zůstane zachovaný.
+-
+-Samostatná module-owned fronta uchová **neměnné původní bajty každého neACKovaného attemptu**. Má vlastní per-attempt download a retry panel, který přežije Game dispose i rejoin; zánik předchozího QA Game panelu jeho zálohy nemaže. Fronta nepřijímá Game/device reference. Pending i failed přenosy blokují dependent měření. Payload se uvolní až po server odpovědi se shodným attemptId, byte length a SHA256; pouhé persisted:true nestačí. Retry posílá přesně stejné bajty a pending request se neduplikuje. Unsent počet může růst při opakovaných rejoin bez připojení; nic se tiše nezahazuje, root má obnovit přenos nebo uložit jednotlivé downloady. Jde o paměť dané stránky, ne trvalý offline outbox přes reload či zavření browseru. Nepovažovat ACK ani basicSampleGatesPassed za schválení výkonových podmínek. Server běží v ignorované root cache, operational PID se necommitují.
+-
+-```powershell
+-node --test docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs
+-```
+-
+-Lehké helper testy ověřují exactonce/drift v aktuálním UI/CSS, původní rejection a pořadí teardown, observer faults, identity/source drift, immutable receipts a request/array/byte bounds. Jejich fixture důkazy jsou výslovně testovací; nejsou fake GPU měření. Neotevírají browser, port nebo server a čistí jen vlastní nové dočasné adresáře uvnitř tohoto prefixu. Build, serve a praktickou GPU přejímku provede root odděleně.
+-
+-## Volitelný společný QA transit clock
+-
+-Rozhodnutí je v sousedním `research/controlled-transit-clock.md`. Default bez posledního config argumentu nic nemapuje a browser neimportuje novou Simulation přes clock adapter. Explicitní JSON soubor musí být absolutní cesta v rootově validation cache a mít pouze tyto položky:
+-
+-| Pole | Kontrakt |
+-|---|---|
+-| `schemaVersion` |1|
+-| `scenarioEpochUTC` |E0: bezpečný nezáporný integer UTC z vědomě zvoleného scénáře, GTFS provenience patří root protokolu|
+-| `armAtUTC` |A: předem daný budoucí integer UTC; během běhu se nepřepisuje|
+-| `benchmarkAtUTC` |Volitelné B>A pro jednorázový planned benchmark|
+-| `latenessToleranceMs` |Povinné s B, předem pevně dané0..1000ms; bez B nesmí být přítomné|
+-
+-```powershell
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABS_SNAPSHOT ABS_NEW_BUILD clock-cm original ABS_CLOCK_JSON
+-node --import tsx docs/performance/evidence/webgpu-completion-20261021/measurement/server-bootstrap.mjs ABS_BUILD ABS_NEW_PROOF_DIRECTORY 2597
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs serve ABS_BUILD ABS_NEW_RUN 4213 2597
+-node --import tsx --test docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/clock.test.mjs
+-```
+-
+-Root vyhradí dostatek času od vytvoření manifestu přes build a startup až po **30s settling před A**. Pozdní server/browser instalace se výslovně odmítne; původní config se neposouvá. Root vytvoří nový čerstvý běh/config, nikoli nový arm v existující Simulation. E0 je mezi porovnávanými běhy stejný; absolutní A/B a proto configId se mohou lišit, ale B−A a lateness policy musejí být shodné. Uvnitř jednoho běhu server a klient vyžadují přesně stejný config ID/SHA. Raw config bajty se kopírují exclusive do build directory, hashuje se jak původní soubor, tak canonical config; jsou součástí buildId. Před/po build se kontroluje i původní config soubor.
+-
+-Při loadBuild se také přímo ověřuje shoda ověřeného manifest.snapshotId s identity.sourceSnapshotId. Nestačí samostatně platný manifest jiného snapshotu. Embedded identity.clock.config musí po normalizaci obsahově souhlasit s ověřenými config bajty/canonical ID, Simulation SHA se kontroluje proti stejnému manifestu. Negativní CPU fixture odmítají podvrženou source identitu i rozporný embedded clock, bez spuštění serveru.
+-
+-Čistá immutable mapa je E0+max(0,t−A). Před A stojí jen transit; po A jde reálnou rychlostí. Server bootstrap obalí přesnou snapshot `Simulation.prototype.tick` před native importem server/index se stejným registrovaným tsx module graph. Browser explicitní Vite adapter importuje tentýž snapshot module ID jako Game a instaluje stejný tick wrapper před Game.start; zároveň mapuje původní Game.trafficInstant pro render. **Jen skutečný MP** je povolený, Guest start se v této QA variantě odmítne před instalací, aby jeho trafficInstant→sim.tick větev nemapovala dvakrát. Ostatní porty a buildy se nepatchují. Date, TimelineSimulationClock, NetworkTimeline, packet Authority/Motion/inputEpoch/ack/replay timestamps a fixedtimestep zůstávají beze změny. Wrapper mění jen transit argument, zachovává receiver, return a původní throw; single-owner registry zakazuje dvojí instalaci.
+-
+-Browser owner má vlastní abort/retirement guard před i po asynchronním importu. Abort uvolní už instalované hooky i v mezeře před publikací výsledku callerovi; observeStartup po await případného pozdního ownera ještě uvolní a nikdy nespustí původní Game.start na retired Game. Dispose i pouhý rejoin během importu zachová AbortError receipt, původní import rejection zůstává totožný. Deferred import nemůže ponechat pozdní prototype wrapper blokující další Game.
+-
+-Node bootstrap před importem snapshot modulů nastaví cwd na přesně identity.snapshot. Vyjmenovaná launch policy vyprázdní serverový Linear credential bez čtení/výpisu zděděné hodnoty, izoluje FEEDBACK_DIR do vlastního proof/feedback, odstraní STATIC_DIR (API-only), nastaví NODE_ENV=production, HOST/PORT a STRAHOV_SOURCE_SNAPSHOT_ID z ověřeného manifestu. Zděděné prostředí se nevypisuje. Proof ukládá jen booleany/cesty a source ID. Koordinátor výslovně povolil normální původní server diagnostics v owned snapshot/.cache/game-diagnostics; source vstupy zůstávají neměnné a skutečný scanner se neobchází. Zbytek QA proof/feedback/logů patří vlastní validation cache. Pure launch-plan test neprovádí změnu cwd/env ani server import.
+-
+-Každý hook vede jen scalar counters/poslední původní a mapovaný UTC, pre/postarm, rewind, počet skutečně viděných instancí a receiver nesoulady. V hot path nevzniká log/JSON/pollovací timer. Browser snapshot dokládá `actualSimulationMatches` a skutečné physics/render calls. Clock snapshot sám nevolá trafficInstant a nezvyšuje render důkaz uměle. Zero physics calls nebo jiná třída/import jsou neplatné, nikoli důkaz dobrého aliasu. Node proof má source/helper/config/Simulation SHA a `observedServerHook`; initial installed proof s0calls je výslovně nepotvrzený. Po server importu je další immutable proof; root může **mimo benchmark** poslat na stdin vlastního procesu řádek `proof` a získat další immutable snapshot. Při normálním process exit vzniká terminal proof; při násilném kill jeho doručení garantované není, proto root pořídí requested proof před shutdown. Import bootstrap modulu v testu nic nespustí; CLI guard je nutný.
+-
+-Po receipt ACK startupu může root stisknout `Naplánovat jediný 10s benchmark UTC`. Jde o jediný harness timer. Běžná Game ani startup smyčka se nemění. Callback uloží plánovaný/actual start a lateness, před skutečným startBenchmark lateness ověří znovu. Pozdní/časný callback, dispose při čekání nebo nedostatečný settling se uloží jako neplatný attempt s prázdnými arrays a bez vymyšleného FPS. Nejde o novou campaign/frame scheduler vrstvu. Když je B nakonfigurované, ruční benchmark zůstane funkčním důkazem, ale jeho comparability gates výslovně neprojdou.
+-
+-Clock CPU fixtures používají skutečný Simulation/Rapier a skutečné transit sampling: porovnávají cache/extrapolaci/create/remove/rewind proti přímo mapované referenci, stejná vozidla/render obstacles, původní Timeline packet/replay hodnoty, defaultoff/Guest/lifecycle a one-shot timer faults. Nejde o Node server, GPU kompilaci, plynulost, multiplayer přejímku ani identické render framy. Root musí prakticky potvrdit oba skutečné import hooky a stejné nastavení kvality/viewportu/počasí/route/teplot. Ani stejné E0 neznamená shodný draw list nebo door/wheel/LOD sampling při různém FPS.
+-
+-## Rozhodnutí před implementací weather/latency rozšíření
+-
+-21.10.2026, delegovaný celek nad589b098c. Root uchoval přesných12 source souborů helperu07b3e1cd v immutable vlastní validation kopii; běžící f511d0ab se nepřestavuje. Nové možnosti vyžadují čerstvý build. NCM30s timeout na6/15 stages a285sync/0async je reprodukce, nikoli důkaz dominance konkrétního GPU fence. Níže zvolená diagnostika nesmí měnit readiness, timeout, scheduler nebo obsah scény.
+-
+-| Varianta | Náklad/riziko | Rozhodnutí |
++| Varianta | Dopad | Volba |
+ |---|---|---|
+-| Zachovat živé počasí + readback | Bez fixture nákladů, ale různé backend starty nemají garantovaný stejný stav | Ponechat jako default, nestačí pro řízené srovnání |
+-| Přepsat Game weather po ready | Rychlé, ale startup by připravoval jiný stav a UI refresh by jej přepsal | Nezvoleno |
+-| Build-bound immutable preview fixture | Jediné čtení JSON a původní middleware; raw/emitted provenance/SHA, stejné numeric/layers/winds | Zvoleno podle existujícího performance-preview, defaultoff |
+-| Přidat vlastní popErrorScope/fence nebo další await | Změní počet/pořadí synchronizací a měřený mechanismus | Odmítnuto |
+-| Pouze celkový startup čas | Nejmenší režie, nerozliší původní scope versus queue completion | Dosavadní důkaz zachovat, doplnit úzký observer |
+-| Obalit dvě původní instance metody a pozorovat jejich native Promise | Dvě reaction handlers na zachycený call, scalar buffers a timestamp reads; měří completion wall latency včetně browser scheduling | Zvoleno pouze explicitně diagnostic |
+-
+-CLI zachová staré positional loading/clock vstupy; nové named flags budou `--weather ABS_JSON` a `--startup-latency`, duplicity/unknown args se odmítnou. Weather input je explicitní omezený JSON ve vlastní validation cache, raw i emitované bytes se hashují a vážou na build/run. Numerická pole včetně wind0.9/cloud0.86 a nested layers/winds se nekorigují, nezaokrouhlují ani nevyjasňují. Mění se jen stejné QA/fallback labely jako v původním preview mechanismu. Default bez fixture nezasáhne weather proxy.
+-
+-Observer bude mít společný cap4096 původních volání přes obě metody, výrazně nad typickým řádem236submitů. Předalokované numeric/status buffers mají konečnou velikost; raw trace obsahuje jen scalar tuples a per-channel souhrny, nikoli GPUError/Promise/device/Game objekty. Odhad trace je několik set KiB, nikoli navyšování2MiB receipt limitu. Overflow/unsupported output/ownership/clock chyba zneplatní úplnost a zůstane v důkazu; původní volání pokračují. Pending calls při stop se označí jako nedokončené. Reakce po stop již nemění sealed trace ani jiného ownera.
+-
+-Každá metoda vrátí původní Promise a zachová receiver/argumenty/původní sync throw. Observer nevolá metody navíc, nečeká na ně a neposílá health report. Pozorování se vztahuje na všechna původní volání vlastního device/queue během Game.start, včetně případných Babylon shader scopes; není automatickou identifikací call site. Terminal/dispose/rejoin obnoví pouze dosud vlastněné instance wrappery. Oba kanály jsou oddělené a všechny takové buildy/receipts označené diagnostic; plain FPS cesta zůstává neinstrumentovaná.
+-
+-### Použití nových explicitních variant
+-
+-```powershell
+-# Weather-only plain: observer zůstává vypnutý, clock není přidán.
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABS_SNAPSHOT ABS_NEW_BUILD weather-plain original --weather ABS_WEATHER_JSON
+-# Samostatný diagnostic startup; starý positional clock argument zůstává platný.
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABS_SNAPSHOT ABS_NEW_BUILD startup-latency original --weather ABS_WEATHER_JSON --startup-latency
+-# Pokud je clock potřeba, lze jej zadat také pojmenovaně.
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABS_SNAPSHOT ABS_NEW_BUILD clock-weather original --clock ABS_CLOCK_JSON --weather ABS_WEATHER_JSON
+-node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs serve ABS_BUILD ABS_NEW_RUN OWN_PREVIEW_PORT OWN_API_PORT
+-node --import tsx --test docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/clock.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/weather-latency.test.mjs
+-```
+-
+-Weather/latency jsou **build flags**, ne mutable serve přepínače nebo zděděné weather env. Neznámé/duplicitní/nejednoznačné argumenty se odmítnou. Root rezervuje vlastní preview/API porty před spuštěním; výchozí4211/2596 ani existující immutable služby helper nepřebírá. Výše uvedené příkazy child nespouštěl.
+-
+-Weather JSON musí být absolutní regular `.json` soubor pod rootovou `.cache/webgpu-completion-20261021/validation/`, nejvýše64KiB, fatal UTF-8 a známý `shared/weather.ts` tvar. Symlink file, únik přes cestu, neznámá pole, chybějící povinná data, neplatná čísla a numericky ztrátový JSON roundtrip se odmítnou. Volitelné hodnoty se nedoplňují ani neclampují. Přesné původní `weather-source.json` a emitované `weather-emitted.json` vzniknou exclusive v novém build adresáři. Jejich SHA, byte length a explicitní provenance jsou v browser/build/run identity i buildId vedle transformů a bundle SHA. `inspect`, bootstrap a `serve` ověří raw/emitted bytes/provenance znovu; zdrojový vstup je ověřen i po buildu. Middleware vrátí jen dřívější přesnou `/api/weather` route s `no-store`; ostatní API a default bez fixture pokračují původní proxy cestou. Game dostává fixture před svým původním startupem/refresh, ne dodatečným přepsáním instance. Panel a původní weather UI uvádějí uložený QA/fallback zdroj. Browser freshness aging může po čase změnit stale metadata; root porovnává také skutečné weatherAtStart/End, nikoli pouze fixture SHA.
+-
+-`--startup-latency` je vždy diagnostic, včetně případného pozdějšího benchmarku ze stejného buildu. Instalace probíhá před původním Game.start, výstup pouze jednou v terminal startup raw `startupLatency`. Během měření nevzniká periodický trace dump. `device.popErrorScope` a `queue.onSubmittedWorkDone` mají nezávislé čítače calls/tracked/settled/pending/fulfilled/rejected/syncThrows/unsupportedResults, souhrn sync wall a completion wall ms. Řádky jsou `[sequence, channel, startAtMs, settledAtMs, completionMs, outcome, nonNullResult]`; kanály0/1 odpovídají pořadí výše. Outcome0 znamená pending při stop,1 fulfilled,2 rejected,3 původní sync throw,4 unsupported výstup. Neexportuje se obsah GPUError, rejection ani Promise/device/Game reference. Completion při reject je zahrnutá, sync throw zůstává samostatný. Pending má age při stop a není vykazovaný jako dokončená nula.
+-
+-Cap4096 je společný pro oba kanály. Původní native volání pokračují i za limitem, ale `issues.overflow` zneplatní evidenceValid; byte limit receipt zůstává2MiB. CPU cap fixture ověřuje konkrétní maximální scalar export pod768KiB, nikoli předpoklad reálné GPU zátěže. Diagnostické wrappery přidávají předalokované buffers, timestamp reads a dvě Promise reaction funkce na sledované volání; jejich režie brání plain causal FPS závěru. Klasifikace příčiny vyžaduje skutečný root startup trace a korelaci s existujícími stage/pipeline údaji. Completion wall včetně browser/microtask plánování se nesmí vydávat za GPU čas nebo call-site fence dominanci.
+-
+-Observer vrací původní native Promise i synchronní výjimku. Instalace/clock/unsupported/ownership chyby zůstávají scalar invalidity a nezastupují původní startup chybu. Abort/dispose/rejoin zastaví observer synchronně a terminal jej uklidí ještě před exportem; pending reactions po stop již sealed trace nemění. Pozdní terminal starého Game nemůže odebrat wrapper nového ownera. Restore vrací přesný původní vlastní descriptor nebo odstraní vlastní instance override pro inherited metodu. Cizí aktuální wrapper se neodstraňuje, konflikt se zaznamená. Metody jiné device/queue generace se nově nesledují; změna původního ownera zneplatní trace. Defaultoff nekontroluje device a nic neobaluje; chybějící API/ne-WebGPU při explicitním flagu je viditelně neplatná diagnostic evidence.
+-
+-### Peer P2: rozhodnutí před opravou build identity
+-
+-Reviewer doložil, že samotná validace weather bytes nestačí: odstraněné/null identity.weather přeskočí jejich větev, pokud loadBuild nepřepočítává buildId. Totéž se týká clock a diagnostic flagu. Samotný nový digest by odmítl běžný drift, ale konzistentně přepočítaný sidecar stále nemusí patřit skutečnému browser bundle. Zvolena proto jediná pure canonical projekce všech společných build vstupů (source/helper/label/loading/transforms/clock/weather/startupLatency/selected dependencies, s povinnými explicitními null/boolean), použitá při build i load. Load dále porovná původní exclusive build-input raw SHA, přesnou z něj odvozenou browser identity v resolved overlay a přítomnost stejného buildId v hashově ověřeném emitovaném JS. Skutečně ověřené source/helper/config/weather/transformed/dependency soubory musí patřit téže větvi. Dodatečná práce probíhá pouze při build/load, ne při startupu nebo měření. Nepřidává se podpisová infrastruktura ani obrana proti přepsání všech bundle; starší helper má vlastní neměnný server a tento nový kontrakt vyžaduje fresh build. Předchozí46/46 důkaz bude zachovaný odděleně.
+-
+-## Rozhodnutí před implementací bounded shader attribution
+-
+-21.10.2026, přímý task nad61a1580e. CM actual source80395553 opakovaně prošel41 světelných stages a selhal až submitted-frame. Dřívější trace má v této etapě434 shader pairs/868 modules bez nových async pipelines; konkrétní job/module/program nebyl přiřazen. To není důkaz shader chyby ani dominance GPU kompilace. Koordinátor uchoval celý helper63d576ff ve vlastní immutable qa-helper-v2 a51/51CPU proof je nyní zachován také v historical before-shader-attribution kopii. Běžící build14983724 se nemění.
+-
+-Primární aktuální mechanismus: vlastní WebGpuCompilationProfile.inspectShader(module,label) volá jediný původní getCompilationInfo, vytvoří validated Promise a synchronně předá tuto Promise do observe(operation,phase,metric,generation,started,label,onResolved?). Observe vrací původní void a sleduje původní Promise plus health branch. Pinned Babylon9.30 _createPipelineStageDescriptor dává modulům label vertex/fragment; Effect._pipelineContext.stages.{vertexStage,fragmentStage}.module jsou datové vazby. Zdroje jsou v manifestu snapshotu, CPU kontrakt ověří skutečnou současnou profile třídu. Tyto private sloty nejsou přenosný Babylon veřejný API kontrakt.
+-
+-| Varianta | Dopad / riziko | Rozhodnutí |
+-| --- | --- | --- |
+-| Další getCompilationInfo nebo vlastní GPU fence | Mění počet práce, scheduling a readiness evidence | Odmítnuto |
+-| Zachytit shader code/defines nebo celou scénu | Neomezená režie a zbytečný text/objekty ve výstupu | Odmítnuto |
+-| Přepsat produkční profile/Game | Změní zkoumaný runtime a sdílené soubory | Mimo tento diagnostický task |
+-| QA-only instance wrappers inspectShader/observe/setStage | Další bounded bookkeeping a Promise reactions, žádný další GPU call; vazba na současný private kontrakt | Vybráno pouze explicitně diagnostic |
+-| Pasivní terminal Effect/submesh/instance mapping | Jediný bounded scan datových slotů po stop, žádné isReady/getDrawWrapper/renderer metody | Vybráno; missing/drift/overflow zůstává unknown/invalid, nikoli domnělá shoda |
+-
+-Nový build flag --shader-attribution bude defaultoff, součást canonical digestu/overlay/input/bundle seal a vždy diagnostic. Pozoruje původní validated Promise bez záměny návratu, this, argumentů nebo throw; WeakMap ID nevystavují GPU objekty. Finite jobs/modules/stages/effect/mesh/link a instance-scan limity, scalar JSON a explicit overflow. Dispose/abort/rejoin obnoví jen vlastní descriptors a pozdní settlement nesmí měnit sealed trace. Terminální scan přečte jen datové properties, nikoli mutující readiness nebo _getInstancesRenderList; last cached visible batch není nové vyhodnocení viditelnosti. Technická jména budou bounded a avatar/user identita redigovaná.
+-
+-Již existující compilation shaderInventory je aktivní pouze se samostatným profileEnvironment=1 a tento helper jej v diagnostic kopii zachová v bounded metadata podobě bez defines/source textu. Samotný flag jej nevyrábí ani nezapíná produkční shader text capture; chybějící inventory je explicitní. Všechny nové pozorovací náklady patří diagnostic, nikoli plain FPS. Následují cílené CPU regresní důkazy; skutečný nový Vite/GPU build a příčinné vyhodnocení vlastní root.
+-
+-### Shader attribution: přesný nový diagnostický běh
+-
+-    node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABS_SNAPSHOT ABS_NEW_BUILD cm-attribution original --weather ABS_WEATHER_JSON --shader-attribution --startup-latency
+-
+-Root otevře nový vlastní immutable endpoint s query renderBackend=webgpu&profileEnvironment=1. Samostatný profileEnvironment zapne již existující production inventory; --shader-attribution jej nedodělává. Vlajku lze použít bez latency/clock/weather, ale je vždy součástí canonical digestu a diagnostic režimu, nikdy plain FPS. Starý helper/bundle nepřebírat ani nepřepisovat. Stejný flag je v build-input, browser overlay, sidecar/run identity a emitovaném JS seal; deletion/null/tamper se odmítne.
+-
+-Terminal startup raw má shaderAttribution: jobs jsou [jobID,moduleID,role,stageID,profileGeneration,startedAtMs,settledAtMs,outcome]. Začátek je původní profile timestamp a konec čas pozorovaného validated Promise settlement, nikoli hardware GPU execution. Pending při stop zůstává outcome0/null settlement. Role1vertex/2fragment; module roleBits může být3. Sloupce a outcome/flag kódy jsou ve výstupu. Neexportují se rejection texty, GPU objekty, shader code/defines ani libovolný profile obsah.
+-
+-Limity:4096jobs,4096modules,2048effects,512 relevant meshes a1024 links; terminal scan nejvýše8192cache/mesh entries a8192regular instances. Žádná extra scene/readiness/render/GPU metoda. Linky čtou již existující submesh._drawWrappers, efekt a per-pass batch cache; material/submaterial pouze ze současných datových slotů. cachedVisibleBatchCount null znamená skutečný null slot poslední cache, -1 neznámý slot; nenahrazuje dnešní _getInstancesRenderList. localVisibleInstances jsou místní flags, nikoli nové frustum/inherited visibility vyhodnocení. Technická jména jsou whitelisted/bounded, avatar/student/player/credential/URL jména redigovaná; local numeric IDs propojují současné objekty.
+-
+-Mapping pokrývá současné efekty s pozorovanými module IDs, ne všechny historické joby nebo celou scénu; staré/retired/context-missing vazby zůstávají explicitně unobserved. mapping.boundedScanComplete označuje pouze úplnost bounded data-slot scanu, není to důkaz stejného draw listu nebo správné grafiky. Overflow/unknown role/stage/private contract/owner drift/unsupported Promise/restore conflict jsou viditelné issues a zneplatní úplné attribution evidence. Maximal CPU cap fixture ověřuje scalar attribution JSON pod1MiB s1024linky/512meshes a4096jobs, nikoli skutečnou GPU workload.
+-
+-Peer review před praktickým buildem doložil konkrétní riziko: první512 relevant meshes z actual3355 mohou být staré hotové programy a čekající avatar/vehicle program se do výstupu nedostane. Původní63/63 proof je zachovaný jako before-attribution-priority63. Varianty: zvýšení capů zvětší receipt, druhý úplný průchod zdvojí slot scan a náhodný sampling může minout čekající program. Zvolen jediný průchod nejvýše8192meshes se stále celkem1024 kandidátními linky; vyšší priorita vytlačí nižší. Pořadí je původní job pending při stop, potom submitted-frame, potom starší dokončené. Output stále nejvýše512meshes/1024links/2048effects, cache scan stále8192entries; Effect řádky vzniknou nejprve pro zvolené linky a až poté z cache ve stejném pořadí priorit. Přetečení i unknown zůstává explicitní. Nejde o nový runtime/render scan ani úplnou historickou mapu; omezený terminální scan pokračuje přes dřívější hotové meshes, aby zachytil pozdější důležité vazby.
+-
+-Diagnostic compilation export nyní zachová bounded shaderInventory metadata (counts, stages, raw/body duplicate fingerprints/IDs a role counts) již existujícího profile.snapshot. max24stages/16rows; shader text a unused define names jsou vynechané, oříznutí explicitní. Inventory null znamená neaktivní/chybějící původní inventory, ne nulové duplikace. No new cache; helper přidává pouze WeakMap technical IDs, bounded scalar evidence a reactions na původní validated Promise. Ověření skutečného CM mechanismu a rendererův hidden-instance nález musí root spojit s novým real trace, není to již doložená příčina timeoutu.
+-
+-### Rozhodnutí před doplněním skutečných shadow map
+-
+-Actual diagnostic source80395553/build60cfd189/receipt0968501c má 2050 pozorovaných jobs, poslední 2049/2050 pending, Effect44/context44 v cache bez mesh vazby. Hooks/role/stage/ownership jsou bez chyb; samotný overflow450 pochází z úmyslně omezené historické mapy. Je doložená chybějící větev mapování, nikoli příčina pending GPU validace. Pinned 9.30 ShadowDepthWrapper vlastní `_subMeshToDepthWrapper.mm: Map<SubMesh,Map<ShadowGenerator,entry>>`, entry má mainDrawWrapper a drawWrapper alias array. Tato data nejsou v submesh._drawWrappers. `_subMeshToEffect: Map<SubMesh,[baseEffect,basePassID]>` navíc zachová původně pozorovaný base program před případným material hot-swap rozhodnutím. Pending shader validation není ekvivalent Effect not-ready; isReady může odpovědět podle již existujících stages. Zdrojem je přesný lokální shadowDepthWrapper.js/drawWrapper.js/material.pure.js/effect.pure.js, žádné obecné tvrzení pro jinou Babylon verzi.
+-
+-Varianty: volat getEffect/isReady by vytvořilo alias nebo spustilo práci; obalit nový produktový lifecycle by změnilo zkoumanou hru; celý shadow map dump či zvýšení capů by zvětšil receipt a odhalil zbytečné zdroje. Vybrán pasivní terminální průchod přes stávající own material/submesh data a native Map reads. Původní shared 1024 candidate/output link cap, 512 meshes/2048 effects/8192 mesh scan zůstává; shadow generator entries používají stávající 8192 scan cap a alias arrays stejný 32 slot cap. Link výslovně odliší submesh-main/pass, shadow-main/pass-alias a original-base, ownership a lokální generator ID; neexportuje defines/token/shader text. Pending priorita zůstává společná pro všechny větve. Deduplikace stejného main/initial alias wrapperu zachová alias pass metadata bez vytváření nového GPU objektu.
+-
+-Job trace completeness je exportovaná samostatně jako jobTraceComplete, s oddělenými traceOverflow/mappingOverflow/mappingErrors: úmyslně oříznutá historie nezamlčí přesně zachované jobs. Celková evidenceValid zůstává konzervativní i při unknown slots nebo chybějící terminální mapě. pendingModuleCoverage počítá observed/linked/unlinked původní pending module IDs; chybějící vazba není potvrzení, že shader nemá vlastníka. readyFlag je pouze own `_isReady` data, nikdy volání API. Původní 64 proof/helper19 zůstane historical a build60cfd189 immutable. Canonical dependency identity nově zahrnuje také přesné drawWrapper/material.pure/effect.pure bajty vedle již ověřovaného shadowDepthWrapper. Následují actual pinned ShadowDepthWrapper CPU fixtures s kontrolovaným engine IO, nikoli nový GPU/build nebo produktová oprava.
+-
+-Materiálové vlastníky čte helper i z existujících per-pass overrides a MultiMaterial subMaterials, se stejným 32 slot capem; nevyžaduje už vytvořený běžný submesh wrapper. Následující root CM discriminator použije --shader-attribution a --startup-latency bez profileEnvironment=1. Existující inventory je nezávisle volitelná; tento běh ji nezapíná ani nezvyšuje její 32MiB cap. Starší recipe s profileEnvironment zůstává samostatný diagnostický režim, nikoli požadavek pro job/Effect/shadow attribution.
+-
+-Navazující peer P2 před actual GPU doplnil konkrétní mezeru původní 67/67 fixture: skutečný pinned MultiMaterial má prototype getter subMaterials a own backing `_subMaterials`; plain object v testu ověřoval pouze nevhodnou náhradu tohoto kontejneru. Původní PASS a a589 helper proof zůstávají before-multimaterial-repair67. Volání getteru by porušilo pasivní kontrakt, přepsání produkčního MultiMaterial je mimo rozsah. Vybrán own backing slot, explicitně označený own-data legacy fallback a unknown při existujícím getteru bez známého backing pole. Test použije skutečný MultiMaterial konstruktor i setter s CPU NullEngine/Scene, otráví public getter a předá jej do skutečné ShadowDepthWrapper fixture. Zkontroluje linked pending owner a explicitní drift bez zavolání getteru. Pinned multiMaterial.pure.js bude přidán do stejné build/load dependency identity. CPU NullEngine v tomto testu není GPU/FPS důkaz.
+-
+-## Rozhodnutí před lifetime diskriminátorem
+-
+-Actual source3 trace df18c609 s helper16: všech 2052 jobs dokončeno, 882 final-gate modulů nemá žádnou současnou Effect/context vazbu; shadow scan je bez unknown. Tři poslední vzorky i terminal mají stejné počty meshes/materials. Není tím doložený asset teardown, leak ani konkrétní instancing chyba. Pinned Effect.dispose ruší cache vazbu, ale neanuluje _processShaderCodeAsync a nenuluje context pointer. Native _makeEffect může vytvořený Effect synchronně nahradit nebo zahodit před návratem. Samotný microtask po prvním shader pairu může přijít až po celé synchronní create/replace/dispose dávce. Jednorázový scene snapshot proto tuto časovou mezeru negarantuje a přidává další scan.
+-
+-Vybrán scope kolem původního _makeEffect, exact engine.createEffect AFTER a engine._releaseEffect BEFORE. Podmíněný instance _onRenderingStateCompiled(context) bridge se instaluje jen když returned Effect nemá dosud známé module IDs; původní callback se volá exactlyonce, bez nové Promise/await/GPU/readiness práce. WeakRef cleanup a WeakMap identity neponechávají silné Effect/resource reference. Bounded scalar owner/link tabulky mají prioritu final-gate před historií a sdílejí původních 512 owner/1024 link budget s terminální mapou; žádné zvýšení capů. Unknown při create/release není no-owner a případná kompilace po disposal je samostatná evidence.
+-
+-Pro base programy před _makeEffect je potřeba původní outer scope. Fresh override není veřejně exportovaný a native prototype wrapper by minul jeho předcházející base refresh. Vybrán per-instance původní ShadowGenerator.isReady(subMesh,useInstances,isTransparent), který pokrývá Fresh i native standalone cestu a poskytuje přesný původní bool; instance se pasivně registrují při existujícím setStage z scene.lights[*]._shadowGenerators nativeMap. Žádná globální prototype mutace, getShadowGenerators ani další readiness call. _makeEffect instance se registruje lazily z existujícího material.shadowDepthWrapper před původním outer voláním. Instance Game.isMeshReadyForCamera pokrývá camera base creation; jeho nedoložitelný submesh/material zůstává unknown. Shader variant INSTANCES/THIN_INSTANCES se čte pouze bounded z own Effect.defines do scalar flags, nikdy z pouhých SM_* shadow argumentů a nikdy se text neexportuje. Původní helper16/68 proof je historical; rootův build/source zůstávají immutable.
+-
+-### Lifetime export a důkazní meze
+-
+-Původní --shader-attribution nyní přidá `shaderAttribution.lifetime`; nejde o nový mutable runtime flag. Výstup má scalar owners a link tuples s deklarovanými columns, místní effect/context ID, již pozorované module IDs, poslední bind create/release/compiled, release timestamp/count, disposedAtBind a přesné INSTANCES/THIN_INSTANCES flags. Owner kind camera/shadow-base/shadow-derived označuje původní caller scope; samotné shadow-base není důkaz skutečného draw. `useInstances` je původní outer boolean, přímý _makeEffect bez outer scope má -1 unknown. Camera scope má nedoložitelný submesh/material ID0; owner pole není doplněné odhadem. Cached batch/regular instance count neznamenají novou viditelnost nebo vykreslení. Full defines přesahující existující 8192 code-unit scan budget mají flag unknown, text se neexportuje.
+-
+-`lifetime.coverage` ukazuje finalModules/linkedFinalModules/unlinkedFinalModules. Create/release bez známých module IDs se samostatně počítají; module může později propojit původní compilation callback i na disposed Effectu. Unknown není absent owner. `lifetime.evidenceComplete` je false při cap/unknown/observer/restore chybě, unlinked final module nebo unscoped create-return; top-level evidenceValid zůstává konzervativní, jobTraceComplete je od lifetime nezávislý. Owner scope pokrývá jen skutečně registrované původní callers, nikoli veškeré historické vlastníky. Nový generator po posledním setStage není zpětně známý; unscoped creation nebo missing module coverage zůstane explicitní. Hardened metody a nepodporovaný private contract se neobcházejí.
+-
+-Celkem lifetime owners + terminal meshes nepřekročí původních512, lifetime links + terminal links nepřekročí1024. Lifetime používá maximálně2048 weak Effect identities/weak hooks, stage registrace čte nejvýše8192 lights a8192 map entries bez getShadowGenerators a bez scene snapshots. Vyčerpaný budget má explicit overflow; final-gate priorita vytlačuje starší historii, při shodné prioritě nejstarší scalar záznam. Terminální mapa může být záměrně oříznutá víc než dříve. Obě namespace effect/context ID jsou ve scope popsané a nesmějí se zaměňovat. Hook targets a row Effect pointers jsou WeakRef; nejsou uložené celé Effecty, materiály nebo shader stringy. Bridge se obnoví při prvním úspěšném bindu nebo owner disposal, pouze pokud stále vlastní descriptor. Callback vrací původní return/throw a nevytváří Promise. Foreign/abort/rejoin nechá cizí novou metodu a sealed evidence beze změny.
+-
+-Před původním _releaseEffect se čte jen own cache slot podle own Effect._key a exportuje scalar `releaseCacheIdentity`: unknown-1/missingOrFalsy0/sameEffect1/otherTruthyEntry2 plus původní refCount. Klíč se nezapisuje do evidence. Pinned native release maže truthy slot bez identity checku; CPU fixture ukazuje možný stale-release mechanismus, ale žádná actual CM příčina ani cache oprava se tím netvrdí. Původní engine volání proběhne beze změny.
+-
+-CPU fixture používá skutečný native WebGPUEngine.createEffect, Effect constructor/processing, native WebGPUPipelineContext, callback/dispose/release a ShadowDepthWrapper/ShadowGenerator algorithms, pouze device/terminal buffer IO a scene/mesh resource vstupy jsou fake. Samostatný actual profile test ověřuje společný lifetime/terminal budget i původní getCompilationInfo count. Maximum512/1024 scalar lifetime export má konkrétní JSON pod1MiB; celý receipt stále podléhá původní2MiB transport kontrole. Není to výkonové měření. Další root běh zůstává fresh immutable source3 s --shader-attribution --startup-latency bez profileEnvironment; CPU PASS není actual attribution.
+-
+-Vlastní závěrečná kontrola doplnila dvě úzké opravy před přijetím: coverage.unresolvedOwnerLinks brání complete=true před vznikem obou původních module IDs, i když je finalModules zatím prázdné. Hook bookkeeping ukládá slabě nejen target, ale i wrapper a původní own function value; descriptor flags zůstávají scalars. Ani cizí bound callback tak nepřidá přes hook tabulku silnou cestu k Effectu. Živý own wrapper drží původní funkci pro přesnou obnovu; foreign replacement se stále neclobberuje. Actual async test ověřuje incomplete před gate a resolved po originálním late compile, vlastní funkční WeakRef konstruktor ověřuje slabé function descriptors. Předchozí82/b6 proof je zachovaný jako lifetime-development82.
+-
+-Pro bezprostřední srovnání s df18 root může zachovat přesně variantu bez startup-latency a zapnout pouze --shader-attribution; --startup-latency je nezávislá volitelná diagnostika, nikoli požadavek lifetime. ProfileEnvironment zůstává vypnutý a žádný původní immutable build se nepřepíše.
+-
+-## Buffer owner/lifecycle: oddělený diagnostický běh
+-
+-Actual NCM source36c134e1/build63ca zůstává neúspěšný důkaz destroyed vertex/storage DataBuffer37326. Velikost2048 je pouze kandidátní signature, nikoli přiřazení vlastníka. [Výzkum, varianty a rozhodnutí](../buffer-lifecycle/README.md) předcházely úzkému helperu; již zahrnutý upstream SelectionOutlineLayer fix se v aplikaci nepoužívá a není automatickou opravou našeho pádu.
+-
+-    node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABS_SNAPSHOT ABS_FRESH_BUILD ncm-buffer original --weather ABS_WEATHER_JSON --buffer-lifecycle
+-
+-Root vytvoří nový immutable build a použije svou běžnou skutečnou WebGPU/NCM relaci. Tento flag nepotřebuje shader attribution, startup latency, routine cost, clock ani profileEnvironment. Všechny tyto volby zůstávají nezávislé a původní clock CLI je zachované. `--buffer-lifecycle` je defaultoff, součást canonical build-input/overlay/bundle/load/browser identity a viditelně přepíná diagnostic režim. Předchozí helper3673/100CPU/frozenv5, c951 a jejich buildy se nepřepisují. Plain FPS měření tento observer nepoužívá.
+-
+-Instance taps pozorují pouze původní Mesh._updateInstancedBuffers a skutečný batch.parent current/previous Buffer._buffer→WebGPUDataBuffer._buffer. Původní manager create/release/deferred sweep a target GPUBuffer.destroy jsou volané právě tolikrát jako předtím. Není přidaná GPU/readiness/render/fence metoda ani await. Přesné původní receiver/args/return/throw/Promise se nezaměňují. Device/scene/generation a descriptor ownership chrání cleanup/rejoin; weak identity/hook bookkeeping nezadržuje staré GPU resources/Mesh objekty. `onNewMeshAddedObservable` pouze doplňuje nové vlastní Mesh instance, bez whole-scene hot loop.
+-
+-Samostatný raw `kind:buffer-lifecycle` vzniká při původním renderer failure ještě před original Game handlerem/cleanupem, při Game disposal, abortu nebo startup rejection. Používá stejnou immutable ACK/retry/download frontu a původní2MiB limit. Original fatal text se dál předává beze změny; trace z něj uchová jen numeric engine/DataBuffer/size target, nikoli celý error/label. Cizí a generic2048 Vertex|Storage buffer zůstává unknown owner. Thin/geometry/RTT ownership se neodvozuje ze signature.
+-
+-Trace má nejvýše2048 resource rows,1024 owner rows,4096 recent event tuples a8192 mesh hooks, celkem12288 weak hook slots. Každý resource má nejvýše8 owner IDs. Vlastní owner budget byl v development CPU fixture konzervativně snížen z2048 na1024, protože maximal scalar export musí zachovat headroom pro nezměněný2MiB transport; žádný produkční/shader limit se nezvýšil. Maximal fixture s96char technickými jmény/9digit scalars dává1,991,415B a přes64KiB rezervy pro envelope; dirty flags zůstávají původní -1unknown/0false/1true. Untracked creation/release/deferred entries, event/resource/owner evictions, owner-link overflow, unsupported/hardened sloty a restore conflicts jsou explicitní. `target.ownerRecordsRetained` zůstává false i po nové asociaci, pokud se starší owner záznam již ztratil; `retainedEventsComplete` negarantuje whole-session historii.
+-
+-Current/previous matrix role dokládá pouze přímý native storage ownership. Před/po update jsou skutečné DrawContext/fastBundle identity; stejná identita po náhradě je discriminator. Helper nepozoruje setVertexBuffer/setBindGroup ani resource obsah GPU bundle a výslovně nemůže tvrdit, který encoded resource zůstal uvnitř. Normální odložený release není označen destroy; odděleně se zaznamená původní destroy call/return/throw. Havarovaný buffer, který nebyl zachycen nebo už vypadl z recent okna, zůstává not-retained/untracked. Nový root GPU běh musí teprve přiřadit skutečný target a rozhodnout o nejmenší produktové opravě.
+-
+-Nezávislé review původních117/117 doložilo chybějící skutečný UI řetězec: Game onFault nahradí GPU detail přátelským handler argumentem. Raw-label fixture proto nestačila. Před původním handlerem helper nyní vedle argumentu pasivně čte nejvýše5 own RenderHealth.firstErrors records stejné generation, které původní recordFault již zapsal před callbackem. `targetSource` explicitně rozliší handler argument, původní health záznam a unavailable; nedělá se snapshot/API call ani nový listener. Regrese spouští skutečný Game onFault AST arrow a RenderHealth/watchWebGpuValidation event chain a ověřuje nezměněné pořadí původních listeners, diagnostics a friendly handleru. Getter/drift/foreign-generation zůstává unknown. Původní helper420f/117 proof je uchován jako before-friendly-target117, aktuální119 proof leží v buffer-lifecycle/verification.json. Dva původně vypočtené dirty flags jsou nově skutečně exportované v event columns14/15, se stejným4096 cap a znovu ověřeným byte limitem.
+-
+-Nezávislé review dále doložilo camera pass P2: původní Game.isMeshReadyForCamera uvnitř přepne pass na camera.renderPassId a ve finally jej obnoví. Metadata čtená před tímto voláním proto mohla označit předchozí pass. Camera-kind metadata se nyní při původním createEffect návratu doplní přesným tehdejším own engine.currentRenderPassId. Pinned AbstractEngine constructor má tento veřejný datový slot; nepoužívá se domnělý backing _currentRenderPassId. Regrese spouští skutečnou AST/transpilovanou metodu Game ze současného source, previous7→camera42→owner42→restore7 i originální throw→restore7. Předchozí82/helper10fc proof je historical before-lifetime-camera-repair82; původních82 testů před opravou prošlo, ale jejich ruční camera fixture nezachycovala tento pass switch. Žádný render pass se nemění v observeru.
++| Dva separátní profilery vedle původních8 | Původní readiness selfSelected neodečte nové děti; riziko doublecount | Ne |
++| Jeden nový pevný10target stack | Zachová společnou hierarchii a odliší readiness residual, prepare residual a createEffect API; omezená observer režie | Ano |
++| Hned měřit MaterialDefines.toString | Vyžaduje receiver identitu skutečného defines argumentu a předbíhá lokalizaci | Odloženo |
++| Opravit cache/reset/serializer bez měření | Nemá kauzální podklad a mění vlastnictví/binding | Ne |
+ 
++Samostatná akce pod již default-off `--routine-cost`, nový receipt/profile. Původní8 moduly/akce a entry waiter zůstanou byteexact. Waiter použije existující startCapture factory, jeden30s deadline a8původních Scene renderů. Nový stack má10rutin/4fáze, stack32,100000calls/frame,128phaseevents/64renderers. Exact native descriptor check před zápisy; engine hook jen na konkrétní instanci, PBR na původním prototype s own-scene filtrem. Obnovení pouze vlastních descriptorů, explicitní partial/conflict/throw; po stop žádné Game/Scene/engine reference v owner state.
+ 
+-## v8 post-ready diagnostic
+-One explicit UI begin/finish window after startup, fixed30s timer, original shader jobs only, passive terminal mapping. No startup attribution observer, no material caller hooks and no extra GPU/readiness/render call. All existing attribution caps stay unchanged. Retirement disposes the observer without publishing retired Game state. Pure lifecycle/stage and original attribution/lifetime tests37/37 withtsx. First no-tsx run failed2moduleloads and passed6pure tests; retained as failed setup. Not suitable for FPS comparison; only v6 is the frozen controlled-series helper.
++Přidání nullReturns rozliší čistou PBR větev. Žádné cache čtení, key rekonstrukce, extra readiness/render/GPU/await/Promise reakce. Výstup obsahuje pouze pevná ID a scalars, nikoli Effect/material/name/source objekty. MaterialDefines.toString zatím neměřit. Případná pozdější diagnostika Standard internals musí být samostatná; nelze ji vysvětlovat podle PBR hranice.
+ 
++## Ověření
+ 
+-## v9 depth inputs
+-Diagnostic tree47-only original-base/entry/define-equality/generator/epoch inputs at existing scoped create returns and release scope. Max8epochrows/32private define strings/8192codeunits each; no raw shader/define text exported, no new material hook/GPU/readiness/render call. Private strings clear on disposal. v8 global mapping limits remain explicit; targeted positive links do not claim complete scene evidence.
++Před/po guards jsou v before.json a následném proofu. Cílené testy musí vykonat native null/dirty/reuse, obě backend origin větve, společné nested selfSelected, reentry, foreign passthrough, original returns/Promise/falsy throws, atomický rollback/late references, lifecycle/deadline/frame IDs/caps a receipt tamper. Každý skutečný neúspěch zůstane zachovaný. CPU/NullEngine/terminal IO nejsou GPU důkaz. Konkrétní counts/commands/TAP/SHA a omezení jsou v předání tasku a public verification.json. Starý corpus, build a GPU provede až root v přiděleném okně.
+ 
++## Použití koordinátorem
+ 
+-## v14 retained waiter retirement
+-V13 remains immutable and was not accepted/built for GPU after review found a retained prepareFrame reference could retrigger during active original8 capture. V14 adds only waiting-phase passthrough before observer clock/check/trigger. Restored stale calls preserve original receiver/args/result/Promise/falsy throw with zero extra observer work; the original core keeps its first trigger and completes its remaining frames. No new state/cache/closure or product/native/old profiler change. Only entry-routine-cost.mjs/test and this README differ;31 inputs remain exact. Research/actual-native RED and targeted GREEN proof live in public entry-routine-helper/stale-correction/. Prior152PASS/one metadata skip stays historical; practical cold-browser/GPU acceptance remains root work.
++Nový immutable build potřebuje existing --routine-cost (výchozí false). Po startup ACK a při vlastním ready pěším Game zvolit „Diagnostic · první vstup do auta /8 framů /10 effect rutin“, potom normálně požádat E o nástup. Waiter čeká na skutečný Actor false→true, ne na samotnou klávesu. Jedna entry akce na Game; po miss/refusal je nutný nový Game. Nevrstvit staré8/3 akce ani jiný profiler. Receipt kind entry-effect-cost obsahuje entryTrigger a nový entryEffectProfile (10×4 rows/frame); nejde o staré routineProfile. První frameId je trigger ID, nativeFrameIdAfter je až následující ID.
+ 
++PBR hranice nevysvětluje Standard internals. Engine span není čistý cache lookup a nečte cache/keys; nullReturns platí pouze jako pozorovaný původní return. Časy jsou diagnostické inclusive wall spans; předmětem není FPS či GPU. Origin webgpu-own nebo thinengine-inherited musí být doložen konkrétní nativní metodou.
+ 
+-## v15 post-ready pipeline inputs
+-Existing --routine-cost enables a separate button Diagnostic ·30s původní compiler vstupy. It passively observes original engine instance _preparePipelineContextAsync during one30s window, max4 sequential/Game, no startupinventory or owner mapping.32calls/512KiBcall/4MiBtotal encodedinputs; actual source/defines/context-name lengths+SHA only, fixed SHADER_NAME family categories and bounded selected define flags. No raw shader/key/name export. Original args/receiver/return/Promise/falsy errors unchanged; native-Promise side observer guarded against species/getters. Pending original jobs insidewindow are allowed, pending/hash/overflow/retirement atdeadline remain explicit incomplete. New kind pipeline-inputs has strict projection/receipt checks. Native argument9_key is empty; actual owncontext._name is hashonly. Old34input modules/actions remain except common/harness/UI/receipt/README;36inputs total. Public research/tests/proof: pipeline-input-helper/. Not FPS/GPU/owner/coldbrowser acceptance.
++## Dokončený refaktor a meze
+ 
++Nový core validuje všech10 descriptorů před prvním zápisem včetně inherited engine metody; nevytváří dočasný native-valued slot. Každý původní capture frame znovu kontroluje vlastnictví10 hooků. Foreign material passthrough neměří vlastní clock/row a během synchronní cizí material větve brání převzetí own engine association. Části callbacků stále patří inclusive API spanům. Engine class origin se importuje z pure modulů, aby nové obaly nepřidávaly barelové shader-registrace.
+ 
+-## v16 exact caller/context associations
+-The same explicit30s action additionally owns one PBRBaseMaterial._prepareEffect prototype wrapper, atomically with the original engine observer. Foreign scene receivers immediately passthrough. Only bounded weak known returnedEffects may link at originalreturn or originalcompilerPromise settlement beforedeadline. Current exactlocal skinned near/medium slots on ownflashlightshadowpass can positively match the observedcontext, no thirdhook/worldscan/getEffect/isReady. No raw mesh/material/parentnames: SHA/length only, max256KiBencodednamework/window. Up to4096weaknon-nullcallers/64plural links per32compilerrows; counters/null/cache/deferred/unmatched/omitted remain explicit. Inputcapturecompleted and ownership.complete are distinct; pendingnamehash makes the capturepartial, missingownersdoesnotclaimabsence. Globalf197shadowmaps and GltfLightBudget provenance are unused. Root must stillattribute actualnewprograms before productfix. Only pipeline-input-window.mjs/test,qa-overlay.mjs,thisREADME differfromv15;32otherinputs byteexact.
++RTT before/after registrace má dílčí rollback; diagnostická chyba z notifikace nepřepíše původní notifikaci. Cleanup nuluje owner state a uvolňuje hook/listener seznamy. Retained wrapper po dispose volá pouze originál; test getteru zaniklého Game nesmí být znovu čten. Nejde o obecný důkaz nulové GC/VRAM retence nativního enginu.
+ 
+-V16 registration clarification: Material is not Node. O(1) scene.materials[index] identity exports only registered; a live AssetContainer material may be unregistered and still receives its exact caller link with unregistered-or-unknown. No material-alive claim. Missing required WeakRefs are omitted, never replaced with another mesh/material. Positive-link completeness covers at least one bounded association for each captured compiler record, not all world owners/draws/uniqueness; this scope is also embedded in raw ownership.scope. Absent nullable parent names are explicit and do not invalidate a known link. Every local PBR observation checks the originaldeadline before counting/calling, foreign scenes remain immediate passthrough. Each input/name digest is deadline-checked immediately before starting; stop never starts projection/hashing.
++Ve V18 jsou změněny pouze pět copied-test kompatibilitních count/import míst (6výskytů) a jsou reverzibilně ověřeny vůči veřejné donor-v17 kopii. Staré routine-cost/core, entry-render-cost a entry-routine-cost runtime moduly a celé původní bloky tlačítek jsou byteexact. Nové helper vstupy39, staré36 zůstávají neměnné. Native WebGPU cache ABI CPU případ má explicitní terminal cached record a neinstancuje GPU/device.

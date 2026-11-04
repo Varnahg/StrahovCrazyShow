@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "rag-auto-20261028-integration",
+  "title": "RAG: koordinace accepted-main synchronizace a pozdější integrace ingestu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/rag-auto-20261028-integration.md",
+    ".cache/rag-auto-integration-20261028/",
+    "compose.ai.yaml",
+    "Dockerfile",
+    ".github/workflows/ci.yml",
+    "package.json",
+    "pnpm-lock.yaml"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568",
+    "port:5468"
+  ],
+  "acceptance": [
+    "První krátké okno je pouze bezpečná synchronizace vlastní codex/automated-document-rag s přesným skutečně přijatým main801b2d07c884c51e42b0fc1a890e7a0f9dbc0196 nebo nově výslovně ověřenou accepted revizí. Zachovat vlastní closeout14218a50, komponentové commity a untracked KEY67 WIP; žádný checkout/reset/stash přes rozpracované změny.",
+    "Před fyzickým merge ověřit HEAD/index, očekávaný tree/path diff a živé vlastníky dotčených cest. Tento task sám neuděluje ruční editace UI/trees/shared/provider/SQL ani cizích research/acquisition/extraction souborů; další skutečný zásah mimo writePaths nebo konflikt nejprve přesně předat původnímu vlastníku/adminovi.",
+    "Pozdější config/build/SDK/DB práce až nad dokončenými komponentami, s novým claimem a konkrétním plánem. Generované build/snapshot/dependency výstupy musí zůstat uvnitř vlastní cache nebo další výslovně rezervované cesty; workspace-build samo nepovoluje zápis do nevyjmenovaného root dist/node_modules.",
+    "Existující strahov-rag-20261028 DB/volume s placenou cache zachovat. Před případným startem ověřit skutečné vlastnictví a port; žádný Docker Desktop reset/prune, cizí kontejnery, GPU nebo zásah do hraných4280/4278.",
+    "Placená OpenAI validace není součást tohoto tasku; bude mít vlastní přesný rozpočet a rezervaci. Před reálným image/worker provisioningem znovu ověřit disk/RAM a kapacitní plán.",
+    "Po krátkém synchronizačním kroku zapsat handoff a skutečně release; rezervaci nedržet během obyčejného čekání nebo psaní jiných oddělených komponent."
+  ],
+  "verification": [
+    "Zdokumentovat accepted base, vlastní before/after HEAD/index/WIP a přesné konflikty/řešení. Rozpracovaný obsah nemíchat do přijatého main ani do jiného PR.",
+    "Source/konfigurační změny, refaktoring a odpovídající cílené důkazy předat společně. Celou lokální pipeline později provést samostatně na stabilní revizi, ne označit synchronizaci za hotový ingest.",
+    "Veškeré příkazy přes explicitní Node/izolované nástroje; žádná implicitní host-root dependency synchronizace."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow, větev codex/automated-document-rag, KEY-67. Handoff/cache i pět sdílených config souborů jsou jedinými novými writePaths.",
+    "Přímá konkrétní žádost koordinátora01a17e9d-dd4a-7fe3-91ac-4f3bc548982d po přijetí priority routeru. Research a implementační child scopes zůstávají samostatně vlastněné; očekávaný accepted-main import se musí před zápisem koordinovat podle skutečného diffu.",
+    "Při registraci nejsou sdílené config cesty ani uvedené resources v cizích aktivních claims. Ready nenahrazuje skutečný claim nebo ověření listenerů."
+  ]
+}

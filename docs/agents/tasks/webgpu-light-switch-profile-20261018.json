@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-light-switch-profile-20261018",
+  "title": "KEY-31: existujícím profilem rozdělit zbývající nárazy při přepnutí světel",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-light-switch-profile-20261018/",
+    "docs/agents/handoffs/webgpu-light-switch-profile-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze copied source/test nad přijatým native909ebf8a; main, WT runtime a hrané4199/4198 i starší verze zůstanou beze změny.",
+    "Převzít existující MeshDrawProfile a jeho testy přesně z frozen combined3d405db9. Do copied native render-cost přidat jen exact renderMeshIdentity helper a potřebný type import; původní native captureRenderCostInventory zachovat byteově. Nepřebírat celý C5 Game/render-cost.",
+    "Native Game připojí profil jen během explicitního local WebGPU benchmarku bez profileEnvironment. Vzorkovat vstup do auta a změny StableLightState.stats.revisions po update a před scene.render; povolen jeden počáteční referenční snímek. Max8vzorků/benchmark a přiznané omitted/error počty; původní vnitřní limity2048attempts/top8 se nezvýší.",
+    "Start/stop/restart/end/fault/dispose musí vlastnit observer cleanup. Normální render, původní benchmark, startup, příprava, kamera, materiály a shader pipeline nesmějí změnit chování. Diagnostická chyba nesmí přepsat původní renderovou chybu.",
+    "Nepřidávat shader inventory, attribution, nový profiler/framework, cache, polling ani persistentní per-frame diagnostiku mimo explicitní okno. Ověřit native sanitizer/export pro bounded sample.",
+    "Cílený refaktoring a actual native lifecycle/frame-trigger testy se source inverse; náklady profileru přiznat, neprezentovat diagnostický běh jako čistéFPS A/B."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy existujícího profileru a nového native zapojení, případně sanitizeru. Frozen manifest včetně testů, logs a handoff; žádné fullTS/build/fullsuite/install/GPU/server/commit.",
+    "Root provede fullTS/build a jediný cílený produkční sběr. Captured pre-bind čas neznamená čistou kompilaci a bind/draw čas není čistý GPU čas."
+  ],
+  "notes": [
+    "Přímé implementační zadání koordinátora v již běžícím BMAD kroku03, bez rekurzivního workflow. Před zápisem claim s unikátním owner.",
+    "Native IP fix B1 má0novýchprogramů/2sync, ale CPUrender153.4/100.9ms a pozdějšímezery134.6/123.2ms. Zdrojově doložené přepracování materialdefines před Effectcache není ještěčasovýprofil; starý periodic5s capture minul druhýburst.",
+    "Porovnáno: hot shader cache/freeze nebo stabilní světelné sloty před profilem mají neprokázané přínosy a binding/shadow/GPU náklady; celý C5 overlay mění jiné části; zvolen pouze existující bounded MeshDrawProfile s přesnými spouštěči.",
+    "Root vlastní heavy-validation/gpu/4194/2589. Vlastní služby4199 jsou uživatelské a nesmí být restartovány nebo přestavěny."
+  ]
+}

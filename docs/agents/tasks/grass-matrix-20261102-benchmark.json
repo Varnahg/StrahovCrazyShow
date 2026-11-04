@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "id": "grass-matrix-20261102-benchmark",
+  "title": "Reprodukovatelný CPU A/B benchmark snapshotů skutečné vegetační dávky",
+  "writePaths": [
+    "scripts/benchmark-grass-snapshots.ts",
+    "tests/benchmark-grass-snapshots.test.ts",
+    ".cache/grass-matrix-20261102/harness/",
+    "docs/agents/handoffs/grass-matrix-20261102-benchmark.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Baseline z explicitního git show, kandidát z main; oba stejně transpilačně připravené a spouštěné se shodnými Babylon závislostmi, bez kopie projektu.",
+    "256/2048/8192 instancí, řídké změny i celá obměna, reserve/rebound/no-op/fade; pět párových běhů s raw hodnotami, žádné vyřazení odlehlých výsledků.",
+    "Parita výsledných dat mimo timed bloky; celkové mutate+flush i samotný flush odděleně, neprezentovat přesun práce jako zrychlení.",
+    "Výstup jen do explicitního adresáře při root spuštění; metadata baseline/candidate/skriptu/testů/dependency/Node/CPU, čas CPU-only a počet skutečných převodů."
+  ],
+  "verification": [
+    "Node/tsx CLI help a cílené lehké testy parseru/metodiky, bez spuštění zátěže.",
+    "Root s heavy-validation provede bench; při benchmarku neběží jiné testy/buildy."
+  ],
+  "notes": [
+    "Žádné browser/CDP/GPU ovládání. Samotný NullEngine není GPU důkaz. Po předání benchmarku další změny koordinovat sroot.",
+    "Povinně root baseline --baseline21d24c5f1bb42c571d5c398d5e4a42aa472709b3; výstupy skutečného měření vlastní .cache/grass-matrix-20261102/root/."
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "task": "webgpu-completion-ui-cleanup-20261021",
+  "owner": "webgpu-completion-01a15a3e-ui-cleanup-v1",
+  "capturedAtUTC": "2026-10-21T11:18:20.313Z",
+  "baselineCommit": "589b098cb60fc716247b8ebb3cc42bff7645588e",
+  "currentHead": "589b098cb60fc716247b8ebb3cc42bff7645588e",
+  "scope": [
+    "client/ui.tsx",
+    "tests/room-callbacks.test.ts"
+  ],
+  "sourceAndTest": [
+    {
+      "path": "client/ui.tsx",
+      "bytes": 111772,
+      "sha256": "6aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe"
+    },
+    {
+      "path": "tests/room-callbacks.test.ts",
+      "bytes": 61570,
+      "sha256": "24645eda0e42414f614cc84ecc5cce68a1f0d3143bcd8bbeaa06bb560d701f23"
+    }
+  ],
+  "manifestSha256": "d745e2dd748669cd360d8e1358b0c9839100d00e11e76e17a5b936935ebd6d85",
+  "qaStartMarkerCount": 1,
+  "baseline": {
+    "reportedTests": 2,
+    "pass": 0,
+    "fail": 2,
+    "pnpmExitCaptured": false,
+    "wrapperExitCode": 0,
+    "note": "The red shell command displayed the failing pnpm output without propagating its exit status; wrapper0 is not a passing test result. Both retained failures assert actual [] vs expected [true] Room leave calls."
+  },
+  "finalTests": {
+    "command": "pnpm --config.verify-deps-before-run=false exec tsx --test tests/room-callbacks.test.ts tests/game-render-engine.test.ts tests/network-input-buffer.test.ts",
+    "tests": 64,
+    "pass": 64,
+    "fail": 0,
+    "skip": 0,
+    "cancelled": 0,
+    "todo": 0,
+    "exitCode": 0,
+    "durationMs": 2215.0097
+  },
+  "typecheck": {
+    "rootFiles": [
+      "client/ui.tsx",
+      "tests/room-callbacks.test.ts"
+    ],
+    "noEmit": true,
+    "diagnostics": [],
+    "qaStartMarkerCount": 1
+  },
+  "artifacts": [
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/research-and-decision.md",
+      "sha256": "178f854616d1a1f0d293c25a214dd9c3d4607667950d2da36d89bf177d8551d2"
+    },
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/baseline-red.txt",
+      "sha256": "2e02b84dba77b8d62f55d204486df20dd7f0fc065a8804d9bc3ad74a74eba368"
+    },
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/targeted-first.txt",
+      "sha256": "7a682695e00bc5109649216a20ff829c123e64cb67ceec29ce184c1897ea9b63"
+    },
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/targeted-second.txt",
+      "sha256": "1592f4004d43b0771aca5c0bb51dc7ce4d6dbec85b5dcdab05e616c67eafba6a"
+    },
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/targeted-final.txt",
+      "sha256": "3706f883fb41ebb9b26d4bd1578cabbcd941fbeae523332182bbf0ea093aae29"
+    },
+    {
+      "path": "docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/typecheck.json",
+      "sha256": "8cdeb9701fa01946ce940cbb75ef091f675137abb7dc7c224d47e59340421283"
+    }
+  ],
+  "notRun": [
+    "full-suite",
+    "build",
+    "integration",
+    "server",
+    "browser",
+    "GPU"
+  ],
+  "limitations": [
+    "No specific onAuth failure branch established",
+    "No runtime/server token/auth change",
+    "Actual failed-start/rejoin and full pipeline belong to root"
+  ]
+}

@@ -1,0 +1,9 @@
+# Actual main synchronization before source15
+
+Owner/integrator webgpu-completion-01a15a3e-main-sync, C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020, branch codex/webgpu-completion-20261021. CAD explicitly stopped/released at05:21UTC and handed over90minutes to06:51UTC; root independently observed Blender0 and no heavy/GPU/build reservations before acquiring main-sync heavy.
+
+Exact premerge dec567cebd9de336fa6890cef4c5ebbb573fb447, main2a7b1998ba66b99480a9ee125fd5ec81e56fd1e0. Actual merge had the one previously researched UI conflict. Removed only its markers, retained startupViewsRef.current?.reset(), verified entire resolved UI byteexact premerge and all17 source/input trees equal. Index has no unresolved entries; initial incoming delta exactly10 documentation files, no runtime/test change. Existing cleanup/refactor is preserved; no new functional refactor is needed for this metadata synchronization.
+
+Actual direct Node --import tsx --test --test-concurrency=1 tests/room-callbacks.test.ts tests/game-render-engine.test.ts tests/network-input-buffer.test.ts:66PASS/0FAIL/0SKIP/3.912834s. Raw proof, manifest, original merge conflict log and the development index-check correction are in docs/performance/evidence/webgpu-main-sync-20261024/. The initial postresolve checker tried :client on the Git index, which addresses files; corrected using write-tree and TREE:path. No test ran during that checker error and no source was reset/restored.
+
+Actual independent acceptance/commit is recorded by the integrator. Main PR24 proof accepts only that prior main UI unit; combined source15 will receive its own fresh dependencies/fullchecks/actual GPU. No new image/performance/default-main/KEY22 completion inferred from this merge. No own server/GPU/helper process was started in this task. Heavy is released after commit and reacquired in the validation task for the same agreed CAD window.

@@ -33,6 +33,11 @@ export class PhotoGrassBatch {
   private fadeDirty = false;
   private rebound = false;
   private sourceRadius: number;
+  private dirtySlots = new Uint32Array(0);
+  private dirtyFlags = new Uint8Array(0);
+  private dirtyCount = 0;
+  private snapshotCache?: Matrix[];
+  private snapshotCount = 0;
   constructor(
     readonly level: CandidateLevel,
     resources: Pick<GrassResources, "clone">,
@@ -77,11 +82,17 @@ export class PhotoGrassBatch {
     if (capacity < count)
       throw Error("Photographic grass batch exceeds the hard root capacity");
     const matrices = new Float32Array(capacity * 16),
-      fades = new Float32Array(capacity * 4);
+      fades = new Float32Array(capacity * 4),
+      dirtySlots = new Uint32Array(capacity),
+      dirtyFlags = new Uint8Array(capacity);
     matrices.set(this.matrices);
     fades.set(this.fades);
+    dirtySlots.set(this.dirtySlots);
+    dirtyFlags.set(this.dirtyFlags);
     this.matrices = matrices;
     this.fades = fades;
+    this.dirtySlots = dirtySlots;
+    this.dirtyFlags = dirtyFlags;
     this.capacity = capacity;
     this.rebound = true;
   }
@@ -101,6 +112,7 @@ export class PhotoGrassBatch {
     this.matrices[offset + 12] += tileX;
     this.matrices[offset + 14] += tileZ;
     this.updateFade(root);
+    this.markMatrixSlot(root.slot);
     this.matrixDirty = true;
   }
   updateFade(root: GrassRootState) {
@@ -122,12 +134,46 @@ export class PhotoGrassBatch {
       );
       this.fades.copyWithin(root.slot * 4, last.slot * 4, last.slot * 4 + 4);
       last.slot = root.slot;
+      this.markMatrixSlot(root.slot);
     }
     this.matrixDirty = this.fadeDirty = true;
   }
+  private markMatrixSlot(slot: number) {
+    // A pending rebind lets Babylon reconstruct every snapshot. Otherwise keep
+    // numerical slots deduplicated until flush succeeds, even after tail reuse.
+    if (this.rebound || this.dirtyFlags[slot]) return;
+    this.dirtyFlags[slot] = 1;
+    this.dirtySlots[this.dirtyCount++] = slot;
+  }
+  private syncSnapshots(rebound: boolean) {
+    const snapshots = this.mesh.thinInstanceGetWorldMatrices();
+    // Our rebind reset Babylon's cache, so the getter just converted the active
+    // prefix. An unexpected cache can predate queued edits: rebuild that one.
+    if (!rebound) {
+      const rebuild = snapshots !== this.snapshotCache ||
+        snapshots.length !== this.snapshotCount;
+      const count = rebuild ? this.roots.length : this.dirtyCount;
+      for (let i = 0; i < count; i++) {
+        const slot = rebuild ? i : this.dirtySlots[i];
+        if (slot >= this.roots.length) continue;
+        snapshots[slot] ??= Matrix.Identity();
+        Matrix.FromArrayToRef(this.matrices, slot * 16, snapshots[slot]);
+      }
+    }
+    snapshots.length = this.roots.length;
+    return snapshots;
+  }
   flush() {
     if (!this.rebound && !this.matrixDirty && !this.fadeDirty) return;
-    if (this.rebound) {
+    this.flushPending();
+  }
+  /** Keep the common idle guard small, independent of snapshot bookkeeping. */
+  private flushPending() {
+    const rebound = this.rebound;
+    if (rebound) {
+      // reserve()+flush() alone must not retain the invalidated native cache.
+      this.snapshotCache = undefined;
+      this.snapshotCount = 0;
       this.mesh.thinInstanceSetBuffer("matrix", this.matrices, 16, false);
       this.mesh.thinInstanceSetBuffer("photoGrassFade", this.fades, 4, false);
       this.rebound = false;
@@ -140,11 +186,11 @@ export class PhotoGrassBatch {
       if (this.fadeDirty) this.mesh.thinInstanceBufferUpdated("photoGrassFade");
     }
     this.mesh.setEnabled(this.roots.length > 0);
+    let snapshots: Matrix[] | undefined;
     if (this.matrixDirty) {
       // Keep Babylon's public CPU snapshot consistent with the same buffers.
       // BufferUpdated alone does not refresh its cached Matrix[] (9.30).
-      const snapshots = this.mesh.thinInstanceGetWorldMatrices();
-      snapshots.length = this.roots.length;
+      snapshots = this.syncSnapshots(rebound);
       let minX = Infinity,
         minY = Infinity,
         minZ = Infinity,
@@ -152,8 +198,6 @@ export class PhotoGrassBatch {
         maxY = -Infinity,
         maxZ = -Infinity;
       for (let i = 0; i < this.roots.length; i++) {
-        snapshots[i] ??= Matrix.Identity();
-        Matrix.FromArrayToRef(this.matrices, i * 16, snapshots[i]);
         const root = this.roots[i];
         minX = Math.min(minX, root.x);
         minY = Math.min(minY, root.y);
@@ -173,16 +217,30 @@ export class PhotoGrassBatch {
         );
       }
     }
+    // Commit cache ownership and clear pending slots only after all work above
+    // succeeds. A failed upload/bounds update can therefore be retried safely.
+    if (snapshots) {
+      this.snapshotCache = snapshots;
+      this.snapshotCount = this.roots.length;
+      for (let i = 0; i < this.dirtyCount; i++)
+        this.dirtyFlags[this.dirtySlots[i]] = 0;
+      this.dirtyCount = 0;
+    }
     this.matrixDirty = this.fadeDirty = false;
   }
   get allocatedBytes() {
-    return this.matrices.byteLength + this.fades.byteLength;
+    return this.matrices.byteLength + this.fades.byteLength +
+      this.dirtySlots.byteLength + this.dirtyFlags.byteLength;
   }
   dispose() {
     this.mesh.dispose(false, false);
     this.roots.length = 0;
     this.matrices = new Float32Array(0);
     this.fades = new Float32Array(0);
+    this.dirtySlots = new Uint32Array(0);
+    this.dirtyFlags = new Uint8Array(0);
+    this.dirtyCount = this.snapshotCount = 0;
+    this.snapshotCache = undefined;
     this.capacity = 0;
   }
 }

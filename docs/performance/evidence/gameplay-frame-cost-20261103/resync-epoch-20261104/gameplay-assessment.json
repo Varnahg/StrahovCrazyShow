@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "scope": "gameplay",
+  "status": "failed",
+  "observationScope": "complete-game-session",
+  "sourceHash": "31a14cdda855eef4486ac82c63778db13d2f614676c88bb22dbd104d6da99827",
+  "sessionId": "4c67532c-7bca-4ed6-b710-359db3d70aab",
+  "policy": {
+    "targetFps": 60,
+    "minFpsRatio": 0.9,
+    "p95BudgetMultiplier": 2,
+    "p99BudgetMultiplier": 3,
+    "maxFrameMs": 250,
+    "hitchThresholdMs": 50,
+    "maxHitchFraction": 0.01,
+    "minSampleSeconds": 5,
+    "minVisibleSeconds": 60,
+    "minMovementSeconds": 20,
+    "minTravelMetres": 20,
+    "maxResyncsPerMinute": 1,
+    "maxCorrectionMetres": 1,
+    "maxAuthorityAgeMs": 250,
+    "maxTimelineWaitsPerMinute": 1
+  },
+  "reasons": [
+    {
+      "code": "window-duration",
+      "message": "Intervaly neodpovídají délce snímkového okna."
+    },
+    {
+      "code": "average-fps",
+      "message": "Průměrné FPS nedosahuje stanoveného cíle.",
+      "actual": 24.263215169493982,
+      "limit": 54
+    },
+    {
+      "code": "p95-frame",
+      "message": "p95 snímkového intervalu překračuje mez.",
+      "actual": 70.5,
+      "limit": 33.333333333333336
+    },
+    {
+      "code": "p99-frame",
+      "message": "p99 snímkového intervalu překračuje mez.",
+      "actual": 97,
+      "limit": 50
+    },
+    {
+      "code": "max-frame",
+      "message": "Nejdelší prodleva překračuje mez.",
+      "actual": 1518.2,
+      "limit": 250
+    },
+    {
+      "code": "hitch-fraction",
+      "message": "Četnost dlouhých snímků překračuje mez.",
+      "actual": 0.21987558559250442,
+      "limit": 0.01
+    },
+    {
+      "code": "stale-authority",
+      "message": "Stáří autority překračuje mez.",
+      "actual": 1491,
+      "limit": 250
+    }
+  ],
+  "evidenceValid": true,
+  "coverageComplete": false,
+  "coverageIssues": [
+    {
+      "code": "window-duration",
+      "message": "Intervaly neodpovídají délce snímkového okna."
+    }
+  ],
+  "frameSample": {
+    "scope": "frame-sample",
+    "status": "failed",
+    "metrics": {
+      "frames": 13021,
+      "durationMs": 536656.0000000015,
+      "averageFps": 24.263215169493982,
+      "p95Ms": 70.5,
+      "p99Ms": 97,
+      "maxMs": 1518.2,
+      "hitches": 2863,
+      "hitchFraction": 0.21987558559250442
+    },
+    "reasons": [
+      {
+        "code": "average-fps",
+        "message": "Průměrné FPS nedosahuje stanoveného cíle.",
+        "actual": 24.263215169493982,
+        "limit": 54
+      },
+      {
+        "code": "p95-frame",
+        "message": "p95 snímkového intervalu překračuje mez.",
+        "actual": 70.5,
+        "limit": 33.333333333333336
+      },
+      {
+        "code": "p99-frame",
+        "message": "p99 snímkového intervalu překračuje mez.",
+        "actual": 97,
+        "limit": 50
+      },
+      {
+        "code": "max-frame",
+        "message": "Nejdelší prodleva překračuje mez.",
+        "actual": 1518.2,
+        "limit": 250
+      },
+      {
+        "code": "hitch-fraction",
+        "message": "Četnost dlouhých snímků překračuje mez.",
+        "actual": 0.21987558559250442,
+        "limit": 0.01
+      }
+    ],
+    "policy": {
+      "targetFps": 60,
+      "minFpsRatio": 0.9,
+      "p95BudgetMultiplier": 2,
+      "p99BudgetMultiplier": 3,
+      "maxFrameMs": 250,
+      "hitchThresholdMs": 50,
+      "maxHitchFraction": 0.01,
+      "minSampleSeconds": 5
+    }
+  },
+  "readyAtMs": 128649.1,
+  "disposedAtMs": 665965.7,
+  "coverage": {
+    "visibleSeconds": 536.6559999999995,
+    "movementSeconds": 26.886599999904632,
+    "travelMetres": 127.58579238195907,
+    "boundaryAllowanceMs": 250,
+    "movementScope": "Conservative estimate from contiguous position/speed snapshots without correction or epoch changes; not an input replay",
+    "windows": 551,
+    "excludedWindows": 1,
+    "qualities": [
+      "low",
+      "medium"
+    ]
+  },
+  "network": {
+    "samples": 551,
+    "resyncs": 4,
+    "resyncEvents": 4,
+    "resyncCounterDelta": 3,
+    "resyncsPerMinute": 0.4472138576667366,
+    "correctionCounterDelta": 28,
+    "detailedCorrectionEvents": 4,
+    "maxCorrectionMetres": 0.17989993101717397,
+    "authorityAgeSamples": 551,
+    "maxAuthorityAgeMs": 1491,
+    "timelineWaits": 3,
+    "timelineWaitReasons": {
+      "prediction-budget": 2,
+      "stale-authority": 1
+    },
+    "timelineWaitsPerMinute": 0.33541039325005245,
+    "disconnectedWindows": 0,
+    "scope": "Resyncs=max(detailed visible events,cumulative snapshot delta), never their sum; detailed correction distance is a lower-bound maximum"
+  },
+  "records": 7738,
+  "lastSeq": 7737
+}

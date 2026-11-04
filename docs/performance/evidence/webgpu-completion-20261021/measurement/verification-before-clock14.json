@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 2,
+  "checkedAtUTC": "2026-10-21T08:37:44.946Z",
+  "node": "v24.19.0",
+  "scope": "Light CPU/unit/DOM transport fixture only; no GPU, browser, build, network server or synthetic performance result",
+  "command": "node --test --test-reporter=tap docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs",
+  "exitCode": 0,
+  "tests": 14,
+  "pass": 14,
+  "fail": 0,
+  "skipped": 0,
+  "logSha256": "1c46cdcd90227300a44410c3fc285cb96af3bce035246fa2f1f983b12c90ecde",
+  "helperSha256": "08507b7f278ec622842e3acc1ce70ca813f562f46e70ed9bcdf3b915117ca1ac",
+  "helperFiles": {
+    "common.mjs": "3005846738ac2ad53ca55bd1660cdc2c30cb51b47e4d3457694b1ac52e9dd230",
+    "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+    "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+    "receipt.mjs": "93a9961fa8f22a1a5950016cec8db4926cdcaf033656a8f7ad1c7154af2f7805",
+    "harness.mjs": "b20a926019b3fe50539d6162b944a023aa2c09dc3873801c637529f43aa14379",
+    "qa-overlay.mjs": "d91a38df62d39d29cb2b1c728778f8adbc5c23e794cb6b394b1c4d99172601a0",
+    "helper.test.mjs": "5721c9188d14fae54624011c38924d5cb11eec3731a9bfd1442f32ddb0ab5b81",
+    "README.md": "3476a56964604f27e9903175050c6a6709e83e80387b55240b080ee2186015cd"
+  },
+  "sourceStable": true,
+  "syntaxChecks": [
+    {
+      "file": "common.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "receipt.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "startup-observer.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "attempt-queue.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "qa-overlay.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "harness.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "helper.test.mjs",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "reviewRepairs": [
+    "Immutable per-attempt transfer queue/download survives pending/failure/rejoin until exact ACK; dependent controls gated",
+    "Owned actual benchmark cleanup handles refused, thrown, thrown-after-allocation and disposed attempts without replacing primary error",
+    "All known Weather fields and independent Game weatherAtStart/weatherAtEnd snapshots retained",
+    "Validated explicit preview port argument/env; origin and receipt request Host derived"
+  ],
+  "initialIteration": {
+    "tests": 14,
+    "pass": 13,
+    "fail": 1,
+    "reason": "Old static assertion expected frames = owner.benchmark.frames; refactor now captures actual ownedBenchmark object. New DOM regression scenarios already passed. Assertion updated to actual ownership path; no runtime/test semantic weakening."
+  }
+}

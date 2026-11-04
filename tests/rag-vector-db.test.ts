@@ -8,8 +8,9 @@ import { createEmbeddingProfile, type Embedder } from "../server/rag-embeddings"
 import { importRagCorpus, prepareRagCorpus, prepareDocumentChanges, importPreparedDocumentCorpus } from "../server/rag-ingest";
 import { createVectorKnowledgeStore, createVectorKnowledgeStoreWithPool, migrateRagSchema, openRagImportSession, openRagImportSessionWithPool, openRagDocumentImportSession, openRagDocumentImportSessionWithPool, type RagSqlPool } from "../server/rag-vector-store";
 import { buildKnowledgeDocumentV3, parserProfileSha256, requirePublishableExtraction, validateWorkerEnvelope } from "../server/rag-document-contract";
+import { buildCuratedKnowledgeDocumentV3 } from "../server/rag-curation-contract";
 import { RAG_TOKENIZER } from "../shared/rag-provenance";
-import type { DocumentMetadataV3 } from "../server/rag-knowledge-types";
+import type { CuratedKnowledgeMetadataV3, DocumentMetadataV3, RagDocumentBundleV3 } from "../server/rag-knowledge-types";
 import type { KnowledgeDocument, RawKnowledgeChunk } from "../server/rag-knowledge-types";
 
 const testUrl = process.env.RAG_TEST_DATABASE_URL;
@@ -78,7 +79,7 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
         await migrateRagSchema({ connectionString, readerRole, ingesterRole });
         assert.deepEqual(await store.captureActive(), before);
         assert.deepEqual((await setup.query("SELECT profile_id,input_hash,input_text,embedding::text FROM rag_embedding_cache ORDER BY profile_id,input_hash")).rows, cached.rows);
-        assert.deepEqual((await setup.query("SELECT version FROM rag_schema_migrations ORDER BY version")).rows.map((row) => row.version), [1, 2]);
+        assert.deepEqual((await setup.query("SELECT version FROM rag_schema_migrations ORDER BY version")).rows.map((row) => row.version), [1, 2, 3]);
         const rights = await admin.query(`SELECT has_table_privilege($1,$4,'SELECT') AS observer_kept,
           has_table_privilege($2,$5,'SELECT') AS reader_select,has_table_privilege($2,$5,'INSERT') AS reader_insert,
           has_table_privilege($3,$5,'INSERT') AS ingester_insert,has_table_privilege($3,$5,'DELETE') AS ingester_delete,
@@ -273,7 +274,7 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
     legacySource.sources[0] = { ...legacySource.sources[0], id: "suz-v3-legacy", authority: "suz", url: "https://www.suz.cvut.cz/cz/media/file/smlouva-o-ubytovani-pro-studenty", discoveryUrl: "https://www.suz.cvut.cz/cz/ubytovani-na-kolejich/ceniky-dokumenty", author: null, license: null, licenseUrl: null };
     legacySource.chunks[0] = { ...legacySource.chunks[0], id: "suz-v3-legacy-chunk", sourceId: "suz-v3-legacy", topic: "housing" };
     let originalLegacyVersion = "", currentBundle = completeDocument();
-    const documentImport = async (upserts: ReturnType<typeof completeDocument>[], extra: Partial<Parameters<typeof prepareDocumentChanges>[1]> = {}, embedder = documentEmbedder()) => {
+    const documentImport = async (upserts: RagDocumentBundleV3[], extra: Partial<Parameters<typeof prepareDocumentChanges>[1]> = {}, embedder = documentEmbedder()) => {
       const session = await openRagDocumentImportSessionWithPool(rolePool(ingesterRole), undefined, () => now);
       try {
         const context = await session.context("current");
@@ -440,6 +441,47 @@ test("opt-in PostgreSQL/pgvector publication, exact cosine, persistence, concurr
         assert.ok(hits.some((hit) => hit.dependency.head === "public-documents"));
         assert.equal(await reader.assertSnapshot(snapshot, hits.map((hit) => hit.dependency), now), true);
       } finally { await reader.close(); }
+    });
+    await t.test("curation shares v3 publication and cache while retaining NULL authority and distinct archived semantics", async () => {
+      const metadata: CuratedKnowledgeMetadataV3 = {
+        id: "kc-db-community", itemId: "faq-db-example", title: "Syntetická komunitní zkušenost", status: "current", verification: "community-experience",
+        applicability: "Syntetická služba", reviewedAt: "2026-10-28", reviewAfter: "2026-11-28", factCheckedAt: null,
+        observedFrom: "2026-09-01", observedUntil: "2026-10-01", limitations: ["Neověřená syntetická zkušenost."], supportingRefs: [], archiveReason: null, versionNote: "Testovací kurace",
+      };
+      const unit = { text: "Obyvatelé v syntetickém příkladu popisují praktickou zkušenost.", headingPath: ["Zkušenosti"], tokenCount: 30 };
+      const b = buildCuratedKnowledgeDocumentV3(metadata, unit), published = await documentImport([b]);
+      assert.equal(published.result.embeddedInputs, 1);
+      const stored = await admin.query(`SELECT authority,metadata,sealed FROM "${schema}".rag_document_versions WHERE id=$1`, [b.document.sourceVersionId]);
+      assert.equal(stored.rows[0].authority, null); assert.equal(stored.rows[0].sealed, true);
+      assert.deepEqual(stored.rows[0].metadata, b.document);
+      const reader = createVectorKnowledgeStoreWithPool(rolePool(readerRole));
+      try {
+        const view = await reader.captureSearch({ kind: "current" }); assert.ok(view);
+        const hits = await reader.searchSnapshot(view, [0, 1, 0], { limit: 64, now });
+        const curated = hits.find((hit) => hit.chunk.document.id === metadata.id); assert.ok(curated);
+        assert.equal(curated.chunk.source.adaptation, "knowledge-curation");
+        assert.ok(!("url" in curated.chunk.source)); assert.ok(!("checkedAt" in curated.chunk.source));
+        assert.equal(await reader.assertSnapshot(view, [curated.dependency], now), true);
+        assert.equal(await reader.assertSnapshot(view, [curated.dependency], Date.parse("2026-11-28T00:00:00Z")), false);
+        assert.ok(!(await reader.searchSnapshot(view, [0, 1, 0], { authority: "suz", limit: 64, now })).some((hit) => hit.chunk.document.id === metadata.id));
+      } finally { await reader.close(); }
+      assert.equal((await documentImport([b])).result.embeddingCalls, 0);
+      const revised = buildCuratedKnowledgeDocumentV3({ ...metadata, reviewedAt: "2026-10-29" }, unit);
+      assert.equal((await documentImport([revised])).result.embeddingCalls, 0);
+      const spoofId = createHash("sha256").update("curation-authority-spoof").digest("hex");
+      await assert.rejects(admin.query(`INSERT INTO "${schema}".rag_document_versions(id,source_id,authority,status,checked_at,review_after,block_count,chunk_count,metadata)
+        VALUES($1,$2,'suz','current','2026-10-28','2026-11-28',1,1,$3::jsonb)`, [spoofId, metadata.id, JSON.stringify({ ...b.document, sourceVersionId: spoofId, authority: "suz" })]), (error: any) => error.code === "23514");
+      const archived = buildCuratedKnowledgeDocumentV3({ ...metadata, status: "archived", archiveReason: "Historická zkušenost pro test" }, unit);
+      const session = await openRagDocumentImportSessionWithPool(rolePool(ingesterRole), undefined, () => now);
+      try {
+        const context = await session.context("archive");
+        const plan = prepareDocumentChanges(context, { collection: "archive", expectedSnapshotId: context.snapshot?.id ?? null, upserts: [archived] }, documentProfile, now);
+        assert.equal((await importPreparedDocumentCorpus(plan, session, { embedder: documentEmbedder(), maxEmbeddingInputs: 0, maxEmbeddingBytes: 0 })).embeddingCalls, 0);
+      } finally { await session.close(); }
+      const archive = await store.captureSearch({ kind: "archive" }); assert.ok(archive);
+      assert.ok((await store.searchSnapshot(archive, [0, 1, 0], { limit: 64, now })).some((hit) => hit.chunk.document.id === metadata.id));
+      const asOf = await store.captureSearch({ kind: "archive", asOf: "2026-10-01T00:00:00.000Z" }); assert.ok(asOf);
+      assert.ok(!(await store.searchSnapshot(asOf, [0, 1, 0], { limit: 64, now })).some((hit) => hit.chunk.document.id === metadata.id));
     });
   } finally {
     await store.close();

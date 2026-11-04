@@ -1,0 +1,28 @@
+{
+  "atUTC": "2026-10-23T20:50:31.629Z",
+  "decision": "Not accepted for GPU build: retained-waiter P2 remains",
+  "helperSha256": "eb34e6fa1f3934c351d9ef057385f3b39b2479d07f01788881ac3be3d9f2415f",
+  "manifestSha256": "ba3d4fe6008a74ff8ab62b01f93fb551552367dfc52d023bd64a8c4a9a3e2ead",
+  "cpu": {
+    "pass": 152,
+    "fail": 0,
+    "explicitFixed32MetadataSkip": 1,
+    "new34MetadataBridge": true
+  },
+  "reviews": [
+    {
+      "reviewer": "webgpu_editor_audit",
+      "findings": [],
+      "scope": "UI/receipt/coverage source lens; finalsealpending"
+    },
+    {
+      "reviewer": "webgpu_renderer_audit",
+      "priority": 2,
+      "module": "entry-routine-cost.mjs",
+      "mechanism": "Retained prepareFrame wrapper remains active while phase=capturing; without waiting-phase guard it can trigger/startCapture again, overwrite first trigger and make actual old8 factory reject/abort healthy capture.",
+      "counterexample": "Retain waiter before trigger; after first captured Scene frame call stale with exact original budget. Source-confirmed, no reviewer CPU/GPU run.",
+      "required": "Before any observer clock/check, non-waiting waiter must directly Reflect.apply original. RED/GREEN retained ref during active core, factory1/firstIDsstable/originalresults+falsythrow/remaining7framescleanup."
+    }
+  ],
+  "limits": "No v13 GPU build exists. Source/proof152PASS truthfully retained; oldv12 actual three-scope pair remains valid. Newv14 narrow follow-up required."
+}

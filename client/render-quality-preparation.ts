@@ -40,8 +40,9 @@ export type RenderQualityPreparationResult = Omit<
 };
 
 const QUALITIES: readonly RenderQuality[] = ["low", "medium", "high"];
-const PASS_TIMEOUT_MS = 30_000;
-const TOTAL_TIMEOUT_MS = 90_000;
+// Explicit WebGPU startup budget; all readiness passes still have to complete.
+const PASS_TIMEOUT_MS = 60_000;
+const TOTAL_TIMEOUT_MS = 180_000;
 
 /** Finite startup sequencing only. The existing light helper owns its loop,
  * visibility/watchdog and real readiness. This adds no timer or GPU resource. */
