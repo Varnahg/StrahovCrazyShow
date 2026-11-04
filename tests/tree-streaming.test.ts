@@ -42,18 +42,18 @@ test("full MID profile is explicit and scales its thresholds with the real proje
   assert.throws(()=>parseTreePilotManifest(raw),/LOD profile/);
 });
 
-test("low full-coverage FAR begins at 45 projected metres while other policies retain their boundaries", () => {
-  for (const [quality, far] of [["low", 45], ["medium", 100], ["high", 135], ["unknown", 75]] as const) {
+test("low full-coverage FAR begins at 75 projected metres while other policies retain their boundaries", () => {
+  for (const [quality, far] of [["low", 75], ["medium", 100], ["high", 135], ["unknown", 75]] as const) {
     assert.equal(treeDetailForProjection(far - .01, quality, "full-coverage"), 1, quality);
     assert.equal(treeDetailForProjection(far, quality, "full-coverage"), 2, quality);
   }
   for (const scale of [.5, 2]) {
-    assert.equal(treeDetailForProjection(45 * scale - .01, "low", "full-coverage", scale), 1);
-    assert.equal(treeDetailForProjection(45 * scale, "low", "full-coverage", scale), 2);
+    assert.equal(treeDetailForProjection(75 * scale - .01, "low", "full-coverage", scale), 1);
+    assert.equal(treeDetailForProjection(75 * scale, "low", "full-coverage", scale), 2);
   }
   for (const scale of [NaN, Infinity, 0, -1]) {
-    assert.equal(treeDetailForProjection(44.99, "low", "full-coverage", scale), 1);
-    assert.equal(treeDetailForProjection(45, "low", "full-coverage", scale), 2);
+    assert.equal(treeDetailForProjection(74.99, "low", "full-coverage", scale), 1);
+    assert.equal(treeDetailForProjection(75, "low", "full-coverage", scale), 2);
   }
   assert.equal(treeDetailForProjection(74.99, "low"), 1, "legacy low still keeps MID until 75 metres");
   assert.equal(treeDetailForProjection(75, "low"), 2);
@@ -125,12 +125,12 @@ test("low renderer retains FAR without a MID request until the real camera proje
   const f = fixture(); Object.assign(f.streamed, { lodProfile: "full-coverage" });
   const engine = new NullEngine({ renderWidth: 1280, renderHeight: 720, textureSize: 1, deterministicLockstep: false, lockstepMaxSteps: 4 });
   const h = harness(t, [f], engine); await h.load();
-  const player = { x: source.x - 60, y: 0, z: source.z };
+  const player = { x: source.x - 90, y: 0, z: source.z };
   const camera = new FreeCamera("low tree projection", new Vector3(player.x, 2, player.z), h.scene); camera.fov = .85;
   const group = h.r.treeGroups[0], far = [...group.lods[2]];
   h.renderer.update(input({ quality: "low", player })); await settle();
   assert.equal(group.desired, 2); assert.equal(group.active, 2);
-  assert.deepEqual(h.calls, [f.streamed.lods[2].url], "the 45–75 metre band must not request MID in low");
+  assert.deepEqual(h.calls, [f.streamed.lods[2].url], "beyond 75 projected metres low must not request MID");
   assert.equal(h.renderer.stats.treeDetailReservedBytes, 0);
   assert.ok(far.every(mesh => mesh.isEnabled()));
 
@@ -151,7 +151,7 @@ for (const finishDuring of ["low", "high"] as const) {
   test(`pending MID finishing in ${finishDuring} obeys the latest low/high selection and remains reusable`, async t => {
     const f = fixture(); Object.assign(f.streamed, { lodProfile: "full-coverage" });
     const h = harness(t, [f]); await h.load();
-    const group = h.r.treeGroups[0], far = [...group.lods[2]], player = { x: source.x - 60, y: 0, z: source.z };
+    const group = h.r.treeGroups[0], far = [...group.lods[2]], player = { x: source.x - 90, y: 0, z: source.z };
     let finish!: (buffer: ArrayBuffer) => void;
     t.mock.method(h.r.loader, "asset", (file: TreeAssetFile) => {
       h.calls.push(file.url);

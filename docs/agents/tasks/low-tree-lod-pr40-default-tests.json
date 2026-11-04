@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "low-tree-lod-pr40-default-tests",
+  "title": "Zachovat projekční a lifecycle regrese při návratu Low FAR75",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/tree-streaming.test.ts",
+    "docs/agents/handoffs/low-tree-lod-pr40-default-tests.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Regrese přes skutečný renderer zachovají projekci, hraniciFAR75, jiné kvality, pozdníMID a cache při low/high.",
+    "Neodstranit testy ani neoslabit lifecycle aserce; měnit jen hranici a odpovídající geometrický vstup po rozhodnutí nepřijmoutFAR45."
+  ],
+  "verification": [
+    "Přímé node --import tsx --test tests/tree-streaming.test.ts tests/tree-cluster-streaming.test.ts tests/tree-catalog-loading.test.ts.",
+    "Runtime konstantu75 dodá koordinátor; předtím neměnit zdroje během post-run manifest revalidace."
+  ],
+  "notes": [
+    "PublikačníPR40: FAR45 nesplnil předem zapsané relativníFPS/p95 kritérium, příčinnost není doložena. Vrací se předchozí default75, experiment se archivuje. Root vlastní renderer/evidence; tento leaf má jen test/handoff. Původní shader/netcode optimalizace se nemění.",
+    "4.11.2026: experiment uzavřen zamítnutím aktivního FAR45, nikoli přijetím GPU optimalizace. Obnoven původní FAR75,36 cílených regresí PASS a nezávislé review[]. Raw důkazy a meze v docs/performance/evidence/low-tree-lod-20261102/pr40-20261104/. Konečná publikační přejímka a čerstvé CI se dokládají na přesném head SHA PR40; širší plynulost KEY-5 zůstává otevřená."
+  ]
+}

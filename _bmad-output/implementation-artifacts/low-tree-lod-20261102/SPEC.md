@@ -2,7 +2,7 @@
 title: 'Úspornější vzdálené stromy v kvalitě Low'
 type: 'feature'
 created: '2026-11-02'
-status: 'in-review'
+status: 'done'
 route: 'oneshot'
 review_loop_iteration: 0
 context:
@@ -37,3 +37,15 @@ Blízký detail Low zůstává 6 normalizovaných metrů. Medium/High, historick
 - Implementace a cílený refaktor dokončeny. Nezávislé review přesného runtime/test diffu a harnessu vrátilo `[]`. První tsc našlo dvě readonly fixture přiřazení; root je opravil stávajícím Object.assign způsobem bez runtime změny.
 - Závěrečné automatické kontroly: 36/36 cílených; celý pnpm test 2848 PASS /0 FAIL /5 SKIP, tsc, pnpm build, kandidátní build a pnpm test:integration PASS. Source/test kandidáta0786606868a5fa20259935ad315ea57c7a540136fcdcfea5ed1ddc74fd887bbe.
 - GPU/obrazová přejímka zůstává blokovaná vypnutým Local browser use v nastavení Work; root požádal uživatele o zpřístupnění a dokončil ostatní práci. Spec proto zůstává in-review a kandidát je pravdivě uveden v docs/work-in-progress.md; žádný FPS přínos ani celkové Done se netvrdí.
+
+## Rozhodnutí přejímky PR40 · 4.11.2026
+
+AktuálníV15 A75/B45 na stejném WebGPU,1280×720/984×553, den/podzim a3skutečnérelace nepřijal FAR45. Aktivní stromová geometrie klesla2 527 289→2 251 443, ale mediánFPS45,6→26,6 a p9529,4→50,6ms nesplnily předem zapsanérelativnípodmínky. Jde o omezené pořadovéA/B, nikoli důkazpříčinyhoršíchFPS. Zachováváme všechny rawvýsledky v docs/performance/evidence/low-tree-lod-20261102/pr40-20261104/.
+
+Konečný práh pro publikaci je původníFAR75. Jediný runtime zásah mění lokální konstantu45→75; ostatnírefaktor,near,medium/high,legacy,projekce,cache/lifecycle,assety a shaderovévarianty zůstávají. Testy zachovají všechnyregrese s hranicí75 a vstupem90mproMID/FAR/zoom. Given Low/full-coverage, when normalizeddistance<75, thenMID; při75 FAR. Given pendingMID a změnylow/high, thennovýLODnenahradíaktuální a cache se znovupoužije.
+
+Ověření: runtime75 odpovídá právězměřenémuA75,36cílenýchregresí, nezávisléreviewpřesného source/testdiffu a novéCI pro finálníhead. Původníkandidát45 je zamítnut pro aktivnídefault, zachovánvhistorii; širšígameplay/Highpřechodyzůstávajíotevřené. Bez novéširokéGPU série.
+
+## Review Triage Log
+
+4.11.2026: nezávislé čtecí review finálního source/test/evidence diffu vrací []. Zachováno projekční i pending-MID/cache pokrytí;90m je zaLow75 a předHigh135.36/36 cílených testů PASS. Stavdone označuje uzavřený experiment s obnoveným default75, nikoli přijetí kandidáta45 nebo splněnou celkovou plynulost. Finální PRCI a project-acceptance zůstávají samostatnou publikační bránou.

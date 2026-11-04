@@ -1,5 +1,7 @@
 # Low: dřívější vzdálené koruny stromů · 2. 11. 2026
 
+**Aktualizace4.11.2026:** [současnéV15 A/B](pr40-20261104/README.md) kandidáta45 nepřijalo. Aktivnídefault je opět75; nižší geometrie bez izolovanéhoFPS důkazu ani nedokončená obrazová přejímka neopravňují k publikaci45 jako hotové optimalizace. Následující text zachovává historický stav2.11.
+
 Implementace kandidáta je v jediném kanonickém checkoutu na `main`. Cílem je snížit množství stromové geometrie a zbytečné žádosti o detail v úsporné kvalitě. **Zisk FPS a obrazová přejímka zatím nejsou doložené.** Tento záznam nezavírá celkovou plynulost KEY-5.
 
 ## Průzkum a rozhodnutí

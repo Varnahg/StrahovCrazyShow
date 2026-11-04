@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## Publikační PR40 a rozhodnutí Low LOD · 4. listopadu 2026
+
+[Současné V15 A75/B45](performance/evidence/low-tree-lod-20261102/pr40-20261104/README.md) uzavírá kandidáta45 jako nepřijatý; default se vrací75. Šest produkčních Edge/WebGPU vzorků se shodnou kamerou, časem a1280×720/984×553 snížilo stromovou geometrii10,9%, ale nesplnilo předem zvolenéFPS/p95 meze. Pohybliví peers navíc měnili avatar LOD (Anear1/medium2, Bnear3), takže rozdílFPS nelze připsat stromoLOD. Kandidátní obrazová trasa nebyla po selhání zahájena. PůvodníA75 také vykazuje dlouhé záseky až7,54s při změněHigh; celková plynulost zůstává otevřená.
+
+Zdroj/test/asset manifesty, všechny raw intervaly, systémová telemetrie, screenshoty, vyhodnocení a nezávislá post-run revalidace jsou v uvedené evidenci. Oba staršíharness shutdowny nenapsalycleanup.json; následně ověřené ukončení vlastníchprocesů/portů a úplné bytehashy jsou vedené samostatně. Nové finálníCI a review budou doložené na přesnémPRhead; zelený původní12d81aa9 se za novéCI nevydává.
+
 ## Ochrana startup shaderů a přímý CPU profil · 3. listopadu 2026
 
 Koherentní renderovací checkpoint obsahuje ochranu proti starému hot-swapped Standard/PBR shaderu, retry jednorázových RTT i bez fronty a lokální CPU diagnostiku. Fronta je výchozí vypnutá a dostupná jen jako výslovný loopback experiment. Poslední společná sada **190/190 cílených testů PASS**, produkční build a izolovaný `pnpm test:integration` PASS; nezávislá review bez blockerů. To nenahrazuje plnou testovací sadu ani úspěšný GPU start. Dřívější nezelené fullsuite výsledky zůstávají níže zachované.

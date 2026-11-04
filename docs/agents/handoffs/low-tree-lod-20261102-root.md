@@ -14,3 +14,25 @@
 - Integrační rozhodnutí: zachovat ověřenou implementační část přímo na main jako dohledatelný kandidát. Implementace/harness/diagnostický rozsah přijaty v uvedených mezích; parent task zůstává `blocked` na GPU/obrazové přejímce, stejně tak obecný KEY-5 není Done. `docs/work-in-progress.md` výslovně uvádí neověřenou kalibraci.
 - Další krok: po zpřístupnění prohlížeče znovu ověřit main/source identity a aktivní scény, rezervovat procesní zdroje, spustit zachované A/B a zkontrolovat koruny/přechody i skutečné frame intervals. Není potřeba znovu implementovat ani bez důvodu opakovat zelené automatické kontroly.
 - Rezervace: po staging/commitu a finální kontrole procesů integrátor uvolní pouze své čtyři claims; release není dokončením GPU přejímky.
+
+## Navázání PR40 · 4. 11. 2026
+
+- Checkpoint: main12d81aa9, publication PR40; automatické verify/source-secret-hygiene/feedback-browser PASS. Nový vlastník pr40-low-20261104-root přebírá pouze chybějící Low obraz/GPU přejímku.
+- Problém: aktivní FAR45 stále nemá slíbené srovnání proti FAR75.
+- Mechanismus/hypotéza: v normalizovaném pásmu45–75 dříve použije méně geometrie; skutečný frame-time přínos a viditelnost přechodu jsou neověřené.
+- Jediná změna: baseline ze současného V15 s konstantou75 versus současný FAR45; po baseline buildu vrátit přesné původní bajty rendereru. Ostatní zdroje, testy, assety, závislosti, backend, populace a kvalita shodné.
+- Hlavní metrika: spárované Low frame intervals/FPS/p95/p99 a vykreslené tree LOD/triangles ve stejné kameře; pomocně load/cache/health. Startup se hodnotí odděleně.
+- Správnost: plná hra/HUD,2 skuteční SDK spoluhráči s různými avatary, WebGPU, CSS1280×720 a zaznamenaný backbuffer, stejné QA počasí/čas, skutečný pohyb/zoom/low→high, žádné DOM/screenshoty během časovaných vzorků. Hlídání readiness, asset/render health a kompletní uložené telemetrie.
+- Přijetí: nižší doložená stromová geometrie ve změněném pásmu, bez opakovatelného zhoršení frame p95/p99 nad běhový rozptyl, bez chyb/zmizení korun či nepřijatelného přechodu v reálném obrazu. Celkových60FPS ani poklesRAM není podmínka ani slib tohoto úzkého ověření. Chybějící/neporovnatelné vzorky znamenají neprůkazné, ne success. Jedna pevná párovaná série; po selhání číst log před dalším během.
+- Další krok: připravit dvě neměnné aktuální varianty, ověřit identitu a průchod do uloženého výsledku, poté cílená série. Původní staré V14 buildy se nepoužijí sV15.
+- Předběžně pevná sérieA75/B45: po dokončení streaming/warmupu3×10s ve shodném spawn pohledu, stejná krátká chůze/zoom/přepnutí kvality mimo ustálené vzorky. Pro toto úzké přijetí zvolená relativní podmínka: medián p95 i p99 kandidáta nepřekročí nejhorší odpovídající baseline vzorek; mediánFPS neklesne pod nejnižší baselineFPS. Aktivní tree triangles musejí v doloženém změněném pásmu klesnout a health/obraz zůstat správné. Jde o nově předem zaznamenané kritérium, nikoli historický číselný práh. Případný pořadový/cache bias výslovně omezí interpretaci; bez reverzníhoBA se nehlásí robustní procentníFPSzisk.
+- Rozhodnutí poA/B: FAR45 nesplnil předem zapsanéFPS/p95 meze, proto se proPR40 vrací předchozí75. Příčina rozdíluFPS není z jedné pořadové dvojice prokázaná (pohybové peers/kolísající systém); nižší geometrie11% není FPSdůkaz. Další běh by nyní prodlužoval neuzavřený experiment; plná kandidátní obrazová přejímka se nezahajuje po nesplnění brány.
+- Následující jediná změna: konstantuLow/full-coverage vrátit75, zachovat refaktor a projekční/streaming regrese s odpovídajícím vstupem. Metrika správnosti: runtime shodný s právě změřenouA75 a36cílenýchregresí, nezávisléreview, freshPRCI. Nepřijímat45, netvrditFPSzrychlení ani bezchybnouHigh změnu.
+
+### Aktuální předání PR40
+
+- Závěr: kandidát FAR45 zamítnut pro aktivní default; obnoven FAR75. Původní runtime/refaktor a všechny nové regrese zachované. Rozdílný avatar LOD a takty znemožňují příčinný FPS závěr.
+- Ověření: 36/36 cílených testů PASS, nezávislé review source/test/evidence[], katalog a diff kontroly PASS. Finální source/tests SHA28641aff1da225430e1fed6e2821783941cc1d229ba7ea7109578289dc3b7a31; runtime proti právě hranéA75 liší jen komentář.
+- Evidence: [PR40 report](../../performance/evidence/low-tree-lod-20261102/pr40-20261104/README.md), raw logy/šest benchmarků/systém/snímky a hash receipt. Meze přejímky a oba původní chybějícícleanup.json jsou zachované; následné plné bytehashy PASS.
+- Procesy: oba peers/samplery ukončené, browser přesUI opuštěn, vlastníokno zavřené a viewport resetovaný. API95044/97860 a porty2568/4179 nepřítomné; původní8080 nedotčen.
+- Integrace: následuje commit na main a fast-forward explicitně autorizované publikační větve. Aktuální head/base, skutečné freshCI a konečný project-acceptance budou zaznamenané přímo v PR40/Linear; nevytvářet další commit jen pro vlastníSHA. Tři cizí untracked podklady se nestagují.

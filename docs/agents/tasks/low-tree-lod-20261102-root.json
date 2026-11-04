@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "blocked",
+  "status": "done",
   "dependsOn": [],
   "id": "low-tree-lod-20261102-root",
   "title": "Ověřit a přijmout úspornější stromové LOD přímo na main",
@@ -15,7 +15,10 @@
     "docs/verification.md",
     "docs/work-in-progress.md",
     "node_modules/",
-    "dist/"
+    "dist/",
+    "client/tree-renderer.ts",
+    ".cache/game-diagnostics/",
+    "docs/performance/evidence/low-tree-lod-20261102/pr40-20261104/"
   ],
   "resources": [
     "heavy-validation",
@@ -39,6 +42,8 @@
   "notes": [
     "Implementace, review, 36 cílených testů, plná sada 2848 PASS/0 FAIL/5 SKIP, build a integrace prošly. Stav blocked se týká pouze chybějící GPU/obrazové přejímky: Computer Use hlásí Local browser use is disabled in Work settings. Kandidát je zachován na main a v docs/work-in-progress.md; FPS přínos se netvrdí.",
     "Uživatelská volba 2.11.2026: jeden postup grafické optimalizace, pouze main, bez kopií/worktrees. Navazuje na KEY-5.",
-    "Výzkumný základ6f263427. Doložený mechanismus LOD a geometrické počty nejsou FPS důkaz. Implementace a harness mají vlastní disjunktní tasky."
+    "Výzkumný základ6f263427. Doložený mechanismus LOD a geometrické počty nejsou FPS důkaz. Implementace a harness mají vlastní disjunktní tasky.",
+    "4.11.2026: integrátor PR40 přebírá zbývající praktickou přejímku z dokončeného root/implementation handoffu. Edge je dostupný; dřívější zákaz UI není současnou blokací. Pouze cílené současné V15/FAR75 versus FAR45. Tree renderer je rezervovaný pro jedinou dočasnou baseline konstantu75 a byte-exact návrat45 před měřením; žádné nové runtime API nebo jiné grafické změny. Aktuální verify/source-secret-hygiene/feedback-browser na head12d81aa9 PASS; úspěšné testy se bez relevantní změny neopakují. Publication branch publish/main-20261104 je výslovná uživatelská výjimka, checkout zůstává main.",
+    "4.11.2026: experiment uzavřen zamítnutím aktivního FAR45, nikoli přijetím GPU optimalizace. Obnoven původní FAR75,36 cílených regresí PASS a nezávislé review[]. Raw důkazy a meze v docs/performance/evidence/low-tree-lod-20261102/pr40-20261104/. Konečná publikační přejímka a čerstvé CI se dokládají na přesném head SHA PR40; širší plynulost KEY-5 zůstává otevřená."
   ]
 }

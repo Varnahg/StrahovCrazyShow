@@ -35,9 +35,9 @@ export const TREE_DETAIL_BYTES_LIMIT = 64 * 1024 * 1024;
 export const TREE_PILOT_BYTES_LIMIT = 96 * 1024 * 1024;
 const fullLeaf: TreePhenology = Object.freeze({ leafAmount: 1, maturity: 1, senescence: 0, litterPotential: 0 });
 const referenceFocalPixels = 720 / (2 * Math.tan(.85 / 2));
-const lowFullCoverageFarDistance = 45;
+const lowFullCoverageFarDistance = 75;
 /** Curved individual leaves remain the hero LOD. Only an audited full LOD1
- * may replace it sooner. Low also adopts the existing FAR crown earlier;
+ * may replace it sooner. Low keeps the established FAR distance until a measured alternative is accepted;
  * all distances scale with projection, while historical LODs keep their policy. */
 export function treeDetailForProjection(distance: number, quality: string, profile?: TreeLodProfile, projectionScale = 1): TreeLod {
   if (profile !== "full-coverage") return treeDetailLevel(distance, quality);
