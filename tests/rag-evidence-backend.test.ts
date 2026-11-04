@@ -585,3 +585,16 @@ test("evidence admission enforces merged locator count and UTF-8 bytes before ge
     }
   }
 });
+test("a block-number clarification stays in the admitted USER topic for later short questions", () => {
+  const refined = prepareEvidenceQuery("Blok 3", "Kdo vede blok?");
+  const next = prepareEvidenceQuery("A kde?", refined.filterText);
+  assert.match(refined.filterText, /Blok 3/);
+  assert.match(next.text, /Blok 3/);
+  assert.match(next.text, /Kdo vede blok/);
+  const english = prepareEvidenceQuery("Block 6", "Who runs the block?");
+  assert.match(
+    prepareEvidenceQuery("And when?", english.filterText).text,
+    /Block 6/,
+  );
+  assert.ok(Buffer.byteLength(refined.filterText) <= 2048);
+});

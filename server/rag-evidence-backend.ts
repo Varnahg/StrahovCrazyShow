@@ -6,6 +6,7 @@ import {
   mergeCrazyTypkaSources,
   type CrazyTypkaKnowledgeScope,
   type CrazyTypkaErrorCode,
+  type CrazyTypkaAnswerMode,
 } from "../shared/crazy-typka";
 import type { EvidenceKnowledgeChunk } from "./rag-knowledge-types";
 import { isKnowledgeCurrent } from "./crazy-typka-retrieval";
@@ -51,6 +52,11 @@ export class RagEvidenceError extends Error {
 export type PreparedEvidenceQuery = Readonly<{
   text: string;
   filterText: string;
+  answerMode?: CrazyTypkaAnswerMode;
+}>;
+export type CrazyTypkaReplyContext = Readonly<{
+  admittedUserTask: string;
+  text: string;
 }>;
 export type EvidenceSnapshot = Readonly<{
   snapshot: RagSearchSnapshot | null;
@@ -87,13 +93,13 @@ export type AsyncEvidenceBackend = {
 function normalized(value: string) {
   return value.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().trim();
 }
-function isFollowUp(value: string) {
+export function isEvidenceFollowUp(value: string) {
   return (
     value.length <= 160 &&
-    (/^(?:a )?(?:kolik(?: to)? stoji|kolik|kde (?:to|ho|ji) najdu|kde to je|jak se tam dostanu|jaka je oteviraci doba|jaka jsou pravidla|a co cena)[?!.]*$/.test(
+    (/^(?:a )?(?:kdy|kde|co to druhe|blok \d{1,2}|kolik(?: to)? stoji|kolik|kde (?:to|ho|ji|je) najdu|kde to je|jak se tam dostanu|jaka je oteviraci doba|jaka jsou pravidla|a co cena)[?!.]*$/.test(
       normalized(value),
     ) ||
-      /^(?:and )?(?:how much (?:does (?:it|that) cost|is (?:it|that))|where (?:is (?:it|that)|can i find (?:it|that))|how (?:do|can) i get there|what (?:are the (?:opening hours|rules)|about the price))[?!.]*$/.test(
+      /^(?:and )?(?:when|where|what about the other one|block \d{1,2}|how much (?:does (?:it|that) cost|is (?:it|that))|where (?:is (?:it|that)|can i find (?:it|that))|how (?:do|can) i get there|what (?:are the (?:opening hours|rules)|about the price))[?!.]*$/.test(
         normalized(value),
       ))
   );
@@ -109,25 +115,64 @@ function truncateUtf8(text: string, bytes: number) {
   }
   return result;
 }
+function admittedFollowUp(message: string, previous: string): string {
+  // A new block number is USER clarification, not a disposable question word.
+  if (!/^(?:a |and )?(?:blok|block) \d{1,2}[?!.]*$/.test(normalized(message)))
+    return previous;
+  const base = previous.split("\nUser clarification:\n")[0];
+  return (
+    truncateUtf8(base, 2048 - Buffer.byteLength(message, "utf8") - 24) +
+    "\nUser clarification:\n" +
+    message
+  );
+}
 /** The returned exact text is moderated before any embedding call. Only a successful USER turn may be supplied. */
 export function prepareEvidenceQuery(
   message: string,
   previousSuccessfulUser?: string,
+  replyContext?: CrazyTypkaReplyContext,
+  answerMode?: CrazyTypkaAnswerMode,
 ): PreparedEvidenceQuery {
   if (!message.trim() || Buffer.byteLength(message, "utf8") > 8191)
     throw new RagEvidenceError("invalid-request");
-  if (!previousSuccessfulUser || !isFollowUp(message))
-    return Object.freeze({ text: message, filterText: message });
+  const mode = answerMode === undefined ? {} : { answerMode };
+  if (replyContext) {
+    const prefix = "Previous admitted user task:\n",
+      separator =
+        "\nVerified earlier AI statement (context only, not evidence):\n";
+    const suffix = "\nCurrent user question:\n" + message;
+    const available =
+      8191 - Buffer.byteLength(prefix + separator + suffix, "utf8");
+    if (available < 1) throw new RagEvidenceError("invalid-request");
+    const userContext = truncateUtf8(
+      replyContext.admittedUserTask,
+      Math.floor(available / 2),
+    );
+    const quote = truncateUtf8(
+      replyContext.text,
+      available - Buffer.byteLength(userContext, "utf8"),
+    );
+    return Object.freeze({
+      text: prefix + userContext + separator + quote + suffix,
+      filterText: isEvidenceFollowUp(message)
+        ? admittedFollowUp(message, replyContext.admittedUserTask)
+        : message,
+      ...mode,
+    });
+  }
+  if (!previousSuccessfulUser || !isEvidenceFollowUp(message))
+    return Object.freeze({ text: message, filterText: message, ...mode });
   const prefix = "Previous successful user question:\n",
     separator = "\nCurrent user question:\n";
   const remaining =
     8191 - Buffer.byteLength(prefix + separator + message, "utf8");
   if (remaining <= 0)
-    return Object.freeze({ text: message, filterText: message });
+    return Object.freeze({ text: message, filterText: message, ...mode });
   const previous = truncateUtf8(previousSuccessfulUser, remaining);
   return Object.freeze({
     text: prefix + previous + separator + message,
-    filterText: previous,
+    filterText: admittedFollowUp(message, previous),
+    ...mode,
   });
 }
 

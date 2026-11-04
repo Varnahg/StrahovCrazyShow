@@ -9,6 +9,7 @@ import {
   CRAZY_TYPKA_LIMITS,
   CRAZY_TYPKA_SPEAKER,
   isCrazyTypkaRequestSeq,
+  isCrazyTypkaReplyTo,
   CURRENT_KNOWLEDGE_SCOPE,
   crazyTypkaScopeKey,
   isCrazyTypkaKnowledgeScope,
@@ -18,6 +19,7 @@ import {
   type CrazyTypkaErrorCode,
   type CrazyTypkaChatResponse,
   type CrazyTypkaErrorResponse,
+  type CrazyTypkaAnswerBlock,
 } from "../shared/crazy-typka";
 import {
   createCrazyTypkaProvider,
@@ -34,12 +36,23 @@ import {
   type DecisionRouter,
 } from "./crazy-typka-decisions";
 import {
+  assessScope,
+  resolvedAnswerMode,
+  splitMixedMessage,
+  prepareSegmentClassification,
+  projectApprovedSegments,
+  scopeReply,
+  mixedRefusal,
+} from "./crazy-typka-scope";
+import {
   createConfiguredEvidenceBackend,
   prepareEvidenceQuery,
+  isEvidenceFollowUp,
   RagEvidenceError,
   isEvidenceCurrent,
   type AsyncEvidenceBackend,
   type EvidenceSnapshot,
+  type CrazyTypkaReplyContext,
 } from "./rag-evidence-backend";
 
 export type CrazyTypkaServiceLimits = {
@@ -143,6 +156,14 @@ type Session = {
   /** Failed or blocked attempts clear this boundary without retaining rejected text. */
   previousSuccessfulUser?: string;
   contextScope?: CrazyTypkaKnowledgeScope;
+  replyAnchor?: CrazyTypkaReplyContext;
+  retainedAnswers: RetainedAnswer[];
+};
+type RetainedAnswer = {
+  requestSeq: number;
+  scope: CrazyTypkaKnowledgeScope;
+  admittedUserTask: string;
+  blocks: CrazyTypkaAnswerBlock[];
 };
 type TerminalResult = {
   status: number;
@@ -169,6 +190,12 @@ function citedSources(
   if (!merged) throw new RequestError(502, "invalid-response");
   return merged;
 }
+function clearImplicitContext(session: Session) {
+  session.history.length = 0;
+  session.previousSuccessfulUser = undefined;
+  session.contextScope = undefined;
+  session.replyAnchor = undefined;
+}
 function rememberTerminal(
   session: Session,
   operation: Operation,
@@ -177,12 +204,44 @@ function rememberTerminal(
   // A failed newer USER attempt is a topic boundary. Do not let the generator
   // silently fall back to older successful dialogue, or resend rejected text.
   if (result.status >= 400) {
-    session.history.length = 0;
+    clearImplicitContext(session);
     operation.evidence = undefined;
-    session.previousSuccessfulUser = undefined;
-    session.contextScope = undefined;
   }
   operation.terminal = result;
+}
+
+/** Reuse the bounded, labeled retrieval input so ordinary admission needs no extra moderation round trip. */
+export function prepareCrazyTypkaDecisionContext(
+  message: string,
+  previousUser?: string,
+  reply?: CrazyTypkaReplyContext,
+  locale: "cs" | "en" = "cs",
+): string {
+  const split = splitMixedMessage(message, locale);
+  if (split.kind === "clarify" && split.reason === "unsplittable")
+    return prepareEvidenceQuery(message, previousUser, reply).text;
+  // Bind every sentence to the same current request; the final sentence is not a replacement task.
+  const data = {
+    currentUserMessage: message,
+    previousSuccessfulUser: previousUser,
+    verifiedReply: reply ? { ...reply } : undefined,
+  };
+  let text = JSON.stringify(data);
+  while (
+    Buffer.byteLength(text, "utf8") > 8191 &&
+    (data.previousSuccessfulUser || data.verifiedReply)
+  ) {
+    if (data.verifiedReply && data.verifiedReply.text.length > 32) {
+      const characters = Array.from(data.verifiedReply.text);
+      data.verifiedReply.text = characters
+        .slice(0, Math.floor(characters.length / 2))
+        .join("");
+    } else if (data.previousSuccessfulUser)
+      data.previousSuccessfulUser = undefined;
+    else data.verifiedReply = undefined;
+    text = JSON.stringify(data);
+  }
+  return text;
 }
 export function isCrazyTypkaPath(url: string | undefined) {
   return (
@@ -608,8 +667,8 @@ export function createCrazyTypkaService(
         );
         sessions.delete(key);
         session.inflight?.abort();
-        session.history.length = 0;
-        session.previousSuccessfulUser = undefined;
+        clearImplicitContext(session);
+        session.retainedAnswers.length = 0;
         session.lastOperation = undefined;
         return reply(204);
       }
@@ -648,6 +707,7 @@ export function createCrazyTypkaService(
           history: [],
           messages: [],
           nextRequestSeq: 1,
+          retainedAnswers: [],
           previousSuccessfulUser: undefined,
         });
         return reply(201, { token, expiresAt });
@@ -661,6 +721,7 @@ export function createCrazyTypkaService(
               "message",
               "locale",
               "knowledgeScope",
+              "replyTo",
             ].includes(key),
         ) ||
         typeof body.message !== "string" ||
@@ -670,7 +731,8 @@ export function createCrazyTypkaService(
         (body.locale !== "cs" && body.locale !== "en") ||
         !isCrazyTypkaRequestSeq(body.requestSeq) ||
         (body.knowledgeScope !== undefined &&
-          !isCrazyTypkaKnowledgeScope(body.knowledgeScope))
+          !isCrazyTypkaKnowledgeScope(body.knowledgeScope)) ||
+        (body.replyTo !== undefined && !isCrazyTypkaReplyTo(body.replyTo))
       )
         throw new RequestError(400, "invalid-request");
       const { key, session } = sessionFor(body.token, origin);
@@ -680,9 +742,21 @@ export function createCrazyTypkaService(
           : Object.freeze({
               ...(body.knowledgeScope as CrazyTypkaKnowledgeScope),
             });
+      const replyTo =
+        body.replyTo === undefined
+          ? undefined
+          : Object.freeze({
+              requestSeq: body.replyTo.requestSeq,
+              blockId: body.replyTo.blockId,
+            });
       const message = body.message.trim(),
         payloadHash = hash(
-          JSON.stringify([message, body.locale, crazyTypkaScopeKey(scope)]),
+          JSON.stringify([
+            message,
+            body.locale,
+            crazyTypkaScopeKey(scope),
+            replyTo ?? null,
+          ]),
         );
       const previous = session.lastOperation;
       if (previous?.seq === body.requestSeq) {
@@ -723,6 +797,7 @@ export function createCrazyTypkaService(
         JSON.stringify([
           message.toLocaleLowerCase("cs"),
           crazyTypkaScopeKey(scope),
+          replyTo ?? null,
         ]),
       );
       if (
@@ -732,11 +807,12 @@ export function createCrazyTypkaService(
       )
         throw new RequestError(429, "rate-limited");
       const greeting =
-        !previous && session.nextRequestSeq === 1 && !session.history.length
+        !replyTo &&
+        !previous &&
+        session.nextRequestSeq === 1 &&
+        !session.history.length
           ? firstGreeting(message, body.locale)
           : undefined;
-      if (!greeting && generations >= limits.generationsPerProcess)
-        throw new RequestError(503, "budget-exhausted");
       session.messages.push(now());
       session.lastMessage = { hash: digest, at: now() };
       session.inflight = controller;
@@ -751,12 +827,34 @@ export function createCrazyTypkaService(
       session.nextRequestSeq++;
       accepted = { key, session, operation };
       if (
-        session.contextScope &&
-        crazyTypkaScopeKey(session.contextScope) !== crazyTypkaScopeKey(scope)
+        (session.contextScope &&
+          crazyTypkaScopeKey(session.contextScope) !==
+            crazyTypkaScopeKey(scope)) ||
+        session.retainedAnswers.some(
+          (answer) =>
+            crazyTypkaScopeKey(answer.scope) !== crazyTypkaScopeKey(scope),
+        )
       ) {
-        session.history.length = 0;
-        session.previousSuccessfulUser = undefined;
+        clearImplicitContext(session);
+        session.retainedAnswers.length = 0;
       }
+      let replyContext: CrazyTypkaReplyContext | undefined;
+      if (replyTo) {
+        const target = session.retainedAnswers.find(
+          (answer) =>
+            answer.requestSeq === replyTo.requestSeq &&
+            crazyTypkaScopeKey(answer.scope) === crazyTypkaScopeKey(scope),
+        );
+        const block = target?.blocks.find(
+          (block) => block.id === replyTo.blockId && block.sourceIds.length > 0,
+        );
+        if (!target || !block) throw new RequestError(409, "reply-unavailable");
+        replyContext = Object.freeze({
+          admittedUserTask: target.admittedUserTask,
+          text: block.text,
+        });
+      } else if (isEvidenceFollowUp(message))
+        replyContext = session.replyAnchor;
       if (greeting) {
         session.contextScope = scope;
         session.history.push(
@@ -770,11 +868,27 @@ export function createCrazyTypkaService(
           requestSeq: operation.seq,
         });
       }
-      const query = prepareEvidenceQuery(
+      const localReply = (
+        kind: "off_topic" | "objectifying_people" | "clarify",
+      ) => {
+        clearImplicitContext(session);
+        return terminalReply(200, {
+          speaker: CRAZY_TYPKA_SPEAKER,
+          text: scopeReply(kind, body.locale as "cs" | "en"),
+          sources: [],
+          requestSeq: operation.seq,
+        });
+      };
+      const admittedPreviousUser = session.previousSuccessfulUser;
+      if (!admittedPreviousUser && !replyContext && isEvidenceFollowUp(message))
+        return localReply("clarify");
+      const classificationText = prepareCrazyTypkaDecisionContext(
         message,
-        session.previousSuccessfulUser,
+        admittedPreviousUser,
+        replyContext,
+        body.locale as "cs" | "en",
       );
-      await provider.moderateInput(query.text, controller.signal);
+      await provider.moderateInput(classificationText, controller.signal);
       const operationActive = () =>
         !closed &&
         sessions.get(key) === session &&
@@ -784,39 +898,113 @@ export function createCrazyTypkaService(
         if (!operationActive()) throw new RequestError(409, "cancelled");
       };
       assertOperationActive();
-      let decision: ComplexityDecision | undefined;
-      try {
-        decision = await router!.classify(query.text, {
-          signal: controller.signal,
-          safetyIdentifier: key,
-          onAttempt: (inputBytes) => {
-            assertOperationActive();
-            if (
-              !Number.isSafeInteger(inputBytes) ||
-              inputBytes < 1 ||
-              decisions.attempts >= limits.decisionsPerProcess ||
-              reservedDecisionInputBytes + inputBytes >
-                limits.decisionTokenBudget
-            )
-              throw new RequestError(503, "budget-exhausted");
-            decisions.attempts++;
-            reservedDecisionInputBytes += inputBytes;
-          },
-        });
-        recordUsage(decisions, decision.usage);
-      } catch (error) {
-        assertOperationActive();
-        if (error instanceof DecisionRouterError && error.code === "cancelled")
-          throw new RequestError(409, "cancelled");
-        const reason: RoutingFallback =
-          error instanceof RequestError && error.code === "budget-exhausted"
-            ? "decision-budget"
-            : error instanceof DecisionRouterError &&
-                error.code === "request-timeout"
-              ? "decision-timeout"
-              : "decision-error";
-        routingFallbacks[reason]++;
+      const decisionOptions = {
+        signal: controller.signal,
+        safetyIdentifier: key,
+        onAttempt: (inputBytes: number) => {
+          assertOperationActive();
+          if (
+            !Number.isSafeInteger(inputBytes) ||
+            inputBytes < 1 ||
+            decisions.attempts >= limits.decisionsPerProcess ||
+            reservedDecisionInputBytes + inputBytes > limits.decisionTokenBudget
+          )
+            throw new RequestError(503, "budget-exhausted");
+          decisions.attempts++;
+          reservedDecisionInputBytes += inputBytes;
+        },
+      };
+      const classify = async <T extends { usage: ComplexityDecision["usage"] }>(
+        run: () => Promise<T>,
+      ): Promise<T> => {
+        try {
+          const result = await run();
+          recordUsage(decisions, result.usage);
+          assertOperationActive();
+          return result;
+        } catch (error) {
+          assertOperationActive();
+          if (error instanceof RequestError) {
+            if (error.code === "budget-exhausted")
+              routingFallbacks["decision-budget"]++;
+            throw error;
+          }
+          if (
+            error instanceof DecisionRouterError &&
+            error.code === "cancelled"
+          )
+            throw new RequestError(409, "cancelled");
+          const timeout =
+            error instanceof DecisionRouterError &&
+            error.code === "request-timeout";
+          routingFallbacks[timeout ? "decision-timeout" : "decision-error"]++;
+          throw new RequestError(
+            timeout ? 504 : 502,
+            timeout ? "request-timeout" : "provider-unavailable",
+          );
+        }
+      };
+      let decision = await classify(() =>
+        router!.classify(classificationText, decisionOptions),
+      );
+      let admittedMessage = message,
+        appendedReply: string | undefined;
+      const scopeDecision = assessScope(decision);
+      if (scopeDecision !== "allowed" && scopeDecision !== "mixed")
+        return localReply(scopeDecision);
+      if (scopeDecision === "mixed") {
+        const split = splitMixedMessage(message, body.locale as "cs" | "en");
+        if (split.kind !== "segments") return localReply("clarify");
+        let segmentInput;
+        try {
+          segmentInput = prepareSegmentClassification(
+            classificationText,
+            split.segments,
+            {
+              previousSuccessfulUser: admittedPreviousUser,
+              verifiedReply: replyContext,
+            },
+          );
+        } catch (error) {
+          if (
+            error instanceof DecisionRouterError &&
+            error.code === "request-too-large"
+          )
+            return localReply("clarify");
+          throw error;
+        }
+        await provider.moderateInput(segmentInput.text, controller.signal);
+        const result = await classify(() =>
+          router!.classifySegments(segmentInput, decisionOptions),
+        );
+        const projected = projectApprovedSegments(split.segments, result);
+        if (projected.kind !== "allowed") return localReply("clarify");
+        admittedMessage = projected.message;
+        decision = { ...decision, ...projected.decision };
+        if (projected.hasRejected) {
+          appendedReply = projected.rejectedKinds.includes(
+            "objectifying_people",
+          )
+            ? scopeReply("objectifying_people", body.locale as "cs" | "en")
+            : projected.rejectedKinds.includes("off_topic")
+              ? mixedRefusal(body.locale as "cs" | "en")
+              : scopeReply("clarify", body.locale as "cs" | "en");
+          clearImplicitContext(session);
+          if (!replyTo) replyContext = undefined;
+        }
       }
+      const answerMode = resolvedAnswerMode(decision);
+      if (generations >= limits.generationsPerProcess)
+        throw new RequestError(503, "budget-exhausted");
+      const query = prepareEvidenceQuery(
+        admittedMessage,
+        admittedPreviousUser,
+        replyContext,
+        answerMode,
+      );
+      // Projection and quote context change the exact query; moderate it before embedding.
+      if (query.text !== classificationText)
+        await provider.moderateInput(query.text, controller.signal);
       assertOperationActive();
       operation.evidence = await backend!.search(query, {
         signal: controller.signal,
@@ -876,11 +1064,17 @@ export function createCrazyTypkaService(
       }
       const selectedProvider = tier === "complex" ? complexProvider : provider;
       const answer = await selectedProvider.generate({
-        message,
+        message: admittedMessage,
         locale: body.locale as "cs" | "en",
         history: session.history,
         evidence,
         scope,
+        answerMode,
+        replyContext,
+        maxParts: CRAZY_TYPKA_LIMITS.answerBlocks - (appendedReply ? 1 : 0),
+        maxAnswerChars:
+          CRAZY_TYPKA_LIMITS.answerChars -
+          (appendedReply ? appendedReply.length + 2 : 0),
         now: now(),
         safetyIdentifier: key,
         signal: controller.signal,
@@ -908,8 +1102,15 @@ export function createCrazyTypkaService(
       assertOperationActive();
       session.previousSuccessfulUser = query.filterText;
       session.contextScope = scope;
+      session.replyAnchor =
+        replyContext && answer.parts.some((part) => part.sourceIds.length)
+          ? Object.freeze({
+              admittedUserTask: query.filterText,
+              text: answer.text,
+            })
+          : undefined;
       session.history.push(
-        { role: "user", content: message },
+        { role: "user", content: admittedMessage },
         { role: "assistant", content: answer.text },
       );
       session.history.splice(
@@ -920,12 +1121,49 @@ export function createCrazyTypkaService(
         ),
       );
       const sources = citedSources(operation.evidence, answer.sourceIds);
+      const blocks: CrazyTypkaAnswerBlock[] = answer.parts.map((part) => ({
+        id: randomBytes(16).toString("hex"),
+        text: part.text,
+        sourceIds: [
+          ...new Set(
+            part.sourceIds.map((id) => {
+              const source = operation.evidence!.chunks.find(
+                (chunk) => chunk.id === id,
+              )?.source;
+              if (!source) throw new RequestError(502, "invalid-response");
+              return source.id;
+            }),
+          ),
+        ],
+      }));
+      if (appendedReply)
+        blocks.push({
+          id: randomBytes(16).toString("hex"),
+          text: appendedReply,
+          sourceIds: [],
+        });
       const result: CrazyTypkaChatResponse = {
         speaker: CRAZY_TYPKA_SPEAKER,
-        text: answer.text,
+        text: blocks.map((block) => block.text).join("\n\n"),
+        blocks,
         sources,
         requestSeq: operation.seq,
       };
+      if (blocks.some((block) => block.sourceIds.length)) {
+        session.retainedAnswers.push({
+          requestSeq: operation.seq,
+          scope,
+          admittedUserTask: query.filterText,
+          blocks,
+        });
+        session.retainedAnswers.splice(
+          0,
+          Math.max(
+            0,
+            session.retainedAnswers.length - CRAZY_TYPKA_LIMITS.historyTurns,
+          ),
+        );
+      }
       return terminalReply(200, result);
     } catch (error) {
       const code = operationTimedOut

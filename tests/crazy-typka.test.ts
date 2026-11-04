@@ -18,6 +18,7 @@ import {
   createDecisionRouter,
   DecisionRouterError,
   type DecisionRouter,
+  type RequestScope,
 } from "../server/crazy-typka-decisions";
 
 import {
@@ -173,12 +174,18 @@ function fakeDecisionRouter(
   calls: string[] = [],
 ): DecisionRouter {
   return {
+    async classifySegments() {
+      throw new Error("unexpected segment classification");
+    },
     async classify(text, options) {
       calls.push(text);
       options.onAttempt?.(Buffer.byteLength(text, "utf8") + 100);
       return {
         complexProbability,
         localSourcesProbability,
+        admissionProbability: 0.99,
+        scope: { kind: "allowed", confidence: 0.99 },
+        answerMode: { kind: "specific", confidence: 0.99 },
         usage: {
           inputTokens: 3,
           outputTokens: 1,
@@ -187,6 +194,50 @@ function fakeDecisionRouter(
           cacheWriteTokens: 0,
           reasoningTokens: 0,
         },
+      };
+    },
+  };
+}
+
+function scopedRouter(
+  scopeFor: (text: string) => RequestScope,
+  mode: "overview" | "specific" = "specific",
+): DecisionRouter {
+  const base = fakeDecisionRouter();
+  return {
+    ...base,
+    async classify(text, options) {
+      return {
+        ...(await base.classify(text, options)),
+        scope: { kind: scopeFor(text), confidence: 0.99 },
+        answerMode: { kind: mode, confidence: 0.99 },
+      };
+    },
+    async classifySegments(input, options) {
+      options.onAttempt?.(Buffer.byteLength(input.text) + 100);
+      const candidates = JSON.parse(input.text).candidates as {
+        id: string;
+        text: string;
+      }[];
+      return {
+        usage: {
+          inputTokens: 3,
+          outputTokens: 1,
+          totalTokens: 4,
+          cachedInputTokens: 0,
+          cacheWriteTokens: 0,
+          reasoningTokens: 0,
+        },
+        segments: await Promise.all(
+          candidates.map(async (item) => ({
+            id: item.id,
+            decision: {
+              ...(await base.classify(item.text, { signal: options.signal })),
+              scope: { kind: scopeFor(item.text), confidence: 0.99 },
+              answerMode: { kind: mode, confidence: 0.99 },
+            },
+          })),
+        ),
       };
     },
   };
@@ -274,7 +325,7 @@ test("explicit archive carries versions and asOf, separates context, and binds e
     const body = {
       token,
       requestSeq: 2,
-      message: "A kolik to stojí?",
+      message: "Jaká byla pravidla ubytování?",
       locale: "cs",
       knowledgeScope: { kind: "archive" },
     };
@@ -469,6 +520,7 @@ test("the exact bounded query is moderated before embedding and failed or blocke
         events.push("decisions");
         return router.classify(text, options);
       },
+      classifySegments: router.classifySegments,
     },
     evidenceBackend: backend,
     now: () => Date.parse("2026-11-03T12:00:00Z"),
@@ -513,8 +565,10 @@ test("the exact bounded query is moderated before embedding and failed or blocke
     assert.deepEqual(decisions, queries);
     assert.match(queries[1], /Kde je Fotokomora/);
     assert.equal((await send(3, "BLOCKED USER text")).body.error, "blocked");
-    await send(4, "A kolik to stojí?");
-    assert.equal(queries.at(-1), "A kolik to stojí?");
+    const priorQueries = queries.length;
+    const dangling = await send(4, "A kolik to stojí?");
+    assert.match(dangling.body.text, /samostatnou místní otázku/);
+    assert.equal(queries.length, priorQueries);
     assert.ok(queries.every((query) => !query.includes("BLOCKED USER")));
     assert.deepEqual(decisions, queries);
     failGeneration = true;
@@ -522,8 +576,12 @@ test("the exact bounded query is moderated before embedding and failed or blocke
       (await send(5, "FAILED USER nové téma")).body.error,
       "provider-unavailable",
     );
-    await send(6, "Kde to najdu?");
-    assert.equal(queries.at(-1), "Kde to najdu?");
+    const beforeDangling = queries.length;
+    assert.match(
+      (await send(6, "Kde to najdu?")).body.text,
+      /samostatnou místní otázku/,
+    );
+    assert.equal(queries.length, beforeDangling);
   } finally {
     await f.service.close();
   }
@@ -1072,6 +1130,7 @@ function responseText(
   text = "Ahoj! Jsem fiktivní AI průvodkyně.",
   sourceIds: string[] = [],
   usage?: unknown,
+  parts?: { text: string; sourceIds: string[] }[],
 ) {
   return Response.json({
     status: "completed",
@@ -1082,7 +1141,10 @@ function responseText(
         role: "assistant",
         status: "completed",
         content: [
-          { type: "output_text", text: JSON.stringify({ text, sourceIds }) },
+          {
+            type: "output_text",
+            text: JSON.stringify({ parts: parts ?? [{ text, sourceIds }] }),
+          },
         ],
       },
     ],
@@ -1220,6 +1282,30 @@ function decisionResponse(
   return Response.json({
     model: "gpt-6-luna",
     answers: [
+      { type: "predicate", name: "local_task_allowed", probability: 0.99 },
+      {
+        type: "choice",
+        name: "request_scope",
+        choice: "allowed",
+        confidence: 0.99,
+        probabilities: [
+          "allowed",
+          "mixed",
+          "off_topic",
+          "objectifying_people",
+          "clarify",
+        ].map((value) => ({ value, probability: value === "allowed" ? 1 : 0 })),
+      },
+      {
+        type: "choice",
+        name: "answer_mode",
+        choice: "specific",
+        confidence: 0.99,
+        probabilities: ["overview", "specific"].map((value) => ({
+          value,
+          probability: value === "specific" ? 1 : 0,
+        })),
+      },
       {
         type: "predicate",
         name: "complex_reasoning",
@@ -1288,6 +1374,7 @@ for (const complex of [false, true])
       const answer = await f.send("/api/ai/chat", body);
       assert.equal(answer.status, 200);
       assert.deepEqual(Object.keys(answer.body).sort(), [
+        "blocks",
         "requestSeq",
         "sources",
         "speaker",
@@ -1304,7 +1391,9 @@ for (const complex of [false, true])
       assert.equal(routed.model, complex ? "gpt-6.1-sol" : env.OPENAI_MODEL);
       assert.deepEqual(routed.reasoning, { effort: complex ? "low" : "none" });
       assert.equal(routed.max_output_tokens, complex ? 4096 : 600);
-      assert.equal(calls[1].body.input, calls[0].body.input);
+      assert.equal(calls[1].body.input[0].role, "developer");
+      assert.equal(calls[1].body.input.at(-1).role, "user");
+      assert.equal(calls[1].body.input.at(-1).content, calls[0].body.input);
       assert.match(calls[1].body.safety_identifier, /^[a-f0-9]{64}$/);
       assert.equal(calls[1].body.safety_identifier, routed.safety_identifier);
       const usage = f.service.usage(),
@@ -1414,10 +1503,11 @@ for (const code of [
   "rate-limited",
   "cancelled",
 ] as const)
-  test(`router ${code} has one bounded attempt, ${code === "cancelled" ? "no fallback" : "simple fallback"}, and free exact replay`, async () => {
+  test(`router ${code} fails closed after one bounded attempt and exact replay is free`, async () => {
     let calls = 0;
     const f = fixture({
       decisionRouter: {
+        ...fakeDecisionRouter(),
         async classify(_text, options) {
           options.onAttempt?.(100);
           calls++;
@@ -1429,18 +1519,18 @@ for (const code of [
       const token = await f.session(),
         body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
       const result = await f.send("/api/ai/chat", body);
-      assert.equal(result.status, code === "cancelled" ? 409 : 200);
+      assert.equal(
+        result.status,
+        code === "cancelled" ? 409 : code === "request-timeout" ? 504 : 502,
+      );
       const usage = f.service.usage();
       assert.equal(usage.decisions.attempts, 1);
       assert.equal(usage.decisions.unconfirmedUsageAttempts, 1);
       assert.equal(usage.decisions.reservedInputBytes, 100);
       assert.equal(usage.generations.complex.attempts, 0);
-      assert.equal(
-        usage.generations.simple.attempts,
-        code === "cancelled" ? 0 : 1,
-      );
-      if (code === "cancelled") assert.equal(usage.embeddingAttempts, 0);
-      else
+      assert.equal(usage.generations.simple.attempts, 0);
+      assert.equal(usage.embeddingAttempts, 0);
+      if (code !== "cancelled")
         assert.equal(
           usage.routingFallbacks[
             code === "request-timeout" ? "decision-timeout" : "decision-error"
@@ -1455,7 +1545,7 @@ for (const code of [
     }
   });
 
-test("Decisions attempts, reservation budget and complex caps independently fall back without disabling generation", async () => {
+test("Decisions caps fail closed while a complex-only cap still allows admitted simple generation", async () => {
   for (const config of [
     { CRAZY_TYPKA_DECISIONS_PER_PROCESS: "1" },
     { CRAZY_TYPKA_DECISION_TOKEN_BUDGET: "1" },
@@ -1467,15 +1557,31 @@ test("Decisions attempts, reservation budget and complex caps independently fall
     });
     try {
       const token = await f.session();
+      const statuses = [];
       for (const message of ["Obecný rozbor", "Další obecný rozbor"])
-        assert.equal(
+        statuses.push(
           (await f.send("/api/ai/chat", { token, message, locale: "cs" }))
             .status,
-          200,
         );
+      assert.deepEqual(
+        statuses,
+        config.CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS
+          ? [200, 200]
+          : config.CRAZY_TYPKA_DECISION_TOKEN_BUDGET
+            ? [503, 503]
+            : [200, 503],
+      );
+      const expectedGenerations =
+        config.CRAZY_TYPKA_COMPLEX_GENERATIONS_PER_PROCESS
+          ? 2
+          : config.CRAZY_TYPKA_DECISION_TOKEN_BUDGET
+            ? 0
+            : 1;
+      /* Scope admission remains necessary even when the complex model is disabled. */
+      /* All blocked requests acknowledge their terminal sequence. */
       const usage = f.service.usage();
-      assert.equal(usage.generationAttempts, 2);
-      assert.equal(usage.embeddingAttempts, 2);
+      assert.equal(usage.generationAttempts, expectedGenerations);
+      assert.equal(usage.embeddingAttempts, expectedGenerations);
       assert.equal(
         usage.decisions.attempts,
         config.CRAZY_TYPKA_DECISION_TOKEN_BUDGET
@@ -1519,6 +1625,7 @@ test("concurrent reasoning requests reserve only one final complex slot before H
         await gate;
         return decision;
       },
+      classifySegments: router.classifySegments,
     },
   });
   try {
@@ -1582,7 +1689,7 @@ test("operator configuration cannot raise the twenty-attempt complex process cei
   }
 });
 
-test("router admission refuses HTTP after its cap but keeps the paid attempt and ordinary generation", async () => {
+test("router admission cap prevents further HTTP and generation", async () => {
   let routerCalls = 0,
     generationCalls = 0;
   const f = fixture({
@@ -1600,13 +1707,28 @@ test("router admission refuses HTTP after its cap but keeps the paid attempt and
   });
   try {
     const token = await f.session();
-    for (const message of ["Obecná úvaha", "Obecná druhá úvaha"])
-      assert.equal(
-        (await f.send("/api/ai/chat", { token, message, locale: "cs" })).status,
-        200,
-      );
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          token,
+          message: "Obecná úvaha",
+          locale: "cs",
+        })
+      ).status,
+      200,
+    );
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          token,
+          message: "Obecná druhá úvaha",
+          locale: "cs",
+        })
+      ).status,
+      503,
+    );
     assert.equal(routerCalls, 1);
-    assert.equal(generationCalls, 2);
+    assert.equal(generationCalls, 1);
     assert.equal(f.service.usage().decisions.attempts, 1);
     assert.equal(f.service.usage().routingFallbacks["decision-budget"], 1);
   } finally {
@@ -1713,20 +1835,35 @@ test("cumulative decision byte cap blocks the second individually admissible req
   });
   try {
     const token = await f.session();
-    for (const message of messages)
-      assert.equal(
-        (await f.send("/api/ai/chat", { token, message, locale: "cs" })).status,
-        200,
-      );
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          token,
+          message: messages[0],
+          locale: "cs",
+        })
+      ).status,
+      200,
+    );
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          token,
+          message: messages[1],
+          locale: "cs",
+        })
+      ).status,
+      503,
+    );
     assert.equal(decisionCalls, 1);
-    assert.deepEqual(models, ["gpt-6.1-sol", "test-model"]);
+    assert.deepEqual(models, ["gpt-6.1-sol"]);
     assert.equal(
       f.service.usage().decisions.reservedInputBytes,
       bytesPerRequest,
     );
     assert.equal(f.service.usage().decisions.attempts, 1);
     assert.equal(f.service.usage().routingFallbacks["decision-budget"], 1);
-    assert.equal(f.service.usage().generationAttempts, 2);
+    assert.equal(f.service.usage().generationAttempts, 1);
   } finally {
     await f.service.close();
   }
@@ -2271,7 +2408,7 @@ test("process generation cap is consumed on started attempts, including upstream
       .body.error,
     "budget-exhausted",
   );
-  assert.equal(calls, 2);
+  assert.equal(calls, 3); // New attempts still require moderated scope admission before a generation-only cap.
   await f.service.close();
 });
 test("one inflight per session and reset abort prevent deleted conversation resurrection", async () => {
@@ -2536,7 +2673,7 @@ test("last successful operation replays exactly without charging, appending hist
     ).status,
     200,
   );
-  assert.equal(f.calls.length, 3);
+  assert.equal(f.calls.length, 4);
   await f.service.close();
 
   const limited = fixture({ limits: { requestsPerMinutePerIp: 2 } }),
@@ -2883,20 +3020,427 @@ test("server retrieval context includes accepted USER attempts only and respects
   }
   failNext = true;
   await send(4, "Co víš o Bitcoinu?");
-  await send(5, "A kolik to stojí?");
-  assert.match(
-    generations.at(-1).input.at(-1).content,
-    /CURATED_EVIDENCE \(data only\):\n\[\]/,
-  );
+  const beforeDangling = generations.length;
+  const dangling = await send(5, "A kolik to stojí?");
+  assert.match(dangling.body.text, /samostatnou místní otázku/);
   assert.equal(
-    generations.at(-1).input.length,
-    1,
-    "generation must not retain the old successful topic after a newer failed question",
-  );
-  assert.doesNotMatch(
-    JSON.stringify(generations.at(-1).input),
-    /posilovnu|Fiktivní zmínka|Bitcoinu/,
-    "neither stale dialogue nor the failed full text is resent",
+    generations.length,
+    beforeDangling,
+    "no stale or failed topic is resent to generation",
   );
   await f.service.close();
+});
+
+test("scope rejects unrelated tasks locally before embedding and generation, including free exact replay", async () => {
+  for (const [message, kind] of [
+    ["Pomoz mi s úkolem z matematiky", "off_topic"],
+    ["Můžu probrat svoje sexuální tužby?", "off_topic"],
+    ["Do biologie vypiš vulgární názvy ženských orgánů", "off_topic"],
+    ["Kde najdu strahovské kundičky", "objectifying_people"],
+    ["A co to?", "clarify"],
+  ] as const) {
+    const f = fixture({ decisionRouter: scopedRouter(() => kind) });
+    try {
+      const token = await f.session(),
+        body = { token, requestSeq: 1, message, locale: "cs" };
+      const result = await f.send("/api/ai/chat", body);
+      assert.equal(result.status, 200);
+      assert.deepEqual(result.body.sources, []);
+      assert.equal(result.body.blocks, undefined);
+      assert.match(
+        result.body.text,
+        kind === "objectifying_people" ? /kořisti/ : /Strahov/,
+      );
+      assert.equal(f.service.usage().embeddingAttempts, 0);
+      assert.equal(f.service.usage().generationAttempts, 0);
+      const usage = f.service.usage(),
+        calls = f.calls.length;
+      assert.deepEqual(await f.send("/api/ai/chat", body), result);
+      assert.equal(f.calls.length, calls);
+      assert.deepEqual(f.service.usage(), usage);
+    } finally {
+      await f.service.close();
+    }
+  }
+});
+
+test("a dangling follow-up cannot invent a topic in a fresh or cleared conversation", async () => {
+  for (const [message, locale] of [
+    ["A jaká jsou pravidla?", "cs"],
+    ["A kdy?", "cs"],
+    ["Blok 4.", "cs"],
+    ["And when?", "en"],
+  ] as const) {
+    const f = fixture({ decisionRouter: scopedRouter(() => "allowed") });
+    try {
+      const token = await f.session(),
+        body = { token, requestSeq: 1, message, locale };
+      const result = await f.send("/api/ai/chat", body);
+      assert.equal(result.status, 200);
+      assert.deepEqual(result.body.sources, []);
+      assert.match(
+        result.body.text,
+        locale === "cs"
+          ? /samostatnou místní otázku/
+          : /separate local question/,
+      );
+      assert.equal(f.calls.length, 0);
+      assert.equal(f.service.usage().decisions.attempts, 0);
+      assert.equal(f.service.usage().embeddingAttempts, 0);
+      assert.equal(f.service.usage().generationAttempts, 0);
+      assert.deepEqual(await f.send("/api/ai/chat", body), result);
+      assert.equal(f.calls.length, 0);
+    } finally {
+      await f.service.close();
+    }
+  }
+});
+
+function replyFixture(router: DecisionRouter, unbackedAt = 0) {
+  const backend = fakeEvidenceBackend(),
+    search = backend.search;
+  const queries: PreparedEvidenceQuery[] = [],
+    generations: any[] = [];
+  backend.search = (query, options) => {
+    queries.push(query);
+    return search(
+      { text: "Kde je kancelář SH?", filterText: "Kde je kancelář SH?" },
+      options,
+    );
+  };
+  const f = fixture({
+    decisionRouter: router,
+    evidenceBackend: backend,
+    limits: { messagesPerMinutePerSession: 50, requestsPerMinutePerIp: 100 },
+    fetch: async (url, init) => {
+      if (String(url).endsWith("/moderations")) return safeModeration();
+      const sent = JSON.parse(String(init?.body));
+      generations.push(sent);
+      if (generations.length === unbackedAt)
+        return responseText("K tomu nemám podklad.", []);
+      const parts = [
+        { text: "Kancelář SH je na bloku 1.", sourceIds: ["sh-office"] },
+      ];
+      if (sent.text.format.schema.properties.parts.minItems > 1)
+        parts.push({
+          text: "Kontakt poskytuje oficiální web Silicon Hill.",
+          sourceIds: ["sh-office"],
+        });
+      return responseText(
+        parts.map((part) => part.text).join("\n\n"),
+        ["sh-office"],
+        undefined,
+        parts,
+      );
+    },
+  });
+  return { ...f, queries, generations };
+}
+
+test("uncertain mixed routing still requires a confident local segment before any retrieval", async () => {
+  for (const segmentConfidence of [0.99, 0.79]) {
+    const router = scopedRouter((text) =>
+      text.includes("Spočítej")
+        ? text.includes("kancelář")
+          ? "mixed"
+          : "off_topic"
+        : "allowed",
+    );
+    const initial = router.classify,
+      segmented = router.classifySegments;
+    let classificationText = "";
+    router.classify = async (text, options) => {
+      classificationText = text;
+      const result = await initial(text, options);
+      return { ...result, scope: { kind: "mixed", confidence: 0.2 } };
+    };
+    router.classifySegments = async (input, options) => {
+      const result = await segmented(input, options);
+      return {
+        ...result,
+        segments: result.segments.map((item) => ({
+          ...item,
+          decision: {
+            ...item.decision,
+            admissionProbability:
+              item.decision.scope.kind === "allowed" ? segmentConfidence : 0,
+          },
+        })),
+      };
+    };
+    const f = replyFixture(router);
+    try {
+      const token = await f.session(),
+        message = "Kde je kancelář SH?\nSpočítej 2+2.";
+      const result = await f.send("/api/ai/chat", {
+        token,
+        message,
+        locale: "cs",
+      });
+      assert.equal(JSON.parse(classificationText).currentUserMessage, message);
+      assert.equal(result.status, 200);
+      assert.equal(f.service.usage().decisions.attempts, 2);
+      assert.equal(
+        f.service.usage().embeddingAttempts,
+        segmentConfidence >= 0.8 ? 1 : 0,
+      );
+      assert.equal(
+        f.service.usage().generationAttempts,
+        segmentConfidence >= 0.8 ? 1 : 0,
+      );
+      assert.doesNotMatch(JSON.stringify(f.generations), /Spočítej|2\+2/);
+    } finally {
+      await f.service.close();
+    }
+  }
+});
+
+test("mixed admission projects only local excerpts into query, generation, history and retained reply context", async () => {
+  const router = scopedRouter(
+    (text) =>
+      text.includes("Spočítej")
+        ? text.includes("kancelář")
+          ? "mixed"
+          : "off_topic"
+        : "allowed",
+    "overview",
+  );
+  const f = replyFixture(router);
+  try {
+    const token = await f.session();
+    const result = await f.send("/api/ai/chat", {
+      token,
+      message: "Kde je kancelář SH? Spočítej 2+2.",
+      locale: "cs",
+    });
+    assert.equal(result.status, 200);
+    assert.equal(f.service.usage().decisions.attempts, 2);
+    assert.equal(f.service.usage().generationAttempts, 1);
+    assert.equal(f.queries[0].text, "Kde je kancelář SH?");
+    assert.doesNotMatch(
+      JSON.stringify(f.generations[0].input),
+      /Spočítej|2\+2/,
+    );
+    assert.match(f.generations[0].instructions, /"answerMode":"overview"/);
+    assert.equal(
+      f.generations[0].text.format.schema.properties.parts.maxItems,
+      5,
+    );
+    assert.equal(result.body.blocks.length, 3);
+    assert.deepEqual(result.body.blocks.at(-1).sourceIds, []);
+    assert.match(result.body.blocks.at(-1).text, /Část zprávy mimo/);
+    const next = await f.send("/api/ai/chat", {
+      token,
+      message: "A kdy?",
+      locale: "cs",
+      replyTo: {
+        requestSeq: result.body.requestSeq,
+        blockId: result.body.blocks[0].id,
+      },
+    });
+    assert.equal(next.status, 200);
+    assert.doesNotMatch(
+      JSON.stringify(f.generations[1].input),
+      /Spočítej|2\+2/,
+    );
+    assert.match(f.queries[1].text, /Verified earlier AI statement/);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("inseparable mixed and more than six segments clarify without retrieval or generation", async () => {
+  for (const message of [
+    "Kde je kancelář a spočítej matematiku",
+    "První? Druhý? Třetí? Čtvrtý? Pátý? Šestý? Sedmý?",
+  ]) {
+    const f = fixture({ decisionRouter: scopedRouter(() => "mixed") });
+    try {
+      const token = await f.session();
+      const result = await f.send("/api/ai/chat", {
+        token,
+        message,
+        locale: "cs",
+      });
+      assert.equal(result.status, 200);
+      assert.match(result.body.text, /samostatnou místní otázku/);
+      assert.equal(f.service.usage().decisions.attempts, 1);
+      assert.equal(f.service.usage().embeddingAttempts, 0);
+      assert.equal(f.service.usage().generationAttempts, 0);
+    } finally {
+      await f.service.close();
+    }
+  }
+});
+
+test("reply targets are session-owned, immutable in operation identity, and explicit return survives a rejected detour", async () => {
+  const f = replyFixture(
+    scopedRouter((text) =>
+      text.includes("matematika") ? "off_topic" : "allowed",
+    ),
+  );
+  try {
+    const token = await f.session(),
+      foreign = await f.session();
+    const first = await f.send("/api/ai/chat", {
+      token,
+      message: "Kde je kancelář SH?",
+      locale: "cs",
+    });
+    assert.equal(first.status, 200);
+    const replyTo = {
+      requestSeq: first.body.requestSeq,
+      blockId: first.body.blocks[0].id,
+    };
+    const calls = f.calls.length;
+    const rejected = await f.send("/api/ai/chat", {
+      token: foreign,
+      message: "A kdy?",
+      locale: "cs",
+      replyTo,
+    });
+    assert.deepEqual(rejected.body, {
+      error: "reply-unavailable",
+      requestSeq: 1,
+    });
+    assert.equal(f.calls.length, calls);
+    const body = {
+      token,
+      requestSeq: 2,
+      message: "A kdy?",
+      locale: "cs",
+      replyTo,
+    };
+    const answer = await f.send("/api/ai/chat", body);
+    assert.equal(answer.status, 200);
+    const afterReply = f.calls.length;
+    assert.deepEqual(await f.send("/api/ai/chat", body), answer);
+    assert.equal(f.calls.length, afterReply);
+    const conflict = await f.send("/api/ai/chat", {
+      ...body,
+      replyTo: { ...replyTo, blockId: "f".repeat(32) },
+    });
+    assert.equal(conflict.body.error, "request-conflict");
+    assert.equal(f.calls.length, afterReply);
+    await f.send("/api/ai/chat", {
+      token,
+      message: "matematika",
+      locale: "cs",
+    });
+    const beforeImplicit = f.queries.length;
+    const implicit = await f.send("/api/ai/chat", {
+      token,
+      message: "A kde?",
+      locale: "cs",
+    });
+    assert.equal(implicit.status, 200);
+    assert.match(implicit.body.text, /samostatnou místní otázku/);
+    assert.equal(f.queries.length, beforeImplicit);
+    const explicit = await f.send("/api/ai/chat", {
+      token,
+      message: "Co platí?",
+      locale: "cs",
+      replyTo,
+    });
+    assert.equal(explicit.status, 200);
+    assert.match(f.queries.at(-1)!.text, /Verified earlier AI statement/);
+    assert.doesNotMatch(
+      JSON.stringify(f.generations.at(-1).input),
+      /matematika/,
+    );
+    assert.equal(
+      explicit.body.text,
+      explicit.body.blocks.map((block: any) => block.text).join("\n\n"),
+    );
+    assert.ok(isCrazyTypkaChatResponse(explicit.body));
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("retained replies are bounded to six supported answers and missing targets are confirmed before API", async () => {
+  const f = replyFixture(scopedRouter(() => "allowed"));
+  try {
+    const token = await f.session();
+    let first: any;
+    for (let index = 0; index < 7; index++) {
+      const result = await f.send("/api/ai/chat", {
+        token,
+        message: `Kancelář dotaz ${index}`,
+        locale: "cs",
+      });
+      assert.equal(result.status, 200);
+      first ??= result.body;
+    }
+    const before = f.calls.length;
+    const result = await f.send("/api/ai/chat", {
+      token,
+      message: "A kdy?",
+      locale: "cs",
+      replyTo: { requestSeq: first.requestSeq, blockId: first.blocks[0].id },
+    });
+    assert.deepEqual(result.body, {
+      error: "reply-unavailable",
+      requestSeq: 8,
+    });
+    assert.equal(f.calls.length, before);
+    await f.send("/api/ai/session", undefined, "DELETE", {
+      authorization: `Bearer ${token}`,
+    });
+    const newToken = await f.session();
+    const oldTarget = await f.send("/api/ai/chat", {
+      token: newToken,
+      message: "A kdy?",
+      locale: "cs",
+      replyTo: { requestSeq: first.requestSeq, blockId: first.blocks[0].id },
+    });
+    assert.equal(oldTarget.body.error, "reply-unavailable");
+    assert.equal(f.calls.length, before);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("a new local topic in a reply replaces or clears the old implicit quote anchor", async () => {
+  for (const unbackedAt of [0, 2]) {
+    const f = replyFixture(
+      scopedRouter(() => "allowed"),
+      unbackedAt,
+    );
+    try {
+      const token = await f.session();
+      const first = await f.send("/api/ai/chat", {
+        token,
+        message: "Kde najdu posilovnu?",
+        locale: "cs",
+      });
+      const second = await f.send("/api/ai/chat", {
+        token,
+        message: "A jak je to s menzou?",
+        locale: "cs",
+        replyTo: {
+          requestSeq: first.body.requestSeq,
+          blockId: first.body.blocks[0].id,
+        },
+      });
+      assert.equal(second.status, 200);
+      assert.equal(
+        (
+          await f.send("/api/ai/chat", {
+            token,
+            message: "A kdy?",
+            locale: "cs",
+          })
+        ).status,
+        200,
+      );
+      const query = f.queries.at(-1)!.text;
+      assert.match(query, /menzou/);
+      assert.doesNotMatch(query, /posilovnu/);
+      if (unbackedAt)
+        assert.doesNotMatch(query, /Verified earlier AI statement/);
+    } finally {
+      await f.service.close();
+    }
+  }
 });

@@ -18,6 +18,9 @@ import {
 import {
   isCrazyTypkaSource,
   mergeCrazyTypkaSources,
+  CRAZY_TYPKA_SPEAKER,
+  isCrazyTypkaResponse,
+  isCrazyTypkaReplyTo,
 } from "../shared/crazy-typka";
 import type { CuratedKnowledgeSource } from "../shared/knowledge-curation";
 import type { EvidenceKnowledgeChunk } from "../server/rag-knowledge-types";
@@ -321,4 +324,61 @@ test("source details visibly distinguish experience from official support withou
   );
   assert.match(official, /Claims checked/);
   assert.match(official, /https:\/\/www.suz.cvut.cz/);
+});
+
+test("block contracts bind canonical text and only public source IDs while replies carry no quote text", () => {
+  const source = curated(true).source;
+  const block = {
+    id: "a".repeat(32),
+    text: "Doložená informace.",
+    sourceIds: [source.id],
+  };
+  const answer = {
+    speaker: CRAZY_TYPKA_SPEAKER,
+    text: block.text,
+    sources: [source],
+    blocks: [block],
+  };
+  assert.ok(isCrazyTypkaResponse(answer));
+  assert.ok(
+    isCrazyTypkaResponse({
+      speaker: CRAZY_TYPKA_SPEAKER,
+      text: block.text,
+      sources: [source],
+    }),
+  );
+  assert.equal(isCrazyTypkaResponse({ ...answer, text: "jiné znění" }), false);
+  assert.equal(
+    isCrazyTypkaResponse({
+      ...answer,
+      blocks: [{ ...block, sourceIds: ["forged"] }],
+    }),
+    false,
+  );
+  assert.equal(
+    isCrazyTypkaResponse({
+      ...answer,
+      blocks: [block, block],
+      text: `${block.text}\n\n${block.text}`,
+    }),
+    false,
+  );
+  assert.equal(
+    isCrazyTypkaResponse({
+      ...answer,
+      blocks: [{ ...block, sourceIds: [source.id, source.id] }],
+    }),
+    false,
+  );
+  const reply = { requestSeq: 1, blockId: block.id };
+  assert.ok(isCrazyTypkaReplyTo(reply));
+  assert.equal(
+    isCrazyTypkaReplyTo({ ...reply, text: "spoofed earlier answer" }),
+    false,
+  );
+  assert.equal(isCrazyTypkaReplyTo({ ...reply, requestSeq: 0 }), false);
+  assert.equal(
+    isCrazyTypkaReplyTo({ ...reply, blockId: "other-session-format" }),
+    false,
+  );
 });
