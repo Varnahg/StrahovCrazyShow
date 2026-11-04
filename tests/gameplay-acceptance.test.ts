@@ -8,6 +8,15 @@ import { assessFrameSample, gameplayAcceptancePolicy } from "../shared/gameplay-
 const { GameplayAcceptanceCollector, evaluateGameplayLog } = await import(new URL("../scripts/gameplay-acceptance.mjs", import.meta.url).href);
 
 const hash = "a".repeat(64), id = "11111111-1111-4111-8111-111111111111";
+test("přesná percentile boundary odpovídá publikovanému Game benchmarku", () => {
+  const sample = [...Array(570).fill(16), ...Array(30).fill(36)];
+  const result = assessFrameSample(sample);
+  assert.equal(result.metrics!.p95Ms, 36);
+  assert.equal(result.metrics!.p99Ms, 36);
+  assert.ok(result.metrics!.averageFps > 54);
+  assert.equal(result.status, "failed");
+  assert.deepEqual(result.reasons.map(reason => reason.code), ["p95-frame"]);
+});
 type RecordRow = { seq: number; atMs: number; kind: string; data: any };
 function records({ seconds = 70, moving = true, dispose = true }: { seconds?: number; moving?: boolean; dispose?: boolean } = {}) {
   const out: RecordRow[] = [];

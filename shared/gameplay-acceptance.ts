@@ -109,8 +109,9 @@ export function assessFrameSample(
   const hitches = sorted.filter(value => value >= limits.hitchThresholdMs).length;
   const metrics = result.metrics = {
     frames: sorted.length, durationMs, averageFps: sorted.length * 1000 / durationMs,
-    p95Ms: sorted[Math.ceil(sorted.length * 0.95) - 1],
-    p99Ms: sorted[Math.ceil(sorted.length * 0.99) - 1],
+    // Match Game's published benchmark quantiles, including exact-rank ties.
+    p95Ms: sorted[Math.floor(sorted.length * 0.95)],
+    p99Ms: sorted[Math.floor(sorted.length * 0.99)],
     maxMs: sorted[sorted.length - 1], hitches, hitchFraction: hitches / sorted.length,
   };
   if (durationMs < limits.minSampleSeconds * 1000) {
