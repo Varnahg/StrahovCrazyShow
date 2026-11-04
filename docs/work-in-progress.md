@@ -1,5 +1,9 @@
 # Rozpracovaná práce soustředěná v main
 
+## Aktuální grafická větev na D · 4.11.2026
+
+CPU decoder celek je uzavřený na codex/graphics-smoothness-20261104 v D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104; [důkazy](performance/evidence/graphics-smoothness-20261104/README.md). Přijaté byteparita, CPU zrychlení,3085testů/build/SDK a úzkáEdgefunkčnost nejsou dokončením celkovéplynulosti. Zbývá přesněpřiřadit několikasekundovéGPU-process mezery; aktuální6,08s interval leží před oběma walking-compilation snapshoty. Navíc recorder vykazuje1,2ms překryv a dva durationnesoulady, proto celkovápřejímka správněneníPASS. Další práce má vyjít z uloženéhozáznamu a specifickéčasovéstopy, ne zopakovat obecnéFPS série.
+
 Konsolidace na přímé zadání uživatele 29. 10. 2026. Jedinou pracovní větví je `main` a jediným pracovním checkoutem `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow`. Nepokračovat ve starých worktrees a nevytvářet náhradní větve.
 
 Aktuální hra zachovává přijaté CAD modely, stromy, síť, Jantar, Docker a RAG. Níže uvedené starší prototypy zůstávají **rozpracované**, neoznačují se za hotové a jejich historické varianty nepřepisují novější funkční kód. Jejich úplné zdroje, testy a historie jsou dostupné z historie `main` bez další větve. Změny, které šly bezpečně převzít samostatně, jsou přímo v současných souborech: nástroje recorded replay, chybějící browser CI a původní výzkumná evidence.

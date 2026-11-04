@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "id": "graphics-smoothness-20261104-root",
   "title": "Podle záznamů opravit jeden doložený zbylý zásek na grafické větvi D",
@@ -28,6 +28,7 @@
   "notes": [
     "Base6805bcd4; původní uživatelský playtest a PR40 LowA75 ukazují zbyléhitches. Resync epoch guard je přijatá oprava správnosti, nikoli opravaCPU/driver záseků.",
     "FAR45 byl zamítnut; shader syntax cache a scheduling experimenty jsou výchozíOFF. Znovu je nezapínat bez nového doloženého rozhodnutí.",
-    "Linear KEY-5 aktualizovat po průzkumu/rozhodnutí/implementaci/ověření/commitu."
+    "Linear KEY-5 aktualizovat po průzkumu/rozhodnutí/implementaci/ověření/commitu.",
+    "4.11.2026: tento CPU celek uzavřen naD; úplné automatické kontroly, byteparita/CPU A/B a úzkýEdge runtime důkaz v docs/performance/evidence/graphics-smoothness-20261104/README.md. Celkováplynulost neníPASS; existujícígameplaygateINCONCLUSIVE aGPU-process hypotéza zůstávajíveKEY-5. Vlastníprocesyukončené,inputrevalidationPASS; žádná integrace doC/main/8080."
   ]
 }

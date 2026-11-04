@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## Grafická větev D: stromový decoder · 4. listopadu 2026
+
+Výslovně povolený checkoutD:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104, codex/graphics-smoothness-20261104. [Dokončený CPU zásah a praktická evidence](performance/evidence/graphics-smoothness-20261104/README.md): privátní per-decode reuse ověřenýchaccessorů, zachované veřejné/invalid-data guardy.6 skutečnýchGLB/12částí byte-identické; na dvouMID Node CPU decode−54% a celáCPU příprava−39–45%. Nejde oFPS zisk.
+
+Celá sada3085PASS/0FAIL/5SKIP, tsc, produkčníVite build, SDK a nezávisléreview PASS. Source/tests3fe11a12ebd947e03581444e08f1b15b707f34abd6ec827badcb236841ef6132. JedinýEdgeWebGPU průchod dosáhlready a načetl43,94MB novýchstromovýchdat, healthvalid a0asset/renderchyb. Celkovýgameplaygate zůstáváINCONCLUSIVE kvůli časovému překryvu/délce oken a nedostatečnědoloženému pohybu; snímkovélimity současněnesplněné, max6,08s. Dvě různépozice téhožbuildu29,6/38,8FPS nejsouA/B. ÚplnéUI compilationreporty a časováomezení delta jsou uložené; GPU-process příčina není prokázaná. Cleanup/inputrevalidacePASS; původníCmain/8080 bezezměny.
+
 ## Publikační PR40 a rozhodnutí Low LOD · 4. listopadu 2026
 
 [Současné V15 A75/B45](performance/evidence/low-tree-lod-20261102/pr40-20261104/README.md) uzavírá kandidáta45 jako nepřijatý; default se vrací75. Šest produkčních Edge/WebGPU vzorků se shodnou kamerou, časem a1280×720/984×553 snížilo stromovou geometrii10,9%, ale nesplnilo předem zvolenéFPS/p95 meze. Pohybliví peers navíc měnili avatar LOD (Anear1/medium2, Bnear3), takže rozdílFPS nelze připsat stromoLOD. Kandidátní obrazová trasa nebyla po selhání zahájena. PůvodníA75 také vykazuje dlouhé záseky až7,54s při změněHigh; celková plynulost zůstává otevřená.
