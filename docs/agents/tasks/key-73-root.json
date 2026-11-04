@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "resources": [],
+  "acceptance": [
+    "Implementovat schválený plán KEY-73 pouze v přidělených writePaths, zachovat soukromí, limity a lifecycle; provést cílený refaktoring.",
+    "Předat skutečné výsledky cílených testů, seznam souborů, podklady a omezení v přiděleném handoffu; necommitovat cizí WIP."
+  ],
+  "verification": [
+    "Přímé node --import tsx --test nad přidělenými testy. Žádné heavy/GPU/build/integration bez samostatné rezervace.",
+    "Před zápisem ověřit skutečný checkout, větev codex/crazy-typka-scope-ui-20261104 a vlastní claim; heartbeat nejpozději15min."
+  ],
+  "notes": [
+    "Výslovně schválený plán uživatele4.11.2026, KEY-73. Cwd C:/Users/rezac/Documents/GitHub/StrahovCrazyShow; jediná nová větev v existujícím checkoutu, žádný nový worktree.",
+    "Root koordinátor crazy-typka-01a1a80f-root integruje pouze vlastní změny. Podagent nespouští další BMAD workflow."
+  ],
+  "id": "key-73-root",
+  "title": "KEY-73: koordinace, server scope/reply integrace a provider kontrakt",
+  "writePaths": [
+    "_bmad/render/bmad-build/strahovcrazyshow-26f06f43ac20/",
+    "_bmad-output/implementation-artifacts/key-73/",
+    "server/crazy-typka.ts",
+    "server/crazy-typka-provider.ts",
+    "server/rag-evidence-backend.ts",
+    "shared/crazy-typka.ts",
+    "server/data/rag/bootstrap-cache.json",
+    "tests/crazy-typka.test.ts",
+    "tests/crazy-typka-provider.test.ts",
+    "tests/crazy-typka-contract.test.ts",
+    "tests/rag-evidence-backend.test.ts",
+    "tests/docker-rag-bootstrap.test.ts",
+    "scripts/integration-ai.ts",
+    "docs/agents/handoffs/key-73-root.md",
+    "docs/verification-evidence/key-73/",
+    ".cache/key-73-root/"
+  ]
+}

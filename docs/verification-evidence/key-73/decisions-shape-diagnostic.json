@@ -1,0 +1,161 @@
+[
+  {
+    "http": 200,
+    "model": "gpt-6-luna",
+    "usage": {
+      "input_tokens": 865,
+      "input_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 865
+    },
+    "answers": [
+      {
+        "name": "complex_reasoning",
+        "type": "predicate",
+        "probability": 0
+      },
+      {
+        "name": "local_sources_required",
+        "type": "predicate",
+        "probability": 0.02
+      },
+      {
+        "name": "request_scope",
+        "type": "choice",
+        "choice": "off_topic",
+        "confidence": 0.85,
+        "probabilities": [
+          {
+            "value": "allowed",
+            "probability": 0.04
+          },
+          {
+            "value": "mixed",
+            "probability": 0.01
+          },
+          {
+            "value": "off_topic",
+            "probability": 0.88
+          },
+          {
+            "value": "objectifying_people",
+            "probability": 0.02
+          },
+          {
+            "value": "clarify",
+            "probability": 0.05
+          }
+        ]
+      },
+      {
+        "name": "answer_mode",
+        "type": "refusal"
+      }
+    ]
+  },
+  {
+    "id": "diagnose-sex-shape",
+    "error": "invalid-response"
+  },
+  {
+    "http": 200,
+    "model": "gpt-6-luna",
+    "usage": {
+      "input_tokens": 1087,
+      "input_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 1087
+    },
+    "answers": [
+      {
+        "name": "complex_reasoning",
+        "type": "predicate",
+        "probability": 0
+      },
+      {
+        "name": "local_sources_required",
+        "type": "predicate",
+        "probability": 0.98
+      },
+      {
+        "name": "request_scope",
+        "type": "choice",
+        "choice": "allowed",
+        "confidence": 0.79,
+        "probabilities": [
+          {
+            "value": "allowed",
+            "probability": 0.83
+          },
+          {
+            "value": "mixed",
+            "probability": 0.02
+          },
+          {
+            "value": "off_topic",
+            "probability": 0.02
+          },
+          {
+            "value": "objectifying_people",
+            "probability": 0.01
+          },
+          {
+            "value": "clarify",
+            "probability": 0.12
+          }
+        ]
+      },
+      {
+        "name": "answer_mode",
+        "type": "choice",
+        "choice": "specific",
+        "confidence": 1,
+        "probabilities": [
+          {
+            "value": "overview",
+            "probability": 0
+          },
+          {
+            "value": "specific",
+            "probability": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "diagnose-local-confidence",
+    "result": {
+      "complexProbability": 0,
+      "localSourcesProbability": 0.98,
+      "scope": {
+        "kind": "allowed",
+        "confidence": 0.79
+      },
+      "answerMode": {
+        "kind": "specific",
+        "confidence": 1
+      },
+      "usage": {
+        "inputTokens": 1087,
+        "outputTokens": 0,
+        "totalTokens": 1087,
+        "cachedInputTokens": 0,
+        "cacheWriteTokens": 0,
+        "reasoningTokens": 0
+      }
+    }
+  }
+]

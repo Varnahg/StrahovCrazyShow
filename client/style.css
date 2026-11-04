@@ -94,11 +94,19 @@ textarea {
   color: var(--ink);
   outline: none;
 }
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #799d58;
-  box-shadow: 0 0 0 3px #d3ed8b55;
+html[data-input-modality] :is(input, select, textarea):focus {
+  box-shadow: none;
+  outline: none;
+}
+html[data-input-modality="keyboard"] :is(input, select, textarea):focus {
+  outline: 1px solid var(--crazy-accent, var(--home-accent, #a5b39c));
+  outline-offset: 2px;
+}
+html[data-input-modality="pointer"] .ae-custom-color:focus-within {
+  outline: none;
+}
+html[data-input-modality="keyboard"] .ae-custom-color:focus-within {
+  outline-width: 1px;
 }
 label {
   display: block;
@@ -1363,11 +1371,6 @@ kbd {
 .game-shell :focus-visible {
   outline: 2px solid #d1b67a;
   outline-offset: 3px;
-}
-.game-shell input:focus,
-.game-shell select:focus,
-.game-shell textarea:focus {
-  box-shadow: 0 0 0 2px #c4ad6829;
 }
 .game-shell .hint {
   background: #162731d9;

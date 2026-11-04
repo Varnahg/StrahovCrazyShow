@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   CrazyTypkaChat,
+  CrazyTypkaChatActions,
   createCrazyTypkaClient,
   type CrazyTypkaState,
 } from "../client/crazy-typka";
@@ -33,6 +34,10 @@ function state(patch: Partial<CrazyTypkaState> = {}): CrazyTypkaState {
     notice: null,
     recovery: "none",
     setDraft() {},
+    selectReply() {},
+    clearReply() {},
+    draftReply: null,
+    replyableRequestSeqs: [],
     setKnowledgeScope() {},
     knowledgeScope: { kind: "current" },
     async send() {},
@@ -142,7 +147,7 @@ test("the compact presentation is opt-in and the default contract stays intact",
   }
 });
 
-test("compact header is clearly AI, uses the portrait and retains complete privacy in native details", () => {
+test("compact composer is quiet and complete privacy lives in the header information icon", () => {
   for (const locale of ["cs", "en"] as const) {
     const html = render(state(), locale, "compact");
     assert.match(html, /class="crazy-chat crazy-compact"/);
@@ -152,8 +157,15 @@ test("compact header is clearly AI, uses the portrait and retains complete priva
       html,
       /Tvoje průvodkyně po kopci|Your guide to the hill/,
     );
-    const details = html.match(
-      /<details class="crazy-privacy">([\s\S]*?)<\/details>/,
+    assert.doesNotMatch(
+      html,
+      /OpenAI|Soukromá AI konverzace|Odpověď může chybovat|<select|datetime-local/,
+    );
+    const actions = renderToStaticMarkup(
+      createElement(CrazyTypkaChatActions, { state: state(), locale }),
+    );
+    const details = actions.match(
+      /<details class="crazy-chat-info">([\s\S]*?)<\/details>/,
     );
     assert.ok(
       details,
@@ -163,7 +175,7 @@ test("compact header is clearly AI, uses the portrait and retains complete priva
     assert.match(details[1], /Silicon Hill/);
     assert.match(
       details[1],
-      locale === "cs" ? /O AI a soukromí/ : /AI and privacy/,
+      locale === "cs" ? /Informace o chatu/ : /Chat information/,
     );
     assert.match(
       details[1],
@@ -187,11 +199,8 @@ test("compact header is clearly AI, uses the portrait and retains complete priva
     assert.equal(label[2], locale === "cs" ? "Zpráva" : "Message");
     assert.match(html, /rows="1"/);
     assert.match(html, locale === "cs" ? /Napiš zprávu…/ : /Write a message…/);
-    assert.match(
-      html.match(/<small id="[^"]+-privacy">([\s\S]*?)<\/small>/)![1],
-      /OpenAI/,
-      "provider disclosure remains visible even while the privacy details are closed",
-    );
+    assert.doesNotMatch(details[0].match(/<details[^>]*>/)![0], /\bopen\b/);
+    assert.match(html, /Enter.*Shift\+Enter/);
     assert.match(
       html,
       locale === "cs"
@@ -251,8 +260,16 @@ test("compact busy composer stays editable and exposes cancellation while send r
   assert.doesNotMatch(html.match(/<textarea\b[^>]*>/)![0], /disabled/);
   assert.match(html.match(/<button\b[^>]*type="submit"[^>]*>/)![0], /disabled/);
   assert.match(html, /Rozepsaná další otázka/);
-  assert.match(html, /Hledám v podkladech a připravuji odpověď…/);
-  assert.match(html, /Zastavit a smazat konverzaci/);
+  assert.match(html, /aria-label="Crazy Typka píše…"/);
+  assert.equal((html.match(/<i>/g) ?? []).length, 3);
+  assert.doesNotMatch(html, /Hledám v podkladech/);
+  const actions = renderToStaticMarkup(
+    createElement(CrazyTypkaChatActions, {
+      state: state({ busy: true, messages: [incoming] }),
+      locale: "cs",
+    }),
+  );
+  assert.match(actions, /aria-label="Zastavit a smazat konverzaci"/);
 });
 
 test("compact recovery, expiration and reset controls retain the existing state contract", () => {
@@ -284,7 +301,15 @@ test("compact recovery, expiration and reset controls retain the existing state 
     "compact",
   );
   assert.match(restart, /The previous session expired/);
-  assert.match(restart, /Start a new conversation/);
+  assert.match(
+    renderToStaticMarkup(
+      createElement(CrazyTypkaChatActions, {
+        state: state({ recovery: "reset" }),
+        locale: "en",
+      }),
+    ),
+    /Start a new conversation/,
+  );
   assert.match(restart, /role="alert"/);
   const reset = render(
     state({ error: "reset-unconfirmed", messages: [incoming] }),
@@ -292,7 +317,15 @@ test("compact recovery, expiration and reset controls retain the existing state 
     "compact",
   );
   assert.match(reset, /Smazání na serveru se nepodařilo potvrdit/);
-  assert.match(reset, /Smazat konverzaci/);
+  assert.match(
+    renderToStaticMarkup(
+      createElement(CrazyTypkaChatActions, {
+        state: state({ messages: [incoming] }),
+        locale: "cs",
+      }),
+    ),
+    /Smazat konverzaci/,
+  );
 });
 
 for (const availability of ["checking", "disabled", "error"] as const) {

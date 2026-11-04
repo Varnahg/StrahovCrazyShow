@@ -5,9 +5,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { getKnowledgeRegistry } from "../server/crazy-typka-retrieval";
 import {
   CrazyTypkaChat,
+  CrazyTypkaChatActions,
   createCrazyTypkaClient,
   crazyTypkaErrorLabel,
   safeCitationHref,
+  fitCrazyTypkaComposer,
   type CrazyTypkaState,
 } from "../client/crazy-typka";
 import {
@@ -46,6 +48,10 @@ test("new verified SUZ and SHerna citations survive client validation and render
     recovery: "none",
     messages: [{ id: 1, role: "ai", text: "Ověřené odkazy", sources }],
     setDraft() {},
+    selectReply() {},
+    clearReply() {},
+    draftReply: null,
+    replyableRequestSeqs: [],
     setKnowledgeScope() {},
     knowledgeScope: { kind: "current" },
     async send() {},
@@ -104,6 +110,8 @@ test("the composer stays editable during a reply and preserves the next draft wi
   const state: CrazyTypkaState = {
     ...client.getSnapshot(),
     setDraft: client.setDraft,
+    selectReply: client.selectReply,
+    clearReply: client.clearReply,
     setKnowledgeScope: client.setKnowledgeScope,
     send: client.send,
     retry: client.retry,
@@ -168,6 +176,8 @@ for (const expiry of ["clock", "server"] as const)
     const state: CrazyTypkaState = {
       ...snapshot,
       setDraft: client.setDraft,
+      selectReply: client.selectReply,
+      clearReply: client.clearReply,
       setKnowledgeScope: client.setKnowledgeScope,
       send: client.send,
       retry: client.retry,
@@ -384,6 +394,10 @@ test("widget is transparent, escaped and localized with source attribution", () 
     recovery: "none",
     messages: [{ id: 1, role: "ai", text: answer.text, sources: [source] }],
     setDraft() {},
+    selectReply() {},
+    clearReply() {},
+    draftReply: null,
+    replyableRequestSeqs: [],
     setKnowledgeScope() {},
     knowledgeScope: { kind: "current" },
     async send() {},
@@ -393,9 +407,11 @@ test("widget is transparent, escaped and localized with source attribution", () 
     async refreshStatus() {},
   };
   for (const locale of ["cs", "en"] as const) {
-    const html = renderToStaticMarkup(
-      createElement(CrazyTypkaChat, { state, locale }),
-    );
+    const html =
+      renderToStaticMarkup(createElement(CrazyTypkaChat, { state, locale })) +
+      renderToStaticMarkup(
+        createElement(CrazyTypkaChatActions, { state, locale }),
+      );
     assert.equal((html.match(/class="crazy-ai-badge"/g) ?? []).length, 2);
     assert.match(html, /OpenAI/);
     assert.match(html, /&lt;script&gt;/);
@@ -448,6 +464,7 @@ type ChatPayload = {
   message: string;
   locale: "cs" | "en";
   knowledgeScope?: CrazyTypkaKnowledgeScope;
+  replyTo?: { requestSeq: number; blockId: string };
 };
 function refinementFixture(
   reply: (
@@ -488,6 +505,8 @@ function chatState(
   return {
     ...client.getSnapshot(),
     setDraft: client.setDraft,
+    selectReply: client.selectReply,
+    clearReply: client.clearReply,
     setKnowledgeScope: client.setKnowledgeScope,
     send: client.send,
     retry: client.retry,
@@ -583,7 +602,7 @@ test("document citations render extraction, archive interval and locators for ea
   assert.match(html, /2020-01-01/);
   assert.match(html, /Další archivní verze/);
   assert.doesNotMatch(html, /stručná parafráze/);
-  assert.match(html, /datetime-local/);
+  assert.doesNotMatch(html, /datetime-local|<select/);
   client.dispose();
 });
 
@@ -750,7 +769,15 @@ for (const code of ["request-conflict", "request-out-of-order"] as const)
         locale: "cs",
       }),
     );
-    assert.match(html, /Začít novou konverzaci/);
+    assert.match(
+      renderToStaticMarkup(
+        createElement(CrazyTypkaChatActions, {
+          state: chatState(f.client),
+          locale: "cs",
+        }),
+      ),
+      /Začít novou konverzaci/,
+    );
     assert.doesNotMatch(
       html,
       /Obnovit odpověď|requestSeq|request-conflict|request-out-of-order/,
@@ -933,4 +960,236 @@ test("an answer arriving after local session expiry cannot revive that conversat
     ["New question", answer.text],
   );
   f.client.dispose();
+});
+
+function blockAnswer(requestSeq: number, supported = true) {
+  const blocks = [
+    {
+      id: requestSeq.toString(16).padStart(32, "0"),
+      text: `Registrátory najdeš na svém bloku ${requestSeq}.`,
+      sourceIds: supported ? [source.id] : [],
+    },
+  ];
+  return {
+    speaker: CRAZY_TYPKA_SPEAKER,
+    requestSeq,
+    text: blocks[0].text,
+    sources: supported ? [source] : [],
+    blocks,
+  };
+}
+
+test("block replies send only server references and recovery freezes the exact quote target", async () => {
+  const f = refinementFixture((payload, attempt) => {
+    if (attempt === 2) throw Error("lost reply");
+    return Response.json(blockAnswer(payload.requestSeq));
+  });
+  await f.client.refreshStatus();
+  f.client.setDraft("Jak se přidám do SH?");
+  await f.client.send("cs");
+  const first = blockAnswer(1);
+  f.client.selectReply(1, first.blocks[0].id);
+  assert.deepEqual(f.client.getSnapshot().draftReply, {
+    requestSeq: 1,
+    blockId: first.blocks[0].id,
+    text: first.text,
+  });
+  f.client.setDraft("A kde přesně?");
+  await f.client.send("cs");
+  assert.equal(f.client.getSnapshot().recovery, "retry");
+  f.client.selectReply(1, "f".repeat(32));
+  f.client.setDraft("Nová rozepsaná otázka");
+  await f.client.retry();
+  assert.equal(f.bodies[1], f.bodies[2]);
+  assert.deepEqual(f.payloads[1].replyTo, {
+    requestSeq: 1,
+    blockId: first.blocks[0].id,
+  });
+  assert.equal("text" in f.payloads[1].replyTo!, false);
+  assert.equal(f.client.getSnapshot().draft, "Nová rozepsaná otázka");
+  const user = f.client
+    .getSnapshot()
+    .messages.find((message) => message.text === "A kde přesně?");
+  assert.equal(user?.quote?.text, first.text);
+  f.client.dispose();
+});
+
+test("only supported blocks in the six-answer window are replyable; local refusals do not evict them", async () => {
+  const f = refinementFixture((payload) =>
+    Response.json(blockAnswer(payload.requestSeq, payload.requestSeq !== 7)),
+  );
+  await f.client.refreshStatus();
+  for (let i = 1; i <= 8; i++) {
+    f.client.setDraft(`Místní otázka ${i}`);
+    await f.client.send("cs");
+  }
+  assert.deepEqual(
+    f.client.getSnapshot().replyableRequestSeqs,
+    [2, 3, 4, 5, 6, 8],
+  );
+  f.client.selectReply(1, blockAnswer(1).blocks[0].id);
+  assert.equal(f.client.getSnapshot().draftReply, null);
+  f.client.selectReply(7, blockAnswer(7).blocks[0].id);
+  assert.equal(f.client.getSnapshot().draftReply, null);
+  f.client.selectReply(2, blockAnswer(2).blocks[0].id);
+  assert.equal(f.client.getSnapshot().draftReply?.requestSeq, 2);
+  f.client.clearReply();
+  assert.equal(f.client.getSnapshot().draftReply, null);
+  f.client.dispose();
+});
+
+test("a confirmed off-topic failure keeps explicit supported replies but scope and reset retire them", async () => {
+  const f = refinementFixture((payload, attempt) =>
+    attempt === 2
+      ? Response.json(
+          { error: "blocked", requestSeq: payload.requestSeq },
+          { status: 403 },
+        )
+      : Response.json(blockAnswer(payload.requestSeq)),
+  );
+  await f.client.refreshStatus();
+  f.client.setDraft("Kdo je registrátor?");
+  await f.client.send("cs");
+  f.client.setDraft("Mimo téma");
+  await f.client.send("cs");
+  f.client.selectReply(1, blockAnswer(1).blocks[0].id);
+  assert.equal(f.client.getSnapshot().draftReply?.requestSeq, 1);
+  f.client.setKnowledgeScope({ kind: "archive" });
+  assert.equal(f.client.getSnapshot().draftReply, null);
+  assert.deepEqual(f.client.getSnapshot().replyableRequestSeqs, []);
+  await f.client.reset();
+  f.client.selectReply(1, blockAnswer(1).blocks[0].id);
+  assert.equal(f.client.getSnapshot().draftReply, null);
+  f.client.dispose();
+});
+
+for (const newDraft of ["", "Next draft"]) {
+  test(`reply-unavailable is acknowledged, removes the quote and preserves ${newDraft ? "new" : "original"} draft`, async () => {
+    let finish!: (value: Response) => void;
+    const f = refinementFixture((payload, attempt) =>
+      attempt === 1
+        ? Response.json(blockAnswer(payload.requestSeq))
+        : attempt === 2
+          ? new Promise<Response>((resolve) => {
+              finish = resolve;
+            })
+          : Response.json(blockAnswer(payload.requestSeq)),
+    );
+    await f.client.refreshStatus();
+    f.client.setDraft("Registrace");
+    await f.client.send("cs");
+    f.client.selectReply(1, blockAnswer(1).blocks[0].id);
+    f.client.setDraft("Kde přesně?");
+    const work = f.client.send("cs");
+    await tick();
+    if (newDraft) f.client.setDraft(newDraft);
+    finish(
+      Response.json(
+        { error: "reply-unavailable", requestSeq: 2 },
+        { status: 409 },
+      ),
+    );
+    await work;
+    assert.equal(f.client.getSnapshot().draftReply, null);
+    assert.equal(f.client.getSnapshot().recovery, "none");
+    assert.equal(f.client.getSnapshot().draft, newDraft || "Kde přesně?");
+    assert.equal(f.payloads.length, 2, "no automatic unquoted resend");
+    await f.client.send("cs");
+    assert.equal(f.payloads[2].requestSeq, 3);
+    assert.equal(f.payloads[2].replyTo, undefined);
+    f.client.dispose();
+  });
+}
+
+test("an expired selected quote cannot be silently sent to a new session", async () => {
+  let instant = 1000;
+  const f = refinementFixture(
+    (payload) => Response.json(blockAnswer(payload.requestSeq)),
+    { now: () => instant, ttl: 100 },
+  );
+  await f.client.refreshStatus();
+  f.client.setDraft("Registrace");
+  await f.client.send("cs");
+  f.client.selectReply(1, blockAnswer(1).blocks[0].id);
+  f.client.setDraft("A kolik?");
+  instant = 1101;
+  await f.client.send("cs");
+  assert.equal(f.payloads.length, 1);
+  assert.equal(f.client.getSnapshot().error, "session-expired");
+  assert.equal(f.client.getSnapshot().draft, "A kolik?");
+  assert.equal(f.client.getSnapshot().draftReply, null);
+  f.client.dispose();
+});
+
+test("rendered thematic blocks quote escaped text and never offer a reply to gaps or legacy messages", () => {
+  const response = blockAnswer(1);
+  const client = createCrazyTypkaClient();
+  const value: CrazyTypkaState = {
+    ...chatState(client),
+    availability: "enabled",
+    replyableRequestSeqs: [1],
+    draftReply: {
+      requestSeq: 1,
+      blockId: response.blocks[0].id,
+      text: "<script>quote</script>",
+    },
+    messages: [
+      {
+        id: 1,
+        role: "ai",
+        ...response,
+        blocks: [
+          ...response.blocks,
+          { id: "f".repeat(32), text: "Nemám podklady.", sourceIds: [] },
+        ],
+      },
+      { id: 2, role: "ai", text: "Legacy text", sources: [] },
+    ],
+  };
+  const html = renderToStaticMarkup(
+    createElement(CrazyTypkaChat, {
+      state: value,
+      locale: "cs",
+      variant: "compact",
+    }),
+  );
+  assert.equal((html.match(/class="crazy-reply"/g) ?? []).length, 1);
+  assert.match(html, /Zrušit citaci/);
+  assert.match(html, /&lt;script&gt;quote&lt;\/script&gt;/);
+  assert.doesNotMatch(html, /<script>/);
+  assert.match(html, /Legacy text/);
+  client.dispose();
+});
+
+test("composer height expands, caps, scrolls and shrinks after its content changes", () => {
+  let scrollHeight = 50;
+  const field = {
+    style: { height: "", overflowY: "" },
+    get scrollHeight() {
+      return scrollHeight;
+    },
+    ownerDocument: {
+      defaultView: {
+        getComputedStyle() {
+          return {
+            minHeight: "42px",
+            maxHeight: "140px",
+            borderTopWidth: "1px",
+            borderBottomWidth: "1px",
+          };
+        },
+      },
+    },
+  } as unknown as HTMLTextAreaElement;
+  fitCrazyTypkaComposer(field);
+  assert.equal(field.style.height, "52px");
+  assert.equal(field.style.overflowY, "hidden");
+  scrollHeight = 300;
+  fitCrazyTypkaComposer(field);
+  assert.equal(field.style.height, "140px");
+  assert.equal(field.style.overflowY, "auto");
+  scrollHeight = 20;
+  fitCrazyTypkaComposer(field);
+  assert.equal(field.style.height, "42px");
+  assert.equal(field.style.overflowY, "hidden");
 });

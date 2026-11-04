@@ -1,0 +1,1867 @@
+{
+  "sessionId": "1668e989-1c5a-4675-9ceb-57e8c6c7cb6c",
+  "url": "http://127.0.0.1:4180/?renderBackend=webgpu",
+  "snapshotId": "dcd8e2758cc80c4a6a34d8582b866610ca39f743b7bb1cdf46a1f4bcb58f3f6f",
+  "clientBuildId": "sha256-05c1790ea19bc6f8604d00eb969bb56e2f8110f8be43e3e445ae68a787d086cd",
+  "records": [
+    {
+      "seq": 2,
+      "atMs": 893.8,
+      "kind": "browser-state",
+      "data": {
+        "reason": "start",
+        "visibility": "visible",
+        "focused": true
+      }
+    },
+    {
+      "seq": 3,
+      "atMs": 896.5,
+      "kind": "browser-state",
+      "data": {
+        "reason": "pageshow",
+        "visibility": "visible",
+        "focused": true
+      }
+    },
+    {
+      "seq": 196,
+      "atMs": 329618.7,
+      "kind": "renderer-ready",
+      "data": {
+        "durationMs": 70.79999995231628,
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "backend": "webgpu",
+        "selection": {
+          "requested": "webgpu",
+          "backend": "webgpu",
+          "automatic": false,
+          "fallbackReason": null
+        }
+      }
+    },
+    {
+      "seq": 672,
+      "atMs": 450319,
+      "kind": "lighting-preparation",
+      "data": {
+        "status": "complete",
+        "elapsedMs": 79311.79999995232,
+        "activeElapsedMs": 79311.79999995232,
+        "pausedMs": 0,
+        "failureStep": null,
+        "stages": [
+          {
+            "stage": "vehicle-0",
+            "elapsedMs": 3707.399999856949,
+            "activeElapsedMs": 3707.399999856949,
+            "pausedMs": 0,
+            "tickCount": 28,
+            "rafGap": {
+              "count": 28,
+              "totalMs": 3667.2999999523163,
+              "maxMs": 843.9000000953674
+            },
+            "cpu": {
+              "apply": {
+                "calls": 4,
+                "totalMs": 95.20000004768372,
+                "maxMs": 40.299999952316284
+              },
+              "checkBatch": {
+                "calls": 24,
+                "totalMs": 277.89999985694885,
+                "maxMs": 33.40000009536743
+              },
+              "render": {
+                "calls": 7,
+                "totalMs": 1343.0000002384186,
+                "maxMs": 525
+              }
+            },
+            "restartReasons": {
+              "meshes": 3
+            },
+            "checks": 722,
+            "renders": 7,
+            "restarts": 3,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 316,
+              "cursor": 316,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "vehicle-1",
+            "elapsedMs": 2604.2000000476837,
+            "activeElapsedMs": 2604.2000000476837,
+            "pausedMs": 0,
+            "tickCount": 18,
+            "rafGap": {
+              "count": 18,
+              "totalMs": 2622.600000143051,
+              "maxMs": 1046.2999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 10.799999952316284,
+                "maxMs": 10.799999952316284
+              },
+              "checkBatch": {
+                "calls": 17,
+                "totalMs": 382.1000003814697,
+                "maxMs": 78.20000004768372
+              },
+              "render": {
+                "calls": 5,
+                "totalMs": 1153.7000000476837,
+                "maxMs": 982.4000000953674
+              }
+            },
+            "restartReasons": {},
+            "checks": 632,
+            "renders": 5,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 316,
+              "cursor": 316,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-off",
+            "elapsedMs": 2836.5999999046326,
+            "activeElapsedMs": 2836.5999999046326,
+            "pausedMs": 0,
+            "tickCount": 21,
+            "rafGap": {
+              "count": 21,
+              "totalMs": 2824.899999856949,
+              "maxMs": 1232.5999999046326
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 13.700000047683716,
+                "maxMs": 13.700000047683716
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 1301.2999994754791,
+                "maxMs": 1120.5999999046326
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1346.5999999046326,
+                "maxMs": 1216.6999998092651
+              }
+            },
+            "restartReasons": {},
+            "checks": 870,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 435,
+              "cursor": 435,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-on",
+            "elapsedMs": 2599.5,
+            "activeElapsedMs": 2599.5,
+            "pausedMs": 0,
+            "tickCount": 31,
+            "rafGap": {
+              "count": 31,
+              "totalMs": 2564.100000143051,
+              "maxMs": 824.1999998092651
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 70.09999990463257,
+                "maxMs": 70.09999990463257
+              },
+              "checkBatch": {
+                "calls": 30,
+                "totalMs": 266.7999997138977,
+                "maxMs": 76.89999985694885
+              },
+              "render": {
+                "calls": 7,
+                "totalMs": 1060.900000333786,
+                "maxMs": 676.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 874,
+            "renders": 7,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 437,
+              "cursor": 437,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-0-off",
+            "elapsedMs": 2728.5,
+            "activeElapsedMs": 2728.5,
+            "pausedMs": 0,
+            "tickCount": 19,
+            "rafGap": {
+              "count": 19,
+              "totalMs": 2768.699999809265,
+              "maxMs": 1944.2999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 18.40000009536743,
+                "maxMs": 18.40000009536743
+              },
+              "checkBatch": {
+                "calls": 18,
+                "totalMs": 285.70000100135803,
+                "maxMs": 56
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1662.6000001430511,
+                "maxMs": 1547.7000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 864,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 432,
+              "cursor": 432,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-0-on",
+            "elapsedMs": 1802.7000000476837,
+            "activeElapsedMs": 1802.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 24,
+            "rafGap": {
+              "count": 24,
+              "totalMs": 1789.6000001430511,
+              "maxMs": 760.2999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 47.09999990463257,
+                "maxMs": 47.09999990463257
+              },
+              "checkBatch": {
+                "calls": 23,
+                "totalMs": 130.19999980926514,
+                "maxMs": 22.299999952316284
+              },
+              "render": {
+                "calls": 9,
+                "totalMs": 1072.9999997615814,
+                "maxMs": 707.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 868,
+            "renders": 9,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 434,
+              "cursor": 434,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-1-off",
+            "elapsedMs": 243.79999995231628,
+            "activeElapsedMs": 243.79999995231628,
+            "pausedMs": 0,
+            "tickCount": 13,
+            "rafGap": {
+              "count": 13,
+              "totalMs": 250.20000004768372,
+              "maxMs": 98.20000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 12.900000095367432,
+                "maxMs": 12.900000095367432
+              },
+              "checkBatch": {
+                "calls": 12,
+                "totalMs": 52.09999942779541,
+                "maxMs": 6.799999952316284
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 158.20000004768372,
+                "maxMs": 84.09999990463257
+              }
+            },
+            "restartReasons": {},
+            "checks": 864,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 432,
+              "cursor": 432,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-1-on",
+            "elapsedMs": 345.7000000476837,
+            "activeElapsedMs": 345.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 14,
+            "rafGap": {
+              "count": 14,
+              "totalMs": 340.39999985694885,
+              "maxMs": 166
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 33,
+                "maxMs": 33
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 67.7999997138977,
+                "maxMs": 9
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 200.89999985694885,
+                "maxMs": 120
+              }
+            },
+            "restartReasons": {},
+            "checks": 868,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 434,
+              "cursor": 434,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-2-off",
+            "elapsedMs": 327.90000009536743,
+            "activeElapsedMs": 327.90000009536743,
+            "pausedMs": 0,
+            "tickCount": 15,
+            "rafGap": {
+              "count": 15,
+              "totalMs": 333.7000000476837,
+              "maxMs": 146.20000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 9.199999809265137,
+                "maxMs": 9.199999809265137
+              },
+              "checkBatch": {
+                "calls": 14,
+                "totalMs": 78.90000009536743,
+                "maxMs": 12.900000095367432
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 210.09999990463257,
+                "maxMs": 135.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 864,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 432,
+              "cursor": 432,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "night-2-on",
+            "elapsedMs": 346.7000000476837,
+            "activeElapsedMs": 346.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 15,
+            "rafGap": {
+              "count": 15,
+              "totalMs": 340.2999999523163,
+              "maxMs": 164.89999985694885
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 39.5,
+                "maxMs": 39.5
+              },
+              "checkBatch": {
+                "calls": 14,
+                "totalMs": 69.89999961853027,
+                "maxMs": 10.400000095367432
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 213.89999985694885,
+                "maxMs": 123.20000004768372
+              }
+            },
+            "restartReasons": {},
+            "checks": 868,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 434,
+              "cursor": 434,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-0-off",
+            "elapsedMs": 3429.5,
+            "activeElapsedMs": 3429.5,
+            "pausedMs": 0,
+            "tickCount": 22,
+            "rafGap": {
+              "count": 22,
+              "totalMs": 3432.7000000476837,
+              "maxMs": 1628.0999999046326
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 47.299999952316284,
+                "maxMs": 47.299999952316284
+              },
+              "checkBatch": {
+                "calls": 21,
+                "totalMs": 331,
+                "maxMs": 94.5
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1619.8000001907349,
+                "maxMs": 1388.7000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 868,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 434,
+              "cursor": 434,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-0-on",
+            "elapsedMs": 4220.599999904633,
+            "activeElapsedMs": 4220.599999904633,
+            "pausedMs": 0,
+            "tickCount": 19,
+            "rafGap": {
+              "count": 19,
+              "totalMs": 4217.900000095367,
+              "maxMs": 2258.600000143051
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 16.5,
+                "maxMs": 16.5
+              },
+              "checkBatch": {
+                "calls": 18,
+                "totalMs": 388.2000000476837,
+                "maxMs": 176.09999990463257
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 2246.5,
+                "maxMs": 2110.2000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 872,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 436,
+              "cursor": 436,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-1-off",
+            "elapsedMs": 2920.5999999046326,
+            "activeElapsedMs": 2920.5999999046326,
+            "pausedMs": 0,
+            "tickCount": 17,
+            "rafGap": {
+              "count": 17,
+              "totalMs": 2932.2999999523163,
+              "maxMs": 1303.5
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 12.799999952316284,
+                "maxMs": 12.799999952316284
+              },
+              "checkBatch": {
+                "calls": 16,
+                "totalMs": 239.20000004768372,
+                "maxMs": 38.19999980926514
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1305.900000333786,
+                "maxMs": 1207.7000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 868,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 434,
+              "cursor": 434,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "day-1-on",
+            "elapsedMs": 3364.2000000476837,
+            "activeElapsedMs": 3364.2000000476837,
+            "pausedMs": 0,
+            "tickCount": 21,
+            "rafGap": {
+              "count": 21,
+              "totalMs": 3349.2999999523163,
+              "maxMs": 1507.7000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 26.799999952316284,
+                "maxMs": 26.799999952316284
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 1725.7000000476837,
+                "maxMs": 1502.2999999523163
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1218.6999998092651,
+                "maxMs": 1078.8999998569489
+              }
+            },
+            "restartReasons": {},
+            "checks": 872,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 436,
+              "cursor": 436,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "restore",
+            "elapsedMs": 205.29999995231628,
+            "activeElapsedMs": 205.29999995231628,
+            "pausedMs": 0,
+            "tickCount": 11,
+            "rafGap": {
+              "count": 11,
+              "totalMs": 222.29999995231628,
+              "maxMs": 86.19999980926514
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 12.699999809265137,
+                "maxMs": 12.699999809265137
+              },
+              "checkBatch": {
+                "calls": 10,
+                "totalMs": 44.40000033378601,
+                "maxMs": 6.6000001430511475
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 127.00000023841858,
+                "maxMs": 72.30000019073486
+              }
+            },
+            "restartReasons": {},
+            "checks": 870,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 435,
+              "cursor": 435,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "low"
+          },
+          {
+            "stage": "current-off",
+            "elapsedMs": 2348.699999809265,
+            "activeElapsedMs": 2348.699999809265,
+            "pausedMs": 0,
+            "tickCount": 15,
+            "rafGap": {
+              "count": 15,
+              "totalMs": 2320.2999999523163,
+              "maxMs": 1070.5
+            },
+            "cpu": {
+              "apply": {
+                "calls": 2,
+                "totalMs": 667.8999998569489,
+                "maxMs": 664.5
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 113.2999997138977,
+                "maxMs": 24.09999990463257
+              },
+              "render": {
+                "calls": 5,
+                "totalMs": 326.3999996185303,
+                "maxMs": 218.19999980926514
+              }
+            },
+            "restartReasons": {
+              "meshes": 1
+            },
+            "checks": 1011,
+            "renders": 5,
+            "restarts": 1,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 502,
+              "cursor": 502,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "current-on",
+            "elapsedMs": 2958.5,
+            "activeElapsedMs": 2958.5,
+            "pausedMs": 0,
+            "tickCount": 18,
+            "rafGap": {
+              "count": 18,
+              "totalMs": 2953.2000000476837,
+              "maxMs": 2422.5999999046326
+            },
+            "cpu": {
+              "apply": {
+                "calls": 2,
+                "totalMs": 45,
+                "maxMs": 34
+              },
+              "checkBatch": {
+                "calls": 16,
+                "totalMs": 191.69999980926514,
+                "maxMs": 39.59999990463257
+              },
+              "render": {
+                "calls": 5,
+                "totalMs": 1005.8999998569489,
+                "maxMs": 820.1999998092651
+              }
+            },
+            "restartReasons": {
+              "meshes": 1
+            },
+            "checks": 1008,
+            "renders": 5,
+            "restarts": 1,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 504,
+              "cursor": 504,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-0-off",
+            "elapsedMs": 1216.8000001907349,
+            "activeElapsedMs": 1216.8000001907349,
+            "pausedMs": 0,
+            "tickCount": 25,
+            "rafGap": {
+              "count": 25,
+              "totalMs": 1223.0999999046326,
+              "maxMs": 190.10000014305115
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 12,
+                "maxMs": 12
+              },
+              "checkBatch": {
+                "calls": 24,
+                "totalMs": 271.40000009536743,
+                "maxMs": 104.30000019073486
+              },
+              "render": {
+                "calls": 8,
+                "totalMs": 362.60000014305115,
+                "maxMs": 159.40000009536743
+              }
+            },
+            "restartReasons": {},
+            "checks": 998,
+            "renders": 8,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 499,
+              "cursor": 499,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-0-on",
+            "elapsedMs": 2363.5999999046326,
+            "activeElapsedMs": 2363.5999999046326,
+            "pausedMs": 0,
+            "tickCount": 16,
+            "rafGap": {
+              "count": 16,
+              "totalMs": 2358.600000143051,
+              "maxMs": 993.7999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 23.799999952316284,
+                "maxMs": 23.799999952316284
+              },
+              "checkBatch": {
+                "calls": 15,
+                "totalMs": 825.5999999046326,
+                "maxMs": 673.9000000953674
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 888.9999997615814,
+                "maxMs": 795.8999998569489
+              }
+            },
+            "restartReasons": {},
+            "checks": 1002,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 501,
+              "cursor": 501,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-1-off",
+            "elapsedMs": 208.70000004768372,
+            "activeElapsedMs": 208.70000004768372,
+            "pausedMs": 0,
+            "tickCount": 10,
+            "rafGap": {
+              "count": 10,
+              "totalMs": 212.39999985694885,
+              "maxMs": 97.59999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 13.599999904632568,
+                "maxMs": 13.599999904632568
+              },
+              "checkBatch": {
+                "calls": 9,
+                "totalMs": 50.39999985694885,
+                "maxMs": 8.5
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 131.60000014305115,
+                "maxMs": 82.90000009536743
+              }
+            },
+            "restartReasons": {},
+            "checks": 998,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 499,
+              "cursor": 499,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-1-on",
+            "elapsedMs": 224.29999995231628,
+            "activeElapsedMs": 224.29999995231628,
+            "pausedMs": 0,
+            "tickCount": 11,
+            "rafGap": {
+              "count": 11,
+              "totalMs": 229.20000004768372,
+              "maxMs": 113.39999985694885
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 13.5,
+                "maxMs": 13.5
+              },
+              "checkBatch": {
+                "calls": 10,
+                "totalMs": 47,
+                "maxMs": 8.5
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 145.70000004768372,
+                "maxMs": 98.79999995231628
+              }
+            },
+            "restartReasons": {},
+            "checks": 1002,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 501,
+              "cursor": 501,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-2-off",
+            "elapsedMs": 2284.9000000953674,
+            "activeElapsedMs": 2284.9000000953674,
+            "pausedMs": 0,
+            "tickCount": 22,
+            "rafGap": {
+              "count": 22,
+              "totalMs": 2272.2999999523163,
+              "maxMs": 984.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 9.400000095367432,
+                "maxMs": 9.400000095367432
+              },
+              "checkBatch": {
+                "calls": 21,
+                "totalMs": 227.19999933242798,
+                "maxMs": 41.60000014305115
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1079.0999999046326,
+                "maxMs": 971.5999999046326
+              }
+            },
+            "restartReasons": {},
+            "checks": 998,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 499,
+              "cursor": 499,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "night-2-on",
+            "elapsedMs": 4243.5,
+            "activeElapsedMs": 4243.5,
+            "pausedMs": 0,
+            "tickCount": 22,
+            "rafGap": {
+              "count": 22,
+              "totalMs": 4218,
+              "maxMs": 3289.7000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 26.09999990463257,
+                "maxMs": 26.09999990463257
+              },
+              "checkBatch": {
+                "calls": 21,
+                "totalMs": 528.9999997615814,
+                "maxMs": 316.40000009536743
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1619.1000001430511,
+                "maxMs": 1452.6000001430511
+              }
+            },
+            "restartReasons": {},
+            "checks": 1002,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 501,
+              "cursor": 501,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-0-off",
+            "elapsedMs": 3818.2000000476837,
+            "activeElapsedMs": 3818.2000000476837,
+            "pausedMs": 0,
+            "tickCount": 19,
+            "rafGap": {
+              "count": 19,
+              "totalMs": 3849.300000190735,
+              "maxMs": 2147.600000143051
+            },
+            "cpu": {
+              "apply": {
+                "calls": 2,
+                "totalMs": 55.00000023841858,
+                "maxMs": 51.80000019073486
+              },
+              "checkBatch": {
+                "calls": 17,
+                "totalMs": 354.8999993801117,
+                "maxMs": 168.70000004768372
+              },
+              "render": {
+                "calls": 5,
+                "totalMs": 2164.2999999523163,
+                "maxMs": 2014.7999999523163
+              }
+            },
+            "restartReasons": {
+              "weather": 1
+            },
+            "checks": 1002,
+            "renders": 5,
+            "restarts": 1,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 501,
+              "cursor": 501,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-0-on",
+            "elapsedMs": 3800.399999856949,
+            "activeElapsedMs": 3800.399999856949,
+            "pausedMs": 0,
+            "tickCount": 21,
+            "rafGap": {
+              "count": 21,
+              "totalMs": 3794,
+              "maxMs": 2943.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 15,
+                "maxMs": 15
+              },
+              "checkBatch": {
+                "calls": 20,
+                "totalMs": 253.10000038146973,
+                "maxMs": 42.30000019073486
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1434.3000001907349,
+                "maxMs": 1319
+              }
+            },
+            "restartReasons": {},
+            "checks": 1006,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 503,
+              "cursor": 503,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-1-off",
+            "elapsedMs": 4011.0999999046326,
+            "activeElapsedMs": 4011.0999999046326,
+            "pausedMs": 0,
+            "tickCount": 19,
+            "rafGap": {
+              "count": 19,
+              "totalMs": 4009.5,
+              "maxMs": 1696.0999999046326
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 13.700000047683716,
+                "maxMs": 13.700000047683716
+              },
+              "checkBatch": {
+                "calls": 18,
+                "totalMs": 225.69999980926514,
+                "maxMs": 45.60000014305115
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 1585.5,
+                "maxMs": 1467.5999999046326
+              }
+            },
+            "restartReasons": {},
+            "checks": 1002,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 501,
+              "cursor": 501,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "day-1-on",
+            "elapsedMs": 5510.899999856949,
+            "activeElapsedMs": 5510.899999856949,
+            "pausedMs": 0,
+            "tickCount": 24,
+            "rafGap": {
+              "count": 24,
+              "totalMs": 5503.399999856949,
+              "maxMs": 3134.800000190735
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 31.600000143051147,
+                "maxMs": 31.600000143051147
+              },
+              "checkBatch": {
+                "calls": 23,
+                "totalMs": 353.5000002384186,
+                "maxMs": 86.90000009536743
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 3283.5,
+                "maxMs": 3098.399999856949
+              }
+            },
+            "restartReasons": {},
+            "checks": 1006,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 503,
+              "cursor": 503,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "restore",
+            "elapsedMs": 270,
+            "activeElapsedMs": 270,
+            "pausedMs": 0,
+            "tickCount": 12,
+            "rafGap": {
+              "count": 12,
+              "totalMs": 284.7000000476837,
+              "maxMs": 143.20000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 17.5,
+                "maxMs": 17.5
+              },
+              "checkBatch": {
+                "calls": 11,
+                "totalMs": 54.200000047683716,
+                "maxMs": 9
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 178.59999990463257,
+                "maxMs": 124
+              }
+            },
+            "restartReasons": {},
+            "checks": 1004,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 502,
+              "cursor": 502,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "high"
+          },
+          {
+            "stage": "current-off",
+            "elapsedMs": 367,
+            "activeElapsedMs": 367,
+            "pausedMs": 0,
+            "tickCount": 14,
+            "rafGap": {
+              "count": 14,
+              "totalMs": 332.5,
+              "maxMs": 172.09999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 20.200000047683716,
+                "maxMs": 20.200000047683716
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 105.90000009536743,
+                "maxMs": 39.39999985694885
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 212.89999985694885,
+                "maxMs": 146.20000004768372
+              }
+            },
+            "restartReasons": {},
+            "checks": 948,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 474,
+              "cursor": 474,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "current-on",
+            "elapsedMs": 407.2999999523163,
+            "activeElapsedMs": 407.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 14,
+            "rafGap": {
+              "count": 14,
+              "totalMs": 404.09999990463257,
+              "maxMs": 212.59999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 52.700000047683716,
+                "maxMs": 52.700000047683716
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 81.60000014305115,
+                "maxMs": 13.5
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 239.30000019073486,
+                "maxMs": 157.79999995231628
+              }
+            },
+            "restartReasons": {},
+            "checks": 952,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 476,
+              "cursor": 476,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "night-0-off",
+            "elapsedMs": 274.10000014305115,
+            "activeElapsedMs": 274.10000014305115,
+            "pausedMs": 0,
+            "tickCount": 12,
+            "rafGap": {
+              "count": 12,
+              "totalMs": 276.90000009536743,
+              "maxMs": 132.10000014305115
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 18.5,
+                "maxMs": 18.5
+              },
+              "checkBatch": {
+                "calls": 11,
+                "totalMs": 53.69999980926514,
+                "maxMs": 9.399999856948853
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 178.00000023841858,
+                "maxMs": 111.10000014305115
+              }
+            },
+            "restartReasons": {},
+            "checks": 942,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 471,
+              "cursor": 471,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "night-0-on",
+            "elapsedMs": 336.89999985694885,
+            "activeElapsedMs": 336.89999985694885,
+            "pausedMs": 0,
+            "tickCount": 12,
+            "rafGap": {
+              "count": 12,
+              "totalMs": 340.2999999523163,
+              "maxMs": 196.59999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 25.59999990463257,
+                "maxMs": 25.59999990463257
+              },
+              "checkBatch": {
+                "calls": 11,
+                "totalMs": 59.299999952316284,
+                "maxMs": 13.200000047683716
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 233.79999995231628,
+                "maxMs": 169.29999995231628
+              }
+            },
+            "restartReasons": {},
+            "checks": 946,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 473,
+              "cursor": 473,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "night-1-off",
+            "elapsedMs": 295.90000009536743,
+            "activeElapsedMs": 295.90000009536743,
+            "pausedMs": 0,
+            "tickCount": 14,
+            "rafGap": {
+              "count": 14,
+              "totalMs": 284.90000009536743,
+              "maxMs": 118.20000004768372
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 15.900000095367432,
+                "maxMs": 15.900000095367432
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 73.19999933242798,
+                "maxMs": 11.199999809265137
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 178.60000014305115,
+                "maxMs": 100.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 942,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 471,
+              "cursor": 471,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "night-1-on",
+            "elapsedMs": 440.5,
+            "activeElapsedMs": 440.5,
+            "pausedMs": 0,
+            "tickCount": 15,
+            "rafGap": {
+              "count": 15,
+              "totalMs": 444.7000000476837,
+              "maxMs": 247.09999990463257
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 22.799999952316284,
+                "maxMs": 22.799999952316284
+              },
+              "checkBatch": {
+                "calls": 14,
+                "totalMs": 80.90000009536743,
+                "maxMs": 14.300000190734863
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 307.19999980926514,
+                "maxMs": 222.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 946,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 473,
+              "cursor": 473,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "night-2-off",
+            "elapsedMs": 410.5,
+            "activeElapsedMs": 410.5,
+            "pausedMs": 0,
+            "tickCount": 16,
+            "rafGap": {
+              "count": 16,
+              "totalMs": 398.5,
+              "maxMs": 147.80000019073486
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 15.600000143051147,
+                "maxMs": 15.600000143051147
+              },
+              "checkBatch": {
+                "calls": 15,
+                "totalMs": 92.80000066757202,
+                "maxMs": 18.899999856948853
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 260.09999990463257,
+                "maxMs": 129.79999995231628
+              }
+            },
+            "restartReasons": {},
+            "checks": 942,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 471,
+              "cursor": 471,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "night-2-on",
+            "elapsedMs": 567.7000000476837,
+            "activeElapsedMs": 567.7000000476837,
+            "pausedMs": 0,
+            "tickCount": 13,
+            "rafGap": {
+              "count": 13,
+              "totalMs": 574.2999999523163,
+              "maxMs": 388.2999999523163
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 50.799999952316284,
+                "maxMs": 50.799999952316284
+              },
+              "checkBatch": {
+                "calls": 12,
+                "totalMs": 73.2000002861023,
+                "maxMs": 14.399999856948853
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 416.2000002861023,
+                "maxMs": 334.7000000476837
+              }
+            },
+            "restartReasons": {},
+            "checks": 946,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 473,
+              "cursor": 473,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "day-0-off",
+            "elapsedMs": 2361.0999999046326,
+            "activeElapsedMs": 2361.0999999046326,
+            "pausedMs": 0,
+            "tickCount": 26,
+            "rafGap": {
+              "count": 26,
+              "totalMs": 2228.899999856949,
+              "maxMs": 1492.5999999046326
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 42.09999990463257,
+                "maxMs": 42.09999990463257
+              },
+              "checkBatch": {
+                "calls": 25,
+                "totalMs": 201.59999918937683,
+                "maxMs": 28.299999952316284
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 648.2000000476837,
+                "maxMs": 233.90000009536743
+              }
+            },
+            "restartReasons": {},
+            "checks": 946,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 473,
+              "cursor": 473,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "day-0-on",
+            "elapsedMs": 2708.2999999523163,
+            "activeElapsedMs": 2708.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 19,
+            "rafGap": {
+              "count": 19,
+              "totalMs": 2760.4000000953674,
+              "maxMs": 2238.2000000476837
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 34.299999952316284,
+                "maxMs": 34.299999952316284
+              },
+              "checkBatch": {
+                "calls": 18,
+                "totalMs": 148.70000004768372,
+                "maxMs": 49.59999990463257
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 562.7000000476837,
+                "maxMs": 309
+              }
+            },
+            "restartReasons": {},
+            "checks": 950,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 475,
+              "cursor": 475,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "day-1-off",
+            "elapsedMs": 2662.2999999523163,
+            "activeElapsedMs": 2662.2999999523163,
+            "pausedMs": 0,
+            "tickCount": 24,
+            "rafGap": {
+              "count": 24,
+              "totalMs": 2684.4000000953674,
+              "maxMs": 1978.3999998569489
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 16.5,
+                "maxMs": 16.5
+              },
+              "checkBatch": {
+                "calls": 23,
+                "totalMs": 216.0999994277954,
+                "maxMs": 57.5
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 525.7000002861023,
+                "maxMs": 205.59999990463257
+              }
+            },
+            "restartReasons": {},
+            "checks": 946,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 473,
+              "cursor": 473,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "day-1-on",
+            "elapsedMs": 2511.2000000476837,
+            "activeElapsedMs": 2511.2000000476837,
+            "pausedMs": 0,
+            "tickCount": 18,
+            "rafGap": {
+              "count": 18,
+              "totalMs": 2569.899999856949,
+              "maxMs": 1570.5
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 54.69999980926514,
+                "maxMs": 54.69999980926514
+              },
+              "checkBatch": {
+                "calls": 17,
+                "totalMs": 104.80000019073486,
+                "maxMs": 19
+              },
+              "render": {
+                "calls": 4,
+                "totalMs": 457.90000009536743,
+                "maxMs": 257.30000019073486
+              }
+            },
+            "restartReasons": {},
+            "checks": 950,
+            "renders": 4,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 475,
+              "cursor": 475,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          },
+          {
+            "stage": "restore",
+            "elapsedMs": 291.7999999523163,
+            "activeElapsedMs": 291.7999999523163,
+            "pausedMs": 0,
+            "tickCount": 14,
+            "rafGap": {
+              "count": 14,
+              "totalMs": 304.60000014305115,
+              "maxMs": 119.40000009536743
+            },
+            "cpu": {
+              "apply": {
+                "calls": 1,
+                "totalMs": 13.799999952316284,
+                "maxMs": 13.799999952316284
+              },
+              "checkBatch": {
+                "calls": 13,
+                "totalMs": 76,
+                "maxMs": 11.799999952316284
+              },
+              "render": {
+                "calls": 3,
+                "totalMs": 167.5,
+                "maxMs": 103.5
+              }
+            },
+            "restartReasons": {},
+            "checks": 948,
+            "renders": 3,
+            "restarts": 0,
+            "lastState": {
+              "operation": "effects",
+              "queueLength": 474,
+              "cursor": 474,
+              "retryCount": 0,
+              "readyRenders": 2
+            },
+            "passQuality": "medium"
+          }
+        ],
+        "qualities": [
+          {
+            "quality": "low",
+            "finalPass": false,
+            "status": "complete",
+            "failureStep": null,
+            "elapsedMs": 32407.39999985695,
+            "activeElapsedMs": 32407.39999985695,
+            "pausedMs": 0,
+            "stageCount": 15
+          },
+          {
+            "quality": "high",
+            "finalPass": false,
+            "status": "complete",
+            "failureStep": null,
+            "elapsedMs": 33265,
+            "activeElapsedMs": 33265,
+            "pausedMs": 0,
+            "stageCount": 13
+          },
+          {
+            "quality": "medium",
+            "finalPass": true,
+            "status": "complete",
+            "failureStep": null,
+            "elapsedMs": 13639.400000095367,
+            "activeElapsedMs": 13639.400000095367,
+            "pausedMs": 0,
+            "stageCount": 13
+          }
+        ],
+        "shaderScheduling": {
+          "active": false,
+          "inert": true,
+          "disposed": false,
+          "faulted": false,
+          "queued": 0,
+          "pending": 0,
+          "started": 0,
+          "completed": 0,
+          "cancelled": 0,
+          "passthrough": 0,
+          "frameCount": 0,
+          "workCpuCount": 0,
+          "workCpuMs": 0,
+          "workCpuMaxMs": 0
+        },
+        "readiness": {
+          "quality": "medium",
+          "stage": "restore",
+          "lastGate": null,
+          "mesh": null,
+          "material": null,
+          "waits": {
+            "mesh": 0,
+            "precipitation": 0,
+            "pipeline": 0,
+            "health": 0,
+            "effects": 0
+          }
+        },
+        "pipeline": {
+          "active": true,
+          "inert": false,
+          "disposed": false,
+          "faulted": false,
+          "completionSerial": 1118,
+          "provenSerial": 1118,
+          "lastRenderComplete": true,
+          "entries": {
+            "total": 0,
+            "pending": 0,
+            "ready": 0
+          },
+          "work": {
+            "total": 0,
+            "pending": 0,
+            "retiredPending": 0
+          },
+          "renders": {
+            "total": 166,
+            "complete": 123,
+            "incomplete": 43
+          },
+          "readiness": {
+            "checks": 201,
+            "waits": 37,
+            "lastResult": true
+          },
+          "skips": {
+            "pending-entry": 8216,
+            "capacity": 0,
+            "descriptor-disabled": 0,
+            "descriptor-identity": 0
+          },
+          "retirements": {
+            "invalidIdentity": 0,
+            "disabled": 0,
+            "unusedReady": 0
+          },
+          "lastSkip": {
+            "reason": "pending-entry",
+            "effectId": 378,
+            "effectName": "pbr",
+            "identityChanges": []
+          }
+        },
+        "pipelineScope": "Snapshot after restoration; readiness and lastState describe the last attempted stage."
+      }
+    },
+    {
+      "seq": 676,
+      "atMs": 450408.2,
+      "kind": "game-ready",
+      "data": {
+        "mode": "multi"
+      }
+    }
+  ],
+  "scope": "HUD UI smoke only; no gameplay/FPS acceptance or NVIDIA sampler"
+}

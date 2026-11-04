@@ -31,6 +31,7 @@ import {
 export const CRAZY_TYPKA_LIMITS = Object.freeze({
   messageChars: 1500,
   answerChars: 4000,
+  answerBlocks: 6,
   sources: 4,
   historyTurns: 6,
 });
@@ -113,10 +114,29 @@ export type CrazyTypkaSource =
 export const CRAZY_TYPKA_DOCUMENT_CITATION_POLICY =
   validateCitationPolicy(citationPolicyData);
 const citationEncoder = new TextEncoder();
+export type CrazyTypkaAnswerMode = "overview" | "specific";
+export type CrazyTypkaAnswerBlock = {
+  id: string;
+  text: string;
+  sourceIds: string[];
+};
+export type CrazyTypkaReplyTo = { requestSeq: number; blockId: string };
+export function isCrazyTypkaReplyTo(
+  value: unknown,
+): value is CrazyTypkaReplyTo {
+  return (
+    record(value) &&
+    hasOnlyKeys(value, ["requestSeq", "blockId"]) &&
+    isCrazyTypkaRequestSeq(value.requestSeq) &&
+    typeof value.blockId === "string" &&
+    /^[a-f0-9]{32}$/.test(value.blockId)
+  );
+}
 export type CrazyTypkaResponse = {
   speaker: typeof CRAZY_TYPKA_SPEAKER;
   text: string;
   sources: CrazyTypkaSource[];
+  blocks?: CrazyTypkaAnswerBlock[];
 };
 /** Acknowledgement belongs to transport, not to the displayed character message. */
 export type CrazyTypkaChatResponse = CrazyTypkaResponse & {
@@ -147,7 +167,8 @@ export type CrazyTypkaErrorCode =
   | "budget-exhausted"
   | "request-conflict"
   | "request-out-of-order"
-  | "response-expired";
+  | "response-expired"
+  | "reply-unavailable";
 
 export function isCrazyTypkaRequestSeq(value: unknown): value is number {
   return typeof value === "number" && Number.isSafeInteger(value) && value > 0;
@@ -179,6 +200,7 @@ const errorCodes: ReadonlySet<string> = new Set<CrazyTypkaErrorCode>([
   "request-conflict",
   "request-out-of-order",
   "response-expired",
+  "reply-unavailable",
 ]);
 export function isCrazyTypkaErrorResponse(
   value: unknown,
@@ -400,6 +422,47 @@ export function isCrazyTypkaResponse(
     value.sources.length <= CRAZY_TYPKA_LIMITS.sources &&
     value.sources.every(isCrazyTypkaSource) &&
     new Set(value.sources.map((source) => source.id)).size ===
-      value.sources.length
+      value.sources.length &&
+    (value.blocks === undefined ||
+      validAnswerBlocks(
+        value.blocks,
+        value.text as string,
+        value.sources as CrazyTypkaSource[],
+      ))
   );
+}
+
+function validAnswerBlocks(
+  value: unknown,
+  text: string,
+  sources: CrazyTypkaSource[],
+): value is CrazyTypkaAnswerBlock[] {
+  if (
+    !Array.isArray(value) ||
+    !value.length ||
+    value.length > CRAZY_TYPKA_LIMITS.answerBlocks
+  )
+    return false;
+  const ids = new Set<string>();
+  const sourceIds = new Set(sources.map((source) => source.id));
+  for (const block of value) {
+    if (
+      !record(block) ||
+      !hasOnlyKeys(block, ["id", "text", "sourceIds"]) ||
+      typeof block.id !== "string" ||
+      !/^[a-f0-9]{32}$/.test(block.id) ||
+      ids.has(block.id) ||
+      !short(block.text, CRAZY_TYPKA_LIMITS.answerChars) ||
+      !block.text.trim() ||
+      !Array.isArray(block.sourceIds) ||
+      block.sourceIds.length > CRAZY_TYPKA_LIMITS.sources ||
+      !block.sourceIds.every(
+        (id) => typeof id === "string" && sourceIds.has(id),
+      ) ||
+      new Set(block.sourceIds).size !== block.sourceIds.length
+    )
+      return false;
+    ids.add(block.id);
+  }
+  return value.map((block) => block.text).join("\n\n") === text;
 }

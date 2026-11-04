@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "key-73-snapshot",
+  "title": "KEY-73: neměnný zdrojový a produkční snapshot včetně testů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/key-73-20261104/",
+    ".cache/performance-snapshot/key-73-20261104-r2/",
+    ".cache/performance-snapshot/key-73-20261104-r3/",
+    ".cache/performance-snapshot/key-73-20261104-r4/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zmrazit runtime, assety a testy existujícím performance-snapshot harness; před/po hash musí souhlasit.",
+    "Žádný nový Git checkout. Build a prohlížeč proběhnou pouze se současně drženým key-73-validation heavy/GPU/build/port claimem stejného root koordinátora."
+  ],
+  "verification": [
+    "node scripts/performance-snapshot.mjs key-73-20261104",
+    "Zdrojový manifest a hash buildu zaznamenat do KEY-73 validační evidence."
+  ],
+  "notes": [
+    "Výslovně schválený immutable test a implementace KEY-73; cwd kanonický C checkout, branch codex/crazy-typka-scope-ui-20261104.",
+    "Výstup je testovací artefakt v .cache, ne další pracovní Git kopie. Nevytvářet dokud není stabilní source checkpoint a dokončená předchozí heavy kontrola."
+  ]
+}

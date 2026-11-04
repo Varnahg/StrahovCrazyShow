@@ -1,0 +1,85 @@
+{
+  "telemetry": [
+    {
+      "phase": "r3",
+      "groups": {
+        "/v1/moderations:omni-moderation-latest": {
+          "count": 34,
+          "elapsedMsTotal": 14573.322399999899,
+          "elapsedMsMax": 1211.6431999999986,
+          "usage": {}
+        },
+        "/v1/decisions:gpt-6-luna": {
+          "count": 19,
+          "elapsedMsTotal": 7436.833199999972,
+          "elapsedMsMax": 786.4890000000014,
+          "usage": {
+            "input_tokens": 27156,
+            "output_tokens": 0,
+            "total_tokens": 27156
+          }
+        },
+        "/v1/embeddings:text-embedding-3-large": {
+          "count": 13,
+          "elapsedMsTotal": 4200.64190000009,
+          "elapsedMsMax": 1053.3843000000343,
+          "usage": {
+            "prompt_tokens": 347,
+            "total_tokens": 347
+          }
+        },
+        "/v1/responses:gpt-6-luna": {
+          "count": 13,
+          "elapsedMsTotal": 36331.09500000009,
+          "elapsedMsMax": 5340.4562000000005,
+          "usage": {
+            "input_tokens": 54802,
+            "output_tokens": 2701,
+            "total_tokens": 57503
+          }
+        }
+      }
+    },
+    {
+      "phase": "r4",
+      "groups": {
+        "/v1/moderations:omni-moderation-latest": {
+          "count": 12,
+          "elapsedMsTotal": 8285.2849999998,
+          "elapsedMsMax": 1680.845399999991,
+          "usage": {}
+        },
+        "/v1/decisions:gpt-6-luna": {
+          "count": 7,
+          "elapsedMsTotal": 3498.5342999999993,
+          "elapsedMsMax": 1108.6080000000075,
+          "usage": {
+            "input_tokens": 11251,
+            "output_tokens": 0,
+            "total_tokens": 11251
+          }
+        },
+        "/v1/embeddings:text-embedding-3-large": {
+          "count": 4,
+          "elapsedMsTotal": 2911.213699999964,
+          "elapsedMsMax": 2185.5260000000126,
+          "usage": {
+            "prompt_tokens": 257,
+            "total_tokens": 257
+          }
+        },
+        "/v1/responses:gpt-6-luna": {
+          "count": 4,
+          "elapsedMsTotal": 9453.149900000019,
+          "elapsedMsMax": 3675.6230000000214,
+          "usage": {
+            "input_tokens": 15728,
+            "output_tokens": 666,
+            "total_tokens": 16394
+          }
+        }
+      }
+    }
+  ],
+  "limitation": "Usage and API wall time are measured. Provider responses do not contain billed currency amounts; dollar cost is not asserted. Aggregates include synthetic API and browser acceptance calls and are not per-user latency benchmarks."
+}

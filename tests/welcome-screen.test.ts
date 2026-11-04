@@ -60,11 +60,12 @@ test("unavailable and loading presence stay unknown, and chat is initially only 
     const html = home({
       presence: { status },
       assistant: createElement("p", {}, "Private assistant contents"),
+      assistantActions: createElement("button", {}, "Private assistant actions"),
     });
     assert.match(html, /<strong>—<\/strong>/);
     assert.doesNotMatch(
       html,
-      /<strong>0<\/strong>|Private assistant contents|home-chat-popup/,
+      /<strong>0<\/strong>|Private assistant contents|Private assistant actions|home-chat-popup/,
     );
     assert.match(html, /aria-expanded="false"/);
     assert.match(html, /Crazy Typka/);

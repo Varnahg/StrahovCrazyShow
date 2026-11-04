@@ -18,6 +18,8 @@ import {
   isCrazyTypkaSession,
   isCrazyTypkaStatus,
   type CrazyTypkaSource,
+  type CrazyTypkaAnswerBlock,
+  type CrazyTypkaReplyTo,
 } from "../shared/crazy-typka";
 import type { CuratedKnowledgeSource } from "../shared/knowledge-curation";
 
@@ -28,7 +30,11 @@ export type CrazyTypkaMessage = {
   text: string;
   sources: CrazyTypkaSource[];
   knowledgeScope?: CrazyTypkaKnowledgeScope;
+  requestSeq?: number;
+  blocks?: readonly CrazyTypkaAnswerBlock[];
+  quote?: CrazyTypkaDraftReply;
 };
+export type CrazyTypkaDraftReply = CrazyTypkaReplyTo & { text: string };
 export type CrazyTypkaSnapshot = {
   availability: "checking" | "enabled" | "disabled" | "error";
   busy: boolean;
@@ -38,6 +44,8 @@ export type CrazyTypkaSnapshot = {
   notice: "session-restarted" | "scope-changed" | null;
   recovery: "none" | "retry" | "reset";
   knowledgeScope: CrazyTypkaKnowledgeScope;
+  draftReply: CrazyTypkaDraftReply | null;
+  replyableRequestSeqs: readonly number[];
 };
 
 export function safeCitationHref(value: string): string | undefined {
@@ -152,6 +160,8 @@ export function createCrazyTypkaClient(
     notice: null,
     recovery: "none",
     knowledgeScope: CURRENT_KNOWLEDGE_SCOPE,
+    draftReply: null,
+    replyableRequestSeqs: [],
   };
   let session: { token: string; expiresAt: number } | undefined;
   type PendingChat = {
@@ -160,7 +170,9 @@ export function createCrazyTypkaClient(
     locale: Locale;
     knowledgeScope?: CrazyTypkaKnowledgeScope;
     token?: string;
+    replyTo?: CrazyTypkaReplyTo;
   };
+  const replyableAnswers = new Map<number, readonly CrazyTypkaAnswerBlock[]>();
   let pending: PendingChat | undefined;
   let nextRequestSeq = 1;
   let generation = 0;
@@ -203,6 +215,8 @@ export function createCrazyTypkaClient(
     session = undefined;
     pending = undefined;
     nextRequestSeq = 1;
+    replyableAnswers.clear();
+    update({ draftReply: null, replyableRequestSeqs: [] });
   };
   const expireSession = () => {
     forgetSession();
@@ -284,9 +298,19 @@ export function createCrazyTypkaClient(
           text: body.text,
           sources: body.sources,
           knowledgeScope: operation.knowledgeScope ?? CURRENT_KNOWLEDGE_SCOPE,
+          requestSeq: body.requestSeq,
+          ...(body.blocks ? { blocks: body.blocks } : {}),
         };
+        if (body.blocks?.some((block) => block.sourceIds.length > 0)) {
+          replyableAnswers.set(body.requestSeq, body.blocks);
+          if (replyableAnswers.size > CRAZY_TYPKA_LIMITS.historyTurns)
+            replyableAnswers.delete(replyableAnswers.keys().next().value!);
+        }
         confirm(operation);
-        update({ messages: [...snapshot.messages, reply].slice(-40) });
+        update({
+          messages: [...snapshot.messages, reply].slice(-40),
+          replyableRequestSeqs: [...replyableAnswers.keys()],
+        });
         return;
       }
       if (
@@ -308,6 +332,18 @@ export function createCrazyTypkaClient(
       }
       if (body.requestSeq === operation.requestSeq) confirm(operation);
       else update({ recovery: "retry" });
+      if (
+        body.error === "reply-unavailable" &&
+        body.requestSeq === operation.requestSeq
+      ) {
+        const { requestSeq } = operation.replyTo ?? {};
+        if (requestSeq !== undefined) replyableAnswers.delete(requestSeq);
+        update({
+          draftReply: null,
+          replyableRequestSeqs: [...replyableAnswers.keys()],
+          ...(!snapshot.draft ? { draft: operation.message } : {}),
+        });
+      }
       if (body.error === "unavailable") update({ availability: "disabled" });
       update({ error: body.error });
     } catch (error) {
@@ -362,6 +398,24 @@ export function createCrazyTypkaClient(
     setDraft(draft: string) {
       update({ draft: draft.slice(0, CRAZY_TYPKA_LIMITS.messageChars) });
     },
+    selectReply(requestSeq: number, blockId: string) {
+      if (snapshot.busy || pending || snapshot.recovery !== "none") return;
+      if (!session || session.expiresAt <= now()) {
+        if (session) expireSession();
+        return;
+      }
+      const block = replyableAnswers
+        .get(requestSeq)
+        ?.find(
+          (candidate) =>
+            candidate.id === blockId && candidate.sourceIds.length > 0,
+        );
+      if (block)
+        update({ draftReply: { requestSeq, blockId, text: block.text } });
+    },
+    clearReply() {
+      update({ draftReply: null });
+    },
     setKnowledgeScope(scope: CrazyTypkaKnowledgeScope) {
       if (
         snapshot.busy ||
@@ -373,11 +427,15 @@ export function createCrazyTypkaClient(
       if (
         crazyTypkaScopeKey(scope) !==
         crazyTypkaScopeKey(snapshot.knowledgeScope)
-      )
+      ) {
+        replyableAnswers.clear();
         update({
           knowledgeScope: Object.freeze({ ...scope }),
           notice: snapshot.messages.length ? "scope-changed" : snapshot.notice,
+          draftReply: null,
+          replyableRequestSeqs: [],
         });
+      }
     },
     async refreshStatus() {
       statusRequest?.abort();
@@ -412,6 +470,11 @@ export function createCrazyTypkaClient(
       const restarting =
         (!!session && session.expiresAt <= now()) ||
         snapshot.error === "session-expired";
+      // A selected old quote must never silently become an unquoted new-session request.
+      if (restarting && snapshot.draftReply) {
+        expireSession();
+        return;
+      }
       if (restarting) forgetSession();
       if (pending || (!restarting && snapshot.recovery === "reset")) return;
       const userMessage: CrazyTypkaMessage = {
@@ -420,11 +483,20 @@ export function createCrazyTypkaClient(
         text: message,
         sources: [],
         knowledgeScope: snapshot.knowledgeScope,
+        ...(snapshot.draftReply ? { quote: { ...snapshot.draftReply } } : {}),
       };
       const operation: PendingChat = {
         requestSeq: nextRequestSeq,
         message,
         locale,
+        ...(snapshot.draftReply
+          ? {
+              replyTo: {
+                requestSeq: snapshot.draftReply.requestSeq,
+                blockId: snapshot.draftReply.blockId,
+              },
+            }
+          : {}),
         ...(snapshot.knowledgeScope.kind === "archive"
           ? { knowledgeScope: snapshot.knowledgeScope }
           : {}),
@@ -434,6 +506,7 @@ export function createCrazyTypkaClient(
       update({
         busy: true,
         draft: "",
+        draftReply: null,
         error: null,
         notice: restarting ? "session-restarted" : snapshot.notice,
         recovery: "none",
@@ -487,6 +560,8 @@ export type CrazyTypkaState = CrazyTypkaSnapshot &
     CrazyTypkaClient,
     | "setDraft"
     | "setKnowledgeScope"
+    | "selectReply"
+    | "clearReply"
     | "send"
     | "retry"
     | "reset"
@@ -509,6 +584,8 @@ export function useCrazyTypka(): CrazyTypkaState {
     ...snapshot,
     setDraft: client.setDraft,
     setKnowledgeScope: client.setKnowledgeScope,
+    selectReply: client.selectReply,
+    clearReply: client.clearReply,
     send: client.send,
     retry: client.retry,
     reset: client.reset,
@@ -560,6 +637,10 @@ export function crazyTypkaErrorLabel(code: string, locale: Locale) {
       "Podklady předchozí odpovědi už nejsou aktuální. Můžeš položit novou otázku.",
       "The sources for the previous answer are no longer current. You can ask a new question.",
     ],
+    "reply-unavailable": [
+      "Na tuto část už nelze přímo odpovědět. Citaci jsem odebrala; otázku můžeš upravit a odeslat znovu.",
+      "That part is no longer available for a direct reply. The quote was removed; you can edit and send your question again.",
+    ],
   };
   return (
     Object.hasOwn(labels, code)
@@ -569,6 +650,142 @@ export function crazyTypkaErrorLabel(code: string, locale: Locale) {
           "The answer could not be completed safely. Please try again later.",
         ]
   )[locale === "cs" ? 0 : 1];
+}
+
+/** Fits content without a resize handle; CSS still owns the min/max sizes. */
+export function fitCrazyTypkaComposer(field: HTMLTextAreaElement) {
+  field.style.height = "auto";
+  const style = field.ownerDocument.defaultView?.getComputedStyle(field);
+  const min = Number.parseFloat(style?.minHeight ?? "") || 0;
+  const max = Number.parseFloat(style?.maxHeight ?? "") || Infinity;
+  const border =
+    (Number.parseFloat(style?.borderTopWidth ?? "") || 0) +
+    (Number.parseFloat(style?.borderBottomWidth ?? "") || 0);
+  const height = field.scrollHeight + border;
+  field.style.height = `${Math.max(min, Math.min(max, height))}px`;
+  field.style.overflowY = height > max ? "auto" : "hidden";
+}
+
+function ChatActionIcon({ kind }: { kind: "info" | "trash" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {kind === "info" ? (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11v6m0-10h.01" />
+        </>
+      ) : (
+        <>
+          <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" />
+        </>
+      )}
+    </svg>
+  );
+}
+
+/** Shells place these beside their close action; clearing and closing stay separate. */
+export function CrazyTypkaChatActions({
+  state,
+  locale,
+}: {
+  state: CrazyTypkaState;
+  locale: Locale;
+}) {
+  const cs = locale === "cs";
+  const info = useRef<HTMLDetailsElement>(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !info.current?.contains(event.target) &&
+        info.current
+      )
+        info.current.open = false;
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    return () => document.removeEventListener("pointerdown", closeOutside);
+  }, [open]);
+  const clearLabel = state.busy
+    ? cs
+      ? "Zastavit a smazat konverzaci"
+      : "Stop and clear conversation"
+    : state.recovery === "reset"
+      ? cs
+        ? "Začít novou konverzaci"
+        : "Start a new conversation"
+      : cs
+        ? "Smazat konverzaci"
+        : "Clear conversation";
+  return (
+    <div className="crazy-chat-actions">
+      <details
+        ref={info}
+        className="crazy-chat-info"
+        onToggle={(event) => setOpen(event.currentTarget.open)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && event.currentTarget.open) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.open = false;
+            event.currentTarget.querySelector("summary")?.focus();
+          }
+        }}
+      >
+        <summary
+          aria-label={cs ? "Informace o chatu" : "Chat information"}
+          title={cs ? "Informace o chatu" : "Chat information"}
+        >
+          <ChatActionIcon kind="info" />
+        </summary>
+        <div className="crazy-chat-info-content">
+          <strong>
+            {cs ? "Soukromá AI konverzace" : "Private AI conversation"}
+          </strong>
+          <p>
+            {cs
+              ? "Fiktivní AI spolužačka, žádná skutečná studentka ani oficiální podpora Silicon Hill."
+              : "A fictional AI classmate, not a real student or official Silicon Hill support."}
+          </p>
+          <p>
+            {cs
+              ? "Zprávy a kontext této konverzace může zpracovat OpenAI. Ostatní hráči ji nevidí. Neposílej hesla ani osobní údaje. AI si pamatuje jen několik posledních výměn v krátké relaci."
+              : "OpenAI may process messages and the context of this conversation. Other players cannot see it. Do not send passwords or personal data. AI remembers only a few recent exchanges in a short session."}
+          </p>
+          <p>
+            {cs
+              ? "Odpověď může chybovat. Ověř si citované podklady."
+              : "Answers can be wrong. Check the cited sources."}
+          </p>
+        </div>
+      </details>
+      <button
+        type="button"
+        className="crazy-chat-clear"
+        aria-label={clearLabel}
+        title={clearLabel}
+        disabled={
+          !state.messages.length &&
+          !state.busy &&
+          !state.draft &&
+          state.recovery === "none"
+        }
+        onClick={() => void (state.busy ? state.cancel() : state.reset())}
+      >
+        <ChatActionIcon kind="trash" />
+      </button>
+    </div>
+  );
 }
 
 export function CrazyTypkaChat({
@@ -588,23 +805,32 @@ export function CrazyTypkaChat({
     if (log.current && followLatest.current)
       log.current.scrollTop = log.current.scrollHeight;
   }, [state.messages]);
+  useEffect(() => {
+    if (composer.current) fitCrazyTypkaComposer(composer.current);
+  }, [state.draft, variant]);
+  useEffect(() => {
+    const field = composer.current;
+    if (!field) return;
+    let width = field.getBoundingClientRect().width;
+    const fit = () => fitCrazyTypkaComposer(field);
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(([entry]) => {
+        if (entry && Math.abs(entry.contentRect.width - width) > 0.5) {
+          width = entry.contentRect.width;
+          fit();
+        }
+      });
+      observer.observe(field);
+      return () => observer.disconnect();
+    }
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
   const cs = locale === "cs";
   const enabled = state.availability === "enabled";
   const compact = variant === "compact";
-  const privacy = (
-    <>
-      <p className="crazy-definition">
-        {cs
-          ? "Fiktivní AI spolužačka, žádná skutečná studentka ani oficiální podpora Silicon Hill."
-          : "A fictional AI classmate, not a real student or official Silicon Hill support."}
-      </p>
-      <p className="crazy-disclosure">
-        {cs
-          ? "Zprávy a kontext této konverzace může zpracovat OpenAI. Ostatní hráči ji nevidí. Neposílej hesla ani osobní údaje. AI si pamatuje jen několik posledních výměn v krátké relaci."
-          : "OpenAI may process messages and the context of this conversation. Other players cannot see it. Do not send passwords or personal data. AI remembers only a few recent exchanges in a short session."}
-      </p>
-    </>
-  );
+  const canSend =
+    enabled && !state.busy && state.recovery === "none" && !!state.draft.trim();
   return (
     <section
       className={compact ? "crazy-chat crazy-compact" : "crazy-chat"}
@@ -634,16 +860,15 @@ export function CrazyTypkaChat({
           )}
         </div>
       </header>
-      {!compact && privacy}
-      <div className={`crazy-availability ${state.availability}`} role="status">
-        {state.availability === "checking"
-          ? cs
-            ? "Ověřuji připojení AI…"
-            : "Checking AI availability…"
-          : enabled
+      {!enabled && (
+        <div
+          className={`crazy-availability ${state.availability}`}
+          role="status"
+        >
+          {state.availability === "checking"
             ? cs
-              ? "Soukromá AI konverzace"
-              : "Private AI conversation"
+              ? "Ověřuji připojení AI…"
+              : "Checking AI availability…"
             : state.availability === "disabled"
               ? cs
                 ? "AI zatím není připojená. Provozovatel ji musí zapnout."
@@ -651,17 +876,12 @@ export function CrazyTypkaChat({
               : cs
                 ? "Připojení AI se nepodařilo ověřit."
                 : "Could not check AI availability."}
-        {!enabled && state.availability !== "checking" && (
-          <button type="button" onClick={() => void state.refreshStatus()}>
-            {cs ? "Ověřit znovu" : "Check again"}
-          </button>
-        )}
-      </div>
-      {compact && (
-        <details className="crazy-privacy">
-          <summary>{cs ? "O AI a soukromí" : "AI and privacy"}</summary>
-          {privacy}
-        </details>
+          {state.availability !== "checking" && (
+            <button type="button" onClick={() => void state.refreshStatus()}>
+              {cs ? "Ověřit znovu" : "Check again"}
+            </button>
+          )}
+        </div>
       )}
       {state.notice === "session-restarted" && (
         <p className="crazy-disclosure" role="status">
@@ -707,7 +927,38 @@ export function CrazyTypkaChat({
                   "You"
                 )}
               </strong>
-              <p>{message.text}</p>
+              {message.quote && (
+                <blockquote className="crazy-message-quote">
+                  {message.quote.text}
+                </blockquote>
+              )}
+              {message.blocks?.length ? (
+                message.blocks.map((block) => (
+                  <div className="crazy-answer-block" key={block.id}>
+                    <p>{block.text}</p>
+                    {block.sourceIds.length > 0 &&
+                      message.requestSeq !== undefined &&
+                      state.replyableRequestSeqs.includes(
+                        message.requestSeq,
+                      ) && (
+                        <button
+                          type="button"
+                          className="crazy-reply"
+                          disabled={state.busy || state.recovery !== "none"}
+                          onClick={() => {
+                            state.selectReply(message.requestSeq!, block.id);
+                            composer.current?.focus();
+                          }}
+                        >
+                          <span aria-hidden="true">↩</span>{" "}
+                          {cs ? "Odpovědět" : "Reply"}
+                        </button>
+                      )}
+                  </div>
+                ))
+              ) : (
+                <p>{message.text}</p>
+              )}
               {message.knowledgeScope?.kind === "archive" && (
                 <small className="crazy-archive-label">
                   {cs ? "Archivní podklady" : "Archive sources"}
@@ -835,11 +1086,17 @@ export function CrazyTypkaChat({
         </div>
       )}
       {state.busy && (
-        <p className="crazy-working" role="status">
-          {cs
-            ? "Hledám v podkladech a připravuji odpověď…"
-            : "Looking through the sources and preparing an answer…"}
-        </p>
+        <div
+          className="crazy-working"
+          role="status"
+          aria-label={cs ? "Crazy Typka píše…" : "Crazy Typka is typing…"}
+        >
+          <span aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+        </div>
       )}
       {state.error && (
         <p className="error" role="alert">
@@ -866,73 +1123,6 @@ export function CrazyTypkaChat({
           </button>
         </div>
       )}
-      <details className="crazy-knowledge">
-        <summary>
-          {cs ? "Podklady" : "Sources"}:{" "}
-          {state.knowledgeScope.kind === "current"
-            ? cs
-              ? "aktuální"
-              : "current"
-            : cs
-              ? "archiv"
-              : "archive"}
-        </summary>
-        <label htmlFor={`${id}-scope`}>
-          {cs ? "Vyhledávat v" : "Search in"}
-        </label>
-        <select
-          id={`${id}-scope`}
-          value={state.knowledgeScope.kind}
-          disabled={!enabled || state.busy || state.recovery !== "none"}
-          onChange={(event) =>
-            state.setKnowledgeScope(
-              event.target.value === "archive"
-                ? { kind: "archive" }
-                : CURRENT_KNOWLEDGE_SCOPE,
-            )
-          }
-        >
-          <option value="current">
-            {cs ? "Aktuální podklady" : "Current sources"}
-          </option>
-          <option value="archive">
-            {cs ? "Archivní podklady" : "Archive sources"}
-          </option>
-        </select>
-        {state.knowledgeScope.kind === "archive" && (
-          <>
-            <label htmlFor={`${id}-asof`}>
-              {cs
-                ? "Účinné k okamžiku (UTC, volitelné)"
-                : "Effective as of (UTC, optional)"}
-            </label>
-            <input
-              id={`${id}-asof`}
-              type="datetime-local"
-              step="1"
-              value={state.knowledgeScope.asOf?.slice(0, 19) ?? ""}
-              disabled={!enabled || state.busy || state.recovery !== "none"}
-              onChange={(event) => {
-                const value = event.target.value;
-                if (!value) state.setKnowledgeScope({ kind: "archive" });
-                else {
-                  const instant = Date.parse(value + "Z");
-                  if (Number.isFinite(instant))
-                    state.setKnowledgeScope({
-                      kind: "archive",
-                      asOf: new Date(instant).toISOString(),
-                    });
-                }
-              }}
-            />
-            <small>
-              {cs
-                ? "Archiv popisuje starší dokumenty; není náhradou aktuálních podmínek."
-                : "Archives describe older documents, not the current terms."}
-            </small>
-          </>
-        )}
-      </details>
       <form
         className="crazy-form"
         onSubmit={(event) => {
@@ -950,6 +1140,21 @@ export function CrazyTypkaChat({
               ? "Napiš Crazy Typce"
               : "Message Crazy Typka"}
         </label>
+        {state.draftReply && (
+          <div className="crazy-draft-reply">
+            <blockquote>{state.draftReply.text}</blockquote>
+            <button
+              type="button"
+              aria-label={cs ? "Zrušit citaci" : "Remove quote"}
+              onClick={() => {
+                state.clearReply();
+                composer.current?.focus();
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
         <textarea
           ref={composer}
           id={`${id}-message`}
@@ -958,6 +1163,24 @@ export function CrazyTypkaChat({
           value={state.draft}
           disabled={!enabled}
           onChange={(event) => state.setDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && state.draftReply) {
+              event.preventDefault();
+              event.stopPropagation();
+              state.clearReply();
+            }
+            if (
+              event.key !== "Enter" ||
+              event.shiftKey ||
+              event.nativeEvent.isComposing ||
+              event.nativeEvent.keyCode === 229
+            )
+              return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (canSend && !event.repeat)
+              event.currentTarget.form?.requestSubmit();
+          }}
           placeholder={
             compact
               ? cs
@@ -967,30 +1190,21 @@ export function CrazyTypkaChat({
                 ? "Třeba jak začít na Strahově…"
                 : "For example, how to get started at Strahov…"
           }
-          aria-describedby={`${id}-privacy`}
+          aria-describedby={`${id}-composer-help`}
         />
+        <span id={`${id}-composer-help`} className="crazy-sr-only">
+          {cs
+            ? "Enter odešle zprávu, Shift+Enter vloží nový řádek."
+            : "Enter sends the message; Shift+Enter adds a new line."}
+        </span>
         <div className="crazy-form-actions">
-          <small id={`${id}-privacy`}>
-            {compact &&
-              (cs
-                ? "Zprávy může zpracovat OpenAI. "
-                : "OpenAI may process messages. ")}
-            {cs
-              ? "Odpověď může chybovat. Ověř si citované podklady."
-              : "Answers can be wrong. Check the cited sources."}
-          </small>
           <button
             type="submit"
             className="primary"
             aria-label={
               compact ? (cs ? "Odeslat zprávu" : "Send message") : undefined
             }
-            disabled={
-              !enabled ||
-              state.busy ||
-              state.recovery !== "none" ||
-              !state.draft.trim()
-            }
+            disabled={!canSend}
           >
             {compact ? (
               <span aria-hidden="true">↑</span>
@@ -1002,28 +1216,6 @@ export function CrazyTypkaChat({
           </button>
         </div>
       </form>
-      {(state.messages.length > 0 || state.busy) && (
-        <button
-          type="button"
-          className="crazy-reset"
-          onClick={() => {
-            void (state.busy ? state.cancel() : state.reset());
-            composer.current?.focus();
-          }}
-        >
-          {state.busy
-            ? cs
-              ? "Zastavit a smazat konverzaci"
-              : "Stop and clear conversation"
-            : state.recovery === "reset"
-              ? cs
-                ? "Začít novou konverzaci"
-                : "Start a new conversation"
-              : cs
-                ? "Smazat konverzaci"
-                : "Clear conversation"}
-        </button>
-      )}
     </section>
   );
 }

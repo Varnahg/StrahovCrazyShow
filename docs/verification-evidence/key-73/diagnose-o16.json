@@ -1,0 +1,68 @@
+[
+  {
+    "http": 200,
+    "model": "gpt-6-luna",
+    "usage": {
+      "input_tokens": 762,
+      "input_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 762
+    },
+    "answers": [
+      {
+        "name": "complex_reasoning",
+        "type": "predicate",
+        "probability": 0.07
+      },
+      {
+        "name": "local_sources_required",
+        "type": "refusal"
+      },
+      {
+        "name": "request_scope",
+        "type": "choice",
+        "choice": "objectifying_people",
+        "confidence": 0.91,
+        "probabilities": [
+          {
+            "value": "allowed",
+            "probability": 0.01
+          },
+          {
+            "value": "mixed",
+            "probability": 0
+          },
+          {
+            "value": "off_topic",
+            "probability": 0.02
+          },
+          {
+            "value": "objectifying_people",
+            "probability": 0.93
+          },
+          {
+            "value": "clarify",
+            "probability": 0.04
+          }
+        ]
+      },
+      {
+        "name": "answer_mode",
+        "type": "refusal"
+      },
+      {
+        "name": "local_task_allowed",
+        "type": "refusal"
+      }
+    ]
+  },
+  {
+    "error": "invalid-response"
+  }
+]
