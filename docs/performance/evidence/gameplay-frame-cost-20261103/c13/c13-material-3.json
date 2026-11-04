@@ -1,0 +1,6734 @@
+{
+  "schemaVersion": 1,
+  "mode": "diagnostic",
+  "kind": "routine-cost",
+  "identity": {
+    "kind": "routine-cost",
+    "routineCost": true,
+    "files": {
+      "run.mjs": {
+        "bytes": 11411,
+        "sha256": "7dee1200c47d0112996c54dcbb3ee047812155fb64737c0402a3166e8fca9f08"
+      },
+      "browser.mjs": {
+        "bytes": 4475,
+        "sha256": "ecfa65334f82a5db43048b0c89a0c2b78b44d18f9b2b7ceafd71e5d4b51fd8e2"
+      },
+      "routine.test.mjs": {
+        "bytes": 6850,
+        "sha256": "bc5ce28f2dff32e10fd708539b16b4f2c4a43b1f5d9329656e04e40ec9c12ffd"
+      },
+      "README.md": {
+        "bytes": 3813,
+        "sha256": "646e92716523d2304a0e031ce2a741949e8f88402098b2b102f5bbbfd52cef01"
+      },
+      "donor/routine-cost.mjs": {
+        "bytes": 7568,
+        "sha256": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33"
+      },
+      "donor/routine-cost-core.mjs": {
+        "bytes": 8617,
+        "sha256": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728"
+      }
+    },
+    "helperHash": "a0e099e0df3f2e8935721958f2ace67af131628fea876da6a1d9d0d6fe7aec8c",
+    "sourceSnapshotId": "2cdef569736faa5d3af601db33363b4f2430d2f80937e8cf15c1e67ec912c144",
+    "transform": {
+      "file": "client/game.ts",
+      "before": "0fe0802f9ce21b2765704dd1688a4ebeb965eb121c2a0209f2e5424c426dce73",
+      "after": "8ff3e9dee3319529e9c9f8d1ae0b47f0b5a8860961567b1b8babfd03240bfa1e"
+    },
+    "donorTransforms": {
+      "routine-cost.mjs": {
+        "before": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33",
+        "after": "921996dea8c3a645adae2f61aa3ba6ebedbeffa94aae2aa03c6610d1b7f9b7b3"
+      },
+      "routine-cost-core.mjs": {
+        "before": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728",
+        "after": "51c58d4eb27e8afc60e333401d676735efef46a88e6aa777c57573b33addab8d"
+      }
+    }
+  },
+  "capturedAtUTC": "2026-11-04T00:11:02.364Z",
+  "completed": true,
+  "timing": {
+    "materialRowLimit": 256,
+    "materialRows": [
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 6881,
+        "name": "CC0 source tree LeafSet024",
+        "className": "PBRMaterial",
+        "metadata": {
+          "materialKey": "LeafSet024",
+          "sourcePixelsModified": false,
+          "treeNormalSource": "authored-local"
+        },
+        "calls": 160,
+        "inclusiveMs": 3.3999998569488525
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 6881,
+        "name": "CC0 source tree LeafSet024",
+        "className": "PBRMaterial",
+        "metadata": {
+          "materialKey": "LeafSet024",
+          "sourcePixelsModified": false,
+          "treeNormalSource": "authored-local"
+        },
+        "calls": 160,
+        "inclusiveMs": 8.500000238418579
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 6891,
+        "name": "Authored FAR tree /models/vegetation/seasonal-r6-far/bank.json:474603:b6bd3a93c859b566b9fb18963441eee646389c9800242b4038e3c11a7f5339aa",
+        "className": "PBRMaterial",
+        "metadata": {
+          "treeClusterBank": "/models/vegetation/seasonal-r6-far/bank.json",
+          "sourcePixelsModified": true,
+          "treeNormalSource": "authored-local"
+        },
+        "calls": 128,
+        "inclusiveMs": 1.9999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 6891,
+        "name": "Authored FAR tree /models/vegetation/seasonal-r6-far/bank.json:474603:b6bd3a93c859b566b9fb18963441eee646389c9800242b4038e3c11a7f5339aa",
+        "className": "PBRMaterial",
+        "metadata": {
+          "treeClusterBank": "/models/vegetation/seasonal-r6-far/bank.json",
+          "sourcePixelsModified": true,
+          "treeNormalSource": "authored-local"
+        },
+        "calls": 128,
+        "inclusiveMs": 8.400001049041748
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 99,
+        "name": "m#f7d590",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 99,
+        "name": "m#f7d590",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 1.1000001430511475
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 110,
+        "name": "mapped ground #6f7561",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 32,
+        "inclusiveMs": 0.7999999523162842
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 110,
+        "name": "mapped ground #6f7561",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 32,
+        "inclusiveMs": 1.2000000476837158
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 379,
+        "name": "street:flush material joints",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 379,
+        "name": "street:flush material joints",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 381,
+        "name": "m#555f5f",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 381,
+        "name": "m#555f5f",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 384,
+        "name": "street:photo white parking poles",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 384,
+        "name": "street:photo white parking poles",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 888,
+        "name": "m#d8d6cb",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 888,
+        "name": "m#d8d6cb",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 985,
+        "name": "road paint line",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 985,
+        "name": "road paint line",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.9000000953674316
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1071,
+        "name": "photo:central-faded-bay-paint",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1071,
+        "name": "photo:central-faded-bay-paint",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1230,
+        "name": "reality flat weathered roof",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 136,
+        "inclusiveMs": 1.700000286102295
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1230,
+        "name": "reality flat weathered roof",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 136,
+        "inclusiveMs": 2.5
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1233,
+        "name": "reality brown timber frames",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1233,
+        "name": "reality brown timber frames",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1236,
+        "name": "reality pale aluminum sill",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 144,
+        "inclusiveMs": 1.2999992370605469
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1236,
+        "name": "reality pale aluminum sill",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 144,
+        "inclusiveMs": 3.5000009536743164
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1237,
+        "name": "reality concrete plinth",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 168,
+        "inclusiveMs": 1.200000524520874
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1237,
+        "name": "reality concrete plinth",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 168,
+        "inclusiveMs": 4.999999761581421
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1239,
+        "name": "reality entrance galvanized frame",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1239,
+        "name": "reality entrance galvanized frame",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.19999980926513672
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1245,
+        "name": "reality glass 0 0",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1245,
+        "name": "reality glass 0 0",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.9000005722045898
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1247,
+        "name": "reality glass 0 1",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1247,
+        "name": "reality glass 0 1",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1250,
+        "name": "reality glass 1 0",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1250,
+        "name": "reality glass 1 0",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1255,
+        "name": "reality glass 2 0",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1255,
+        "name": "reality glass 2 0",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.5999999046325684
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1275,
+        "name": "reality Potraviny painted east wall",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1275,
+        "name": "reality Potraviny painted east wall",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.3000001907348633
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 2663,
+        "name": "reality wall sign 7",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 2663,
+        "name": "reality wall sign 7",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 2665,
+        "name": "reality wall sign KLUB 007",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 2665,
+        "name": "reality wall sign KLUB 007",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.5
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 3830,
+        "name": "landmark:metal",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 3830,
+        "name": "landmark:metal",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.3000001907348633
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 3836,
+        "name": "landmark:infill",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 3836,
+        "name": "landmark:infill",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.39999961853027344
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 3841,
+        "name": "landmark:glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 3841,
+        "name": "landmark:glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000033378601074
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 3965,
+        "name": "campus-exterior:paint",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 3965,
+        "name": "campus-exterior:paint",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.5000002384185791
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 3970,
+        "name": "campus-exterior:fence",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 3970,
+        "name": "campus-exterior:fence",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4016,
+        "name": "campus-exterior:sand",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4016,
+        "name": "campus-exterior:sand",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4026,
+        "name": "campus-exterior:courtGreen",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4026,
+        "name": "campus-exterior:courtGreen",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.5999996662139893
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4030,
+        "name": "campus-exterior:courtRed",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4030,
+        "name": "campus-exterior:courtRed",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4035,
+        "name": "campus-exterior:roof",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4035,
+        "name": "campus-exterior:roof",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.5999999046325684
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4038,
+        "name": "campus-exterior:roofSeam",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4038,
+        "name": "campus-exterior:roofSeam",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "campus-exterior"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.20000028610229492
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4042,
+        "name": "outdoor-artifacts:outdoor-dark-metal",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 192,
+        "inclusiveMs": 1.9999992847442627
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4042,
+        "name": "outdoor-artifacts:outdoor-dark-metal",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 192,
+        "inclusiveMs": 3.5999999046325684
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4046,
+        "name": "outdoor-artifacts:outdoor-ivory",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4046,
+        "name": "outdoor-artifacts:outdoor-ivory",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.6000001430511475
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4049,
+        "name": "outdoor-artifacts:outdoor-black",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4049,
+        "name": "outdoor-artifacts:outdoor-black",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4094,
+        "name": "outdoor-artifacts:outdoor-wood",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 144,
+        "inclusiveMs": 1.3999998569488525
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4094,
+        "name": "outdoor-artifacts:outdoor-wood",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 144,
+        "inclusiveMs": 3.3999993801116943
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 4135,
+        "name": "outdoor-artifacts:outdoor-galvanized",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.19999980926513672
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 4135,
+        "name": "outdoor-artifacts:outdoor-galvanized",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.6999995708465576
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5371,
+        "name": "outdoor-artifacts:outdoor-glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5371,
+        "name": "outdoor-artifacts:outdoor-glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.20000028610229492
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5374,
+        "name": "outdoor-artifacts:outdoor-concrete",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5374,
+        "name": "outdoor-artifacts:outdoor-concrete",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "outdoor-artifacts"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 5377,
+        "name": "m#c5d989",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 5377,
+        "name": "m#c5d989",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5672,
+        "name": "black.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 0.5000002384185791
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5672,
+        "name": "black.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 1.0999996662139893
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5676,
+        "name": "Rear brake strip lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5676,
+        "name": "Rear brake strip lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.4999995231628418
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5680,
+        "name": "chrome",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 0.5999994277954102
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5680,
+        "name": "chrome",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 1.200000286102295
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5696,
+        "name": "interior",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5696,
+        "name": "interior",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5700,
+        "name": "Campus enamel",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback",
+          "vehiclePaint": true
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000033378601074
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5700,
+        "name": "Campus enamel",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback",
+          "vehiclePaint": true
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000033378601074
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5708,
+        "name": "white",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5708,
+        "name": "white",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5716,
+        "name": "rubber.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 24,
+        "inclusiveMs": 0.39999961853027344
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5716,
+        "name": "rubber.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 24,
+        "inclusiveMs": 0.7000000476837158
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5720,
+        "name": "steel.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 24,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5720,
+        "name": "steel.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 24,
+        "inclusiveMs": 1.0999996662139893
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5765,
+        "name": "black.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 40,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5765,
+        "name": "black.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 40,
+        "inclusiveMs": 1.2000000476837158
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5769,
+        "name": "Rear brake strip lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5769,
+        "name": "Rear brake strip lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5773,
+        "name": "chrome",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 40,
+        "inclusiveMs": 0.20000028610229492
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5773,
+        "name": "chrome",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 40,
+        "inclusiveMs": 1.3999996185302734
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5789,
+        "name": "interior",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5789,
+        "name": "interior",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000033378601074
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5793,
+        "name": "Campus enamel",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback",
+          "vehiclePaint": true
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5793,
+        "name": "Campus enamel",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback",
+          "vehiclePaint": true
+        },
+        "calls": 8,
+        "inclusiveMs": 0.6999995708465576
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5801,
+        "name": "white",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5801,
+        "name": "white",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.6999998092651367
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5809,
+        "name": "rubber.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 0.5000002384185791
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5809,
+        "name": "rubber.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 1.1000001430511475
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5813,
+        "name": "steel.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 0.19999980926513672
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5813,
+        "name": "steel.001",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 32,
+        "inclusiveMs": 1.1999995708465576
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5971,
+        "name": "parked dark lens Rear position lamp lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5971,
+        "name": "parked dark lens Rear position lamp lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.8999993801116943
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 6876,
+        "name": "CC0 source tree Bark012",
+        "className": "PBRMaterial",
+        "metadata": {
+          "materialKey": "Bark012",
+          "sourcePixelsModified": false,
+          "treeNormalSource": "authored-local"
+        },
+        "calls": 112,
+        "inclusiveMs": 1.1000006198883057
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 6876,
+        "name": "CC0 source tree Bark012",
+        "className": "PBRMaterial",
+        "metadata": {
+          "materialKey": "Bark012",
+          "sourcePixelsModified": false,
+          "treeNormalSource": "authored-local"
+        },
+        "calls": 112,
+        "inclusiveMs": 3.1000003814697266
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 7884,
+        "name": "B06 / metal",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 7884,
+        "name": "B06 / metal",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 7895,
+        "name": "B6 / b6_facade_ivory",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.7000000476837158
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 7895,
+        "name": "B6 / b6_facade_ivory",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.6999998092651367
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 7900,
+        "name": "B6 / b6_frame_bronze",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 7900,
+        "name": "B6 / b6_frame_bronze",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 8122,
+        "name": "B06 / door",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.19999980926513672
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 8122,
+        "name": "B06 / door",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.5
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 8237,
+        "name": "B6 / b6_white_paint",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 8237,
+        "name": "B6 / b6_white_paint",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.6000001430511475
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 8603,
+        "name": "B06 / floor",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 8603,
+        "name": "B06 / floor",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "cad-buildings",
+          "buildingId": "b06"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12088,
+        "name": "terrain:soil-grass-base",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 120,
+        "inclusiveMs": 2.3999993801116943
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12088,
+        "name": "terrain:soil-grass-base",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 120,
+        "inclusiveMs": 3.6000001430511475
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12095,
+        "name": "mapped ground #788268",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 56,
+        "inclusiveMs": 0.5999999046325684
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12095,
+        "name": "mapped ground #788268",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 56,
+        "inclusiveMs": 2.1999995708465576
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12099,
+        "name": "street:asphalt",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 112,
+        "inclusiveMs": 2.200000047683716
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12099,
+        "name": "street:asphalt",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 112,
+        "inclusiveMs": 4.500000238418579
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12103,
+        "name": "street:sett",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 24,
+        "inclusiveMs": 0.4999997615814209
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12103,
+        "name": "street:sett",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 24,
+        "inclusiveMs": 1.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12107,
+        "name": "street:paving",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 40,
+        "inclusiveMs": 0.6999995708465576
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12107,
+        "name": "street:paving",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 40,
+        "inclusiveMs": 1.3999998569488525
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12111,
+        "name": "street:gravel",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12111,
+        "name": "street:gravel",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.9000000953674316
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12115,
+        "name": "street:soil",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.6000003814697266
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12115,
+        "name": "street:soil",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.7000000476837158
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12122,
+        "name": "photo:central-asphalt",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 24,
+        "inclusiveMs": 0.5999996662139893
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12122,
+        "name": "photo:central-asphalt",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 24,
+        "inclusiveMs": 0.7000000476837158
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12123,
+        "name": "reality aged pale plaster",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 168,
+        "inclusiveMs": 2.200000762939453
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12123,
+        "name": "reality aged pale plaster",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 168,
+        "inclusiveMs": 5.299999952316284
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12127,
+        "name": "reality board concrete",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12127,
+        "name": "reality board concrete",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.7000000476837158
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12131,
+        "name": "m#797c75",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 168,
+        "inclusiveMs": 2.6999993324279785
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12131,
+        "name": "m#797c75",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 168,
+        "inclusiveMs": 6.099999189376831
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12135,
+        "name": "landmark:concrete",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12135,
+        "name": "landmark:concrete",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 1.0999996662139893
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12136,
+        "name": "landmark:pale",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12136,
+        "name": "landmark:pale",
+        "className": "PBRMaterial",
+        "metadata": {
+          "sourcePack": "landmark-reality"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000033378601074
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12148,
+        "name": "character skin:#d7a77f",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.5000002384185791
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12148,
+        "name": "character skin:#d7a77f",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 1.5999999046325684
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12156,
+        "name": "character hair:#352823",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12156,
+        "name": "character hair:#352823",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.8000001907348633
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12168,
+        "name": "character leather:#343a36",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12168,
+        "name": "character leather:#343a36",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.5
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12171,
+        "name": "character rubber:#a5a79c",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.20000028610229492
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12171,
+        "name": "character rubber:#a5a79c",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.39999961853027344
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12181,
+        "name": "character ocular:#6b4c36",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.19999980926513672
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12181,
+        "name": "character ocular:#6b4c36",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.5000004768371582
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12218,
+        "name": "CC0 student garment sweatshirt:upper:#657b67",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12218,
+        "name": "CC0 student garment sweatshirt:upper:#657b67",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.7000002861022949
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12221,
+        "name": "CC0 student garment sweatshirt:trousers:#273b40",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.3000001907348633
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12221,
+        "name": "CC0 student garment sweatshirt:trousers:#273b40",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.7000002861022949
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12352,
+        "name": "character skin:#8f5c42",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12352,
+        "name": "character skin:#8f5c42",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 1.1999998092651367
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12357,
+        "name": "character hair:#241f1d",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.5000002384185791
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12357,
+        "name": "character hair:#241f1d",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.6999995708465576
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12379,
+        "name": "character metal:#343d39",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12379,
+        "name": "character metal:#343d39",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12382,
+        "name": "character ocular:#52604d",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12382,
+        "name": "character ocular:#52604d",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12407,
+        "name": "CC0 student garment sweatshirt:upper:#9b7258",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12407,
+        "name": "CC0 student garment sweatshirt:upper:#9b7258",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12410,
+        "name": "CC0 student garment sweatshirt:trousers:#343b48",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12410,
+        "name": "CC0 student garment sweatshirt:trousers:#343b48",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.5
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12420,
+        "name": "character skin:#e9c4a6",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.6000001430511475
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12420,
+        "name": "character skin:#e9c4a6",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 1
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12425,
+        "name": "character hair:#69513e",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.5
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12425,
+        "name": "character hair:#69513e",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 16,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12446,
+        "name": "character ocular:#526575",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.10000014305114746
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12446,
+        "name": "character ocular:#526575",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.5999999046325684
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12473,
+        "name": "CC0 student garment jacket:upper:#626e88",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12473,
+        "name": "CC0 student garment jacket:upper:#626e88",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.7999997138977051
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12476,
+        "name": "CC0 student garment jacket:trousers:#3d3c46",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12476,
+        "name": "CC0 student garment jacket:trousers:#3d3c46",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.6000006198883057
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 989,
+        "name": "road paint bicycle",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 989,
+        "name": "road paint bicycle",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 1220,
+        "name": "central-silicon-hill-ground-paint:paint",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.20000004768371582
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 1220,
+        "name": "central-silicon-hill-ground-paint:paint",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.3000001907348633
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 12189,
+        "name": "character strands-short02:#352823",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999997138977051
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 12189,
+        "name": "character strands-short02:#352823",
+        "className": "PBRMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.40000033378601074
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 382,
+        "name": "art:lamp-pool",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 382,
+        "name": "art:lamp-pool",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.3000001907348633
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5692,
+        "name": "Window glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.19999980926513672
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5692,
+        "name": "Window glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.40000009536743164
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5785,
+        "name": "Window glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.19999980926513672
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5785,
+        "name": "Window glass",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.6000001430511475
+      },
+      {
+        "routine": "StandardMaterial.isReadyForSubMesh",
+        "materialId": 93,
+        "name": "soft contact occlusion",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.2999999523162842
+      },
+      {
+        "routine": "StandardMaterial.bindForSubMesh",
+        "materialId": 93,
+        "name": "soft contact occlusion",
+        "className": "StandardMaterial",
+        "metadata": {},
+        "calls": 8,
+        "inclusiveMs": 0.39999985694885254
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5684,
+        "name": "clearlens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.3000001907348633
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5684,
+        "name": "clearlens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.3000001907348633
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5777,
+        "name": "clearlens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5777,
+        "name": "clearlens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 8,
+        "inclusiveMs": 0.6000003814697266
+      },
+      {
+        "routine": "PBRBaseMaterial.isReadyForSubMesh",
+        "materialId": 5968,
+        "name": "parked dark lens Front headlamp lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.09999990463256836
+      },
+      {
+        "routine": "PBRBaseMaterial.bindForSubMesh",
+        "materialId": 5968,
+        "name": "parked dark lens Front headlamp lens",
+        "className": "PBRMaterial",
+        "metadata": {
+          "assetId": "campus-hatchback"
+        },
+        "calls": 16,
+        "inclusiveMs": 0.8999998569488525
+      }
+    ],
+    "materialOmitted": {
+      "calls": 0,
+      "inclusiveMs": 0
+    },
+    "schemaVersion": 1,
+    "scope": {
+      "clock": "performance.now synchronous CPU wall time; includes observer overhead/GC/scheduling, not GPU execution",
+      "frames": "at most eight original actualScene.render calls with native _frameId progress; no additional render/readiness calls",
+      "phases": "innermost public active/main/ObjectRenderer init-finish scope, otherwise other; scopes may nest",
+      "nesting": "inclusive times overlap; selfSelected subtracts selected children only, not all children or whole-frame CPU",
+      "residual": "unselected culling/reset/sort/engine/custom material work remains unassigned; no measured3ms saving or FPS A/B"
+    },
+    "limits": {
+      "routines": 8,
+      "frames": 8,
+      "stack": 32,
+      "callsPerFrame": 100000,
+      "phaseEvents": 128,
+      "renderers": 64
+    },
+    "targets": [
+      "scene.getActiveMeshCandidates",
+      "Scene._activeMesh",
+      "TransformNode.computeWorldMatrix",
+      "Mesh.getLOD",
+      "PBRBaseMaterial.isReadyForSubMesh",
+      "StandardMaterial.isReadyForSubMesh",
+      "PBRBaseMaterial.bindForSubMesh",
+      "StandardMaterial.bindForSubMesh"
+    ],
+    "frames": [
+      {
+        "frameId": 4703,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 2.1000001430511475,
+            "selfSelectedMs": 2.1000001430511475,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2644,
+            "inclusiveMs": 3.700000762939453,
+            "selfSelectedMs": 3.200000047683716,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.7999997138977051,
+            "selfSelectedMs": 0.7999997138977051,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 774,
+            "inclusiveMs": 0.9000003337860107,
+            "selfSelectedMs": 0.9000003337860107,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 3.000000476837158,
+            "selfSelectedMs": 3.000000476837158,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 5.6000001430511475,
+            "selfSelectedMs": 5.6000001430511475,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.2999999523162842,
+            "selfSelectedMs": 0.2999999523162842,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.5,
+            "selfSelectedMs": 1.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 9.79999852180481,
+            "selfSelectedMs": 9.79999852180481,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.6000001430511475,
+            "selfSelectedMs": 0.6000001430511475,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 2.299999952316284,
+            "selfSelectedMs": 2.299999952316284,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4704,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4704,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 2.200000524520874,
+            "selfSelectedMs": 2.200000524520874,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2644,
+            "inclusiveMs": 5.400000333786011,
+            "selfSelectedMs": 5.000000715255737,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 1.2000007629394531,
+            "selfSelectedMs": 1.2000007629394531,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 1.299999475479126,
+            "selfSelectedMs": 1.299999475479126,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 3.3999996185302734,
+            "selfSelectedMs": 3.3999996185302734,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 4.300000429153442,
+            "selfSelectedMs": 4.300000429153442,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.19999980926513672,
+            "selfSelectedMs": 0.19999980926513672,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.9000000953674316,
+            "selfSelectedMs": 0.9000000953674316,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 14.100000619888306,
+            "selfSelectedMs": 14.000000476837158,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.6000003814697266,
+            "selfSelectedMs": 0.6000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 2.6999990940093994,
+            "selfSelectedMs": 2.6999990940093994,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4705,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4705,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 2.299999952316284,
+            "selfSelectedMs": 2.299999952316284,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2644,
+            "inclusiveMs": 3.4000003337860107,
+            "selfSelectedMs": 3.4000003337860107,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 1.5000004768371582,
+            "selfSelectedMs": 1.5000004768371582,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 1.299999713897705,
+            "selfSelectedMs": 1.299999713897705,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 3.1000003814697266,
+            "selfSelectedMs": 3.1000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 3.3999993801116943,
+            "selfSelectedMs": 3.3999993801116943,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.8999996185302734,
+            "selfSelectedMs": 0.8999996185302734,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 9.999999761581421,
+            "selfSelectedMs": 9.999999761581421,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.6000001430511475,
+            "selfSelectedMs": 0.6000001430511475,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.9000000953674316,
+            "selfSelectedMs": 1.9000000953674316,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4706,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4706,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.6000003814697266,
+            "selfSelectedMs": 1.6000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2649,
+            "inclusiveMs": 4.600000381469727,
+            "selfSelectedMs": 4,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 1.1999998092651367,
+            "selfSelectedMs": 1.1999998092651367,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 1.000000238418579,
+            "selfSelectedMs": 1.000000238418579,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 2.5999999046325684,
+            "selfSelectedMs": 2.5999999046325684,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 5.200001239776611,
+            "selfSelectedMs": 5.200001239776611,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.20000004768371582,
+            "selfSelectedMs": 0.20000004768371582,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.7999997138977051,
+            "selfSelectedMs": 0.7999997138977051,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 13.299998998641968,
+            "selfSelectedMs": 13.299998998641968,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.40000009536743164,
+            "selfSelectedMs": 0.40000009536743164,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.6000003814697266,
+            "selfSelectedMs": 1.6000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4707,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4707,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 2.5999996662139893,
+            "selfSelectedMs": 2.5999996662139893,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2649,
+            "inclusiveMs": 5.299999713897705,
+            "selfSelectedMs": 5.299999713897705,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 1.3999991416931152,
+            "selfSelectedMs": 1.3999991416931152,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 1.3999996185302734,
+            "selfSelectedMs": 1.3999996185302734,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 2.90000057220459,
+            "selfSelectedMs": 2.90000057220459,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 5.7999982833862305,
+            "selfSelectedMs": 5.7999982833862305,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.39999985694885254,
+            "selfSelectedMs": 0.39999985694885254,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.700000524520874,
+            "selfSelectedMs": 1.700000524520874,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 12.700000047683716,
+            "selfSelectedMs": 12.600000143051147,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 1.299999713897705,
+            "selfSelectedMs": 1.299999713897705,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 3.3000004291534424,
+            "selfSelectedMs": 3.3000004291534424,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4708,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4708,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.5999999046325684,
+            "selfSelectedMs": 1.5999999046325684,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2644,
+            "inclusiveMs": 4.599999904632568,
+            "selfSelectedMs": 4.299999952316284,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 1.7000007629394531,
+            "selfSelectedMs": 1.7000007629394531,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 1.1000008583068848,
+            "selfSelectedMs": 1.1000008583068848,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 2.999999523162842,
+            "selfSelectedMs": 2.999999523162842,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 4.399998664855957,
+            "selfSelectedMs": 4.399998664855957,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1,
+            "selfSelectedMs": 1,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 10.600000381469727,
+            "selfSelectedMs": 10.600000381469727,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.7000002861022949,
+            "selfSelectedMs": 0.7000002861022949,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 2.799999713897705,
+            "selfSelectedMs": 2.799999713897705,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4709,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4709,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.499999761581421,
+            "selfSelectedMs": 1.499999761581421,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2647,
+            "inclusiveMs": 3.3000006675720215,
+            "selfSelectedMs": 3.1000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 1.1000003814697266,
+            "selfSelectedMs": 1.1000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 1.500000238418579,
+            "selfSelectedMs": 1.500000238418579,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 2.6000001430511475,
+            "selfSelectedMs": 2.6000001430511475,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 4.599999666213989,
+            "selfSelectedMs": 4.599999666213989,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.2999992370605469,
+            "selfSelectedMs": 1.2999992370605469,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 10.299999475479126,
+            "selfSelectedMs": 10.299999475479126,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.9000000953674316,
+            "selfSelectedMs": 0.9000000953674316,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 2.9000015258789062,
+            "selfSelectedMs": 2.9000015258789062,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4710,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4710,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 2.3999993801116943,
+            "selfSelectedMs": 2.3999993801116943,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2649,
+            "inclusiveMs": 5.500001430511475,
+            "selfSelectedMs": 4.600001096725464,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.5000002384185791,
+            "selfSelectedMs": 0.5000002384185791,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.5999999046325684,
+            "selfSelectedMs": 0.5999999046325684,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2558,
+            "inclusiveMs": 3.200000047683716,
+            "selfSelectedMs": 3.200000047683716,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 2.1000001430511475,
+            "selfSelectedMs": 2.1000001430511475,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.20000004768371582,
+            "selfSelectedMs": 0.20000004768371582,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 8.5,
+            "selfSelectedMs": 8.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.5,
+            "selfSelectedMs": 0.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.700000286102295,
+            "selfSelectedMs": 1.700000286102295,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4711,
+        "progressed": true,
+        "threw": false
+      }
+    ],
+    "complete": true,
+    "reason": "complete",
+    "errors": 0,
+    "phaseErrors": 0,
+    "restoreConflicts": 0,
+    "installedRoutineHooks": 8,
+    "remainingRoutineHooks": 0,
+    "active": false
+  },
+  "failure": null,
+  "materialRows": [
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 6881,
+      "name": "CC0 source tree LeafSet024",
+      "className": "PBRMaterial",
+      "metadata": {
+        "materialKey": "LeafSet024",
+        "sourcePixelsModified": false,
+        "treeNormalSource": "authored-local"
+      },
+      "calls": 160,
+      "inclusiveMs": 3.3999998569488525
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 6881,
+      "name": "CC0 source tree LeafSet024",
+      "className": "PBRMaterial",
+      "metadata": {
+        "materialKey": "LeafSet024",
+        "sourcePixelsModified": false,
+        "treeNormalSource": "authored-local"
+      },
+      "calls": 160,
+      "inclusiveMs": 8.500000238418579
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 6891,
+      "name": "Authored FAR tree /models/vegetation/seasonal-r6-far/bank.json:474603:b6bd3a93c859b566b9fb18963441eee646389c9800242b4038e3c11a7f5339aa",
+      "className": "PBRMaterial",
+      "metadata": {
+        "treeClusterBank": "/models/vegetation/seasonal-r6-far/bank.json",
+        "sourcePixelsModified": true,
+        "treeNormalSource": "authored-local"
+      },
+      "calls": 128,
+      "inclusiveMs": 1.9999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 6891,
+      "name": "Authored FAR tree /models/vegetation/seasonal-r6-far/bank.json:474603:b6bd3a93c859b566b9fb18963441eee646389c9800242b4038e3c11a7f5339aa",
+      "className": "PBRMaterial",
+      "metadata": {
+        "treeClusterBank": "/models/vegetation/seasonal-r6-far/bank.json",
+        "sourcePixelsModified": true,
+        "treeNormalSource": "authored-local"
+      },
+      "calls": 128,
+      "inclusiveMs": 8.400001049041748
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 99,
+      "name": "m#f7d590",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 99,
+      "name": "m#f7d590",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 1.1000001430511475
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 110,
+      "name": "mapped ground #6f7561",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 32,
+      "inclusiveMs": 0.7999999523162842
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 110,
+      "name": "mapped ground #6f7561",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 32,
+      "inclusiveMs": 1.2000000476837158
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 379,
+      "name": "street:flush material joints",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 379,
+      "name": "street:flush material joints",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 381,
+      "name": "m#555f5f",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 381,
+      "name": "m#555f5f",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 384,
+      "name": "street:photo white parking poles",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 384,
+      "name": "street:photo white parking poles",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 888,
+      "name": "m#d8d6cb",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 888,
+      "name": "m#d8d6cb",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 985,
+      "name": "road paint line",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 985,
+      "name": "road paint line",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.9000000953674316
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1071,
+      "name": "photo:central-faded-bay-paint",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1071,
+      "name": "photo:central-faded-bay-paint",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1230,
+      "name": "reality flat weathered roof",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 136,
+      "inclusiveMs": 1.700000286102295
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1230,
+      "name": "reality flat weathered roof",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 136,
+      "inclusiveMs": 2.5
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1233,
+      "name": "reality brown timber frames",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1233,
+      "name": "reality brown timber frames",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1236,
+      "name": "reality pale aluminum sill",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 144,
+      "inclusiveMs": 1.2999992370605469
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1236,
+      "name": "reality pale aluminum sill",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 144,
+      "inclusiveMs": 3.5000009536743164
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1237,
+      "name": "reality concrete plinth",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 168,
+      "inclusiveMs": 1.200000524520874
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1237,
+      "name": "reality concrete plinth",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 168,
+      "inclusiveMs": 4.999999761581421
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1239,
+      "name": "reality entrance galvanized frame",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1239,
+      "name": "reality entrance galvanized frame",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.19999980926513672
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1245,
+      "name": "reality glass 0 0",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1245,
+      "name": "reality glass 0 0",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.9000005722045898
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1247,
+      "name": "reality glass 0 1",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1247,
+      "name": "reality glass 0 1",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1250,
+      "name": "reality glass 1 0",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1250,
+      "name": "reality glass 1 0",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1255,
+      "name": "reality glass 2 0",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1255,
+      "name": "reality glass 2 0",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.5999999046325684
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1275,
+      "name": "reality Potraviny painted east wall",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1275,
+      "name": "reality Potraviny painted east wall",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.3000001907348633
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 2663,
+      "name": "reality wall sign 7",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 2663,
+      "name": "reality wall sign 7",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 2665,
+      "name": "reality wall sign KLUB 007",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 2665,
+      "name": "reality wall sign KLUB 007",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.5
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 3830,
+      "name": "landmark:metal",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 3830,
+      "name": "landmark:metal",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.3000001907348633
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 3836,
+      "name": "landmark:infill",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 3836,
+      "name": "landmark:infill",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.39999961853027344
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 3841,
+      "name": "landmark:glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 3841,
+      "name": "landmark:glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000033378601074
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 3965,
+      "name": "campus-exterior:paint",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 3965,
+      "name": "campus-exterior:paint",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.5000002384185791
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 3970,
+      "name": "campus-exterior:fence",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 3970,
+      "name": "campus-exterior:fence",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4016,
+      "name": "campus-exterior:sand",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4016,
+      "name": "campus-exterior:sand",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4026,
+      "name": "campus-exterior:courtGreen",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4026,
+      "name": "campus-exterior:courtGreen",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.5999996662139893
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4030,
+      "name": "campus-exterior:courtRed",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4030,
+      "name": "campus-exterior:courtRed",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4035,
+      "name": "campus-exterior:roof",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4035,
+      "name": "campus-exterior:roof",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.5999999046325684
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4038,
+      "name": "campus-exterior:roofSeam",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4038,
+      "name": "campus-exterior:roofSeam",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "campus-exterior"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.20000028610229492
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4042,
+      "name": "outdoor-artifacts:outdoor-dark-metal",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 192,
+      "inclusiveMs": 1.9999992847442627
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4042,
+      "name": "outdoor-artifacts:outdoor-dark-metal",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 192,
+      "inclusiveMs": 3.5999999046325684
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4046,
+      "name": "outdoor-artifacts:outdoor-ivory",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4046,
+      "name": "outdoor-artifacts:outdoor-ivory",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.6000001430511475
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4049,
+      "name": "outdoor-artifacts:outdoor-black",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4049,
+      "name": "outdoor-artifacts:outdoor-black",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4094,
+      "name": "outdoor-artifacts:outdoor-wood",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 144,
+      "inclusiveMs": 1.3999998569488525
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4094,
+      "name": "outdoor-artifacts:outdoor-wood",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 144,
+      "inclusiveMs": 3.3999993801116943
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 4135,
+      "name": "outdoor-artifacts:outdoor-galvanized",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.19999980926513672
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 4135,
+      "name": "outdoor-artifacts:outdoor-galvanized",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.6999995708465576
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5371,
+      "name": "outdoor-artifacts:outdoor-glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5371,
+      "name": "outdoor-artifacts:outdoor-glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.20000028610229492
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5374,
+      "name": "outdoor-artifacts:outdoor-concrete",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5374,
+      "name": "outdoor-artifacts:outdoor-concrete",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "outdoor-artifacts"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 5377,
+      "name": "m#c5d989",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 5377,
+      "name": "m#c5d989",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5672,
+      "name": "black.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 0.5000002384185791
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5672,
+      "name": "black.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 1.0999996662139893
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5676,
+      "name": "Rear brake strip lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5676,
+      "name": "Rear brake strip lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.4999995231628418
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5680,
+      "name": "chrome",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 0.5999994277954102
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5680,
+      "name": "chrome",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 1.200000286102295
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5696,
+      "name": "interior",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5696,
+      "name": "interior",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5700,
+      "name": "Campus enamel",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback",
+        "vehiclePaint": true
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000033378601074
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5700,
+      "name": "Campus enamel",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback",
+        "vehiclePaint": true
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000033378601074
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5708,
+      "name": "white",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5708,
+      "name": "white",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5716,
+      "name": "rubber.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 24,
+      "inclusiveMs": 0.39999961853027344
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5716,
+      "name": "rubber.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 24,
+      "inclusiveMs": 0.7000000476837158
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5720,
+      "name": "steel.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 24,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5720,
+      "name": "steel.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 24,
+      "inclusiveMs": 1.0999996662139893
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5765,
+      "name": "black.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 40,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5765,
+      "name": "black.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 40,
+      "inclusiveMs": 1.2000000476837158
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5769,
+      "name": "Rear brake strip lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5769,
+      "name": "Rear brake strip lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5773,
+      "name": "chrome",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 40,
+      "inclusiveMs": 0.20000028610229492
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5773,
+      "name": "chrome",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 40,
+      "inclusiveMs": 1.3999996185302734
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5789,
+      "name": "interior",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5789,
+      "name": "interior",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000033378601074
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5793,
+      "name": "Campus enamel",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback",
+        "vehiclePaint": true
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5793,
+      "name": "Campus enamel",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback",
+        "vehiclePaint": true
+      },
+      "calls": 8,
+      "inclusiveMs": 0.6999995708465576
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5801,
+      "name": "white",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5801,
+      "name": "white",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.6999998092651367
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5809,
+      "name": "rubber.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 0.5000002384185791
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5809,
+      "name": "rubber.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 1.1000001430511475
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5813,
+      "name": "steel.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 0.19999980926513672
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5813,
+      "name": "steel.001",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 32,
+      "inclusiveMs": 1.1999995708465576
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5971,
+      "name": "parked dark lens Rear position lamp lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5971,
+      "name": "parked dark lens Rear position lamp lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.8999993801116943
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 6876,
+      "name": "CC0 source tree Bark012",
+      "className": "PBRMaterial",
+      "metadata": {
+        "materialKey": "Bark012",
+        "sourcePixelsModified": false,
+        "treeNormalSource": "authored-local"
+      },
+      "calls": 112,
+      "inclusiveMs": 1.1000006198883057
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 6876,
+      "name": "CC0 source tree Bark012",
+      "className": "PBRMaterial",
+      "metadata": {
+        "materialKey": "Bark012",
+        "sourcePixelsModified": false,
+        "treeNormalSource": "authored-local"
+      },
+      "calls": 112,
+      "inclusiveMs": 3.1000003814697266
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 7884,
+      "name": "B06 / metal",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 7884,
+      "name": "B06 / metal",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 7895,
+      "name": "B6 / b6_facade_ivory",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.7000000476837158
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 7895,
+      "name": "B6 / b6_facade_ivory",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.6999998092651367
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 7900,
+      "name": "B6 / b6_frame_bronze",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 7900,
+      "name": "B6 / b6_frame_bronze",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 8122,
+      "name": "B06 / door",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.19999980926513672
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 8122,
+      "name": "B06 / door",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.5
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 8237,
+      "name": "B6 / b6_white_paint",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 8237,
+      "name": "B6 / b6_white_paint",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.6000001430511475
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 8603,
+      "name": "B06 / floor",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 8603,
+      "name": "B06 / floor",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "cad-buildings",
+        "buildingId": "b06"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12088,
+      "name": "terrain:soil-grass-base",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 120,
+      "inclusiveMs": 2.3999993801116943
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12088,
+      "name": "terrain:soil-grass-base",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 120,
+      "inclusiveMs": 3.6000001430511475
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12095,
+      "name": "mapped ground #788268",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 56,
+      "inclusiveMs": 0.5999999046325684
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12095,
+      "name": "mapped ground #788268",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 56,
+      "inclusiveMs": 2.1999995708465576
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12099,
+      "name": "street:asphalt",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 112,
+      "inclusiveMs": 2.200000047683716
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12099,
+      "name": "street:asphalt",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 112,
+      "inclusiveMs": 4.500000238418579
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12103,
+      "name": "street:sett",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 24,
+      "inclusiveMs": 0.4999997615814209
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12103,
+      "name": "street:sett",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 24,
+      "inclusiveMs": 1.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12107,
+      "name": "street:paving",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 40,
+      "inclusiveMs": 0.6999995708465576
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12107,
+      "name": "street:paving",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 40,
+      "inclusiveMs": 1.3999998569488525
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12111,
+      "name": "street:gravel",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12111,
+      "name": "street:gravel",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.9000000953674316
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12115,
+      "name": "street:soil",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.6000003814697266
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12115,
+      "name": "street:soil",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.7000000476837158
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12122,
+      "name": "photo:central-asphalt",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 24,
+      "inclusiveMs": 0.5999996662139893
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12122,
+      "name": "photo:central-asphalt",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 24,
+      "inclusiveMs": 0.7000000476837158
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12123,
+      "name": "reality aged pale plaster",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 168,
+      "inclusiveMs": 2.200000762939453
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12123,
+      "name": "reality aged pale plaster",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 168,
+      "inclusiveMs": 5.299999952316284
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12127,
+      "name": "reality board concrete",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12127,
+      "name": "reality board concrete",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.7000000476837158
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12131,
+      "name": "m#797c75",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 168,
+      "inclusiveMs": 2.6999993324279785
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12131,
+      "name": "m#797c75",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 168,
+      "inclusiveMs": 6.099999189376831
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12135,
+      "name": "landmark:concrete",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12135,
+      "name": "landmark:concrete",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 1.0999996662139893
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12136,
+      "name": "landmark:pale",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12136,
+      "name": "landmark:pale",
+      "className": "PBRMaterial",
+      "metadata": {
+        "sourcePack": "landmark-reality"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000033378601074
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12148,
+      "name": "character skin:#d7a77f",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.5000002384185791
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12148,
+      "name": "character skin:#d7a77f",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 1.5999999046325684
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12156,
+      "name": "character hair:#352823",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12156,
+      "name": "character hair:#352823",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.8000001907348633
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12168,
+      "name": "character leather:#343a36",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12168,
+      "name": "character leather:#343a36",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.5
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12171,
+      "name": "character rubber:#a5a79c",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.20000028610229492
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12171,
+      "name": "character rubber:#a5a79c",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.39999961853027344
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12181,
+      "name": "character ocular:#6b4c36",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.19999980926513672
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12181,
+      "name": "character ocular:#6b4c36",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.5000004768371582
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12218,
+      "name": "CC0 student garment sweatshirt:upper:#657b67",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12218,
+      "name": "CC0 student garment sweatshirt:upper:#657b67",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.7000002861022949
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12221,
+      "name": "CC0 student garment sweatshirt:trousers:#273b40",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.3000001907348633
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12221,
+      "name": "CC0 student garment sweatshirt:trousers:#273b40",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.7000002861022949
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12352,
+      "name": "character skin:#8f5c42",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12352,
+      "name": "character skin:#8f5c42",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 1.1999998092651367
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12357,
+      "name": "character hair:#241f1d",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.5000002384185791
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12357,
+      "name": "character hair:#241f1d",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.6999995708465576
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12379,
+      "name": "character metal:#343d39",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12379,
+      "name": "character metal:#343d39",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12382,
+      "name": "character ocular:#52604d",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12382,
+      "name": "character ocular:#52604d",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12407,
+      "name": "CC0 student garment sweatshirt:upper:#9b7258",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12407,
+      "name": "CC0 student garment sweatshirt:upper:#9b7258",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12410,
+      "name": "CC0 student garment sweatshirt:trousers:#343b48",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12410,
+      "name": "CC0 student garment sweatshirt:trousers:#343b48",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.5
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12420,
+      "name": "character skin:#e9c4a6",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.6000001430511475
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12420,
+      "name": "character skin:#e9c4a6",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 1
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12425,
+      "name": "character hair:#69513e",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.5
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12425,
+      "name": "character hair:#69513e",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 16,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12446,
+      "name": "character ocular:#526575",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.10000014305114746
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12446,
+      "name": "character ocular:#526575",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.5999999046325684
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12473,
+      "name": "CC0 student garment jacket:upper:#626e88",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12473,
+      "name": "CC0 student garment jacket:upper:#626e88",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.7999997138977051
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12476,
+      "name": "CC0 student garment jacket:trousers:#3d3c46",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12476,
+      "name": "CC0 student garment jacket:trousers:#3d3c46",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.6000006198883057
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 989,
+      "name": "road paint bicycle",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 989,
+      "name": "road paint bicycle",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 1220,
+      "name": "central-silicon-hill-ground-paint:paint",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.20000004768371582
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 1220,
+      "name": "central-silicon-hill-ground-paint:paint",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.3000001907348633
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 12189,
+      "name": "character strands-short02:#352823",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999997138977051
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 12189,
+      "name": "character strands-short02:#352823",
+      "className": "PBRMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.40000033378601074
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 382,
+      "name": "art:lamp-pool",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 382,
+      "name": "art:lamp-pool",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.3000001907348633
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5692,
+      "name": "Window glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.19999980926513672
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5692,
+      "name": "Window glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.40000009536743164
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5785,
+      "name": "Window glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.19999980926513672
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5785,
+      "name": "Window glass",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.6000001430511475
+    },
+    {
+      "routine": "StandardMaterial.isReadyForSubMesh",
+      "materialId": 93,
+      "name": "soft contact occlusion",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.2999999523162842
+    },
+    {
+      "routine": "StandardMaterial.bindForSubMesh",
+      "materialId": 93,
+      "name": "soft contact occlusion",
+      "className": "StandardMaterial",
+      "metadata": {},
+      "calls": 8,
+      "inclusiveMs": 0.39999985694885254
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5684,
+      "name": "clearlens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.3000001907348633
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5684,
+      "name": "clearlens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.3000001907348633
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5777,
+      "name": "clearlens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5777,
+      "name": "clearlens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 8,
+      "inclusiveMs": 0.6000003814697266
+    },
+    {
+      "routine": "PBRBaseMaterial.isReadyForSubMesh",
+      "materialId": 5968,
+      "name": "parked dark lens Front headlamp lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.09999990463256836
+    },
+    {
+      "routine": "PBRBaseMaterial.bindForSubMesh",
+      "materialId": 5968,
+      "name": "parked dark lens Front headlamp lens",
+      "className": "PBRMaterial",
+      "metadata": {
+        "assetId": "campus-hatchback"
+      },
+      "calls": 16,
+      "inclusiveMs": 0.8999998569488525
+    }
+  ],
+  "materialOmitted": {
+    "calls": 0,
+    "inclusiveMs": 0
+  }
+}

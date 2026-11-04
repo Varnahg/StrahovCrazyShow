@@ -1,0 +1,2475 @@
+{
+  "schemaVersion": 1,
+  "mode": "diagnostic",
+  "kind": "routine-cost",
+  "identity": {
+    "kind": "routine-cost",
+    "routineCost": true,
+    "files": {
+      "run.mjs": {
+        "bytes": 5962,
+        "sha256": "f865f6988750d3e91039a48c377b2c336f968eab6b2e46639fa74068aea10b51"
+      },
+      "browser.mjs": {
+        "bytes": 2627,
+        "sha256": "863876bb6f710529ea1a751f7b2029d84932abdb52ab47b0e2f3799523a04e38"
+      },
+      "routine.test.mjs": {
+        "bytes": 2449,
+        "sha256": "8c02a13a7758b6949e57f7f394f88fc12915f20c76abd357c41e4ab512049954"
+      },
+      "README.md": {
+        "bytes": 2424,
+        "sha256": "1943eded9d9db383673ee7f10ae97b2532cf3a99c54a9fb68d4e2354f23276b7"
+      },
+      "donor/routine-cost.mjs": {
+        "bytes": 7568,
+        "sha256": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33"
+      },
+      "donor/routine-cost-core.mjs": {
+        "bytes": 8617,
+        "sha256": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728"
+      }
+    },
+    "helperHash": "ac8d8cc2e4efb1e434bc3a5487776cb6ebcad77b445a8b12200475031910b66e",
+    "sourceSnapshotId": "2cdef569736faa5d3af601db33363b4f2430d2f80937e8cf15c1e67ec912c144",
+    "transform": {
+      "file": "client/game.ts",
+      "before": "0fe0802f9ce21b2765704dd1688a4ebeb965eb121c2a0209f2e5424c426dce73",
+      "after": "8ff3e9dee3319529e9c9f8d1ae0b47f0b5a8860961567b1b8babfd03240bfa1e"
+    }
+  },
+  "capturedAtUTC": "2026-11-03T23:54:06.646Z",
+  "completed": true,
+  "timing": {
+    "schemaVersion": 1,
+    "scope": {
+      "clock": "performance.now synchronous CPU wall time; includes observer overhead/GC/scheduling, not GPU execution",
+      "frames": "at most eight original actualScene.render calls with native _frameId progress; no additional render/readiness calls",
+      "phases": "innermost public active/main/ObjectRenderer init-finish scope, otherwise other; scopes may nest",
+      "nesting": "inclusive times overlap; selfSelected subtracts selected children only, not all children or whole-frame CPU",
+      "residual": "unselected culling/reset/sort/engine/custom material work remains unassigned; no measured3ms saving or FPS A/B"
+    },
+    "limits": {
+      "routines": 8,
+      "frames": 8,
+      "stack": 32,
+      "callsPerFrame": 100000,
+      "phaseEvents": 128,
+      "renderers": 64
+    },
+    "targets": [
+      "scene.getActiveMeshCandidates",
+      "Scene._activeMesh",
+      "TransformNode.computeWorldMatrix",
+      "Mesh.getLOD",
+      "PBRBaseMaterial.isReadyForSubMesh",
+      "StandardMaterial.isReadyForSubMesh",
+      "PBRBaseMaterial.bindForSubMesh",
+      "StandardMaterial.bindForSubMesh"
+    ],
+    "frames": [
+      {
+        "frameId": 4237,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.3999998569488525,
+            "selfSelectedMs": 1.3999998569488525,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2680,
+            "inclusiveMs": 3.6000006198883057,
+            "selfSelectedMs": 3.40000057220459,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.39999985694885254,
+            "selfSelectedMs": 0.39999985694885254,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 1.299999475479126,
+            "selfSelectedMs": 1.299999475479126,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 1.6000006198883057,
+            "selfSelectedMs": 1.6000006198883057,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 4.4999988079071045,
+            "selfSelectedMs": 4.4999988079071045,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.6000003814697266,
+            "selfSelectedMs": 1.6000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 8.700000524520874,
+            "selfSelectedMs": 8.700000524520874,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.5999999046325684,
+            "selfSelectedMs": 0.5999999046325684,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 2.500000238418579,
+            "selfSelectedMs": 2.500000238418579,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4238,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4238,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.700000524520874,
+            "selfSelectedMs": 1.700000524520874,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2675,
+            "inclusiveMs": 3,
+            "selfSelectedMs": 3,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.40000009536743164,
+            "selfSelectedMs": 0.40000009536743164,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.6999998092651367,
+            "selfSelectedMs": 0.6999998092651367,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 1.3000001907348633,
+            "selfSelectedMs": 1.3000001907348633,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 2.8999993801116943,
+            "selfSelectedMs": 2.8999993801116943,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.7000000476837158,
+            "selfSelectedMs": 0.7000000476837158,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 4.999999523162842,
+            "selfSelectedMs": 4.999999523162842,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.40000009536743164,
+            "selfSelectedMs": 0.40000009536743164,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.5,
+            "selfSelectedMs": 1.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4239,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4239,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.2000000476837158,
+            "selfSelectedMs": 1.2000000476837158,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2675,
+            "inclusiveMs": 2.4999990463256836,
+            "selfSelectedMs": 2.3999991416931152,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.9000000953674316,
+            "selfSelectedMs": 0.9000000953674316,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.39999985694885254,
+            "selfSelectedMs": 0.39999985694885254,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 1.5999999046325684,
+            "selfSelectedMs": 1.5999999046325684,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 1.7999989986419678,
+            "selfSelectedMs": 1.7999989986419678,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.2000000476837158,
+            "selfSelectedMs": 1.2000000476837158,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 4.800001621246338,
+            "selfSelectedMs": 4.800001621246338,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.20000004768371582,
+            "selfSelectedMs": 0.20000004768371582,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.5999996662139893,
+            "selfSelectedMs": 1.5999996662139893,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4240,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4240,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 2.5000009536743164,
+            "selfSelectedMs": 2.5000009536743164,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2680,
+            "inclusiveMs": 3.7999978065490723,
+            "selfSelectedMs": 3.2999980449676514,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.3000001907348633,
+            "selfSelectedMs": 0.3000001907348633,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.9000000953674316,
+            "selfSelectedMs": 0.9000000953674316,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 2.6999993324279785,
+            "selfSelectedMs": 2.6999993324279785,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 2.499999761581421,
+            "selfSelectedMs": 2.499999761581421,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.5,
+            "selfSelectedMs": 0.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 6.299998998641968,
+            "selfSelectedMs": 6.299998998641968,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.40000009536743164,
+            "selfSelectedMs": 0.40000009536743164,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.3999998569488525,
+            "selfSelectedMs": 1.3999998569488525,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4241,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4241,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.3999998569488525,
+            "selfSelectedMs": 1.3999998569488525,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2680,
+            "inclusiveMs": 2.500000476837158,
+            "selfSelectedMs": 2.500000476837158,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.6999995708465576,
+            "selfSelectedMs": 0.6999995708465576,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.7999999523162842,
+            "selfSelectedMs": 0.7999999523162842,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 0.8000004291534424,
+            "selfSelectedMs": 0.8000004291534424,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 2.90000057220459,
+            "selfSelectedMs": 2.90000057220459,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.9000000953674316,
+            "selfSelectedMs": 0.9000000953674316,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 5.600000619888306,
+            "selfSelectedMs": 5.600000619888306,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.20000004768371582,
+            "selfSelectedMs": 0.20000004768371582,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1,
+            "selfSelectedMs": 1,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4242,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4242,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.000000238418579,
+            "selfSelectedMs": 1.000000238418579,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2673,
+            "inclusiveMs": 2.40000057220459,
+            "selfSelectedMs": 2.40000057220459,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.5000002384185791,
+            "selfSelectedMs": 0.5000002384185791,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.5999994277954102,
+            "selfSelectedMs": 0.5999994277954102,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 1.3999993801116943,
+            "selfSelectedMs": 1.3999993801116943,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 1.9000000953674316,
+            "selfSelectedMs": 1.9000000953674316,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.09999990463256836,
+            "selfSelectedMs": 0.09999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.5,
+            "selfSelectedMs": 0.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 5.299999475479126,
+            "selfSelectedMs": 5.299999475479126,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.40000009536743164,
+            "selfSelectedMs": 0.40000009536743164,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.1999998092651367,
+            "selfSelectedMs": 1.1999998092651367,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4243,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4243,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.3000001907348633,
+            "selfSelectedMs": 1.3000001907348633,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2680,
+            "inclusiveMs": 2.700000762939453,
+            "selfSelectedMs": 2.4000003337860107,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.9000003337860107,
+            "selfSelectedMs": 0.9000003337860107,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.5,
+            "selfSelectedMs": 0.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 0.8000001907348633,
+            "selfSelectedMs": 0.8000001907348633,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 1.4999992847442627,
+            "selfSelectedMs": 1.4999992847442627,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.40000009536743164,
+            "selfSelectedMs": 0.40000009536743164,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 5.200000286102295,
+            "selfSelectedMs": 5.200000286102295,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.3000001907348633,
+            "selfSelectedMs": 0.3000001907348633,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1.299999713897705,
+            "selfSelectedMs": 1.299999713897705,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4244,
+        "progressed": true,
+        "threw": false
+      },
+      {
+        "frameId": 4244,
+        "rows": [
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "active",
+            "calls": 1,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "scene.getActiveMeshCandidates",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "active",
+            "calls": 319,
+            "inclusiveMs": 1.1000006198883057,
+            "selfSelectedMs": 1.1000006198883057,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Scene._activeMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "active",
+            "calls": 2680,
+            "inclusiveMs": 2.3999996185302734,
+            "selfSelectedMs": 2.299999713897705,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "main",
+            "calls": 724,
+            "inclusiveMs": 0.7000000476837158,
+            "selfSelectedMs": 0.7000000476837158,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "rtt",
+            "calls": 773,
+            "inclusiveMs": 0.799999475479126,
+            "selfSelectedMs": 0.799999475479126,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "TransformNode.computeWorldMatrix",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "active",
+            "calls": 2584,
+            "inclusiveMs": 2.4999990463256836,
+            "selfSelectedMs": 2.4999990463256836,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "main",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "Mesh.getLOD",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 2.1000003814697266,
+            "selfSelectedMs": 2.1000003814697266,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.10000014305114746,
+            "selfSelectedMs": 0.10000014305114746,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 0.5,
+            "selfSelectedMs": 0.5,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.isReadyForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 278,
+            "inclusiveMs": 5.599999666213989,
+            "selfSelectedMs": 5.599999666213989,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 8,
+            "inclusiveMs": 0.39999985694885254,
+            "selfSelectedMs": 0.39999985694885254,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "PBRBaseMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "active",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "main",
+            "calls": 82,
+            "inclusiveMs": 1,
+            "selfSelectedMs": 1,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "rtt",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          },
+          {
+            "id": "StandardMaterial.bindForSubMesh",
+            "phase": "other",
+            "calls": 0,
+            "inclusiveMs": 0,
+            "selfSelectedMs": 0,
+            "falseReturns": 0,
+            "throws": 0
+          }
+        ],
+        "errors": 0,
+        "depthSkipped": 0,
+        "callsSkipped": 0,
+        "nativeFrameIdAfter": 4245,
+        "progressed": true,
+        "threw": false
+      }
+    ],
+    "complete": true,
+    "reason": "complete",
+    "errors": 0,
+    "phaseErrors": 0,
+    "restoreConflicts": 0,
+    "installedRoutineHooks": 8,
+    "remainingRoutineHooks": 0,
+    "active": false
+  },
+  "failure": null
+}
