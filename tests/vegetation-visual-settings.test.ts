@@ -82,7 +82,7 @@ test("ground OFF suppresses grass updates and helpers while retaining resources 
 
 test("a grass request disabled during resource loading never starts a later flower request", async t => {
   const { scene } = sceneFixture(t); let enabled = true, finish!: () => Promise<void>, flowerLoads = 0;
-  t.mock.method(globalThis, "fetch", async input => new Response(JSON.stringify(String(input).endsWith("geometry.json") ? pack : recipe)));
+  t.mock.method(globalThis, "fetch", async (input: Parameters<typeof fetch>[0]) => new Response(JSON.stringify(String(input).endsWith("geometry.json") ? pack : recipe)));
   t.mock.method(PhotographicGrass.prototype as any, "loadResources", function (this: any) {
     return new Promise<void>(resolve => { finish = async () => { this.installResources(await resources(scene)); resolve(); }; });
   });
@@ -120,7 +120,7 @@ for (const end of ["off", "disposed"] as const) {
     const { scene } = sceneFixture(t);
     t.mock.method(TreeRenderer.prototype, "load", async () => {});
     const replies: (() => void)[] = []; let textureLoads = 0, flowerLoads = 0;
-    t.mock.method(globalThis, "fetch", input => new Promise<Response>(resolve => {
+    t.mock.method(globalThis, "fetch", (input: Parameters<typeof fetch>[0]) => new Promise<Response>(resolve => {
       const body = String(input).endsWith("geometry.json") ? pack : recipe;
       replies.push(() => resolve(new Response(JSON.stringify(body))));
     }));
@@ -147,7 +147,7 @@ for (const end of ["off", "disposed"] as const) {
 test("dormant grass resource failure remains retryable after rollback Off", async t => {
   const { scene } = sceneFixture(t); t.mock.method(TreeRenderer.prototype, "load", async () => {});
   const replies: (() => void)[] = []; let attempts = 0;
-  t.mock.method(globalThis, "fetch", input => new Promise<Response>(resolve => {
+  t.mock.method(globalThis, "fetch", (input: Parameters<typeof fetch>[0]) => new Promise<Response>(resolve => {
     replies.push(() => resolve(new Response(JSON.stringify(String(input).endsWith("geometry.json") ? pack : recipe))));
   }));
   t.mock.method(PhotographicGrass.prototype as any, "loadResources", async function (this: any) {
@@ -169,7 +169,7 @@ test("dormant grass resource failure remains retryable after rollback Off", asyn
 test("On returning at the dormant JSON boundary awaits one complete resource initialization", async t => {
   const { scene } = sceneFixture(t); t.mock.method(TreeRenderer.prototype, "load", async () => {});
   const replies: (() => void)[] = []; let textureLoads = 0, reenabling: Promise<void> | undefined;
-  t.mock.method(globalThis, "fetch", input => new Promise<Response>(resolve => {
+  t.mock.method(globalThis, "fetch", (input: Parameters<typeof fetch>[0]) => new Promise<Response>(resolve => {
     replies.push(() => resolve(new Response(JSON.stringify(String(input).endsWith("geometry.json") ? pack : recipe))));
   }));
   t.mock.method(PhotographicGrass.prototype as any, "loadResources", async function (this: any) {
@@ -203,7 +203,7 @@ for (const end of ["off", "disposed"] as const) {
     t.mock.method(engine, "createTexture", (...args: Parameters<NullEngine["createTexture"]>) => {
       textures.push(String(args[0])); return createTexture(...args);
     });
-    t.mock.method(globalThis, "fetch", async input => {
+    t.mock.method(globalThis, "fetch", async (input: Parameters<typeof fetch>[0]) => {
       const url = String(input);
       if (url === "/models/vegetation/flowers/geometry.json" && ++flowerRequests === 1) {
         return new Promise<Response>(resolve => {

@@ -2,7 +2,7 @@
 
 Koordinátor `ultra-20261104-root`; existující větev `codex/graphics-smoothness-20261104` v `D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104`. Základ `bf0a6550e0aa46eddcfa33cb8c76fd207d6592bc`. Uživatel nově výslovně požaduje PR a merge do main po dokončení. C checkout má souběžnou cizí větev a rozpracované změny; nepřepínat ani nepřepisovat.
 
-## Stav 4. 11. 2026, 21:35 UTC
+## Stav 4. 11. 2026, 21:58 UTC
 
 Implementované preference V2, resolver, společný panel před hrou i během hraní, Ultra a vlastní volby. Leaf implementace vegetace/mraků a světel/postprocess jsou předané s cílenými testy. Game používá transakci Apply se samostatným stavem, zachovaným ready a sítí, neutrálními vstupy, jediným vlastníkem vizuální přípravy, potvrzením po dokončeném snímku a rollbackem. Diagnostika/export rozlišují skutečně aplikovaná nastavení, revizi a fázi změny.
 
@@ -12,13 +12,15 @@ Cílená původní Game sada: 138/138 PASS; následné skutečné Apply regrese 
 
 Review opravy jsou předané: JSON hranice trávy i květin, autoClear vlastnictví, modální focus, skutečné storage/replay, policy-aware FAR readiness, obnovitelný deadline s fatálními skutečnými GPU chybami a opakovaný potvrzovací snímek nad ready rendererem. Nezávislý post toggle zachová WebGL materiálové barvy; interní snapshot barev umožní pravdivý rollback změny kvality. Poslední review adaptéru uzavřeno; následný okraj návratu do High má 2/2 parametrizované rollback regrese s kontrolou skutečného obnoveného snímku. Úplná triage je ve SPEC. Archiv je commitnutý jako f32e274c, runtime celek jako 4ad9725d a publikovaný v [draft PR41](https://github.com/Varnahg/StrahovCrazyShow/pull/41).
 
-První plné CI na 4ad9725d: 3189 testů, 3179 PASS, 8 FAIL, 2 SKIP; build a SDK byly správně přeskočené po selhání. Feedback browser a source hygiene prošly. [Úplný log a identita](../../performance/evidence/ultra-graphics-20261104/ci/4ad9725d.json) zůstávají zachované. Všech osm selhání bylo místně reprodukovaných: pět avatarových fixtures obcházelo Game konstruktor bez adaptive pole; druhý authored-light VM fixture postrádal nový grafický stav/resolver. Oprava doplňuje pouze inicializaci testů; žádné původní aserce, limity ani produkční kód se nemění. Dotčené sady pak 13/13 a 11/11 PASS. Následuje samostatný testový commit a nové CI, nikoli opakování beze změny.
+První plné CI na 4ad9725d: 3189 testů, 3179 PASS, 8 FAIL, 2 SKIP; build a SDK byly správně přeskočené po selhání. Feedback browser a source hygiene prošly. [Úplný log a identita](../../performance/evidence/ultra-graphics-20261104/ci/4ad9725d.json) zůstávají zachované. Všech osm selhání bylo místně reprodukovaných: pět avatarových fixtures obcházelo Game konstruktor bez adaptive pole; druhý authored-light VM fixture postrádal nový grafický stav/resolver. Oprava v c3854084 doplnila pouze inicializaci testů; původní aserce, limity i produkční kód zůstaly. Dotčené sady pak 13/13 a 11/11 PASS.
+
+Druhé [plné CI na c3854084](../../performance/evidence/ultra-graphics-20261104/ci/c3854084.json): **3187 PASS, 0 FAIL, 2 SKIP**. Build následně zjistil pět TS7006 ve fetch mock parametrech testu vegetace; SDK přeskočeno. Doplněny pouze typové anotace, přísná kontrola se skutečnými tsconfig přepínači prošla. Předchozí omezená kontrola leafu bez strict byla nedostatečná a handoff to výslovně opravuje. Žádná herní změna ani oslabení přejímky.
 
 ## Další krok
 
 Dokončit celkové testy/build/SDK v CI na opraveném checkpointu. Místní heavy-validation/GPU/workspace-build/2568 stále vlastní KEY-73; claim Ultra validation byl správně odmítnut. Po uvolnění připravit neměnný produkční Edge build a místní runtime ověření. [Předem určené měření](../../performance/evidence/ultra-graphics-20261104/MEASUREMENT.md) má 48 desetisekundových intervalů, tři prokládaná opakování osmi variant ve dvou pohledech. Poté evidence a přejímka, ready PR a autorizovaný merge. Výkonový přínos zatím není prokázaný a žádná vlastní testovací scéna neběží.
 
-Pro zprávu konkrétnímu souběžnému chatu „Uprav chat a odpovědi AI“ nástroj vyžaduje přímou autorizaci uživatele; textová otázka k předání validačního okna je pending. Bez odpovědi se žádná zpráva neposílá a cizí rezervace se nepřebírá. Samostatný task Ultra record později zapíše docs/verification.md, které zatím vlastní KEY-73 verification-record. Browser dokumentace a viewport API jsou načtené, Edge binding id3 zůstává vybraný; nebyla otevřena nová scéna ani změněn viewport.
+Uživatel ve 21:53 UTC výslovně povolil koordinaci s chatem „Uprav chat a odpovědi AI“ (01a1a80f-d5fa-74c1-b137-7d030ba06b9d). Chat potvrdil krátké dokončení kontroly úvodního AI panelu a následné uklizení procesů/uvolnění claimu; čekáme na skutečné potvrzení. Navrženo sloučení PR41 před PR42, potom krátký chat HUD smoke na novém main. Jeho WebGL Medium startup skončil timeoutem, nikoli platným prvním snímkem; tento cizí neúspěch se nepřebírá jako přejímka. Samostatný task Ultra record později zapíše docs/verification.md, které zatím vlastní KEY-73 verification-record. Browser dokumentace a viewport API jsou načtené, Edge binding id3 zůstává vybraný; nebyla otevřena nová scéna ani změněn viewport.
 
 ## Rozsah a předání
 

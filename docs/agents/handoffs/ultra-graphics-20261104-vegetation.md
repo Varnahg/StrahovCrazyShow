@@ -83,3 +83,17 @@ Aktuální SHA256 nahrazující předchozí položky:
 - client/ground-flowers.ts: 41f4cc2d2b39ef825eeda2e867c870ffe89c33b6f6de0269e0c52affa1eee12e
 - client/photographic-grass.ts: f0623f74f0936a31403fff74ba31b35ca7701263f80d157bd61bc6ece49010fe
 - tests/vegetation-visual-settings.test.ts: 651f53de5db23b8f183954ff66fa5c821015a5baa0c525c7281fb01d16f9bae9
+
+## Přísná typová kontrola testů po CI c3854084
+
+CI podle koordinátora dokončilo 3189 testů (3187 PASS, 0 FAIL, 2 SKIP), ale build zachytil pět TS7006 v parametrech fetch mocků tohoto tasku. Předchozí lokální explicitní tsc příkaz neobsahoval `--strict`, a proto implicitní any neověřil; tento nedostatek ověření patří tomuto tasku.
+
+Změna je pouze pět anotací `input: Parameters<typeof fetch>[0]` v `tests/vegetation-visual-settings.test.ts`. Místo uvolnění přísnosti používá přesný typ existujícího API; produkční kód, runtime testů i jejich přejímka zůstávají beze změny. Již zelená runtime sada se neopakovala.
+
+Ověření **PASS, exit 0** přesným příkazem odpovídajícím přepínačům projektu:
+
+```text
+node node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --lib ES2022,DOM,DOM.Iterable --module ESNext --moduleResolution Bundler --jsx react-jsx --skipLibCheck --esModuleInterop --resolveJsonModule --allowImportingTsExtensions --experimentalDecorators --useDefineForClassFields false --types vite/client,node tests/vegetation-visual-settings.test.ts
+```
+
+Scoped `git diff --check` PASS. Žádný build, runtime test, GPU ani commit spuštěn. Proces typové kontroly skončil; předáno rootovi a následuje release. Nový SHA256 testu: `7ccec146a8de6d8fc6440d861ef9cc0758bcc520e0dc3a010377c591f27adf4c`.
