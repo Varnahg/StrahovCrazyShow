@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "graphics-d-user-playtest-20261104",
+  "title": "Předat neměnný D build uživateli s automatickými logy",
+  "status": "done",
+  "dependsOn": [
+    "graphics-smoothness-20261104-root"
+  ],
+  "writePaths": [
+    "client/",
+    "server/",
+    "shared/",
+    "scripts/",
+    "tests/",
+    "public/",
+    "patches/",
+    "node_modules/",
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "tsconfig.json",
+    "vite.config.ts",
+    "index.html",
+    ".cache/render-next-20261102/candidate1/build/",
+    ".cache/render-next-20261102/candidate1/runs/run2/",
+    ".cache/game-diagnostics/",
+    ".cache/graphics-d-user-playtest-20261104/",
+    "docs/agents/handoffs/graphics-d-user-playtest-20261104.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "port:2568",
+    "port:4179"
+  ],
+  "acceptance": [
+    "Neměnný ověřený source/tests3fe11a12ebd947e03581444e08f1b15b707f34abd6ec827badcb236841ef6132 odpovídá runtime bf0a6550; žádný HMR, rebuild ani změna hry během hraní.",
+    "Uživatel dostane skutečnou hru v popředí Edge a potvrzené automatické ukládání nové relace; žádní vlastní SDK boti.",
+    "Původní8080 a cizí karty zůstanou zachované. Source a build cesty jsou rezervované jen pro ochranu před zápisy, nemění se."
+  ],
+  "verification": [
+    "Existující serve run2 ověří snapshot, veřejné assety, závislosti a bundle.",
+    "Před předáním ověřit URL, source identity, viditelnost, ready a nové uložené batch záznamy.",
+    "Systémový sampler60min, server90min; heartbeat drží rezervaci až do čistého ukončení vlastních procesů."
+  ],
+  "notes": [
+    "Výslovné zadání uživatele: zapnout hru pro další vlastní testing. Nejde o novou implementaci ani automatickou přejímku plynulosti.",
+    "Hraní běží na D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104, codex/graphics-smoothness-20261104. Nezapisovat do chráněných zdrojů/assetů během testu.",
+    "Před dalším zásahem nejprve přečíst logy nové session a ověřit skončení uživatelského hraní.",
+    "Uživatel ukončil hraní a schválil další implementaci. STOP run2: API+sampler exit0, inputrevalidation true, launcher uvolnilclaim. Root přebírá pouze archivaci vlastníchlogů/handoffu."
+  ]
+}
