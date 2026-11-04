@@ -3228,7 +3228,7 @@ test("mixed admission projects only local excerpts into query, generation, histo
     );
     assert.equal(result.body.blocks.length, 3);
     assert.deepEqual(result.body.blocks.at(-1).sourceIds, []);
-    assert.match(result.body.blocks.at(-1).text, /Část zprávy mimo/);
+    assert.match(result.body.blocks.at(-1).text, /Zbývající část zprávy/);
     const next = await f.send("/api/ai/chat", {
       token,
       message: "A kdy?",
@@ -3244,6 +3244,52 @@ test("mixed admission projects only local excerpts into query, generation, histo
       /Spočítej|2\+2/,
     );
     assert.match(f.queries[1].text, /Verified earlier AI statement/);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("a mixed answer declines the unadmitted remainder without asking again about its answered local part", async () => {
+  const router = scopedRouter((text) =>
+    text.includes("Spočítej")
+      ? text.includes("kancelář")
+        ? "mixed"
+        : "off_topic"
+      : "allowed",
+  );
+  const segments = router.classifySegments;
+  router.classifySegments = async (input, options) => {
+    const result = await segments(input, options);
+    return {
+      ...result,
+      segments: result.segments.map((item) =>
+        item.decision.scope.kind === "off_topic"
+          ? {
+              ...item,
+              decision: {
+                ...item.decision,
+                admissionProbability: 0.01,
+                scope: { kind: "off_topic", confidence: 0.2 },
+              },
+            }
+          : item,
+      ),
+    };
+  };
+  const f = replyFixture(router);
+  try {
+    const token = await f.session();
+    const result = await f.send("/api/ai/chat", {
+      token,
+      message: "Kde je kancelář SH?\nSpočítej příklad z matematiky.",
+      locale: "cs",
+    });
+    assert.equal(result.status, 200);
+    const remainder = result.body.blocks.at(-1);
+    assert.match(remainder.text, /Zbývající část zprávy/);
+    assert.doesNotMatch(remainder.text, /Co konkrétně|\?/);
+    assert.deepEqual(remainder.sourceIds, []);
+    assert.doesNotMatch(JSON.stringify(f.generations), /Spočítej příklad/);
   } finally {
     await f.service.close();
   }

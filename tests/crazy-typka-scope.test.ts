@@ -466,6 +466,8 @@ test("localized replies preserve respectful objectification rejection and practi
     assert.match(scopeReply("off_topic", locale), /Silicon Hill/);
     assert.match(scopeReply("clarify", locale), /\?/);
     assert.ok(mixedRefusal(locale).length > 20);
+    assert.doesNotMatch(mixedRefusal(locale), /\?|mimo|outside/i);
+    assert.match(mixedRefusal(locale), /samostatně|separately/);
     assert.doesNotMatch(
       scopeReply("off_topic", locale),
       /API|Decisions|classifier|prompt|spam/i,

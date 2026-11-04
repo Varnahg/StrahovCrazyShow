@@ -240,6 +240,6 @@ export function scopeReply(kind: ScopeRejection, locale: "cs" | "en"): string {
 
 export function mixedRefusal(locale: "cs" | "en"): string {
   return locale === "cs"
-    ? "Část zprávy mimo informace a praktický život na Strahově vynechávám; s tou ti tady nepomůžu."
-    : "I'm leaving out the part outside information and practical life at Strahov; I can't help with that here.";
+    ? "Zbývající část zprávy tady nezodpovím. Pomáhám s praktickým životem na Strahově; místní dotaz můžeš položit samostatně."
+    : "I won't answer the remaining part of this message here. I help with practical life at Strahov; you can ask your local question separately.";
 }

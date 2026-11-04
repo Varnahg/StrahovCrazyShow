@@ -986,9 +986,7 @@ export function createCrazyTypkaService(
             "objectifying_people",
           )
             ? scopeReply("objectifying_people", body.locale as "cs" | "en")
-            : projected.rejectedKinds.includes("off_topic")
-              ? mixedRefusal(body.locale as "cs" | "en")
-              : scopeReply("clarify", body.locale as "cs" | "en");
+            : mixedRefusal(body.locale as "cs" | "en");
           clearImplicitContext(session);
           if (!replyTo) replyContext = undefined;
         }
