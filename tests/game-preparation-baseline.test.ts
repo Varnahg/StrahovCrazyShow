@@ -51,11 +51,11 @@ function fixture(initial='medium') {
     const f=fixture();f.game.engine.isWebGPU=false;const operation=Promise.resolve(result());let calls=0;
     f.game.prepareLightingVariants=()=>{calls++;return operation;};assert.equal(f.run(),operation);assert.equal(calls,1);assert.equal(f.samples.length,0);assert.equal(f.applies.length,0);
   });
-  test(`native Game: synchronization cost belongs to original first 30s and global active budget`,async()=>{
+  test(`native Game: synchronization cost belongs to first 60s and 180s global active budget`,async()=>{
     const f=fixture();f.onEnvironment(()=>f.advance(125));const out=await f.run();
-    assert.equal(out.status,'complete');assert.equal(f.passes[0].timeout,29875);assert.equal(out.activeElapsedMs,125);assert.equal(out.qualities[0].activeElapsedMs,125);
-    const timeout=fixture();timeout.onEnvironment(()=>timeout.advance(30000));assert.equal((await timeout.run()).status,'timeout');assert.equal(timeout.passes.length,0);assert.equal(timeout.game.preparingRenderQuality,false);assert.equal(timeout.game.quality,'medium');
-    const global=fixture();global.onEnvironment(()=>global.advance(100));global.onPass(()=>global.advance(29000));const bounded=await global.run();assert.equal(bounded.status,'complete');assert.equal(bounded.activeElapsedMs,87100);assert.equal(bounded.qualities[0].activeElapsedMs,29100);assert.equal(bounded.qualities[1].activeElapsedMs,29000);assert.equal(bounded.qualities[2].activeElapsedMs,29000);
+    assert.equal(out.status,'complete');assert.equal(f.passes[0].timeout,59875);assert.equal(out.activeElapsedMs,125);assert.equal(out.qualities[0].activeElapsedMs,125);
+    const timeout=fixture();timeout.onEnvironment(()=>timeout.advance(60000));assert.equal((await timeout.run()).status,'timeout');assert.equal(timeout.passes.length,0);assert.equal(timeout.game.preparingRenderQuality,false);assert.equal(timeout.game.quality,'medium');
+    const global=fixture();global.onEnvironment(()=>global.advance(100));global.onPass(()=>global.advance(59000));const bounded=await global.run();assert.equal(bounded.status,'complete');assert.equal(bounded.activeElapsedMs,177100);assert.equal(bounded.qualities[0].activeElapsedMs,59100);assert.equal(bounded.qualities[1].activeElapsedMs,59000);assert.equal(bounded.qualities[2].activeElapsedMs,59000);
   });
   test(`native Game: latest quality/scaling/time request survives seed and final restoration`,async()=>{
     const f=fixture();const latest={quality:'high',hardwareScaling:1.4,revision:9};
