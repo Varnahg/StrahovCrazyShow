@@ -151,8 +151,169 @@
   font-size: 12px;
   margin-bottom: 7px;
 }
+.crazy-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.crazy-chat-actions,
+.crazy-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.crazy-panel-actions {
+  position: relative;
+}
+.crazy-chat-actions {
+  color: inherit;
+}
+.crazy-chat-info > summary,
+.crazy-chat-actions > button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 36px;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  list-style: none;
+}
+.crazy-chat-info > summary::-webkit-details-marker {
+  display: none;
+}
+.crazy-chat-actions svg {
+  width: 20px;
+  height: 20px;
+}
+.crazy-chat-actions :is(button, summary):focus-visible {
+  outline: 2px solid var(--home-accent, #c9b57d);
+  outline-offset: 2px;
+}
+.crazy-chat-info-content {
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  top: calc(100% + 6px);
+  width: min(280px, calc(100vw - 60px));
+  max-height: min(65vh, 380px);
+  padding: 16px;
+  overflow: auto;
+  color: var(--home-text, #edf0e5);
+  background: var(--home-panel, #1d2d35);
+  border: 1px solid var(--home-accent, #a59a78);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px #0004;
+}
+.crazy-chat-info-content p {
+  margin: 9px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.crazy-answer-block + .crazy-answer-block {
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px solid #91a38a33;
+}
+.crazy-chat .crazy-reply {
+  margin-top: 5px;
+  padding: 3px 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  opacity: 0.8;
+}
+.crazy-draft-reply,
+.crazy-message-quote {
+  border-left: 2px solid var(--crazy-accent, #7b9167);
+  background: #91a38a14;
+  border-radius: 3px;
+}
+.crazy-draft-reply {
+  display: flex;
+  align-items: flex-start;
+  grid-column: 1 / -1;
+  gap: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.crazy-draft-reply blockquote,
+.crazy-message-quote {
+  max-height: 96px;
+  margin: 6px 0 0;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.crazy-draft-reply blockquote {
+  flex: 1;
+  margin: 0;
+}
+.crazy-message-quote {
+  padding: 6px 9px;
+}
+.crazy-chat .crazy-draft-reply > button {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  min-height: 24px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.crazy-working > span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 30px;
+  padding: 8px 12px;
+  border-radius: 12px 12px 12px 3px;
+  background: #91a38a20;
+}
+.crazy-working i {
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: crazy-typing 1.2s ease-in-out infinite;
+}
+.crazy-working i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.crazy-working i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes crazy-typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crazy-working i {
+    animation: none;
+  }
+}
 .crazy-form textarea {
-  resize: vertical;
+  resize: none;
+  overflow-y: hidden;
   min-height: 72px;
   max-height: 200px;
   font-size: 13px;
@@ -162,23 +323,10 @@
   align-items: center;
   gap: 12px;
   margin-top: 10px;
-}
-.crazy-form-actions small {
-  flex: 1;
-  color: #64705d;
-  font-size: 10px;
-  line-height: 1.5;
+  justify-content: flex-end;
 }
 .crazy-form-actions button {
   white-space: nowrap;
-}
-.crazy-reset {
-  font-size: 11px;
-  background: transparent;
-  border: 0;
-  padding: 8px 0 0;
-  margin-top: 8px;
-  text-decoration: underline;
 }
 .crazy-chat .crazy-working {
   font-size: 12px;
@@ -257,7 +405,7 @@
   gap: 10px;
   min-height: 36px;
   margin: 0 0 9px;
-  padding-right: 40px;
+  padding-right: 108px;
 }
 .crazy-compact .crazy-heading > div:last-child {
   min-width: 0;
@@ -319,19 +467,6 @@
 .crazy-compact .crazy-recovery button:hover {
   background: rgba(var(--crazy-tint), 0.14);
 }
-.crazy-compact .crazy-privacy {
-  margin: 0 0 5px;
-  color: var(--crazy-muted);
-  font-size: 11px;
-  line-height: 1.6;
-}
-.crazy-compact .crazy-privacy summary {
-  width: fit-content;
-  padding: 3px 0;
-  color: var(--crazy-muted);
-  cursor: pointer;
-}
-.crazy-compact .crazy-definition,
 .crazy-compact .crazy-disclosure {
   margin: 7px 0;
   color: var(--crazy-muted);
@@ -422,7 +557,6 @@
 }
 .crazy-compact .crazy-form textarea {
   grid-column: 1;
-  grid-row: 1;
   min-height: 42px;
   max-height: 140px;
   margin: 0;
@@ -440,17 +574,9 @@
 .crazy-compact .crazy-form-actions {
   display: contents;
 }
-.crazy-compact .crazy-form-actions small {
-  grid-column: 1 / -1;
-  grid-row: 2;
-  color: var(--crazy-muted);
-  font-size: 11px;
-  line-height: 1.5;
-}
 .crazy-compact .crazy-form-actions button {
   display: grid;
   grid-column: 2;
-  grid-row: 1;
   place-items: center;
   width: 42px;
   height: 42px;
@@ -484,12 +610,6 @@
   font-size: 11px;
   line-height: 1.55;
 }
-.crazy-compact .crazy-reset {
-  align-self: flex-start;
-  margin-top: 8px;
-  color: var(--crazy-muted);
-  font-size: 11px;
-}
 .crazy-compact button:focus-visible,
 .crazy-compact a:focus-visible,
 .crazy-compact summary:focus-visible,
@@ -511,41 +631,7 @@
   }
 }
 
-.crazy-knowledge {
-  margin: 8px 0;
-  color: var(--crazy-muted, #b7c3c7);
-  font-size: 12px;
-}
-.crazy-knowledge summary {
-  cursor: pointer;
-  width: fit-content;
-}
-.crazy-knowledge label {
-  display: block;
-  margin: 8px 0 4px;
-}
-.crazy-knowledge select,
-.crazy-knowledge input {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 36px;
-  padding: 6px 8px;
-  border: 1px solid rgba(var(--crazy-tint, 185, 204, 210), 0.3);
-  border-radius: 8px;
-  background: #11191c;
-  color: var(--crazy-text, #f5f8f7);
-  font: inherit;
-}
-.crazy-knowledge small {
-  display: block;
-  margin-top: 6px;
-}
 .crazy-archive-label {
   color: var(--crazy-accent, #efd084);
   font-size: 11px;
-}
-.crazy-knowledge select:focus-visible,
-.crazy-knowledge input:focus-visible {
-  outline: 2px solid var(--crazy-accent, #efd084);
-  outline-offset: 2px;
 }

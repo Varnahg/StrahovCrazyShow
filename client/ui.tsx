@@ -2,7 +2,7 @@ import { HudIcon } from "./hud-icons";
 import { WelcomeScreen } from "./welcome-screen";
 import { LoadingScreen } from "./loading-screen";
 import { observeStartupProgress, paintStartupStage } from "./startup-progress";
-import { CrazyTypkaChat, useCrazyTypka } from "./crazy-typka";
+import { CrazyTypkaChat, CrazyTypkaChatActions, useCrazyTypka } from "./crazy-typka";
 import "./welcome-screen.css";
 import "./crazy-typka.css";
 import { FeedbackDialog } from "./feedback";
@@ -1216,6 +1216,7 @@ export function App() {
             {feedbackLocale === "cs" ? "Zpětná vazba" : "Feedback"}
           </button>}
           assistant={<CrazyTypkaChat state={ai} locale={feedbackLocale} variant="compact" />}
+          assistantActions={<CrazyTypkaChatActions state={ai} locale={feedbackLocale} />}
         />
         {feedbackDialog}
       </>
@@ -1605,14 +1606,19 @@ export function App() {
                   }
                 </h2>
               </div>
-              <button
-                className="close"
-                ref={mapClose}
-                aria-label={t("Zavřít panel")}
-                onClick={() => setPanel("")}
-              >
-                ×
-              </button>
+              <div className="crazy-panel-actions">
+                {panel === "chat" && aiChatActive && (
+                  <CrazyTypkaChatActions state={ai} locale={feedbackLocale} />
+                )}
+                <button
+                  className="close"
+                  ref={mapClose}
+                  aria-label={t("Zavřít panel")}
+                  onClick={() => setPanel("")}
+                >
+                  ×
+                </button>
+              </div>
             </div>
             {panel === "events" && (
               <>

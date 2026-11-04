@@ -80,6 +80,7 @@ export type WelcomeScreenProps = {
   language: ReactNode;
   feedback: ReactNode;
   assistant?: ReactNode;
+  assistantActions?: ReactNode;
   /** Optional externally supplied snapshot, also useful for static rendering. */
   presence?: PublicPresenceState;
 };
@@ -134,6 +135,7 @@ export function WelcomeScreen({
   language,
   feedback,
   assistant,
+  assistantActions,
   presence,
 }: WelcomeScreenProps) {
   const viewport = useViewportHeight<HTMLElement>();
@@ -394,14 +396,17 @@ export function WelcomeScreen({
               className="home-chat-popup home-glass"
               aria-label={cs ? "Soukromý AI chat" : "Private AI chat"}
             >
-              <button
-                type="button"
-                className="home-chat-close home-quiet"
-                aria-label={cs ? "Zavřít chat" : "Close chat"}
-                onClick={closeChat}
-              >
-                <HomeIcon kind="close" />
-              </button>
+              <div className="home-chat-toolbar">
+                {assistantActions}
+                <button
+                  type="button"
+                  className="home-chat-close home-quiet"
+                  aria-label={cs ? "Zavřít chat" : "Close chat"}
+                  onClick={closeChat}
+                >
+                  <HomeIcon kind="close" />
+                </button>
+              </div>
               {assistant}
             </section>
           )}

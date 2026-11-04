@@ -63,10 +63,6 @@ html:has(.welcome-screen) {
   background: rgba(9, 6, 12, 0.23);
   border-color: rgba(var(--home-tint), 0.25);
 }
-.welcome-screen :is(input, textarea, select):focus {
-  border-color: var(--home-accent);
-  box-shadow: 0 0 0 3px rgba(var(--home-tint), 0.1);
-}
 .welcome-screen input::placeholder {
   color: var(--home-muted);
 }
@@ -511,11 +507,16 @@ html:has(.welcome-screen) {
   padding-top: 8px;
   background: var(--home-panel);
 }
-.welcome-screen .home-chat-close {
+.welcome-screen .home-chat-toolbar {
   position: absolute;
   z-index: 2;
   right: 10px;
   top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.welcome-screen .home-chat-close {
   width: 36px;
   height: 36px;
   padding: 7px;
