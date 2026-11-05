@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "ultra-graphics-20261104-analysis",
+  "title": "Připravit úzký souhrn skutečných Ultra A/B záznamů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [".cache/ultra-report-20261104/", "docs/agents/handoffs/ultra-graphics-20261104-analysis.md"],
+  "resources": [],
+  "acceptance": ["Čte skutečné zachované benchmarky a jejich explicitní mapování; nezaměňuje singleton GPU čas za průměr, stav inventáře za intervalový průměr ani chybějící vzorky za PASS."],
+  "verification": ["Kvantilová metoda shodná s aktuálním HUD, samostatný medián a přesný seznam chybějících/znehodnocených vzorků. Žádné testy/build/GPU během časovaných intervalů."],
+  "notes": ["Koordinátor drží samotný runtime/harness; agent pouze připraví malý offline report nástroj a předá jeho použití. Žádná změna produkce nebo metrik přejímky."]
+}

@@ -1,0 +1,547 @@
+{
+  "scope": "Saved GetProcess deltas by PID+nativeStartTime. Derived windows use process provider endedUtc minus row intervalMs; provider bracket is not an exact per-row timestamp. Only selected observable processes, not global OS census or per-tab attribution. 100% oneCore=one logical core; total-system scale /12.",
+  "window": {
+    "key": "1/B/down",
+    "from": "2026-11-04T23:44:08.919Z",
+    "to": "2026-11-04T23:44:18.937Z",
+    "totalSystemCpuPDH": {
+      "n": 4,
+      "min": 82.64801372094513,
+      "max": 93.85120243840498,
+      "mean": 86.28166998516691
+    }
+  },
+  "providerKeys": [
+    "status",
+    "endedUtc",
+    "rows",
+    "scope",
+    "error",
+    "startedUtc"
+  ],
+  "providerScope": "GetProcess cumulative user/kernel for GPU-memory/active-engine PIDs, browsers, collector/NVIDIA/WMI/node/shell/Blender; roles WMI refreshed every5s; no full command lines retained; not a global top-CPU process ranking",
+  "topProcesses": [
+    {
+      "pid": 87044,
+      "startUtc": "2026-11-04T23:02:33.4581625Z",
+      "name": "msedge",
+      "browserRole": "renderer",
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 112.51508124020174,
+      "weightedSystemPercent": 9.376256770016811,
+      "weightedKernelSystemPercent": 0.4883467067717089,
+      "peakOneCorePercent": 130.2280375153184
+    },
+    {
+      "pid": 14216,
+      "startUtc": "2026-11-04T08:24:58.8461622Z",
+      "name": "msedge",
+      "browserRole": "browser",
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 76.76810230451264,
+      "weightedSystemPercent": 6.397341858709386,
+      "weightedKernelSystemPercent": 1.2208667669292723,
+      "peakOneCorePercent": 90.91880700002905
+    },
+    {
+      "pid": 94540,
+      "startUtc": "2026-11-04T08:24:59.1951784Z",
+      "name": "msedge",
+      "browserRole": "gpu-process",
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 42.583832830493016,
+      "weightedSystemPercent": 3.548652735874418,
+      "weightedKernelSystemPercent": 0.91158051930719,
+      "peakOneCorePercent": 53.618783615401746
+    },
+    {
+      "pid": 105772,
+      "startUtc": "2026-11-04T18:53:35.6571289Z",
+      "name": "Taskmgr",
+      "browserRole": null,
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 40.04442995528013,
+      "weightedSystemPercent": 3.3370358296066773,
+      "weightedKernelSystemPercent": 1.351092555401728,
+      "peakOneCorePercent": 55.699943756551846
+    },
+    {
+      "pid": 90872,
+      "startUtc": "2026-11-04T15:31:57.1921016Z",
+      "name": "codex-computer-use",
+      "browserRole": null,
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 31.84020528151542,
+      "weightedSystemPercent": 2.653350440126285,
+      "weightedKernelSystemPercent": 1.1231974255749304,
+      "peakOneCorePercent": 39.22531250461398
+    },
+    {
+      "pid": 36540,
+      "startUtc": "2026-11-04T23:44:00.8845195Z",
+      "name": "Spotify",
+      "browserRole": null,
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 25.19869006942018,
+      "weightedSystemPercent": 2.0998908391183484,
+      "weightedKernelSystemPercent": 0.6348507188032216,
+      "peakOneCorePercent": 50.510448333349466
+    },
+    {
+      "pid": 27168,
+      "startUtc": "2026-11-04T23:39:14.0857382Z",
+      "name": "node",
+      "browserRole": null,
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 15.236417251277318,
+      "weightedSystemPercent": 1.2697014376064433,
+      "weightedKernelSystemPercent": 0.13022578847245572,
+      "peakOneCorePercent": 34.19168810257503
+    },
+    {
+      "pid": 81052,
+      "startUtc": "2026-11-04T23:38:09.8597463Z",
+      "name": "pwsh",
+      "browserRole": null,
+      "samples": 4,
+      "observedFromUtc": "2026-11-04T23:44:10.087Z",
+      "observedToUtc": "2026-11-04T23:44:17.9720501Z",
+      "weightedOneCorePercent": 9.571595452725495,
+      "weightedSystemPercent": 0.7976329543937912,
+      "weightedKernelSystemPercent": 0.21161690626774052,
+      "peakOneCorePercent": 17.095844051287514
+    }
+  ],
+  "edgeSubtotalFromRecordedRows": {
+    "meanSystemPercent": 19.647815835781756,
+    "scope": "Sum of selected recorded Edge CPU means; not exact synchronized total and not whole-GPU utilization."
+  },
+  "AH": [
+    {
+      "key": "1/A/down",
+      "start": "2026-11-04T23:42:54.699Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 16,
+        "max": 34,
+        "mean": 21.6
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 4986,
+        "max": 4999,
+        "mean": 4990.2
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 54.10402649062356,
+        "max": 68.37509219563024,
+        "mean": 59.254919177609814
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 835,
+        "max": 961,
+        "mean": 935.8
+      },
+      "pstates": [
+        "P5",
+        "P0"
+      ]
+    },
+    {
+      "key": "1/A/scenery",
+      "start": "2026-11-04T23:43:16.564Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 12,
+        "max": 18,
+        "mean": 15.2
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5009,
+        "max": 5023,
+        "mean": 5014.2
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 26.449651841959533,
+        "max": 28.990267706489668,
+        "mean": 27.78289463447973
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 961,
+        "max": 961,
+        "mean": 961
+      },
+      "pstates": [
+        "P0"
+      ]
+    },
+    {
+      "key": "1/H/down",
+      "start": "2026-11-04T23:57:06.713Z",
+      "gpuUtil": {
+        "n": 4,
+        "min": 12,
+        "max": 30,
+        "mean": 20.75
+      },
+      "vramMiB": {
+        "n": 4,
+        "min": 5480,
+        "max": 5496,
+        "mean": 5485
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 33.579462531563976,
+        "max": 40.40215017567734,
+        "mean": 36.528111142529426
+      },
+      "graphicsMHz": {
+        "n": 4,
+        "min": 835,
+        "max": 898,
+        "mean": 882.25
+      },
+      "pstates": [
+        "P5",
+        "P3"
+      ]
+    },
+    {
+      "key": "1/H/scenery",
+      "start": "2026-11-04T23:57:28.485Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 12,
+        "max": 15,
+        "mean": 12.6
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5479,
+        "max": 5493,
+        "mean": 5482.4
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 25.534874686387376,
+        "max": 28.661640193373618,
+        "mean": 27.568791603483554
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 898,
+        "max": 898,
+        "mean": 898
+      },
+      "pstates": [
+        "P3"
+      ]
+    },
+    {
+      "key": "2/H/scenery",
+      "start": "2026-11-04T23:57:51.184Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 9,
+        "max": 26,
+        "mean": 14
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5477,
+        "max": 5492,
+        "mean": 5482.4
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 26.799662351204788,
+        "max": 37.33484704772441,
+        "mean": 29.8140632301925
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 835,
+        "max": 885,
+        "mean": 875
+      },
+      "pstates": [
+        "P5",
+        "P3"
+      ]
+    },
+    {
+      "key": "2/H/down",
+      "start": "2026-11-04T23:58:12.824Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 17,
+        "max": 19,
+        "mean": 18
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5478,
+        "max": 5488,
+        "mean": 5480.2
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 31.955182698738916,
+        "max": 39.73573080713931,
+        "mean": 36.0030913741151
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 885,
+        "max": 885,
+        "mean": 885
+      },
+      "pstates": [
+        "P3"
+      ]
+    },
+    {
+      "key": "2/A/scenery",
+      "start": "2026-11-05T00:12:41.596Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 9,
+        "max": 17,
+        "mean": 13.2
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5560,
+        "max": 5580,
+        "mean": 5567
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 22.948662931437312,
+        "max": 35.335479889238506,
+        "mean": 28.164307812987374
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 885,
+        "max": 885,
+        "mean": 885
+      },
+      "pstates": [
+        "P3"
+      ]
+    },
+    {
+      "key": "2/A/down",
+      "start": "2026-11-05T00:13:02.918Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 22,
+        "max": 32,
+        "mean": 26.8
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5564,
+        "max": 5579,
+        "mean": 5567.4
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 29.80072528548282,
+        "max": 40.80958381459106,
+        "mean": 35.4483967994379
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 822,
+        "max": 1037,
+        "mean": 994
+      },
+      "pstates": [
+        "P5",
+        "P0"
+      ]
+    },
+    {
+      "key": "3/A/down",
+      "start": "2026-11-05T00:13:49.071Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 21,
+        "max": 30,
+        "mean": 25.2
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5564,
+        "max": 5584,
+        "mean": 5569.6
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 32.41098476966548,
+        "max": 37.29410024412121,
+        "mean": 35.23751225677245
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 822,
+        "max": 1012,
+        "mean": 918.2
+      },
+      "pstates": [
+        "P2",
+        "P3",
+        "P5",
+        "P0"
+      ]
+    },
+    {
+      "key": "3/A/scenery",
+      "start": "2026-11-05T00:14:11.331Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 12,
+        "max": 17,
+        "mean": 13.6
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5565,
+        "max": 5579,
+        "mean": 5568.4
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 25.09968476754272,
+        "max": 34.9876454470996,
+        "mean": 28.72484512058341
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 1012,
+        "max": 1012,
+        "mean": 1012
+      },
+      "pstates": [
+        "P0"
+      ]
+    },
+    {
+      "key": "3/H/down",
+      "start": "2026-11-05T00:14:51.315Z",
+      "gpuUtil": {
+        "n": 5,
+        "min": 16,
+        "max": 20,
+        "mean": 18.2
+      },
+      "vramMiB": {
+        "n": 5,
+        "min": 5541,
+        "max": 5557,
+        "mean": 5546.8
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 33.82192803404847,
+        "max": 38.49947340361209,
+        "mean": 35.79264777819442
+      },
+      "graphicsMHz": {
+        "n": 5,
+        "min": 873,
+        "max": 873,
+        "mean": 873
+      },
+      "pstates": [
+        "P3"
+      ]
+    },
+    {
+      "key": "3/H/scenery",
+      "start": "2026-11-05T00:15:13.029Z",
+      "gpuUtil": {
+        "n": 4,
+        "min": 10,
+        "max": 13,
+        "mean": 12
+      },
+      "vramMiB": {
+        "n": 4,
+        "min": 5543,
+        "max": 5556,
+        "mean": 5546.25
+      },
+      "cpuSystem": {
+        "n": 4,
+        "min": 25.850273185289186,
+        "max": 47.36224163975385,
+        "mean": 35.102402608904356
+      },
+      "graphicsMHz": {
+        "n": 4,
+        "min": 873,
+        "max": 873,
+        "mean": 873
+      },
+      "pstates": [
+        "P3"
+      ]
+    }
+  ],
+  "missing": [
+    "CPU temperature/frequency",
+    "system available RAM/commit/page faults",
+    "JS heap/ArrayBuffers",
+    "renderer PID to measured browser tab mapping"
+  ],
+  "supersedes": "candidate2-run3-process-cpu.json (sample end approximations replaced by process-provider endedUtc)",
+  "alignedSystemCpuRows": [
+    {
+      "utc": "2026-11-04T23:44:11.5852822Z",
+      "cpu": 85.86952819145938,
+      "dpc": 0.5887671466053156,
+      "interrupt": 1.439218070685418
+    },
+    {
+      "utc": "2026-11-04T23:44:13.6249579Z",
+      "cpu": 93.85120243840498,
+      "dpc": 2.330070968866623,
+      "interrupt": 2.200620924768011
+    },
+    {
+      "utc": "2026-11-04T23:44:15.5818916Z",
+      "cpu": 82.75793558985819,
+      "dpc": 0.7211501788739838,
+      "interrupt": 1.2456253248483764
+    },
+    {
+      "utc": "2026-11-04T23:44:17.5926183Z",
+      "cpu": 82.64801372094513,
+      "dpc": 1.2949261303808028,
+      "interrupt": 1.7481455521296065
+    }
+  ]
+}

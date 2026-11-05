@@ -1,4 +1,8 @@
-# Ultra grafika: stav po přerušeném ověření
+# Ultra grafika: aktuální výsledky
+
+Aktuální [výkonové srovnání z5.listopadu2026](comparison-run3/README.md) má45/48 platných vzorků a kompletní tři Low/Ultra opakování pro oba pohledy. Ultra zkrátilo medián ve scenérii53,30→45,00ms (**15,57 %**, hranice20 % nesplněná). Největší samostatný přínos mělo vypnutí stínů; samotných50 % renderu přínos neprokázalo. Všechny použité záznamy mají správnou identitu, fokus, nastavení a validní render. Měření nezahrnulo aktivní drobnou vegetaci v tomto záběru a celková plynulost60FPS nadále neprošla. Živé přepínání testovaných Low/Custom/Ultra konfigurací je nyní prakticky doložené; B6/jízda/noční svítilna a WebGL2 smoke zůstávají samostatně nedokončené.
+
+## Historický první pokus: run1
 
 Implementace a samostatné zvýšení WebGL2 přípravy na 60 s jsou na větvi `codex/graphics-smoothness-20261104`, runtime checkpoint `e60d33a6796d6aacc8adf39e2ca8fae5baa3964a`. [PR41](https://github.com/Varnahg/StrahovCrazyShow/pull/41) zůstává draft: celková funkční a výkonová přejímka není dokončená.
 
