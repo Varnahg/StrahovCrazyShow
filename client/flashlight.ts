@@ -22,14 +22,17 @@ export class PlayerFlashlight {
   private readonly direction = Vector3.Forward();
   private readonly cameraWorld = Matrix.Identity();
   private disposed = false;
-  constructor(private readonly scene: Scene) {
-    this.beam = new VehicleLighting(scene, "player");
+  constructor(private readonly scene: Scene, shadowsEnabled = true) {
+    this.beam = new VehicleLighting(scene, "player", shadowsEnabled);
     this.casing = new StandardMaterial("torch · graphite casing", scene);
     this.casing.diffuseColor = Color3.FromHexString("#252d33");
     this.casing.specularColor.set(0.28, 0.3, 0.32);
     this.glass = new StandardMaterial("torch · warm lens", scene);
     this.glass.diffuseColor = Color3.FromHexString("#fff1c4");
     this.glass.emissiveColor.set(0.75, 0.66, 0.4);
+  }
+  setShadowsEnabled(enabled: boolean) {
+    this.beam.setShadowsEnabled(enabled);
   }
   private attach(rig: AvatarRig) {
     if (!this.body || this.body.isDisposed()) {

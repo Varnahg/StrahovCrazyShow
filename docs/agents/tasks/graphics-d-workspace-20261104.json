@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "id": "graphics-d-workspace-20261104",
+  "title": "Připravit výslovně zadanou grafickou větev na D",
+  "writePaths": [
+    "assets/",
+    "public/",
+    "node_modules/",
+    ".cache/graphics-d-workspace-20261104/",
+    "docs/agents/handoffs/graphics-d-workspace-20261104.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Checkout na D a codex/graphics-smoothness-20261104 odpovídá6805bcd4; původní C/main a cizí WIP beze změny.",
+    "LFS hydratace zachová původní objekty bez regenerace; dependencies z frozen lockfile bez změny manifestů."
+  ],
+  "verification": [
+    "git status/branch/worktree a společný registr.",
+    "git lfs checkout; runtime LFS preflight; pnpm install --frozen-lockfile; ověřit unchanged package/lock."
+  ],
+  "notes": [
+    "Výslovné nové zadání uživatele4.11.2026 povoluje právě tento D worktree a větev. Nejde o oprávnění převzít staréD worktrees.",
+    "Široké assets/public rezervace slouží pouze materializaci všech609 GitLFS souborů v novémcheckoutu; žádná změna obsahu/generátorů. Po přípravě uvolnit.",
+    "LFS609/preflight/frozen install PASS, příprava ukončená; přesné výsledky v root handoffu."
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "id": "ultra-graphics-20261104-root",
+  "title": "Integrovat Ultra50, živé grafické transakce a měřenou přejímku",
+  "writePaths": [
+    "_bmad/render/bmad-build/strahovcrazyshow-graphics-20261104-1b881598b8a9/",
+    "_bmad-output/implementation-artifacts/ultra-graphics-20261104/",
+    ".cache/ultra-graphics-20261104/",
+    ".cache/render-next-20261102/candidate2/",
+    ".cache/render-next-20261102/candidate3/",
+    ".cache/render-next-20261102/candidate4/",
+    ".cache/game-diagnostics/",
+    "dist/",
+    "docs/performance/evidence/ultra-graphics-20261104/",
+    "docs/agents/handoffs/ultra-graphics-20261104-root.md",
+    "docs/agents/handoffs/graphics-d-user-playtest-20261104.md",
+    "docs/work-in-progress.md",
+    "client/game.ts",
+    "client/graphics-transition.ts",
+    "client/render-quality-preparation.ts",
+    "client/render-startup.ts",
+    "tests/render-startup.test.ts",
+    "client/game-diagnostics.ts",
+    "shared/local-benchmark.ts",
+    "tests/graphics-transition.test.ts",
+    "tests/render-quality-preparation.test.ts",
+    "tests/local-benchmarks.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přesně schválený plán: Ultra50+5 nezávislých voleb, Vlastní, transakční Použít za běhu a před vstupem.",
+    "Game.ready/síť/autority/neutral input pokračují během grafické přípravy; jeden vizuální vlastník, validní dokončený snímek před commitem preferencí, rollback a device-loss pravdivě.",
+    "Archivovat ukončený usertest, zachovat C/main/8080 a bez nových worktrees; pouze D grafická větev.",
+    "Prokázat funkce, změřit jednotlivé volby i Ultra/Low ze stejné pozice dolů/scenérie. Významný FPS přínos jen při≥20% mediánu času bez opakovatelnép99regrese; vadná data nejsouPASS."
+  ],
+  "verification": [
+    "Cílené regrese a nezávislé review, potom jedna stabilní plná sada/tsc/build/SDK.",
+    "Neměnný Edge build, stejné kamery/počasí/avataři/LOD, opakované10s vzorky, CPU/draw/geometry/GPU/systém, cold/warm/lifecycle zvlášť."
+  ],
+  "notes": [
+    "Uživatel výslovně schválil plán implementací4.11.2026. Root přebírá vlastní dříve necommitnuté user-playtest zadání/handoff po doloženém STOP a čistém launcher cleanup.",
+    "Výzkum z plánovací fáze a nové userlogybc908fab; nezaměnit render scope za čistýCPU/GPU. Limity60/180s neměnit.",
+    "Root po úspěšném rendereru zužuje vlastní BMAD scope na přesný D root-hash prefix pro souběh s explicitně autorizovaným C AI chatem. Vlastní rozpracované SPEC/CONTRACT a user handoff se převádějí release/reclaim pod stejným ownerem; žádný pomocný proces neběží.",
+    "Během implementace root uvolňuje heavy/GPU/build/port zdroje a docs/verification.md pro souběžnou výslovně zadanou C AI validaci. Nejsou živé vlastní procesy. Před vlastním full/build/GPU získá samostatný validační claim; vlastní SPEC/CONTRACT/archive/helper WIP se převádí pod stejným ownerem.",
+    "Root předává dosud neupravené Game fixture/test paths novému disjunktnímu leafu ultra-graphics-20261104-game-tests. Vlastní Game/helper/telemetry WIP zůstává rootu; release/reclaim bez živých procesů."
+  ]
+}

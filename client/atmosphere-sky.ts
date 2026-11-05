@@ -622,7 +622,7 @@ export function atmosphereStarPixels(
 }
 
 /** The caller owns its dome mesh; this handle owns material and both GPU textures. */
-export function createAtmosphereSky(scene: Scene, quality: string) {
+export function createAtmosphereSky(scene: Scene, quality: string, options: { cloudsEnabled?: boolean } = {}) {
   const lowQuality = quality === "low";
   const noisePixels = atmosphereNoisePixels();
   const noise = RawTexture.CreateRGBATexture(
@@ -680,6 +680,8 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
   material.disableDepthWrite = true;
   material.setTexture("atmosphereStars", stars);
   const cloudMaterials = new Set<ShaderMaterial>([material]);
+  const noVisualClouds = Vector3.Zero();
+  let cloudsEnabled = options.cloudsEnabled ?? true;
   const coverage = new Vector3(),
     offsets = [new Vector2(), new Vector2(), new Vector2()];
   const cloudLight = new CloudLightSampler(noisePixels, 256, coverage, offsets);
@@ -700,7 +702,7 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
     cloudDetail = lowQuality ? 0 : 1,
     haze = 0;
   const bind = (target: ShaderMaterial) => {
-    target.setVector3("atmosphereCoverage", coverage);
+    target.setVector3("atmosphereCoverage", cloudsEnabled ? coverage : noVisualClouds);
     target.setVector2("atmosphereLowOffset", offsets[0]);
     target.setVector2("atmosphereMidOffset", offsets[1]);
     target.setVector2("atmosphereHighOffset", offsets[2]);
@@ -846,6 +848,11 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
   return {
     material,
     update,
+    setCloudsEnabled(enabled: boolean) {
+      if (disposed || cloudsEnabled === enabled) return;
+      cloudsEnabled = enabled;
+      for (const target of cloudMaterials) bind(target);
+    },
     /** Reused values for this frame's observer, computed from the bound cloud
      * masks. Local irradiance only, not a campus-wide cloud shadow map. */
     lightTransmission: lightTransmission as Readonly<typeof lightTransmission>,

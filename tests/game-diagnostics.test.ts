@@ -1,3 +1,4 @@
+import { graphicsLifecycleFixture, graphicsFixtureEnvironment, graphicsFixtureMembers } from "./helpers/weather-door-render-fixture";
 import test from "node:test";
 import { doorLifecycleFixture } from "./helpers/weather-door-render-fixture";
 import assert from "node:assert/strict";
@@ -51,6 +52,10 @@ const members = declaration.members.filter(
   (node) =>
     node.name &&
     [
+      ...graphicsFixtureMembers,
+      "renderingSnapshot",
+      "updateFramePresentation",
+      "finishDiagnosticCallback",
       "frame",
       "updateWorldPresentation",
       "updateRenderEnvironment",
@@ -88,7 +93,7 @@ const compiled = ts.transpileModule(
 ).outputText;
 // Same-realm object literals exercise the real sanitizer's plain-object policy.
 const script = new Script(`(function(environment) {
-  const { exports, Vector3, Quaternion, writeQuaternion, writeVector3, performance, document, window,
+  const { createRenderPreferences, resolveVisualSettings, renderBudget, exports, Vector3, Quaternion, writeQuaternion, writeVector3, performance, document, window,
     testImportMeta, sessionDiagnostics, vehicleCameraCanFollow, zoneAt, applyArtLighting, getTreeSeasonState, snapshotTransportDiagnostics, snapshotTimelineDiagnostics, readWebGpuMainPassTiming, HUNT_POINTS, localizeText } = environment;
   ${compiled}
   return FrameGame;
@@ -133,6 +138,7 @@ function fixture(hostname = "localhost") {
   };
   const recorder = new SessionDiagnostics(environment);
   const FrameGame = script.runInThisContext()({
+    ...graphicsFixtureEnvironment,
     exports: {},
     Vector3,
     Quaternion,
@@ -163,6 +169,7 @@ function fixture(hostname = "localhost") {
   });
   const game = Object.assign(new FrameGame(), {
     ...doorLifecycleFixture(),
+    ...graphicsLifecycleFixture(),
     ready: true,
     disposed: false,
     startupAbort: new AbortController(),
@@ -186,7 +193,7 @@ function fixture(hostname = "localhost") {
     },
     adaptive: {
       state: {
-        mode: "manual",
+        mode: "medium",
         quality: "medium",
         targetFps: 60,
         hardwareScaling: 1,

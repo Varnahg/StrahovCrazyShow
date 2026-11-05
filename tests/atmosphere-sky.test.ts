@@ -515,3 +515,24 @@ test("cloud layers ease changes and model FROM wind advects during a frozen astr
   scene.dispose();
   engine.dispose();
 });
+
+
+test("visual clouds off shares zero coverage with all discs but preserves weather light transmission", () => {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  const shown = createAtmosphereSky(scene, "low"), hidden = createAtmosphereSky(scene, "low", { cloudsEnabled: false });
+  const disc = new ShaderMaterial("test hidden cloud disc", scene, "not-compiled", {}); hidden.bindClouds(disc);
+  const input = { instant: j2000, dt: .016, sun: { x: 0, y: 1, z: 0, altitude: 1 }, cloud: .9, rain: 0,
+    cloudLayers: { low: .9, mid: .8, high: .7 }, player: { x: 0, z: 0 } };
+  try {
+    shown.update(input); hidden.update(input);
+    assert.deepEqual(hidden.lightTransmission, shown.lightTransmission);
+    assert.deepEqual((hidden.material as any)._vectors3.atmosphereCoverage.asArray(), [0, 0, 0]);
+    assert.equal((disc as any)._vectors3.atmosphereCoverage, (hidden.material as any)._vectors3.atmosphereCoverage);
+    const textures = scene.textures.length;
+    hidden.setCloudsEnabled(true);
+    assert.deepEqual((hidden.material as any)._vectors3.atmosphereCoverage.asArray(), (shown.material as any)._vectors3.atmosphereCoverage.asArray());
+    hidden.setCloudsEnabled(false); hidden.update({ ...input, instant: j2000 + 20, cloud: .1 });
+    assert.deepEqual((disc as any)._vectors3.atmosphereCoverage.asArray(), [0, 0, 0]);
+    assert.equal(scene.textures.length, textures);
+  } finally { disc.dispose(); shown.dispose(); hidden.dispose(); scene.dispose(); engine.dispose(); }
+});

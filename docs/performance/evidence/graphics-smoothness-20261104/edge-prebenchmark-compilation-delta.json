@@ -1,0 +1,76 @@
+{
+  "scope": "Startup preparation snapshot to first benchmark start; includes ready, Low→Medium and day/autumn selection plus idle. Brackets 6083.9ms hitch but does NOT isolate its cause.",
+  "fromSeq": 865,
+  "fromAtMs": 111047.8,
+  "toAtMs": 198182.9,
+  "generation": [
+    1,
+    1
+  ],
+  "delta": {
+    "glslToSpirv": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "spirvToWgsl": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "compilerLoad": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "shaderPreparation": {
+      "calls": 45,
+      "completed": 45,
+      "failures": 0,
+      "cpuTotalMs": 38.299999713897705,
+      "asyncTotalMs": 23199.70000076294
+    },
+    "shaderModule": {
+      "calls": 90,
+      "completed": 90,
+      "failures": 0,
+      "cpuTotalMs": 18.70000147819519,
+      "asyncTotalMs": 0
+    },
+    "shaderValidation": {
+      "calls": 90,
+      "completed": 90,
+      "failures": 0,
+      "cpuTotalMs": 1.499999761581421,
+      "asyncTotalMs": 210959.09999585152
+    },
+    "syncPipeline": {
+      "calls": 58,
+      "completed": 58,
+      "failures": 0,
+      "cpuTotalMs": 1.5999999046325684,
+      "asyncTotalMs": 0
+    },
+    "asyncPipeline": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "submit": {
+      "calls": 17612,
+      "completed": 17612,
+      "failures": 0,
+      "cpuTotalMs": 364.40001034736633,
+      "asyncTotalMs": 0
+    }
+  },
+  "cacheMissDelta": 58
+}

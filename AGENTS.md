@@ -1,5 +1,13 @@
 # Práce na StrahovCrazyShow
 
+## Výslovná grafická větev na D — zadání 4. 11. 2026
+
+Pro tuto práci uživatel výslovně mění starší pravidlo main-only: grafická vylepšení a navazující opravy záseků probíhají v D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104 na větvi codex/graphics-smoothness-20261104, založené z6805bcd4396eeb6abd17f724914a054b06fa86bc. Tato konkrétní výjimka má přednost před níže zachovanými historickými pravidly main-only. Další kopie se nezakládají. C checkout/main, cizí WIP a produkční8080 se nemění.
+
+Výjimka platí pro uvedenou grafickou větev a její dokončení. Uživatel následně výslovně schválil PR a merge do main. Po integraci je tato sekce historickou evidencí, nikoli pokynem přesměrovat další práci z main na D; nové zadání používá pravidla main níže, pokud uživatel znovu výslovně neurčí jinak.
+
+Koordinační registr zůstává společný v Git common directory původního repozitáře. Zdrojové rezervace, heavy-validation/GPU/porty a pravidla praktického měření platí nadále; worktree není náhradou koordinace. Všechny příkazy používej s výslovnou pracovní cestou naD, protože ručně vytvořený worktree není připojen jako spravovaný checkout aplikace.
+
 Před implementací ověř očekávané chování, existující kód a vhodné primární podklady. Uživatel výslovně požaduje průzkum před změnami a praktické ověření výsledku.
 
 ## Jediná pracovní větev a kopie — výslovné zadání 29. 10. 2026
@@ -49,6 +57,7 @@ Aktivní rezervace jsou lokální ve společném Git adresáři; nesdílejí se 
 - Před změnou nebo výkonovým během zapiš do existujícího plánu šest položek: problém, doložený mechanismus/hypotézu, jedinou zkoušenou změnu, hlavní metriku, podmínky správnosti a kritérium přijetí. Rozliš startup a plynulost hraní; dílčí CPU zrychlení není FPS důkaz.
 - Po selhání nejprve vyhodnoť uložené logy. Nový běh musí zodpovědět konkrétní rozlišovací otázku nebo být předem plánovaným opakováním. Po druhém stejném neplánovaném selhání zastav opakování a uprav diagnostický postup; bez výslovného nového zadání neprodlužuj herní timeouty a neoslabuj přejímku.
 - Výslovné zadání3.11.2026 po C10: umožnit dokončení WebGPU přípravy zvýšením rozpočtu na60s pro jednu kvalitu a180s celkem. Všechny readiness/health/submission podmínky zůstávají; staré30/90s údaje v evidenci popisují historické běhy. Změna limitu není sama o sobě zrychlením hry.
+- Následné výslovné zadání 4.11.2026: stejných 60 s dostává také jediná vybraná kvalita při WebGL2 Game startupu. Obecné helper timeouty ani finální submission gate se plošně neprodlužují; readiness a skutečný neúspěch po vyčerpání limitu zůstávají. Starý WebGL2 údaj 30 s je historická evidence.
 - Před dlouhou sérií ověř identitu buildu a krátký průchod telemetrie až do uloženého výsledku. Sleduj výpadek sběru, stáří vzorků, limity a rotaci souborů. Chybějící data znamenají omezený/neplatný výsledek, nikoli úspěch. Při testování použij přímé Node CLI nebo `pnpm --config.verifyDepsBeforeRun=error`; instalace závislostí je samostatný vědomý krok.
 - Rozpracuj jeden optimalizační kandidát. Nezbytnou opravu správnosti odděl a uzavři samostatně. Výsledkem série je přijetí, zamítnutí nebo neprůkazný výsledek s přesným chybějícím měřením; další kandidát nesmí zakrýt neuzavřený předchozí.
 - Po 30 minutách bez poznatku, který mění rozhodnutí nebo vylučuje konkrétní příčinu, zvol levnější rozlišovací kontrolu, návrat k datům nebo odložení hypotézy. Jde o kontrolu účelnosti práce, nikoli automatické ukončení úkolu, zkrácení testu či nový schvalovací krok pro uživatele.

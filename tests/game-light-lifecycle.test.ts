@@ -109,7 +109,7 @@ test("Game installs one scene-owned budget/order pair before world creation", (t
   assert.throws(() => new GltfLightBudget(game.scene), /already owns/);
 });
 
-test("both production render callsites canonicalize actual light slots before drawing", (t) => {
+test("all production render callsites canonicalize actual light slots before drawing", (t) => {
   const game = fixture(t);
   const ambient = new HemisphericLight("ambient", Vector3.Up(), game.scene);
   const lamp = new PointLight("lamp", Vector3.Zero(), game.scene);
@@ -131,8 +131,8 @@ test("both production render callsites canonicalize actual light slots before dr
   );
   assert.equal(
     calls.length,
-    2,
-    "cover preload and gameplay; new render sites need explicit review",
+    3,
+    "cover preload, live graphics preparation and gameplay; new render sites need explicit review",
   );
   for (const call of calls) {
     const statement = call.parent;

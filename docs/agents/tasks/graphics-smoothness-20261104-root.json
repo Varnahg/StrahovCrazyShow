@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "id": "graphics-smoothness-20261104-root",
+  "title": "Podle záznamů opravit jeden doložený zbylý zásek na grafické větvi D",
+  "writePaths": [
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/graphics-smoothness-20261104/",
+    ".cache/graphics-smoothness-20261104/",
+    "docs/performance/evidence/graphics-smoothness-20261104/",
+    "docs/agents/handoffs/graphics-smoothness-20261104-root.md",
+    "docs/verification.md",
+    "docs/work-in-progress.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdřív rozlišit CPU render/asset CPU a čekání mimo callback ze zachovaných rawlogů, oddělit síťové zpoždění; žádná domnělá příčina.",
+    "Porovnat rozumné varianty a implementovat jediný kandidát s regresí/lifecycle/refaktoringem; dílčí zrychlení není celkový FPSclaim.",
+    "Skutečné Edge ověření s identitou zdrojů/testů/assetů a bez kontaminace pohyblivými peers; původní selhání zůstávají.",
+    "Výsledek commitnut na novévětvi naD, širší přejímka zůstává pravdivá."
+  ],
+  "verification": [
+    "Čtecí log/source audit, primary evidence a šestipoložkový plán před změnou/během.",
+    "Samostatné implementační scopes po rozhodnutí; review a cílené regrese.",
+    "Před plným test/build/SDK/GPU rezervovat explicitní validační úkol a porty."
+  ],
+  "notes": [
+    "Base6805bcd4; původní uživatelský playtest a PR40 LowA75 ukazují zbyléhitches. Resync epoch guard je přijatá oprava správnosti, nikoli opravaCPU/driver záseků.",
+    "FAR45 byl zamítnut; shader syntax cache a scheduling experimenty jsou výchozíOFF. Znovu je nezapínat bez nového doloženého rozhodnutí.",
+    "Linear KEY-5 aktualizovat po průzkumu/rozhodnutí/implementaci/ověření/commitu.",
+    "4.11.2026: tento CPU celek uzavřen naD; úplné automatické kontroly, byteparita/CPU A/B a úzkýEdge runtime důkaz v docs/performance/evidence/graphics-smoothness-20261104/README.md. Celkováplynulost neníPASS; existujícígameplaygateINCONCLUSIVE aGPU-process hypotéza zůstávajíveKEY-5. Vlastníprocesyukončené,inputrevalidationPASS; žádná integrace doC/main/8080."
+  ]
+}

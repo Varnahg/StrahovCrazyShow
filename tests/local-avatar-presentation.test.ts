@@ -5,6 +5,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Game } from "../client/game";
+import { AdaptiveQualityController } from "../client/adaptive-quality";
 import {
   LocalAvatarPresentation,
   type LocalAvatarView,
@@ -217,6 +218,7 @@ test("native local LOD removes and restores every preset once, with no hidden-fr
       localId: "self",
       camera,
       quality: "medium",
+      adaptive: new AdaptiveQualityController({ mode: "medium" }),
       flashlightOn: false,
       actor: { grounded: true },
       sim: { floorHeight: () => 0 },

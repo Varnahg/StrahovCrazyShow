@@ -1,3 +1,4 @@
+import { graphicsLifecycleFixture, graphicsFixtureEnvironment, graphicsFixtureMembers } from "./helpers/weather-door-render-fixture";
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -10,17 +11,17 @@ const methods=()=>{
   const source=fs.readFileSync(new URL('../client/game.ts',import.meta.url),'utf8');
   const tree=ts.createSourceFile('game.ts',source,ts.ScriptTarget.Latest,true);
   const game=tree.statements.find((node):node is ts.ClassDeclaration=>ts.isClassDeclaration(node)&&node.name?.text==='Game')!;
-  return ['prepareLighting','applyRenderQuality'].map(name=>game.members.find(n=>n.name?.getText(tree)===name)!.getText(tree));
+  return [...graphicsFixtureMembers,'prepareLighting','applyRenderQuality'].map(name=>game.members.find(n=>n.name?.getText(tree)===name)!.getText(tree));
 };
 const result=(status='complete',active=0)=>({status,failureStep:null,stages:[],elapsedMs:active,activeElapsedMs:active,pausedMs:0});
 function fixture(initial='medium') {
   let clock=0,scale=1,environment:(()=>void)|undefined,passAction:((index:number,options:any)=>void)|undefined;
   const source=`class Subject { ${methods().join('\n')} }; Subject`;
   const Subject=vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,
-    {prepareRenderQualities,MANUAL_HARDWARE_SCALING,performance:{now:()=>clock}});
+    {...graphicsFixtureEnvironment,prepareRenderQualities,MANUAL_HARDWARE_SCALING,performance:{now:()=>clock}});
   const requested={quality:initial,hardwareScaling:1.17,revision:7},pos=Object.freeze({x:1,y:2,z:3}),self=Object.freeze({id:'local'}),camera=Object.freeze({identity:'unchanged'}),weather=Object.freeze({rain:.1});
   const samples:any[]=[],passes:any[]=[],applies:string[]=[];
-  const game:any=Object.assign(new Subject(),{
+  const game:any=Object.assign(new Subject(),{...graphicsLifecycleFixture(),
     disposed:false,rendererFailed:false,scene:{isDisposed:false},quality:initial,adaptive:{state:requested},
     engine:{isWebGPU:true,getHardwareScalingLevel:()=>scale,setHardwareScalingLevel:(value:number)=>{scale=value;}},
     actor:Object.freeze({position:pos,vehicle:false}),avatars:new Map([['local',self]]),localId:'local',camera,weather,timeOverride:12345,flashlightOn:true,

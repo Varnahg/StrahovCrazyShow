@@ -108,10 +108,10 @@ function fixture(tree = source) {
   return { tree, id, prototype, streamed, original, files, manifest };
 }
 
-function harness(t: any, fixtures = [fixture()], engine = new NullEngine()) {
+function harness(t: any, fixtures = [fixture()], engine = new NullEngine(), detailMode: "normal" | "far-only" = "normal") {
   const scene = new Scene(engine); scene.useRightHandedSystem = true;
   const selections = Object.fromEntries(fixtures.map(f => [f.tree.osmId, f.id]));
-  const renderer = new TreeRenderer(scene, { treePilot: { manifestUrl: "/models/vegetation/seasonal-streamed/test.json", selections } }), r = renderer as any;
+  const renderer = new TreeRenderer(scene, { treePilot: { manifestUrl: "/models/vegetation/seasonal-streamed/test.json", selections }, detailMode }), r = renderer as any;
   for (const key of ["Bark012", "LeafSet024"]) r.materials.set(key, new PBRMaterial(key, scene));
   const manifest = parseTreePilotManifest({ ...fixtures[0].manifest, prototypes: Object.assign({}, ...fixtures.map(f => f.manifest.prototypes)), placements: fixtures.flatMap(f => f.manifest.placements) });
   const byUrl = new Map(fixtures.flatMap(f => f.streamed.lods.map((file, lod) => [file.url, asBuffer(f.files[lod])] as const)));
@@ -381,4 +381,44 @@ test("actual streamed export is byte-identical to every referenced R4 accessor",
       const parts = decodeTreePrototype(asBuffer(bytes), id, prototype, lod); assert.equal(parts.length, 2);
     }
   }
+});
+
+
+test("FAR-only survives all quality warmup passes without detail requests and keeps visible wood", async t => {
+  const f = fixture(), h = harness(t, [f], new NullEngine(), "far-only"); await h.load();
+  for (const [index, quality] of ["low", "medium", "high"].entries()) {
+    h.renderer.update(input({ time: index + 1, quality })); await settle();
+    assert.equal(h.r.treeGroups[0].desired, 2); assert.equal(h.r.treeGroups[0].active, 2);
+  }
+  assert.deepEqual(h.calls, [f.streamed.lods[2].url]);
+  assert.ok(h.r.treeGroups[0].lods[2].some((m: any) => m.metadata.treeRole === "wood" && m.isEnabled()));
+  h.renderer.setDetailMode("normal"); h.renderer.update(input({ time: 5 })); await settle();
+  assert.equal(h.r.treeGroups[0].active, 0); assert.ok(h.calls.includes(f.streamed.lods[0].url));
+});
+
+test("late MID completion cannot allocate or show detail after FAR-only, then normal can request it again", async t => {
+  const f = fixture(), h = harness(t, [f]); await h.load();
+  const player = { x: source.x - 90, y: 0, z: source.z }, group = h.r.treeGroups[0];
+  let finish!: (value: ArrayBuffer) => void, pending = true;
+  t.mock.method(h.r.loader, "asset", (file: TreeAssetFile) => {
+    h.calls.push(file.url); assert.equal(file.url, f.streamed.lods[1].url);
+    if (pending) { pending = false; return new Promise<ArrayBuffer>(resolve => finish = resolve); }
+    return Promise.resolve(asBuffer(f.files[1]));
+  });
+  h.renderer.update(input({ player })); assert.equal(h.r.loadingTrees.size, 1);
+  h.renderer.setDetailMode("far-only"); finish(asBuffer(f.files[1])); await settle();
+  assert.equal(group.active, 2); assert.equal(group.lods[1].length, 0);
+  assert.equal(h.r.loadingTrees.size, 0); assert.equal(h.renderer.stats.treeDetailReservedBytes, 0);
+  h.renderer.setDetailMode("normal"); h.renderer.update(input({ time: 3, player })); await settle();
+  assert.equal(group.active, 1); assert.equal(h.calls.length, 3);
+});
+
+test("FAR-only retires only detail failures while preserving a failed tree foundation", async t => {
+  const f = fixture(), h = harness(t, [f]); await h.load();
+  t.mock.method(h.r.loader, "asset", async () => { throw Error("requested MID failed"); });
+  h.renderer.update(input({ player: { x: source.x - 90, y: 0, z: source.z } })); await settle();
+  assert.match(h.renderer.stats.loadError!, /MID failed/);
+  h.renderer.setDetailMode("far-only"); assert.equal(h.renderer.stats.loadError, undefined);
+  h.r.error(Error("FAR foundation failed")); h.renderer.setDetailMode("normal"); h.renderer.setDetailMode("far-only");
+  assert.match(h.renderer.stats.loadError!, /FAR foundation failed/);
 });

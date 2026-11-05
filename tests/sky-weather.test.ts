@@ -7,6 +7,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createAtmosphereSky } from "../client/atmosphere-sky";
+import { SkyWeatherController } from "../client/sky-weather";
 import {
   applyArtLighting,
   applyCloudTransmission,
@@ -115,4 +116,22 @@ test("live lighting consumes the current cloud frame and retains smooth drift, f
     scene.dispose();
     engine.dispose();
   }
+});
+
+
+test("SkyWeather initial and live cloud policy reaches sun and moon without changing weather or astronomy", () => {
+  const engine = new NullEngine(), scene = new Scene(engine), sky = new SkyWeatherController(scene, { cloudsEnabled: false });
+  const input = { instant: Date.UTC(2026, 9, 20, 10), dt: 0, quality: "low", player: { x: 110, y: 1, z: 12 } };
+  try {
+    const state = sky.update(input); sky.atmosphere.update({ ...state, dt: 0, player: input.player });
+    const before = JSON.stringify(state), owner = sky as any;
+    for (const material of [sky.atmosphere.material, owner.sunMaterial, owner.moonMaterial])
+      assert.deepEqual(material._vectors3.atmosphereCoverage.asArray(), [0, 0, 0]);
+    sky.setCloudsEnabled(true);
+    assert.ok(owner.sunMaterial._vectors3.atmosphereCoverage.length() > 0);
+    assert.equal(owner.moonMaterial._vectors3.atmosphereCoverage, owner.sunMaterial._vectors3.atmosphereCoverage);
+    assert.equal(JSON.stringify(sky.update(input)), before);
+    sky.setCloudsEnabled(false);
+    assert.deepEqual(owner.sunMaterial._vectors3.atmosphereCoverage.asArray(), [0, 0, 0]);
+  } finally { sky.dispose(); scene.dispose(); engine.dispose(); }
 });

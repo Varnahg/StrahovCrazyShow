@@ -336,3 +336,12 @@ test("compact flow follows actual keyboard height while pinch zoom preserves the
   stop();
   assert.equal(view.attributes.has("data-compact-viewport"), false);
 });
+
+test("graphics can be opened before entry without mounting the avatar editor", () => {
+  let renders = 0;
+  const Editor = () => { renders++; return createElement("canvas"); };
+  const html = home({ graphics: createElement("button", { type: "button" }, "Grafika"), editor: createElement(Editor) });
+  assert.ok(html.includes(">Grafika</button>"));
+  assert.equal(renders, 0);
+  assert.doesNotMatch(html, /<canvas/);
+});

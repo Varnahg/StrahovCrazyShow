@@ -27,7 +27,7 @@ async function build() {
     const after = await readInputs(); assertInputIdentity(inputs, after);
     const identity = { schemaVersion: 1, createdAt: new Date().toISOString(), inputs,
       bundleFiles: await treeHashes(dist), clientBuildId: loaded.config.define?.["import.meta.env.VITE_CLIENT_BUILD_ID"] ?? null,
-      hashAfterDurationMs: after.hashDurationMs, method: "Unmodified production bootstrap, canonical main, build artifacts only; public assets served read-only" };
+      hashAfterDurationMs: after.hashDurationMs, method: "Unmodified production bootstrap, explicitly authorized checkout recorded in inputs.checkout, build artifacts only; public assets served read-only" };
     await saveNew(join(buildDir, "identity.json"), identity);
     console.log(JSON.stringify({ status: "built", sourceHash: inputs.sourceHash, dist }));
   } catch (error) { await saveNew(join(buildDir, "failure.json"), { at: new Date().toISOString(), error: String(error) }); throw error; }

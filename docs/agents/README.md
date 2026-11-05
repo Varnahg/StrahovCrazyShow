@@ -1,5 +1,7 @@
 # Souběžná práce agentů
 
+**Výjimka4.11.2026:** aktuální grafická práce je výslovně povolená pouze v D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104 na codex/graphics-smoothness-20261104. Podrobnosti a zachované společné rezervace určuje nová sekce AGENTS.md; níže uvedené main-only zadání z29.10 je pro tento jediný rozsah nahrazené.
+
 Od 29. 10. 2026 se na výslovné zadání uživatele pracuje pouze na main v C:/Users/rezac/Documents/GitHub/StrahovCrazyShow. Další větve a worktrees se nezakládají. Níže uvedené popisy historických worktrees vysvětlují koordinátor, nejsou pokynem k jejich použití. Rozpracované prototypy a přesné zdroje zachované v historii main shrnuje [přehled WIP](../work-in-progress.md).
 
 Tato pravidla rozdělují zápis do souborů, náročné procesy a předání výsledků. Kořenový [AGENTS.md](../../AGENTS.md) je vstupní instrukce pro každý nový úkol. [Mapa architektury](architecture.md) vychází ze skutečného kódu a lockfilu; [current-work.md](current-work.md) zachycuje rozpracovaný stav při zavedení koordinace 12. 10. 2026.

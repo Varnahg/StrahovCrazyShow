@@ -61,7 +61,19 @@ import {
   isRenderTargetFps,
   MANUAL_HARDWARE_SCALING,
   type RenderQuality,
+  type RenderQualityMode,
+  renderBudget,
+  createRenderPreferences,
+  parseRenderPreferences,
+  resolveVisualSettings,
+  sameRenderPreferences,
+  type RenderPreferences,
+  type EffectiveVisualSettings,
+  type GraphicsApplicationState,
+  type VisualFeatures,
 } from "../shared/render-quality";
+import { GraphicsTransition, graphicsOperation } from "./graphics-transition";
+import { paintStartupStage } from "./startup-progress";
 import {
   readGpuDiagnostics,
   readWebGpuMainPassTiming,
@@ -202,6 +214,13 @@ function vehiclePredictionMatches(
   );
 }
 
+type GraphicsConfiguration = {
+  preferences: RenderPreferences;
+  effective: EffectiveVisualSettings;
+  /** Previous material grading is renderer state, never a stored player setting. */
+  imageProcessingEnabled?: boolean;
+};
+
 export type GameStats = {
   fps: number;
   triangles: number;
@@ -319,6 +338,17 @@ export class Game {
   engineInstrumentation: EngineInstrumentation;
   gpu: GpuDiagnostics;
   adaptive = new AdaptiveQualityController();
+  graphicsApplying = false;
+  onGraphicsState?: (state: GraphicsApplicationState) => void;
+  private graphicsState: GraphicsApplicationState = { applying: false, phase: null, error: null, restartRequired: false };
+  private graphicsTransition?: GraphicsTransition<GraphicsConfiguration>;
+  private appliedVisualSettings?: EffectiveVisualSettings;
+  private graphicsSettingsRevision = 0;
+  private graphicsPreparationPreferences?: RenderPreferences;
+  private visualLoadRevision = 0;
+  private pendingVisualLoad = false;
+  private visualLoadError: unknown;
+  private vegetationPolicy?: Pick<VisualFeatures, "groundVegetation" | "trees">;
   appliedQualityRevision = -1;
   lastCpuFrameMs: number | undefined;
   private completedDiagnosticCallback?: { frameStartedAtMs: number; cpuMs: number };
@@ -618,9 +648,11 @@ export class Game {
     public canvas: HTMLCanvasElement,
     profile: Profile,
     preparedEngine: AbstractEngine,
+    preferences?: RenderPreferences,
   ) {
     this.profile = profile;
     this.engine = preparedEngine;
+    if (preferences) this.adaptive = new AdaptiveQualityController({ preferences: parseRenderPreferences(preferences) });
     this.canvas.dataset.renderErrorCount = "0";
     this.renderHealth = new RenderHealth(this.engine, "game", (fault, health) => {
       if (this.disposed) return;
@@ -787,7 +819,7 @@ export class Game {
       groundHeight(CAR_SPAWN.x, CAR_SPAWN.z),
       CAR_SPAWN.z,
     );
-    this.skyWeather = new SkyWeatherController(this.scene);
+    this.skyWeather = new SkyWeatherController(this.scene, { cloudsEnabled: this.getEffectiveVisualSettings().features.clouds });
     this.precipitation = new PrecipitationRenderer(this.scene);
     this.localPlayer = {
       ...profile,
@@ -835,6 +867,7 @@ export class Game {
     attempt("abort", () => this.startupAbort.abort());
     attempt("startup-assets", () => this.disposeStartupAssets());
     attempt("light-preparation", () => this.cancelLightPreparation?.());
+    attempt("graphics-application", () => this.graphicsTransition?.dispose());
     attempt("render-loop", () => this.engine.stopRenderLoop());
     attempt("benchmark", () => benchmark?.profile.dispose());
     attempt("held-input", () => this.blur());
@@ -1009,7 +1042,7 @@ export class Game {
             throw error;
           },
         )),
-        this.trackStartupAsset(loadVegetation(this.scene, treePilot ? { treePilot } : { treeCatalog })),
+        this.trackStartupAsset(loadVegetation(this.scene, { ...(treePilot ? { treePilot } : { treeCatalog }), visualFeatures: this.getEffectiveVisualSettings().features })),
         this.trackStartupAsset(loadCar(this.scene).then(
           (value) => {
             if (!this.disposed && !this.rendererFailed) this.canvas.dataset.carStage = "ready";
@@ -1036,6 +1069,7 @@ export class Game {
       }
       if (vegetation.status === "fulfilled") {
         this.vegetation = vegetation.value;
+        await this.setVegetationFeatures(this.getEffectiveVisualSettings().features);
         this.startupAssets.delete(vegetation.value);
       }
       else {
@@ -1073,8 +1107,8 @@ export class Game {
     await this.loadCadBuildingsForStartup(loadCadBuildings);
     this.surfacePack = new SurfacePack(this.scene);
     this.surfacePack.update(1, this.quality, this.effectiveWeather?.rain ?? 0);
-    this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
-    this.vehicleLighting = new VehicleLighting(this.scene);
+    this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun, this.getEffectiveVisualSettings().features);
+    this.vehicleLighting = new VehicleLighting(this.scene, "vehicle", this.getEffectiveVisualSettings().features.shadows);
     this.updatePlayers([this.localPlayer]);
     this.prepareTerrainReviewCamera();
     this.engine.stopRenderLoop(preloadRender);
@@ -1802,7 +1836,7 @@ export class Game {
   toggleFlashlight() {
     if (!this.ready || this.actor.vehicle || this.respawnPending)
       return this.flashlightOn;
-    this.flashlight ??= new PlayerFlashlight(this.scene);
+    this.flashlight ??= new PlayerFlashlight(this.scene, this.getEffectiveVisualSettings().features.shadows);
     this.flashlightOn = !this.flashlightOn;
     this.canvas.dataset.flashlight = String(this.flashlightOn);
     return this.flashlightOn;
@@ -1889,15 +1923,27 @@ export class Game {
   }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
     if (this.disposed || this.rendererFailed) return;
-    if (this.preparingRenderQuality) return;
+    if (this.preparingRenderQuality || this.graphicsApplying) return;
     if (next.revision === this.appliedQualityRevision) return;
     this.appliedQualityRevision = next.revision;
     this.applyRenderQuality(next.quality, next.hardwareScaling);
   }
   private preparingRenderQuality = false;
   /** Render-only overrides never write the user's adaptive controller state. */
-  private applyRenderQuality(quality: RenderQuality, hardwareScaling: number) {
+  private applyRenderQuality(quality: RenderQuality, hardwareScaling: number, features?: VisualFeatures, mode?: RenderQualityMode, deferOwners = false) {
     if (this.disposed || this.rendererFailed || this.scene?.isDisposed) return;
+    const preferences = this.graphicsPreparationPreferences ?? this.adaptive.preferences ?? createRenderPreferences(this.adaptive.state.mode ?? "auto", this.adaptive.state.targetFps);
+    const resolved = resolveVisualSettings(preferences, { quality, hardwareScaling });
+    const flags = features ?? resolved.features;
+    const budget = renderBudget(quality);
+    this.appliedVisualSettings = Object.freeze({ ...resolved, mode: mode ?? resolved.mode, quality, hardwareScaling,
+      renderScale: 1 / hardwareScaling, features: flags,
+      budgets: flags.postProcesses === budget.postProcesses ? budget : Object.freeze({ ...budget, postProcesses: flags.postProcesses }) });
+    // Disable-down precedes resize so the retained pipeline cannot rebuild a blur
+    // for a configuration that the player has just turned off.
+    if (!deferOwners) this.publishVisualFeatures(flags);
+    if (!deferOwners && this.vegetation && (this.vegetationPolicy?.groundVegetation !== flags.groundVegetation || this.vegetationPolicy?.trees !== flags.trees))
+      void this.setVegetationFeatures(flags).catch(() => {}); // Readiness consumes the current failure.
     this.quality = quality;
     this.setCarQuality?.(this.quality);
     if (
@@ -1906,18 +1952,186 @@ export class Game {
     )
       this.engine.setHardwareScalingLevel(hardwareScaling);
   }
+  private publishVisualFeatures(features: VisualFeatures) {
+    this.cinematic?.setVisualFeatures(features);
+    this.vehicleLighting?.setShadowsEnabled(features.shadows);
+    this.flashlight?.setShadowsEnabled(features.shadows);
+    this.skyWeather?.setCloudsEnabled(features.clouds);
+  }
+  private async setVegetationFeatures(features: VisualFeatures) {
+    if (!this.vegetation) return;
+    const revision = ++this.visualLoadRevision;
+    this.vegetationPolicy = { groundVegetation: features.groundVegetation, trees: features.trees };
+    this.pendingVisualLoad = true; this.visualLoadError = undefined;
+    try { await this.vegetation.setVisualFeatures(features); }
+    catch (error) { if (revision === this.visualLoadRevision) this.visualLoadError = error; throw error; }
+    finally { if (revision === this.visualLoadRevision) this.pendingVisualLoad = false; }
+  }
+  getEffectiveVisualSettings(): EffectiveVisualSettings {
+    return this.appliedVisualSettings ?? resolveVisualSettings(
+      this.adaptive.preferences ?? createRenderPreferences(this.adaptive.state.mode ?? "auto", this.adaptive.state.targetFps), this.adaptive.state);
+  }
+  private get renderingSnapshot(): AdaptiveQualitySnapshot & { graphicsApplying: boolean; settingsRevision: number; transitionPhase: GraphicsApplicationState["phase"] } {
+    return { ...this.adaptive.state, ...this.getEffectiveVisualSettings(), graphicsApplying: this.graphicsApplying,
+      settingsRevision: this.graphicsSettingsRevision, transitionPhase: this.graphicsState.phase };
+  }
+  cancelGraphicsApply() { this.graphicsTransition?.cancel(); }
+  async applyRenderPreferences(value: RenderPreferences): Promise<boolean> {
+    if (this.disposed || this.rendererFailed || this.graphicsApplying || this.benchmark) return false;
+    const preferences = parseRenderPreferences(value);
+    if (sameRenderPreferences(preferences, this.adaptive.preferences)) return true;
+    if (!this.ready) {
+      this.applyAdaptiveQuality(this.adaptive.setPreferences(preferences));
+      return true;
+    }
+    const previous: GraphicsConfiguration = { preferences: this.adaptive.preferences, effective: this.getEffectiveVisualSettings(),
+      imageProcessingEnabled: this.scene.imageProcessingConfiguration.isEnabled };
+    const next = { preferences, effective: resolveVisualSettings(preferences, this.adaptive.state) };
+    const previousModal = this.uiModal;
+    this.graphicsTransition ??= new GraphicsTransition({
+      retired: () => this.disposed,
+      canRestore: () => {
+        const health = this.renderHealth.snapshot();
+        return !this.rendererFailed && !health.errorCount && (health.phase === "ready" || health.phase === "preparing");
+      },
+      targetBudget: config => config.preferences.mode === "auto" ? 180_000 : 60_000,
+      prepare: (config, signal, remaining, restoring) => this.prepareGraphicsConfiguration(config, signal, remaining, restoring),
+      commit: config => {
+        this.adaptive.setPreferences(config.preferences);
+        this.appliedQualityRevision = this.adaptive.state.revision;
+        this.graphicsSettingsRevision++;
+      },
+      publish: state => {
+        if (this.rendererFailed && !state.applying && !this.disposed)
+          state = { ...state, restartRequired: true, error: state.error ?? "Renderer vyžaduje nové spuštění." };
+        this.graphicsApplying = state.applying;
+        this.graphicsState = state;
+        this.onGraphicsState?.(state);
+        sessionDiagnostics.event("visual-settings-transition", { ...state, revision: this.graphicsSettingsRevision,
+          effective: this.getEffectiveVisualSettings() });
+        if (state.restartRequired && !this.disposed && !this.rendererFailed)
+          this.handleRendererFailure(state.error ?? "Grafiku se nepodařilo obnovit. Spusť scénu znovu.");
+      },
+    });
+    this.setUiModal(true);
+    sessionDiagnostics.event("visual-settings-request", { requested: preferences, effective: previous.effective, revision: this.graphicsSettingsRevision });
+    try { return await this.graphicsTransition.apply(previous, next); }
+    finally { if (!this.disposed) this.setUiModal(previousModal); }
+  }
+  private async prepareGraphicsConfiguration(
+    config: GraphicsConfiguration,
+    signal: AbortSignal, remaining: () => number, restoring: boolean,
+  ) {
+    signal.throwIfAborted();
+    // Paint the preparation cover before any synchronous resource changes.
+    await paintStartupStage(signal);
+    signal.throwIfAborted();
+    let pipelines: WebGpuPipelinePreparation | undefined;
+    let shaders: WebGpuShaderPreparation | undefined;
+    let materials: StartupMaterialReadiness | undefined;
+    let renderedCompletions = this.compilationProfile.shaderPreparationCompletions;
+    const retryTargets = () => { for (const renderer of this.scene.objectRenderers) renderer.resetRefreshCounter(); };
+    const draw = () => {
+      signal.throwIfAborted();
+      this.gltfLightBudget.prepareFrame(); this.stableLights.update(); this.scene.render();
+    };
+    const render = () => {
+      if (signal.aborted || this.disposed || this.rendererFailed) return;
+      materials?.prepareFrame();
+      if (renderedCompletions !== this.compilationProfile.shaderPreparationCompletions) {
+        renderedCompletions = this.compilationProfile.shaderPreparationCompletions; retryTargets();
+      }
+      return pipelines ? pipelines.render(draw) : draw();
+    };
+    const apply = async (effective: EffectiveVisualSettings) => {
+      // No visual frame can run between this suspension and the final target.
+      this.cinematic?.setVisualFeatures({ shadows: false, postProcesses: false });
+      this.vehicleLighting?.setShadowsEnabled(false); this.flashlight?.setShadowsEnabled(false);
+      if (restoring && config.imageProcessingEnabled !== undefined)
+        this.scene.imageProcessingConfiguration.isEnabled = config.imageProcessingEnabled;
+      this.applyRenderQuality(effective.quality, effective.hardwareScaling, effective.features, effective.mode, true);
+      this.skyWeather?.setCloudsEnabled(effective.features.clouds);
+      const vegetation = graphicsOperation(this.setVegetationFeatures(effective.features), signal);
+      void vegetation.catch(() => {}); // Also observed if synchronous view setup fails before awaiting it.
+      this.updateWorldPresentation(this.actor.position);
+      this.updateRenderEnvironment(this.actor.position, this.avatars.get(this.localId), false, 0, performance.now() / 1000);
+      // A legacy Medium/High transition can change grading inside environment
+      // setup. Reassert the captured owner state before preparation draws it.
+      if (restoring && config.imageProcessingEnabled !== undefined)
+        this.scene.imageProcessingConfiguration.isEnabled = config.imageProcessingEnabled;
+      this.publishVisualFeatures(effective.features);
+      await vegetation;
+    };
+    this.graphicsPreparationPreferences = config.preferences;
+    try {
+      pipelines = new WebGpuPipelinePreparation(this.engine, { signal, diagnostics: this.localPreparationDiagnostics, retryIncompleteFrame: retryTargets });
+      shaders = new WebGpuShaderPreparation(this.engine, { signal, enabled: false,
+        onError: error => { if (!signal.aborted && !this.disposed) this.renderHealth.report("shader", error); } });
+      materials = new StartupMaterialReadiness(this.scene, { signal });
+      this.engine.runRenderLoop(render);
+      await apply(config.effective);
+      this.engine.stopRenderLoop(render);
+      const readiness = { isReady: () => shaders!.isReady() && pipelines!.isReady() };
+      let result;
+      if (config.preferences.mode === "auto" && !restoring && this.engine.isWebGPU) {
+        result = await prepareRenderQualities({
+          initialQuality: config.effective.quality,
+          applyQuality: quality => this.applyRenderQuality(quality, MANUAL_HARDWARE_SCALING[quality],
+            resolveVisualSettings(config.preferences, { quality, hardwareScaling: MANUAL_HARDWARE_SCALING[quality] }).features, "auto"),
+          prepare: pass => this.prepareLightingVariants(render, readiness, { timeoutMs: Math.min(pass.timeoutMs, remaining()), signal,
+            restoreQuality: pass.finalPass ? () => this.applyRenderQuality(config.effective.quality, config.effective.hardwareScaling, config.effective.features, config.effective.mode) : undefined }),
+          restore: () => this.applyRenderQuality(config.effective.quality, config.effective.hardwareScaling, config.effective.features, config.effective.mode),
+          isDisposed: () => signal.aborted || this.disposed || this.rendererFailed,
+          now: () => performance.now(),
+        });
+      } else result = await this.prepareLightingVariants(render, readiness, { timeoutMs: Math.min(60_000, remaining()), signal });
+      signal.throwIfAborted();
+      if (result.status !== "complete") throw new Error("Příprava grafiky: " + result.status);
+      const renderCurrent = () => {
+        const view = this.updateFramePresentation(0);
+        this.updateRenderEnvironment(view.pos, view.self, view.cameraLight, 0, view.time);
+        return render();
+      };
+      await waitForRenderStartup({ engine: this.engine, health: this.renderHealth, signal,
+        timeoutMs: Math.min(30_000, remaining()), recoverableTimeout: true, render: renderCurrent,
+        isReady: () => {
+          if (this.visualLoadError || this.vegetation?.stats.loadError) throw new Error("Načtení grafiky selhalo: " + String(this.visualLoadError ?? this.vegetation?.stats.loadError));
+          if (!readiness.isReady() || this.pendingVisualLoad ||
+              (this.getEffectiveVisualSettings().features.trees === "normal" && (this.vegetation?.stats.pendingTreeLoads ?? 0) > 0)) return false;
+          if (this.precipitation && !this.precipitation.prepare()) return false;
+          const active = this.scene.getActiveMeshes();
+          for (let i = 0; i < active.length; i++) if (!this.isMeshReadyForCamera(active.data[i])) return false;
+          return arePreparationEffectsReady(this.engine);
+        },
+      });
+      signal.throwIfAborted();
+    } finally {
+      this.engine.stopRenderLoop(render);
+      this.graphicsPreparationPreferences = undefined;
+      try { shaders?.dispose(); }
+      finally { try { materials?.dispose(); materials?.assertHealthy(); } finally { pipelines?.dispose(); } }
+    }
+    if (!this.renderHealth.snapshot().valid) throw new Error("Grafický snímek není po přípravě potvrzený.");
+  }
   setQuality(mode: string) {
     if (this.disposed || this.rendererFailed) return;
-    if (isRenderQualityMode(mode))
-      this.applyAdaptiveQuality(this.adaptive.setMode(mode));
+    if (isRenderQualityMode(mode)) {
+      if (this.ready) void this.applyRenderPreferences(mode === "custom"
+        ? { version: 2, mode, targetFps: this.adaptive.state.targetFps, quality: this.quality,
+          renderScale: this.getEffectiveVisualSettings().renderScale, features: this.getEffectiveVisualSettings().features }
+        : createRenderPreferences(mode, this.adaptive.state.targetFps));
+      else this.applyAdaptiveQuality(this.adaptive.setMode(mode));
+    }
   }
   setTargetFps(fps: number) {
     if (this.disposed || this.rendererFailed) return;
-    if (isRenderTargetFps(fps))
-      this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
+    if (isRenderTargetFps(fps)) {
+      if (this.ready) void this.applyRenderPreferences({ ...this.adaptive.preferences, targetFps: fps });
+      else this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
+    }
   }
   startBenchmark() {
-    if (!this.ready || this.disposed || this.rendererFailed) return false;
+    if (!this.ready || this.disposed || this.rendererFailed || this.graphicsApplying) return false;
     // Faulted renderers retain automatic diagnostic records, but cannot start
     // another performance sample until a fresh Game has completed preparation.
     this.benchmark?.profile.dispose();
@@ -2381,7 +2595,7 @@ export class Game {
       0.95,
       0.65,
       p.yaw,
-      !p.vehicle && lod.visible && distance < 45 && grounded === true,
+      this.getEffectiveVisualSettings().features.shadows && !p.vehicle && lod.visible && distance < 45 && grounded === true,
     );
   }
 
@@ -2465,20 +2679,21 @@ export class Game {
       return;
     }
     this.accumulator += dt;
+    const inputAllowed = !this.graphicsApplying;
     const forward =
-        (this.keys.has("KeyW") || this.keys.has("ArrowUp") ? 1 : 0) -
-        (this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0),
+        (inputAllowed && (this.keys.has("KeyW") || this.keys.has("ArrowUp")) ? 1 : 0) -
+        (inputAllowed && (this.keys.has("KeyS") || this.keys.has("ArrowDown")) ? 1 : 0),
       side =
-        (this.keys.has("KeyD") || this.keys.has("ArrowRight") ? 1 : 0) -
-        (this.keys.has("KeyA") || this.keys.has("ArrowLeft") ? 1 : 0);
+        (inputAllowed && (this.keys.has("KeyD") || this.keys.has("ArrowRight")) ? 1 : 0) -
+        (inputAllowed && (this.keys.has("KeyA") || this.keys.has("ArrowLeft")) ? 1 : 0);
     const makeInput = (seq: number): Input => {
-      const jumpDown = this.keys.has("Space");
+      const jumpDown = inputAllowed && this.keys.has("Space");
       const input = canonicalInput({
         ...movementFromKeys(forward, side, this.yaw, this.actor.vehicle),
         yaw: this.yaw,
         jump: this.actor.vehicle ? jumpDown : jumpDown && !this.jumpWasDown,
         seq,
-        run: this.keys.has("ShiftLeft") || this.keys.has("ShiftRight"),
+        run: inputAllowed && (this.keys.has("ShiftLeft") || this.keys.has("ShiftRight")),
         vehicle: this.actor.vehicle,
       })!;
       this.jumpWasDown = jumpDown;
@@ -2635,7 +2850,7 @@ export class Game {
     if (this.disposed) return { mode: "disposed", network: null };
     const position = this.actor.position;
     const stage = this.canvas.dataset.networkStage;
-    const rendering = this.adaptive.state;
+    const rendering = this.renderingSnapshot;
     return {
       mode: this.network ? "multiplayer" : "guest",
       connection: !this.network ? "offline" : stage === "connected"
@@ -2649,6 +2864,11 @@ export class Game {
         quality: rendering.quality,
         targetFps: rendering.targetFps,
         hardwareScaling: rendering.hardwareScaling,
+        renderScale: rendering.renderScale,
+        features: rendering.features,
+        settingsRevision: rendering.settingsRevision,
+        graphicsApplying: rendering.graphicsApplying,
+        transitionPhase: this.graphicsState.phase,
       },
       viewport: { width: this.canvas.clientWidth, height: this.canvas.clientHeight },
       renderResolution: { width: this.engine.getRenderWidth(), height: this.engine.getRenderHeight() },
@@ -2774,7 +2994,19 @@ export class Game {
     return lighting;
   }
   private prepareLighting(render: () => void, pipelines?: Pick<WebGpuPipelinePreparation, "isReady">) {
-    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines);
+    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines, { timeoutMs: 60_000 });
+    // Manual modes prepare only their selected state, including Ultra's 50%.
+    if (this.adaptive.preferences && this.adaptive.preferences.mode !== "auto") {
+      this.preparingRenderQuality = true;
+      const restore = () => {
+        const requested = this.adaptive.state;
+        this.applyRenderQuality(requested.quality, requested.hardwareScaling);
+        this.appliedQualityRevision = requested.revision;
+      };
+      restore();
+      return this.prepareLightingVariants(render, pipelines, { timeoutMs: 60_000, restoreQuality: restore })
+        .finally(() => { this.preparingRenderQuality = false; });
+    }
     const isDisposed = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     const restoreQuality = () => {
       if (!this.preparingRenderQuality) return;
@@ -2821,7 +3053,7 @@ export class Game {
   private prepareLightingVariants(
     render: () => void,
     pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
-    options?: { timeoutMs: number; restoreQuality?: () => void },
+    options?: { timeoutMs: number; restoreQuality?: () => void; signal?: AbortSignal },
   ) {
     // Local diagnostics, including multiplayer. Reuse actual results; no extra mesh,
     // Effect or pipeline probes and no retained renderer object references.
@@ -2849,9 +3081,9 @@ export class Game {
       }
       return ready;
     };
-    const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
+    const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed || !!options?.signal?.aborted;
     // The same controller/materials survive into gameplay; no proxy shaders.
-    this.flashlight ??= new PlayerFlashlight(this.scene);
+    this.flashlight ??= new PlayerFlashlight(this.scene, this.getEffectiveVisualSettings().features.shadows);
     const night = selectLightingPreview("night").instant!;
     const includeDayPointVariants = this.engine.isWebGPU;
     const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
@@ -3038,10 +3270,14 @@ export class Game {
         const health = this.renderHealth.snapshot();
         if (health.errorCount || health.phase === "restart-required")
           throw new Error("Příprava rendereru byla přerušena chybou zařízení nebo shaderu.");
+        if (this.visualLoadError || this.vegetation?.stats.loadError)
+          throw new Error("Načtení grafiky selhalo: " + String(this.visualLoadError ?? this.vegetation?.stats.loadError));
         // Shader diagnostics remain owned until the final submitted-frame gate.
         // Real preparation and newly requested effects must settle before this
         // variant advances, even if a material can still draw its old effect.
         return (
+          !this.pendingVisualLoad &&
+          (this.getEffectiveVisualSettings().features.trees === "far-only" || (this.vegetation?.stats.pendingTreeLoads ?? 0) === 0) &&
           gate("precipitation", this.precipitation?.prepare() ?? true) &&
           gate("pipeline", pipelines?.isReady() ?? true) &&
           gate("health", health.pendingPreparationOperations === 0) &&
@@ -3054,8 +3290,11 @@ export class Game {
       onDispose: (callback) => {
         this.cancelLightPreparation = callback;
         const observer = this.scene.onDisposeObservable.add(callback);
+        options?.signal?.addEventListener("abort", callback, { once: true });
+        if (options?.signal?.aborted) callback();
         return () => {
           this.scene.onDisposeObservable.remove(observer);
+          options?.signal?.removeEventListener("abort", callback);
           if (this.cancelLightPreparation === callback)
             this.cancelLightPreparation = undefined;
         };
@@ -3063,6 +3302,7 @@ export class Game {
       isDisposed: isRetired,
       revision: () => [
         this.quality,
+        this.appliedVisualSettings,
         this.timeOverride,
         this.profile,
         this.effectiveWeather,
@@ -3075,7 +3315,7 @@ export class Game {
         this.vegetation,
         this.vegetation?.grassPreparationRevision,
       ],
-      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed", "vegetation", "grassResources"],
+      revisionKeys: ["quality", "visualSettings", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed", "vegetation", "grassResources"],
       isVisible: () => !document.hidden,
       onVisibilityChange: (callback) => {
         document.addEventListener("visibilitychange", callback);
@@ -3094,51 +3334,8 @@ export class Game {
     });
   }
 
-  frame() {
-    if (!this.ready || this.disposed) return;
-    const frameStarted = performance.now();
-    this.onBeforeInputFrame?.();
-    const rawFrameMs = this.engine.getDeltaTime(),
-      dt = Math.min(0.1, rawFrameMs / 1000);
-    const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
-      ? this.engineInstrumentation.gpuFrameTimeCounter
-      : undefined;
-    const mainPassTiming = readWebGpuMainPassTiming(this.engine, this.lastMainPassCounterCount);
-    this.lastMainPassCounterCount = mainPassTiming.count;
-    const freshGpuSample = !!gpuCounter && gpuCounter.count !== this.lastGpuCounterCount;
-    if (freshGpuSample) {
-      this.lastGpuCounterCount = gpuCounter.count;
-      this.lastGpuCounterAt = frameStarted;
-      this.lastGpuFrameMs =
-        Number.isFinite(gpuCounter.current) && gpuCounter.current > 0
-          ? gpuCounter.current / 1e6
-          : undefined;
-    }
-    if (frameStarted - this.lastGpuCounterAt > 500)
-      this.lastGpuFrameMs = undefined;
-    this.applyAdaptiveQuality(
-      this.adaptive.update({
-        nowMs: frameStarted,
-        frameMs: rawFrameMs,
-        visible: !document.hidden,
-        suspended: !!this.benchmark,
-        cpuFrameMs: this.lastCpuFrameMs,
-        gpuFrameMs: this.lastGpuFrameMs,
-      }),
-    );
-    if (
-      vehicleCameraCanFollow({
-        driving: this.actor.vehicle,
-        speed: this.actor.speed,
-        nowMs: frameStarted,
-        lastLookMs: this.lastCameraInput,
-        orbiting: this.orbiting,
-        uiModal: this.uiModal,
-      })
-    )
-      this.yaw = vehicleChaseYaw(this.yaw, this.actor.yaw, dt);
-    this.advanceSimulation(dt, frameStarted);
-    const simulationEnded = performance.now();
+  /** The same live view is used by gameplay and the final settings submission. */
+  private updateFramePresentation(dt: number) {
     const pos = this.actor.position;
     this.updateWorldPresentation(pos);
     if (
@@ -3297,7 +3494,7 @@ export class Game {
       2.3,
       3.8,
       this.actor.vehicle ? this.actor.yaw : (driving?.target.yaw ?? 0),
-      true,
+      this.getEffectiveVisualSettings().features.shadows,
     );
     this.updateCameraFollow(renderPosition, self?.eyeHeight ?? 1.63, dt);
     const localView = this.localAvatarPresentation.update({
@@ -3324,7 +3521,64 @@ export class Game {
         (m.metadata?.groundY ?? 0) + 1.3 + Math.sin(time * 2 + i) * 0.12;
     });
     const avatarsEnded = performance.now();
-    this.updateRenderEnvironment(pos, self, localView.cameraLight, dt, time);
+    return { pos, self, time, cameraLight: localView.cameraLight, worldEnded, avatarsEnded };
+  }
+  frame() {
+    if (!this.ready || this.disposed) return;
+    const frameStarted = performance.now();
+    this.onBeforeInputFrame?.();
+    const rawFrameMs = this.engine.getDeltaTime(),
+      dt = Math.min(0.1, rawFrameMs / 1000);
+    const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
+      ? this.engineInstrumentation.gpuFrameTimeCounter
+      : undefined;
+    const mainPassTiming = readWebGpuMainPassTiming(this.engine, this.lastMainPassCounterCount);
+    this.lastMainPassCounterCount = mainPassTiming.count;
+    const freshGpuSample = !!gpuCounter && gpuCounter.count !== this.lastGpuCounterCount;
+    if (freshGpuSample) {
+      this.lastGpuCounterCount = gpuCounter.count;
+      this.lastGpuCounterAt = frameStarted;
+      this.lastGpuFrameMs =
+        Number.isFinite(gpuCounter.current) && gpuCounter.current > 0
+          ? gpuCounter.current / 1e6
+          : undefined;
+    }
+    if (frameStarted - this.lastGpuCounterAt > 500)
+      this.lastGpuFrameMs = undefined;
+    this.applyAdaptiveQuality(
+      this.adaptive.update({
+        nowMs: frameStarted,
+        frameMs: rawFrameMs,
+        visible: !document.hidden,
+        suspended: !!this.benchmark || this.graphicsApplying,
+        cpuFrameMs: this.lastCpuFrameMs,
+        gpuFrameMs: this.lastGpuFrameMs,
+      }),
+    );
+    if (
+      vehicleCameraCanFollow({
+        driving: this.actor.vehicle,
+        speed: this.actor.speed,
+        nowMs: frameStarted,
+        lastLookMs: this.lastCameraInput,
+        orbiting: this.orbiting,
+        uiModal: this.uiModal,
+      })
+    )
+      this.yaw = vehicleChaseYaw(this.yaw, this.actor.yaw, dt);
+    this.advanceSimulation(dt, frameStarted);
+    const simulationEnded = performance.now();
+    if (this.graphicsApplying) {
+      if (sessionDiagnostics.isRecording) sessionDiagnostics.recordFrame({
+        frameMs: rawFrameMs, frameStartedAtMs: frameStarted, cpuMs: simulationEnded - frameStarted, gpuMs: null,
+        phases: { simulation: simulationEnded - frameStarted, world: 0, avatarsAndCamera: 0, environment: 0, render: 0, labels: 0 },
+        previousCallback: this.completedDiagnosticCallback,
+      }, this.diagnosticContext);
+      this.finishDiagnosticCallback(frameStarted);
+      return;
+    }
+    const { pos, self, time, cameraLight, worldEnded, avatarsEnded } = this.updateFramePresentation(dt);
+    this.updateRenderEnvironment(pos, self, cameraLight, dt, time);
     const environmentEnded = performance.now();
     this.benchmark?.profile.beginFrame();
     // All beam, street, interior and celestial shadow states are final here.
@@ -3423,7 +3677,7 @@ export class Game {
             surfaces: this.surfacePack?.stats ?? null,
             vegetation: this.vegetation?.stats ?? null,
           },
-          rendering: this.adaptive.state,
+          rendering: this.renderingSnapshot,
           gpu: this.gpu,
           presentationRate: this.presentationRate,
         });
@@ -3556,12 +3810,15 @@ export class Game {
         flashlight: this.flashlightOn,
         zone: zoneAt(pos),
         hint: localizeText(hint),
-        rendering: this.adaptive.state,
+        rendering: this.renderingSnapshot,
         gpu: this.gpu,
         cpuFrameMs: this.lastCpuFrameMs ?? null,
         gpuFrameMs: this.lastGpuFrameMs ?? null,
       });
     }
+    this.finishDiagnosticCallback(frameStarted);
+  }
+  private finishDiagnosticCallback(frameStarted: number) {
     this.lastCpuFrameMs = performance.now() - frameStarted;
     if (sessionDiagnostics.isRecording && !this.disposed) {
       // The next frame can pair this endpoint with its preceding interval.
@@ -3574,6 +3831,7 @@ export class Game {
   dispose() {
     if (this.disposed) return;
     this.feedbackCapture?.dispose();
+    this.graphicsTransition?.dispose();
     this.disposed = true;
     this.ready = false;
     this.startupAbort.abort();

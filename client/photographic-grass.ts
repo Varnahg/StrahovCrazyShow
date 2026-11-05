@@ -147,12 +147,15 @@ export class PhotographicGrass {
   private statsDirty = true;
   private allocationDirty = false;
   private disposed = false;
+  private enabled = true;
   private resources?: GrassResources;
+  private resourcesLoading?: Promise<void>;
   private shaderPreparation?: PhotoGrassPreparation;
   private wind: PhotoGrassWindState = createPhotoGrassWindState();
   private disposeObserver: Observer<Scene> | null = null;
   private pendingResources = new Set<GrassResources>();
   private flowers?: GroundFlowers;
+  private flowersLoading?: Promise<void>;
   private flowerBudget = 0;
   private flowerSubmissionRevision = -1;
 
@@ -181,7 +184,7 @@ export class PhotographicGrass {
       this.dispose(),
     );
   }
-  static async load(scene: Scene) {
+  static async load(scene: Scene, options: { isEnabled?: () => boolean } = {}) {
     const abort = new AbortController(),
       observer = scene.onDisposeObservable.addOnce(() => abort.abort());
     try {
@@ -200,9 +203,15 @@ export class PhotographicGrass {
       if (scene.isDisposed) throw Error("Grass scene disposed during loading");
       const controller = new PhotographicGrass(scene, geometry, material);
       try {
-        await controller.loadResources();
-        controller.flowers = await GroundFlowers.load(scene);
-        controller.stats.flowers = controller.flowers.stats;
+        controller.setEnabled(options.isEnabled?.() ?? true);
+        // JSON may finish after the owning feature was disabled or retired.
+        // Keep only dormant metadata; On can initialize this same owner later.
+        if (!controller.enabled) return controller;
+        await controller.ensureResourcesLoaded();
+        controller.setEnabled(options.isEnabled?.() ?? true);
+        await controller.ensureFlowersLoaded(options.isEnabled);
+        controller.setEnabled(options.isEnabled?.() ?? true);
+        if (scene.isDisposed) throw Error("Grass scene disposed during loading");
         return controller;
       } catch (error) {
         controller.dispose();
@@ -210,6 +219,45 @@ export class PhotographicGrass {
       }
     } finally {
       scene.onDisposeObservable.remove(observer);
+    }
+  }
+  private async ensureResourcesLoaded(): Promise<void> {
+    if (this.disposed || this.scene.isDisposed || !this.enabled || this.resources) return;
+    this.resourcesLoading ??= this.loadResources().finally(() => { this.resourcesLoading = undefined; });
+    return this.resourcesLoading;
+  }
+  /** Ground readiness is coalesced; dormant owners initialize grass maps before flowers. */
+  async ensureFlowersLoaded(isEnabled?: () => boolean): Promise<void> {
+    if (this.disposed || this.scene.isDisposed || !this.enabled || isEnabled?.() === false) return;
+    await this.ensureResourcesLoaded();
+    if (this.disposed || this.scene.isDisposed || !this.enabled || !this.resources || isEnabled?.() === false) return;
+    if (this.flowers) { this.flowers.setEnabled(true); return; }
+    if (!this.flowersLoading) this.flowersLoading = (async () => {
+      const flowers = await GroundFlowers.load(this.scene, {
+        isEnabled: () => !this.disposed && this.enabled && (isEnabled?.() ?? true),
+      });
+      if (!flowers) return;
+      if (this.disposed || this.scene.isDisposed) { flowers.dispose(); return; }
+      flowers.setEnabled(this.enabled && (isEnabled?.() ?? true));
+      this.flowers = flowers; this.stats.flowers = flowers.stats;
+      this.statsDirty = true;
+    })().finally(() => { this.flowersLoading = undefined; });
+    return this.flowersLoading;
+  }
+  setEnabled(enabled: boolean) {
+    if (this.disposed || this.enabled === enabled) return;
+    this.enabled = enabled;
+    this.flowers?.setEnabled(enabled);
+    this.disposeShaderPreparation();
+    this.cancelPreparation(); this.cancelTilePreparation(); this.tileRequests.clear();
+    this.previousQuality = ""; this.lastUpdate = -Infinity;
+    if (!enabled) {
+      for (const root of this.roots.values()) this.removeRoot(root);
+      for (const batch of this.batches.values()) batch.mesh.setEnabled(false);
+      this.selected.length = this.nextSelected.length = this.records.length = this.workRecords.length = 0;
+      this.wanted.clear(); this.nextWanted.clear(); this.preferredLevels.clear(); this.preferredRoots.clear();
+      this.statsDirty = true; this.updateStats();
+      this.stats.preparing = false; this.stats.pendingTiles = 0;
     }
   }
   private installResources(lease: GrassResources) {
@@ -240,10 +288,10 @@ export class PhotographicGrass {
   }
   /** Identity only for the bounded startup revision gate, never a frame scan. */
   get shaderPreparationRevision(): object | undefined {
-    return this.resources;
+    return this.enabled ? this.resources : undefined;
   }
   beginShaderPreparation(): (() => void) | undefined {
-    if (this.disposed || this.scene.isDisposed || !this.resources) return;
+    if (this.disposed || !this.enabled || this.scene.isDisposed || !this.resources) return;
     this.shaderPreparation ??= new PhotoGrassPreparation(this.resources);
     const stopGrass = this.shaderPreparation.begin();
     try {
@@ -310,7 +358,7 @@ export class PhotographicGrass {
     focus?: { x: number; y: number; z: number };
     flowerBloom?: number;
   }) {
-    if (this.disposed || !this.resources) return;
+    if (this.disposed || !this.enabled || !this.resources) return;
     const camera = this.scene.activeCamera;
     if (!camera) return;
     const view = camera.getViewMatrix(), projection = camera.getProjectionMatrix();

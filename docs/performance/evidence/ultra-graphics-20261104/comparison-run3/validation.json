@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "createdAtUTC": "2026-11-05T00:41:59.185Z",
+  "owner": "ultra-report-20261104-cpu",
+  "scope": "Existing accepted capture-map only; offline post-measurement analysis, no new tests/build/GPU",
+  "sourceHash": "74780b517048cdf304643486912d2921cd7dff88e6b0c5d7ad9007ce05b6f4c2",
+  "helper": {
+    "bytes": 16516,
+    "sha256": "6320833e8fc26a7889bad361b80f1f9effdf6c043e4f33428013b99d5bf91360"
+  },
+  "helperUnchanged": true,
+  "files": {
+    "candidate2-run3-report.json": {
+      "bytes": 1217425,
+      "sha256": "9df6c73e155f5000bb8da96a275d54e8feddcf1bba48c2b081cb45c415b2a94c"
+    },
+    "candidate2-run3-report.log": {
+      "bytes": 1370,
+      "sha256": "6b8d1c13349f0b8a70950b4c7cddb0fc91ab3e869575df9f6f6f6562a30c33db"
+    },
+    "candidate2-run3-analysis.json": {
+      "bytes": 232796,
+      "sha256": "4e38791f4bf76e86018e3ac467da517522869f5548f2ada36c7fa5ec336707fe"
+    },
+    "candidate2-run3-checks.json": {
+      "bytes": 1741,
+      "sha256": "216c7f94c24f482bdc54e54cbba91f01ed8c220503486f3cf7aeb65edf78e51a"
+    },
+    "candidate2-run3-process-cpu.json": {
+      "bytes": 12596,
+      "sha256": "7e8f97c8a0faacf7d62f14bf8a8712bcd53a20e9d2d1a0e1b077cb4a1220eb3d"
+    },
+    "candidate2-run3-process-cpu-v2.json": {
+      "bytes": 13110,
+      "sha256": "580d1119a50baff8801fac4594c83348cad00813cbcc04a28169719ba91c3bf5"
+    },
+    "candidate2-run3-results.md": {
+      "bytes": 8171,
+      "sha256": "a3a607942bad0122e05811f04a821235671598aaeed23f692f80ad93e2510d40"
+    }
+  },
+  "handoff": {
+    "bytes": 8330,
+    "sha256": "748bc171e8ee6524262f8eb8921b14da3139c99e402d8db8d7d860f76060f447"
+  },
+  "verification": {
+    "reportCLIExit": 0,
+    "coverage": "45/48",
+    "accepted": false,
+    "rawSeq": "0..38022 contiguous",
+    "sourceChanges": 0,
+    "intervalAlignmentIssues": 0
+  },
+  "provenance": "Each server/full input SHA is in report.json; raw session/system SHA are in analysis.json. process-cpu-v2 supersedes v1 window timestamp approximation; v1 preserved.",
+  "processes": "All own analysis CLI commands exited; no helper remains",
+  "release": "After this handoff; successful claim CLI output is authoritative"
+}

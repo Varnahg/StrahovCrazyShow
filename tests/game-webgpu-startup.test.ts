@@ -1,3 +1,4 @@
+import { graphicsLifecycleFixture, graphicsFixtureEnvironment, graphicsFixtureMembers } from "./helpers/weather-door-render-fixture";
 import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
 import { Script } from "node:vm";
@@ -24,6 +25,7 @@ const { source, gameClass, selectMembers } = readGameSource(
   process.env.GAME_STARTUP_SOURCE,
 );
 const methods = selectMembers([
+  ...graphicsFixtureMembers,
   "start",
   "createStartupActor",
   "prepareTerrainReviewCamera",
@@ -69,7 +71,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, CAD_BUILDINGS, hasCadBuilding, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, WebGpuShaderPreparation, StartupMaterialReadiness, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady, resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity, treeCatalog, CHARACTER_RADIUS, CHARACTER_HALF_HEIGHT, Vector3, window } = env;
+  const { createRenderPreferences, resolveVisualSettings, renderBudget, exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, CAD_BUILDINGS, hasCadBuilding, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, WebGpuShaderPreparation, StartupMaterialReadiness, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady, resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity, treeCatalog, CHARACTER_RADIUS, CHARACTER_HALF_HEIGHT, Vector3, window } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -173,7 +175,7 @@ function fixture(
     updateLighting() {},
   };
   const interiorAsset = disposable(),
-    vegetationAsset = disposable();
+    vegetationAsset = { ...disposable(), async setVisualFeatures() {} };
   const cadAsset = {
     ...disposable(), stats: { buildings: cadBuildings.length, meshes: 2, materials: 2 },
     setDoorStates(states: unknown) {
@@ -190,6 +192,7 @@ function fixture(
   if (!options.holdCad) cad.resolve(cadAsset);
   let game: any, health: RenderHealth;
   const StartupGame = make({
+    ...graphicsFixtureEnvironment,
     arePreparationEffectsReady,
     exports: {},
     measurePresentationRate: async () => ({
@@ -329,6 +332,7 @@ function fixture(
   });
   game = Object.assign(new StartupGame(), {
     ...doorLifecycleFixture(),
+    ...graphicsLifecycleFixture(),
     engine,
     startupAbort: new AbortController(),
     startupAssets: new Set(),
@@ -340,7 +344,7 @@ function fixture(
     avatars: new Map([["guest", { eyeHeight: options.eyeHeight ?? 1.63 }]]),
     previousPosition: new Vector3(110, 0, 12), visualOffset: new Vector3(), keys: new Set(),
     canvas: { dataset: {} },
-    adaptive: { setPresentationHz: () => ({}) },
+    adaptive: { ...graphicsLifecycleFixture().adaptive, setPresentationHz: () => ({}) },
     applyAdaptiveQuality() {},
     gltfLightBudget: { prepareFrame() {} },
     stableLights: { update() {} },
@@ -484,7 +488,7 @@ test("actual Game passes a fixed pilot only to a valid local static guest startu
     const start = f.game.start(); await settle(); f.gate.resolve(); await start;
     const expected = scope === "static" ? { manifestUrl: variant === "own" ? "/models/vegetation/seasonal-r6-far/runtime-contract.json" : "/models/vegetation/seasonal-streamed/runtime-contract.json",
       selections: { "ipr-crown-014": variant + "-broadleaf", "ipr-b6-north-conifer": variant + "-conifer" } } : undefined;
-    assert.deepEqual(f.vegetationOptions, [expected ? { treePilot: expected } : { treeCatalog }]);
+    assert.deepEqual(f.vegetationOptions, [{ ...(expected ? { treePilot: expected } : { treeCatalog }), visualFeatures: f.game.getEffectiveVisualSettings().features }]);
     assert.equal(f.game.ready, true);
   }
 });
@@ -495,7 +499,7 @@ test("ordinary guest, multiplayer and catalogue-only QA start with the same comp
   } }]) {
     const f = fixture(t, options);
     const start = f.game.start(); await settle(); f.gate.resolve(); await start;
-    assert.deepEqual(f.vegetationOptions, [{ treeCatalog }]);
+    assert.deepEqual(f.vegetationOptions, [{ treeCatalog, visualFeatures: f.game.getEffectiveVisualSettings().features }]);
     assert.equal(f.game.ready, true);
   }
 });

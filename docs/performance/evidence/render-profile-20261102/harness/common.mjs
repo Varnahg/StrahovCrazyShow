@@ -23,10 +23,16 @@ export function parseArguments(args) {
     throw new Error("Usage: run.mjs --build baseline | --serve run1|run2|run3 | --peers run1|run2|run3; retry run1-attempt2 preserves failed starts");
   return { command, name };
 }
+/** Preserve the original harness entry point; the user authorized this exact D checkout on 4 Nov. */
+export function isAllowedPerformanceCheckout(checkoutRoot, branch) {
+  const normalized = checkoutRoot.replaceAll("\\", "/").replace(/\/+$/, "").toLowerCase();
+  return branch === "main" || (branch === "codex/graphics-smoothness-20261104" &&
+    normalized === "d:/codexworkspaces/strahovcrazyshow-graphics-20261104");
+}
 export function assertCanonicalMain() {
   const branch = execFileSync("git", ["branch", "--show-current"], { cwd: root, encoding: "utf8", windowsHide: true }).trim();
-  if (resolve(process.cwd()).toLowerCase() !== root.toLowerCase() || branch !== "main")
-    throw new Error("Use the canonical main checkout as cwd");
+  if (resolve(process.cwd()).toLowerCase() !== root.toLowerCase() || !isAllowedPerformanceCheckout(root, branch))
+    throw new Error("Use canonical main or the explicitly authorized graphics checkout on D as cwd");
 }
 export function runDirectory(name) {
   if (!/^run[123](?:-attempt[1-9][0-9]*)?$/.test(name)) throw new Error("Invalid run name");
@@ -66,7 +72,8 @@ export async function readInputs() {
     dependencies[name] = await fileHash(join(root, "node_modules", name, "package.json"));
   const harness = await treeHashes(import.meta.dirname);
   const oldHarness = await fileHash(join(root, "docs/performance/evidence/low-tree-lod-20261102/harness/run.mjs"));
-  return { source, publicFiles, dependencies, harness, oldHarness,
+  return { checkout: { root, branch: execFileSync("git", ["branch", "--show-current"], { cwd: root, encoding: "utf8", windowsHide: true }).trim() },
+    source, publicFiles, dependencies, harness, oldHarness,
     sourceHash: source.sourceHash, publicHash: hash(JSON.stringify(publicFiles)),
     dependencyHash: hash(JSON.stringify(dependencies)), harnessHash: hash(JSON.stringify(harness)),
     hashDurationMs: performance.now() - started };

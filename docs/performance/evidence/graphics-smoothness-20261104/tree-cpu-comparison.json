@@ -1,0 +1,104 @@
+{
+  "method": "Same production files/functions, independent Node processes, first run excluded from seven-run median; CPU-only, not GPU/FPS or resolution of driver stalls.",
+  "rows": [
+    {
+      "id": "ipr-crown-032",
+      "lod": 1,
+      "assetSha": "3adaad4396d933a6bf27a3234876656b85c46cf04a9d8215b09f78e07aa01df6",
+      "metrics": {
+        "decodeMs": {
+          "baseline": 183.36679999999978,
+          "candidate": 83.23189999999977,
+          "reductionPercent": 54.60906772654599
+        },
+        "standaloneSeasonMs": {
+          "baseline": 31.310300000001007,
+          "candidate": 30.503900000000158,
+          "reductionPercent": 2.5755102953367524
+        },
+        "createMeshesIncludingSeasonMs": {
+          "baseline": 61.21180000000095,
+          "candidate": 59.190399999999954,
+          "reductionPercent": 3.3023044576388267
+        },
+        "postFetchCpuMs": {
+          "baseline": 247.53130000000056,
+          "candidate": 151.21579999999994,
+          "reductionPercent": 38.910432741233286
+        }
+      }
+    },
+    {
+      "id": "ipr-crown-033",
+      "lod": 1,
+      "assetSha": "45bf341ddf3c3c3c040edd876ed48604ea59dd0d650c83bfd312261f145ff92e",
+      "metrics": {
+        "decodeMs": {
+          "baseline": 130.97490000000107,
+          "candidate": 59.88119999999981,
+          "reductionPercent": 54.280400290437846
+        },
+        "standaloneSeasonMs": {
+          "baseline": 15.750200000000405,
+          "candidate": 16.05369999999948,
+          "reductionPercent": -1.9269596576492245
+        },
+        "createMeshesIncludingSeasonMs": {
+          "baseline": 35.06770000000142,
+          "candidate": 33.32039999999961,
+          "reductionPercent": 4.982647849735637
+        },
+        "postFetchCpuMs": {
+          "baseline": 164.90890000000036,
+          "candidate": 91.0036,
+          "reductionPercent": 44.815834682057904
+        }
+      }
+    },
+    {
+      "id": "ipr-crown-032",
+      "lod": 2,
+      "assetSha": "dbed1fd9e5eb1ab7c06bdf428af27f691f306b1bbb588af0dc535c33811db4d1",
+      "metrics": {
+        "decodeMs": {
+          "baseline": 4.975300000000061,
+          "candidate": 2.389900000000125,
+          "reductionPercent": 51.96470564588878
+        },
+        "standaloneSeasonMs": {
+          "baseline": 0.4529999999995198,
+          "candidate": 0.9322000000001935,
+          "reductionPercent": -105.78366445942201
+        },
+        "createMeshesIncludingSeasonMs": {
+          "baseline": 1.3955999999998312,
+          "candidate": 1.5042999999996027,
+          "reductionPercent": -7.788764689007214
+        },
+        "postFetchCpuMs": {
+          "baseline": 6.602899999999863,
+          "candidate": 4.066499999999905,
+          "reductionPercent": 38.41342440442851
+        }
+      }
+    }
+  ],
+  "checks": [
+    {
+      "id": "ipr-crown-032",
+      "lod": 1,
+      "passed": true
+    },
+    {
+      "id": "ipr-crown-033",
+      "lod": 1,
+      "passed": true
+    },
+    {
+      "id": "ipr-crown-032",
+      "lod": 2,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

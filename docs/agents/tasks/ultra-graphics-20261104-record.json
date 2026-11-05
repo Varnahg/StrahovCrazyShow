@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "ultra-graphics-20261104-record",
+  "title": "Zapsat výsledky přejímky Ultra do společného ověření",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["docs/verification.md"],
+  "resources": [],
+  "acceptance": ["Přesné výsledky testů a měření, identita buildu, otevřená omezení a související commit/PR; zachovat cizí záznamy."],
+  "verification": ["Odkazy odpovídají samostatné Ultra evidenci; nepřisoudit CPU testu GPU/FPS výsledek."],
+  "notes": ["Odděleno od validačních zdrojů, aby cizí editace společného přehledu neblokovala volné měřicí okno. Claim až po uvolnění KEY-73 verification-record."]
+}

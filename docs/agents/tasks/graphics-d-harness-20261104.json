@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "graphics-d-harness-20261104",
+  "title": "Povolit přesně autorizovaný D checkout ve stávajícím měřicím harnessu",
+  "status": "done",
+  "dependsOn": [
+    "graphics-d-workspace-20261104"
+  ],
+  "writePaths": [
+    "docs/performance/evidence/render-profile-20261102/harness/common.mjs",
+    "docs/performance/evidence/render-profile-20261102/harness/harness.test.mjs",
+    "docs/performance/evidence/render-next-20261102/harness/run.mjs",
+    "docs/agents/handoffs/graphics-d-harness-20261104.md",
+    ".cache/render-next-20261102/",
+    "docs/performance/evidence/render-profile-20261102/harness/run.mjs"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Výjimka pouze přesnáD cesta+grafickávětev; původnímain a cwdguardzachovány.",
+    "Metadata neběh naDnevydávajíza main; identity,STOP,hashes,readiness/health atimeouty neoslabit."
+  ],
+  "verification": [
+    "Cílené existujícíharness testy+policyregrese a syntaktickéCLI.",
+    "Skutečnýbuild/run používá rootvalidačnírezervaci; novéimmutablevýstupy pouze vDcache."
+  ],
+  "notes": [
+    "NovézadáníD vyžaduje aktualizaci starého branchguardu. Měřicířadič/SDK/STOP se znovupoužijí; nevzniká obecnýnovýframework.",
+    "Původní vlastník graphics-d-20261104-root obnovuje vlastní dirty scope po přidání parent run.mjs pro doloženou review opravu identity.method; vlastnictví původních3 editů je ve vlastním handoffu.",
+    "4.11.2026: tento CPU celek uzavřen naD; úplné automatické kontroly, byteparita/CPU A/B a úzkýEdge runtime důkaz v docs/performance/evidence/graphics-smoothness-20261104/README.md. Celkováplynulost neníPASS; existujícígameplaygateINCONCLUSIVE aGPU-process hypotéza zůstávajíveKEY-5. Vlastníprocesyukončené,inputrevalidationPASS; žádná integrace doC/main/8080."
+  ]
+}
