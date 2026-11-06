@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "coolify-build-20261106",
+  "title": "KEY-74: Opravit vyčerpání V8 haldy v Docker buildu Coolify",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "Dockerfile",
+    "docs/verification.md",
+    "docs/agents/handoffs/coolify-build-20261106.md",
+    ".cache/coolify-build-20261106/",
+    "_bmad/render/bmad-build/"
+  ],
+  "resources": ["heavy-validation", "workspace-build"],
+  "acceptance": [
+    "Původní limit z logu reprodukovat a ověřit dokončení stejné TypeScript a Vite pipeline s rezervou haldy pouze ve fázi sestavení.",
+    "Lokálně sestavený Linux image projde health a servíruje produkční web. Produkční nasazení je samostatně doložené podle skutečné Coolify revize."
+  ],
+  "verification": [
+    "Kontrolovaný Docker build se stejným checkoutem, porovnání původního limitu a kandidáta, health a HTTP smoke uvnitř vlastního dočasného kontejneru bez publikování portu."
+  ],
+  "notes": [
+    "Lokální Docker build a smoke prošly, produkční nasazení zůstává otevřené.",
+    "docs/agents/handoffs/coolify-build-20261106.md",
+    "https://linear.app/gigeconomy/issue/KEY-74/opravit-pad-docker-buildu-pri-nasazeni-do-coolify"
+  ]
+}

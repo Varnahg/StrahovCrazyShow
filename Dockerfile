@@ -29,6 +29,8 @@ COPY . .
 # silently become part of the build stage.
 RUN test ! -d assets/blender
 RUN node scripts/check-runtime-assets.mjs
+# The TypeScript check can exhaust the builder's default V8 heap.
+ENV NODE_OPTIONS=--max-old-space-size=3072
 # The SDK resolves / against the browser origin, including HTTPS and its port.
 # The frozen install/cache key above already verifies manifests and patches.
 # COPY may refresh identical input mtimes; do not let pnpm 11 reinstall them.
