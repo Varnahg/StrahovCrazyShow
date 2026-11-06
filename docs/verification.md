@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## Sestavení image pro Coolify · 6. listopadu 2026
+
+Coolify zkusilo nasadit `6614cb9b` s chatem z PR #42. Po kontrole 8 064 runtime assetů skončila kontrola TypeScriptu vyčerpáním asi 2 GiB V8 haldy a kódem 134. Vlastní Linux Docker build se stejným Node image tento pád reprodukoval. S 3 GiB ve fázi buildu prošla kontrola TypeScriptu, Vite i vytvoření image. Izolovaný kontejner vrátil HTTP 200 pro health, úvodní stránku a produkční JS. Cílené testy prošly 13/13.
+
+Produkční nasazení zůstává otevřené. Veřejný klient odpovídal zdrojům z 21. října a grafický draft #41 v `6614cb9b` chybí. Podrobnosti a identitu lokálního image uvádí [předání KEY-74](agents/handoffs/coolify-build-20261106.md).
+
 ## Publikační PR40 a rozhodnutí Low LOD · 4. listopadu 2026
 
 [Současné V15 A75/B45](performance/evidence/low-tree-lod-20261102/pr40-20261104/README.md) uzavírá kandidáta45 jako nepřijatý; default se vrací75. Šest produkčních Edge/WebGPU vzorků se shodnou kamerou, časem a1280×720/984×553 snížilo stromovou geometrii10,9%, ale nesplnilo předem zvolenéFPS/p95 meze. Pohybliví peers navíc měnili avatar LOD (Anear1/medium2, Bnear3), takže rozdílFPS nelze připsat stromoLOD. Kandidátní obrazová trasa nebyla po selhání zahájena. PůvodníA75 také vykazuje dlouhé záseky až7,54s při změněHigh; celková plynulost zůstává otevřená.
