@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-monitor-playtest-20261107",
+  "title": "Spustit lokální zkušební přehled a chat Crazy Typky",
+  "status": "ready",
+  "dependsOn": ["chat-monitor-20261106"],
+  "writePaths": [
+    ".cache/chat-monitor-playtest-20261107/",
+    "docs/agents/handoffs/chat-monitor-playtest-20261107.md"
+  ],
+  "resources": ["port:4278", "port:5548"],
+  "acceptance": [
+    "Hra i /admin jsou dostupné jen přes loopback na stejném portu. Nový dotaz se objeví v přehledu v samostatné dočasné databázi.",
+    "Přihlášení a model používají místní testovací odpovědi, bez produkčních přístupů a placených volání."
+  ],
+  "verification": [
+    "Shoda neměnného klienta s 45db37f0, health, viditelná informace v chatu, průchod přihlášením a zobrazení nové výměny v Edge."
+  ],
+  "notes": [
+    "Výslovné zadání uživatelského spuštění KEY-75. Ověřený klient se čte z .cache/chat-monitor-20261106/dist.",
+    "Živé testovací služby mají zůstat pod touto rezervací do konce uživatelského testu."
+  ]
+}
