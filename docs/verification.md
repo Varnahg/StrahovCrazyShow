@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## Správcovský monitoring Crazy Typky · 7. listopadu 2026
+
+Izolovaný PostgreSQL 17 potvrdil idempotenci výměny, audit čtení a tříměsíční retenci včetně kalendářní hranice. Skutečný server s produkčním bundlem ověřil syntetickou konverzaci a její zobrazení v /admin přes testovací GitHub API. Ve skutečném Edge prošlo zobrazení ⓘ na úvodu i v připraveném multiplayerovém HUD. Před veřejným zapnutím zůstává ověření produkční HTTPS proxy a skutečného přihlášení, zveřejnění podmínek a potvrzení právního titulu. [Předání KEY-75](agents/handoffs/chat-monitor-20261106.md) · [Provozní konfigurace](deployment/chat-monitor.md)
+
+Úplná sada měla 3 185 PASS, 5 SKIP a 0 FAIL před poslední úpravou chybové stránky správce. Finální checkpoint prošel 148 cílenými testy, úplným TypeScriptem a izolovanou multiplayerovou integrací. Vite build odpovídá stejným klientským vstupům.
+
 ## Sestavení image pro Coolify · 6. listopadu 2026
 
 Coolify zkusilo nasadit `6614cb9b` s chatem z PR #42. Po kontrole 8 064 runtime assetů skončila kontrola TypeScriptu vyčerpáním asi 2 GiB V8 haldy a kódem 134. Vlastní Linux Docker build se stejným Node image tento pád reprodukoval. S 3 GiB ve fázi buildu prošla kontrola TypeScriptu, Vite i vytvoření image. Izolovaný kontejner vrátil HTTP 200 pro health, úvodní stránku a produkční JS. Cílené testy prošly 13/13.

@@ -13,6 +13,7 @@ import {
   type CrazyTypkaState,
 } from "../client/crazy-typka";
 import {
+  CRAZY_TYPKA_MONITORING_NOTICE_VERSION,
   CRAZY_TYPKA_SPEAKER,
   isCrazyTypkaSource,
   type CrazyTypkaSource,
@@ -471,10 +472,16 @@ function refinementFixture(
     payload: ChatPayload,
     attempt: number,
   ) => Response | Promise<Response>,
-  options: { now?: () => number; ttl?: number } = {},
+  options: {
+    now?: () => number;
+    ttl?: number;
+    monitoring?: unknown;
+    issueSession?: (body: string) => Response | undefined;
+  } = {},
 ) {
   const payloads: ChatPayload[] = [];
   const bodies: string[] = [];
+  const sessionBodies: string[] = [];
   let sessions = 0;
   const now = options.now ?? Date.now;
   const client = createCrazyTypkaClient({
@@ -482,8 +489,12 @@ function refinementFixture(
     request: (async (input, init) => {
       if (init?.method === "DELETE") return new Response(null, { status: 204 });
       if (String(input).endsWith("status"))
-        return Response.json({ enabled: true });
+        return Response.json({ enabled: true, monitoring: options.monitoring });
       if (String(input).endsWith("session")) {
+        const body = String(init?.body);
+        sessionBodies.push(body);
+        const rejection = options.issueSession?.(body);
+        if (rejection) return rejection;
         sessions++;
         return Response.json({
           token: sessions.toString(16).padStart(64, "0"),
@@ -497,7 +508,7 @@ function refinementFixture(
       return await reply(payload, payloads.length);
     }) as typeof fetch,
   });
-  return { client, payloads, bodies, sessions: () => sessions };
+  return { client, payloads, bodies, sessionBodies, sessions: () => sessions };
 }
 function chatState(
   client: ReturnType<typeof createCrazyTypkaClient>,
@@ -515,6 +526,109 @@ function chatState(
     refreshStatus: client.refreshStatus,
   };
 }
+
+const monitoringNotice = {
+  noticeVersion: CRAZY_TYPKA_MONITORING_NOTICE_VERSION,
+  privacyUrl: "https://strahov.bandportal.cz/privacy#transcripts",
+};
+const mockAnswer = ({ requestSeq }: ChatPayload) =>
+  Response.json({ ...answer, requestSeq });
+
+test("disclosure marks only future sessions and survives status refresh", async () => {
+  const f = refinementFixture(mockAnswer, { monitoring: monitoringNotice });
+  await f.client.refreshStatus();
+  assert.equal(f.client.getSnapshot().monitoring?.shown, false);
+  f.client.setDraft("Before the notice opened");
+  await f.client.send("en");
+  assert.deepEqual(f.sessionBodies, ["{}"]);
+
+  f.client.getSnapshot().monitoring!.markShown();
+  await f.client.refreshStatus();
+  assert.equal(f.client.getSnapshot().monitoring?.shown, true);
+  f.client.setDraft("In the same session after the notice opened");
+  await f.client.send("en");
+  assert.deepEqual(f.sessionBodies, ["{}"]);
+
+  await f.client.reset();
+  f.client.setDraft("In a new session");
+  await f.client.send("en");
+  assert.deepEqual(f.sessionBodies.map((body) => JSON.parse(body)), [
+    {},
+    { monitoringNoticeVersion: CRAZY_TYPKA_MONITORING_NOTICE_VERSION },
+  ]);
+  assert.ok(f.bodies.every((body) => !body.includes("monitoringNoticeVersion")));
+  f.client.dispose();
+});
+
+test("old status and unsupported or unsafe monitoring capabilities keep chat usable without recording", async () => {
+  for (const monitoring of [
+    undefined,
+    { ...monitoringNotice, noticeVersion: 2 },
+    { ...monitoringNotice, privacyUrl: "javascript:alert(1)" },
+    { ...monitoringNotice, privacyUrl: "https://user:pass@example.com/privacy" },
+  ]) {
+    const f = refinementFixture(mockAnswer, { monitoring });
+    await f.client.refreshStatus();
+    assert.equal(f.client.getSnapshot().monitoring, undefined);
+    f.client.setDraft("Old client path");
+    await f.client.send("en");
+    assert.deepEqual(f.sessionBodies, ["{}"]);
+    assert.equal(f.client.getSnapshot().messages.length, 2);
+    f.client.dispose();
+  }
+});
+
+test("a definite legacy session rejection retries once without monitoring, and other errors do not", async () => {
+  for (const status of [400, 503]) {
+    const f = refinementFixture(mockAnswer, {
+      monitoring: monitoringNotice,
+      issueSession: (body) =>
+        body === "{}"
+          ? undefined
+          : Response.json({ error: "invalid-request" }, { status }),
+    });
+    await f.client.refreshStatus();
+    f.client.getSnapshot().monitoring!.markShown();
+    f.client.setDraft("One question during rollback");
+    await f.client.send("en");
+    assert.equal(f.sessionBodies.length, status === 400 ? 2 : 1);
+    assert.equal(f.payloads.length, status === 400 ? 1 : 0);
+    if (status === 400) assert.equal(f.sessionBodies[1], "{}");
+    f.client.dispose();
+  }
+});
+
+test("the shared info bubble localizes retention, links privacy terms and explains starting over", async () => {
+  const f = refinementFixture(mockAnswer, { monitoring: monitoringNotice });
+  await f.client.refreshStatus();
+  for (const locale of ["cs", "en"] as const) {
+    const html = renderToStaticMarkup(
+      createElement(CrazyTypkaChatActions, { state: chatState(f.client), locale }),
+    );
+    assert.match(html, /<details class="crazy-chat-info"/);
+    assert.ok(html.includes(monitoringNotice.privacyUrl));
+    assert.match(html, /rel="noopener noreferrer"/);
+    assert.match(html, locale === "cs" ? /3 měsíce/ : /3 months/);
+    assert.match(
+      html,
+      locale === "cs" ? /Může ho číst správce/ : /An administrator can read them/,
+    );
+    assert.match(
+      html,
+      locale === "cs"
+        ? /Neposílej osobní údaje ani hesla/
+        : /Do not send personal data or passwords/,
+    );
+    assert.match(
+      html,
+      locale === "cs" ? /Začít novou konverzaci/ : /Start a new conversation/,
+    );
+    assert.doesNotMatch(html, /Soukromá AI konverzace|Private AI conversation/);
+  }
+  // Server-side rendering must not mark an unopened client disclosure as shown.
+  assert.equal(f.client.getSnapshot().monitoring?.shown, false);
+  f.client.dispose();
+});
 
 test("archive control captures scope for exact recovery and reset restores current", async () => {
   const f = refinementFixture((payload, attempt) => {

@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type {
   IncomingMessage,
   ServerResponse,
@@ -14,6 +14,8 @@ import {
   crazyTypkaScopeKey,
   isCrazyTypkaKnowledgeScope,
   mergeCrazyTypkaSources,
+  isCrazyTypkaMonitoringNotice,
+  type CrazyTypkaMonitoringNotice,
   type CrazyTypkaKnowledgeScope,
   type CrazyTypkaSource,
   type CrazyTypkaErrorCode,
@@ -83,6 +85,15 @@ export type CrazyTypkaServiceOptions = {
   fetch?: typeof globalThis.fetch;
   now?: () => number;
   limits?: Partial<CrazyTypkaServiceLimits>;
+  monitoring?: {
+    notice: CrazyTypkaMonitoringNotice;
+    enqueue(exchange: {
+      conversationId: string;
+      completedAt: number;
+      question: string;
+      answer: CrazyTypkaChatResponse;
+    }): void;
+  };
 };
 const DEFAULT_LIMITS: CrazyTypkaServiceLimits = {
   requestBytes: 8192,
@@ -147,6 +158,7 @@ function usageSnapshot(counter: ReturnType<typeof usageCounter>) {
 type Session = {
   expiresAt: number;
   origin: string;
+  monitoringId?: string;
   history: AiHistoryMessage[];
   messages: number[];
   inflight?: AbortController;
@@ -388,6 +400,9 @@ export function createCrazyTypkaService(
   const env = options.env ?? process.env,
     now = options.now ?? Date.now;
   const limits = { ...DEFAULT_LIMITS, ...options.limits };
+  const monitoring = isCrazyTypkaMonitoringNotice(options.monitoring?.notice)
+    ? options.monitoring
+    : undefined;
   for (const [key, value] of Object.entries(limits)) {
     const minimum = [
       "decisionsPerProcess",
@@ -587,7 +602,8 @@ export function createCrazyTypkaService(
     let inflight: Session | undefined,
       operationTimedOut = false;
     let accepted:
-      { key: string; session: Session; operation: Operation } | undefined;
+      | { key: string; session: Session; operation: Operation; question: string }
+      | undefined;
     const terminalReply = (
       status: number,
       body: CrazyTypkaChatResponse | CrazyTypkaErrorResponse,
@@ -597,11 +613,32 @@ export function createCrazyTypkaService(
         sessions.get(accepted.key) === accepted.session &&
         accepted.session.lastOperation === accepted.operation &&
         accepted.session.expiresAt > now()
-      )
+      ) {
         rememberTerminal(accepted.session, accepted.operation, {
           status,
           body,
         });
+        const conversationId = accepted.session.monitoringId;
+        if (
+          monitoring &&
+          conversationId &&
+          status === 200 &&
+          "speaker" in body &&
+          !res.destroyed &&
+          !res.writableEnded
+        ) {
+          try {
+            monitoring.enqueue({
+              conversationId,
+              completedAt: now(),
+              question: accepted.question,
+              answer: body,
+            });
+          } catch {
+            // Optional monitoring must not change the response to the player.
+          }
+        }
+      }
       return reply(status, body);
     };
     const disconnected = () => controller?.abort();
@@ -618,7 +655,10 @@ export function createCrazyTypkaService(
           return reply(403, { error: "origin-rejected" });
         if (origin) res.setHeader("Access-Control-Allow-Origin", origin);
         const available = enabled && !closed && (await backend!.ready());
-        return reply(200, { enabled: available && !closed });
+        return reply(200, {
+          enabled: available && !closed,
+          ...(available && !closed && monitoring ? { monitoring: monitoring.notice } : {}),
+        });
       }
       const origin = originFor(req, origins);
       if (!origin) return reply(403, { error: "origin-rejected" });
@@ -694,7 +734,11 @@ export function createCrazyTypkaService(
           throw new RequestError(503, "unavailable");
         if (closed || controller.signal.aborted)
           throw new RequestError(409, "cancelled");
-        if (Object.keys(body).length)
+        const noticeVersion = body.monitoringNoticeVersion;
+        if (
+          Object.keys(body).some((key) => key !== "monitoringNoticeVersion") ||
+          (noticeVersion !== undefined && !isCrazyTypkaRequestSeq(noticeVersion))
+        )
           throw new RequestError(400, "invalid-request");
         // Recheck after asynchronous uploads: other admitted requests may have issued sessions.
         if (sessions.size >= limits.maxSessions)
@@ -704,6 +748,9 @@ export function createCrazyTypkaService(
         sessions.set(hash(token), {
           expiresAt,
           origin,
+          ...(monitoring && noticeVersion === monitoring.notice.noticeVersion
+            ? { monitoringId: randomUUID() }
+            : {}),
           history: [],
           messages: [],
           nextRequestSeq: 1,
@@ -825,7 +872,7 @@ export function createCrazyTypkaService(
       };
       session.lastOperation = operation;
       session.nextRequestSeq++;
-      accepted = { key, session, operation };
+      accepted = { key, session, operation, question: message };
       if (
         (session.contextScope &&
           crazyTypkaScopeKey(session.contextScope) !==

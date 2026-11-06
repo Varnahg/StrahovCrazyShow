@@ -97,7 +97,7 @@ test("Docker build runs the frozen dependency tree without an implicit pnpm inst
   }
 });
 
-test("isolated integration excludes inherited feedback/Linear/OpenAI/RAG settings while preserving NODE_OPTIONS", () => {
+test("isolated integration excludes production service settings while preserving NODE_OPTIONS", () => {
   const directory = join(tmpdir(), "strahov-integration-feedback-unit");
   const env = integration.createIsolatedIntegrationEnvironment(
     {
@@ -123,6 +123,8 @@ test("isolated integration excludes inherited feedback/Linear/OpenAI/RAG setting
       RAG_DATABASE_URL: "postgresql://fake:fake@production.invalid/private",
       rag_test_database_url: "postgresql://fake:fake@production.invalid/test",
       RAG_MAX_COSINE_DISTANCE: "0.5",
+      CHAT_MONITOR_DATABASE_URL: "postgresql://fake:fake@production.invalid/chat",
+      chat_monitor_github_client_secret: "fake-monitor-secret",
     },
     directory,
   );

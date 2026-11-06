@@ -149,6 +149,11 @@ export type CrazyTypkaErrorResponse = {
   retryAfterSeconds?: number;
 };
 export type CrazyTypkaSession = { token: string; expiresAt: number };
+export const CRAZY_TYPKA_MONITORING_NOTICE_VERSION = 1;
+export type CrazyTypkaMonitoringNotice = Readonly<{
+  noticeVersion: typeof CRAZY_TYPKA_MONITORING_NOTICE_VERSION;
+  privacyUrl: string;
+}>;
 export type CrazyTypkaErrorCode =
   | "unavailable"
   | "origin-rejected"
@@ -226,8 +231,26 @@ function short(value: unknown, max: number): value is string {
 }
 export function isCrazyTypkaStatus(
   value: unknown,
-): value is { enabled: boolean } {
+): value is { enabled: boolean; monitoring?: unknown } {
   return record(value) && typeof value.enabled === "boolean";
+}
+export function isCrazyTypkaMonitoringNotice(
+  value: unknown,
+): value is CrazyTypkaMonitoringNotice {
+  if (
+    !record(value) ||
+    value.noticeVersion !== CRAZY_TYPKA_MONITORING_NOTICE_VERSION ||
+    !short(value.privacyUrl, 1000) ||
+    !value.privacyUrl.startsWith("https://") ||
+    /[\s\\\u0000-\u001f\u007f]/.test(value.privacyUrl)
+  )
+    return false;
+  try {
+    const url = new URL(value.privacyUrl);
+    return url.protocol === "https:" && !url.username && !url.password;
+  } catch {
+    return false;
+  }
 }
 export function isCrazyTypkaSession(
   value: unknown,

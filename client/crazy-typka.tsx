@@ -1,6 +1,7 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -15,9 +16,11 @@ import {
   type CrazyTypkaKnowledgeScope,
   isCrazyTypkaChatResponse,
   isCrazyTypkaErrorResponse,
+  isCrazyTypkaMonitoringNotice,
   isCrazyTypkaSession,
   isCrazyTypkaStatus,
   type CrazyTypkaSource,
+  type CrazyTypkaMonitoringNotice,
   type CrazyTypkaAnswerBlock,
   type CrazyTypkaReplyTo,
 } from "../shared/crazy-typka";
@@ -35,6 +38,10 @@ export type CrazyTypkaMessage = {
   quote?: CrazyTypkaDraftReply;
 };
 export type CrazyTypkaDraftReply = CrazyTypkaReplyTo & { text: string };
+type MonitoringNoticeState = CrazyTypkaMonitoringNotice & {
+  shown: boolean;
+  markShown: () => void;
+};
 export type CrazyTypkaSnapshot = {
   availability: "checking" | "enabled" | "disabled" | "error";
   busy: boolean;
@@ -46,6 +53,7 @@ export type CrazyTypkaSnapshot = {
   knowledgeScope: CrazyTypkaKnowledgeScope;
   draftReply: CrazyTypkaDraftReply | null;
   replyableRequestSeqs: readonly number[];
+  monitoring?: MonitoringNoticeState;
 };
 
 export function safeCitationHref(value: string): string | undefined {
@@ -139,7 +147,11 @@ export function CuratedKnowledgeDetails({
   );
 }
 
-class ChatRequestError extends Error {}
+class ChatRequestError extends Error {
+  constructor(message: string, readonly status?: number) {
+    super(message);
+  }
+}
 
 /** Own one private conversation in App memory, independently of either widget mount. */
 export function createCrazyTypkaClient(
@@ -179,10 +191,17 @@ export function createCrazyTypkaClient(
   let nextMessage = 0;
   let inflight: AbortController | undefined;
   let statusRequest: AbortController | undefined;
+  let shownMonitoringNoticeVersion: number | undefined;
   const listeners = new Set<() => void>();
   const update = (patch: Partial<CrazyTypkaSnapshot>) => {
     snapshot = { ...snapshot, ...patch };
     for (const listener of listeners) listener();
+  };
+  const markMonitoringNoticeShown = (version: number) => {
+    const { monitoring } = snapshot;
+    if (monitoring?.noticeVersion !== version || monitoring.shown) return;
+    shownMonitoringNoticeVersion = version;
+    update({ monitoring: { ...monitoring, shown: true } });
   };
   const decode = async (response: Response) => {
     const body: unknown = await response.json();
@@ -190,7 +209,7 @@ export function createCrazyTypkaClient(
       const code = isCrazyTypkaErrorResponse(body)
         ? body.error
         : "provider-unavailable";
-      throw new ChatRequestError(code);
+      throw new ChatRequestError(code, response.status);
     }
     return body;
   };
@@ -247,14 +266,36 @@ export function createCrazyTypkaClient(
     update({ busy: true, error: null, recovery: "none" });
     try {
       if (!operation.token) {
-        const body = await decode(
-          await request("/api/ai/session", {
+        const issueSession = (body: string) =>
+          request("/api/ai/session", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: "{}",
+            body,
             signal: controller.signal,
-          }),
-        );
+          }).then(decode);
+        const { monitoring } = snapshot;
+        let body: unknown;
+        try {
+          body = await issueSession(
+            monitoring?.shown
+              ? JSON.stringify({
+                  monitoringNoticeVersion: monitoring.noticeVersion,
+                })
+              : "{}",
+          );
+        } catch (error) {
+          // A rollback can route a request to an older session endpoint after status succeeded.
+          if (
+            !monitoring?.shown ||
+            !(error instanceof ChatRequestError) ||
+            error.status !== 400 ||
+            error.message !== "invalid-request" ||
+            !isCurrent() ||
+            controller.signal.aborted
+          )
+            throw error;
+          body = await issueSession("{}");
+        }
         if (!isCrazyTypkaSession(body))
           throw new ChatRequestError("invalid-response");
         if (!isCurrent()) {
@@ -455,7 +496,21 @@ export function createCrazyTypkaClient(
           throw new ChatRequestError("request-timeout");
         if (!isCrazyTypkaStatus(body))
           throw new ChatRequestError("invalid-response");
-        update({ availability: body.enabled ? "enabled" : "disabled" });
+        const monitoring = body.monitoring;
+        update({
+          availability: body.enabled ? "enabled" : "disabled",
+          monitoring:
+            body.enabled && isCrazyTypkaMonitoringNotice(monitoring)
+              ? {
+                  noticeVersion: monitoring.noticeVersion,
+                  privacyUrl: monitoring.privacyUrl,
+                shown:
+                  shownMonitoringNoticeVersion === monitoring.noticeVersion,
+                markShown: () =>
+                  markMonitoringNoticeShown(monitoring.noticeVersion),
+                }
+              : undefined,
+        });
       } catch {
         if (statusRequest === controller) update({ availability: "error" });
       } finally {
@@ -531,7 +586,7 @@ export function createCrazyTypkaClient(
       await perform(pending);
     },
     reset,
-    /** Cancellation also erases this private conversation on the server. */
+    /** Cancellation also discards the active server session. */
     cancel: reset,
     dispose() {
       generation++;
@@ -594,7 +649,15 @@ export function useCrazyTypka(): CrazyTypkaState {
   };
 }
 
-export function crazyTypkaErrorLabel(code: string, locale: Locale) {
+export function crazyTypkaErrorLabel(
+  code: string,
+  locale: Locale,
+  monitoring = false,
+) {
+  if (monitoring && code === "reset-unconfirmed")
+    return locale === "cs"
+      ? "Otevřený chat je vyčištěný. Ukončení předchozí relace na serveru se nepodařilo potvrdit."
+      : "The open chat is cleared. The previous server session could not be confirmed as closed.";
   const labels: Record<string, readonly [string, string]> = {
     "rate-limited": [
       "Chvilku počkej před další zprávou.",
@@ -703,6 +766,12 @@ export function CrazyTypkaChatActions({
   const cs = locale === "cs";
   const info = useRef<HTMLDetailsElement>(null);
   const [open, setOpen] = useState(false);
+  const { monitoring } = state;
+  useLayoutEffect(() => {
+    if (!monitoring || monitoring.shown || !info.current) return;
+    info.current.open = true;
+    monitoring.markShown();
+  }, [monitoring]);
   useEffect(() => {
     if (!open) return;
     const closeOutside = (event: PointerEvent) => {
@@ -716,17 +785,18 @@ export function CrazyTypkaChatActions({
     document.addEventListener("pointerdown", closeOutside);
     return () => document.removeEventListener("pointerdown", closeOutside);
   }, [open]);
-  const clearLabel = state.busy
+  const startsNew =
+    Boolean(monitoring) || (!state.busy && state.recovery === "reset");
+  const clearLabel = startsNew
     ? cs
-      ? "Zastavit a smazat konverzaci"
-      : "Stop and clear conversation"
-    : state.recovery === "reset"
-      ? cs
-        ? "Začít novou konverzaci"
-        : "Start a new conversation"
-      : cs
-        ? "Smazat konverzaci"
-        : "Clear conversation";
+      ? "Začít novou konverzaci"
+      : "Start a new conversation"
+    : cs
+      ? "Smazat konverzaci"
+      : "Clear conversation";
+  const actionLabel = state.busy
+    ? (cs ? "Zastavit a " : "Stop and ") + clearLabel.toLowerCase()
+    : clearLabel;
   return (
     <div className="crazy-chat-actions">
       <details
@@ -750,7 +820,13 @@ export function CrazyTypkaChatActions({
         </summary>
         <div className="crazy-chat-info-content">
           <strong>
-            {cs ? "Soukromá AI konverzace" : "Private AI conversation"}
+            {monitoring
+              ? cs
+                ? "Informace o AI konverzaci"
+                : "AI conversation information"
+              : cs
+                ? "Soukromá AI konverzace"
+                : "Private AI conversation"}
           </strong>
           <p>
             {cs
@@ -759,9 +835,38 @@ export function CrazyTypkaChatActions({
           </p>
           <p>
             {cs
-              ? "Zprávy a kontext této konverzace může zpracovat OpenAI. Ostatní hráči ji nevidí. Neposílej hesla ani osobní údaje. AI si pamatuje jen několik posledních výměn v krátké relaci."
-              : "OpenAI may process messages and the context of this conversation. Other players cannot see it. Do not send passwords or personal data. AI remembers only a few recent exchanges in a short session."}
+              ? "Zprávy a kontext této konverzace může zpracovat OpenAI. Ostatní hráči ji nevidí. AI si pamatuje jen několik posledních výměn v krátké relaci."
+              : "OpenAI may process messages and the context of this conversation. Other players cannot see it. AI remembers only a few recent exchanges in a short session."}
+            {!monitoring &&
+              (cs
+                ? " Neposílej hesla ani osobní údaje."
+                : " Do not send passwords or personal data.")}
           </p>
+          {monitoring && (
+            <>
+              <p>
+                {cs
+                  ? "Přepis konverzace uchováváme 3 měsíce kvůli zlepšování podpory. Může ho číst správce. Neposílej osobní údaje ani hesla."
+                  : "We keep conversation transcripts for 3 months to improve support. An administrator can read them. Do not send personal data or passwords."}
+              </p>
+              <p>
+                {cs
+                  ? "Zahájením nové konverzace vyčistíš otevřený chat. Na uložený přepis se dál vztahuje uvedená doba uchování."
+                  : "Starting a new conversation clears the open chat. The stored transcript remains subject to the stated retention period."}
+              </p>
+              <p>
+                <a
+                  href={monitoring.privacyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {cs
+                    ? "Podmínky zpracování a kontakt pro výmaz"
+                    : "Privacy terms and deletion contact"}
+                </a>
+              </p>
+            </>
+          )}
           <p>
             {cs
               ? "Odpověď může chybovat. Ověř si citované podklady."
@@ -772,8 +877,8 @@ export function CrazyTypkaChatActions({
       <button
         type="button"
         className="crazy-chat-clear"
-        aria-label={clearLabel}
-        title={clearLabel}
+        aria-label={actionLabel}
+        title={actionLabel}
         disabled={
           !state.messages.length &&
           !state.busy &&
@@ -1100,7 +1205,7 @@ export function CrazyTypkaChat({
       )}
       {state.error && (
         <p className="error" role="alert">
-          {crazyTypkaErrorLabel(state.error, locale)}
+          {crazyTypkaErrorLabel(state.error, locale, Boolean(state.monitoring))}
         </p>
       )}
       {state.recovery === "retry" && (
