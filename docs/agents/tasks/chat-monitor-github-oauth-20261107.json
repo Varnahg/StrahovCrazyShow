@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-monitor-github-oauth-20261107",
+  "title": "Ověřit skutečný GitHub OAuth na izolovaném HTTPS přehledu",
+  "status": "ready",
+  "dependsOn": ["chat-monitor-20261106"],
+  "writePaths": [
+    ".cache/chat-monitor-github-oauth-20261107/",
+    "docs/agents/handoffs/chat-monitor-github-oauth-20261107.md"
+  ],
+  "resources": ["port:4282", "port:4283"],
+  "acceptance": [
+    "Na izolované HTTPS adrese projde běžný GitHub OAuth callback a jen povolené ID získá správcovskou relaci.",
+    "Zkušební endpoint neobsluhuje hru a čte výhradně syntetickou databázi. OAuth tajemství zůstávají mimo Git a logy."
+  ],
+  "verification": [
+    "HTTPS a anonymní odmítnutí ověřit před registrací. Po registraci ověřit autorizovaný přístup a audit čtení syntetického přepisu."
+  ],
+  "notes": [
+    "Výslovné zadání uživatele ověřit GitHub přihlášení v podmínkách podobných produkci.",
+    "Samostatný HTTPS testovací endpoint. Lokální playtest a jeho databáze mají vlastní rezervaci."
+  ]
+}
