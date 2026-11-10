@@ -305,3 +305,19 @@ test("scene disposal aborts flower geometry loading before any late resources ca
   await assert.rejects(pending, /fixture aborted/);
   assert.equal(scene.meshes.length, 0); engine.dispose();
 });
+
+
+test("disabled flowers hide batches and helpers, stop selection and reselect the current view on enable", async t => {
+  const f = fixture(t); await f.flowers.ready;
+  for (let i = 0; i < 20; i++) f.frame(i * .2);
+  assert.ok(f.flowers.stats.instances > 0);
+  const stop = f.flowers.beginPreparation();
+  f.flowers.setEnabled(false); stop();
+  assert.equal(f.flowers.stats.draws, 0); assert.equal(f.flowers.stats.triangles, 0);
+  assert.ok(f.scene.meshes.filter(m => m.metadata?.groundFlowers).every(m => !m.isEnabled()));
+  const before = JSON.stringify(f.flowers.stats); const inactiveStop = f.flowers.beginPreparation();
+  for (let i = 0; i < 10; i++) f.frame(100 + i);
+  inactiveStop(); assert.equal(JSON.stringify(f.flowers.stats), before);
+  f.flowers.setEnabled(true); for (let i = 0; i < 20; i++) f.frame(120 + i * .2);
+  assert.ok(f.flowers.stats.instances > 0); assert.ok(f.flowers.stats.triangles > 0);
+});

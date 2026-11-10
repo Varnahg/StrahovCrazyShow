@@ -1,3 +1,4 @@
+import { graphicsLifecycleFixture, graphicsFixtureEnvironment, graphicsFixtureMembers } from "./helpers/weather-door-render-fixture";
 import { AuthoredLightPreparation } from "../client/authored-light-preparation";
 import { unoccludedAtmosphereFixture } from "./helpers/weather-door-render-fixture";
 import test from "node:test";
@@ -56,6 +57,7 @@ const methods = declaration.members.filter(
   (n) =>
     n.name &&
     [
+      ...graphicsFixtureMembers,
       "prepareLighting",
       "prepareLightingVariants",
       "isMeshReadyForCamera",
@@ -63,13 +65,13 @@ const methods = declaration.members.filter(
       "effectiveWeather",
     ].includes(n.name.getText(source)),
 );
-assert.equal(methods.length, 5);
+assert.equal(methods.length, 5 + graphicsFixtureMembers.length);
 const code = ts.transpileModule(
   `class TestGame {${methods.map((n) => n.getText(source)).join("\n")}}`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(
-  `(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
+  `(env)=>{const {createRenderPreferences,resolveVisualSettings,renderBudget,AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
 ).runInThisContext();
 const anchor = Date.parse("2026-10-18T12:45:00Z");
 const select = (mode: Parameters<typeof selectLightingPreview>[0]) =>
@@ -223,6 +225,7 @@ function fixture(
   // The only engine adapter is Game's backend/scheduler routing. All material,
   // light, shadow, cache, readiness and actual draws use the real NullEngine.
   const Game = make({
+    ...graphicsFixtureEnvironment,
     AuthoredLightPreparation,
     PlayerFlashlight,
     Vector3,
@@ -244,6 +247,7 @@ function fixture(
   });
   let skyInstant: number | undefined;
   const game: any = Object.assign(new Game(), {
+    ...graphicsLifecycleFixture(),
     engine: gameEngine,
     scene,
     camera,
@@ -338,7 +342,9 @@ function fixture(
   if (grass) {
     // Real forwarding methods/owner. Unrelated live world selection stays out
     // of this bounded Game wiring fixture, as do avatar/world presentation.
-    const vegetation = Object.assign(Object.create(VegetationController.prototype), {scene,disposed:false,photographicGrass:grass,update(input:VegetationInput){
+    const vegetation = Object.assign(Object.create(VegetationController.prototype), {scene,disposed:false,
+      visualFeatures: { groundVegetation: true, trees: "normal" }, stats: { pendingTreeLoads: 0 },
+      photographicGrass:grass,update(input:VegetationInput){
       assert.notEqual(skyInstant,undefined);
       assert.equal(input.season,getTreeSeasonState(skyInstant!,game.timeOverride===null?"regional-model":"demo"),"each actual quality/light stage gives sky and vegetation the same UTC sample");
     }});

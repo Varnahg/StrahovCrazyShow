@@ -12,6 +12,16 @@ Coolify zkusilo nasadit `6614cb9b` s chatem z PR #42. Po kontrole 8 064 runtime 
 
 Produkční nasazení zůstává otevřené. Veřejný klient odpovídal zdrojům z 21. října a grafický draft #41 v `6614cb9b` chybí. Podrobnosti a identitu lokálního image uvádí [předání KEY-74](agents/handoffs/coolify-build-20261106.md).
 
+## Ultra 50 % a živé grafické volby · integrace PR #41
+
+Původní měření výhledu Low → Ultra snížilo medián snímku z 53,30 na 45,00 ms (15,57 %). Cíl 20 % nebyl splněn a žádný z 22 vzorků ve výhledu neprošel limity pro 60 FPS. Uloženo je 45 z 48 vzorků a všechny tři dvojice Low/Ultra pro oba pohledy. Vypnutí stínů mělo největší samostatný přínos. Samotný vliv renderování v 50 % rozlišení nebyl průkazný. [Historické měření](performance/evidence/ultra-graphics-20261104/comparison-run3/README.md)
+
+Původní checkpoint e60d33a6 prošel 3 189 testy, buildem a SDK integrací. WebGPU na NVIDIA spustilo Ultra při 1280 × 720 CSS a interních 640 × 360, s HUD a třemi relacemi. Záznam stromového decoderu dokládá shodný výstup šesti GLB a kratší CPU dekódování dvou MID assetů. [Původní přejímka Ultra](performance/evidence/ultra-graphics-20261104/README.md) · [Stromový decoder](performance/evidence/graphics-smoothness-20261104/README.md)
+
+Na současném mainu prošlo 3 257 testů, 6 bylo přeskočeno a 0 selhalo. Prošly také TypeScript, produkční build a izolovaná SDK integrace. V aktivním Edge na GTX 1060 prošly WebGPU i WebGL2 start a živá změna grafiky, jízda, průchod B6 a noční svítilna. Číselná přejímka plynulosti na trase WebGL2 skončila FAILED s 39,29 FPS, maximální prodlevou 2,13 s a 1,47 resyncu/min. [Integrační předání](agents/handoffs/pr41-main-20261110.md)
+
+Pro jedinou vybranou kvalitu při startu WebGL2 platí 60 s. Obecné limity přípravy, požadavky na připravenost a ověření snímku zůstávají v platnosti.
+
 ## Publikační PR40 a rozhodnutí Low LOD · 4. listopadu 2026
 
 [Současné V15 A75/B45](performance/evidence/low-tree-lod-20261102/pr40-20261104/README.md) uzavírá kandidáta45 jako nepřijatý; default se vrací75. Šest produkčních Edge/WebGPU vzorků se shodnou kamerou, časem a1280×720/984×553 snížilo stromovou geometrii10,9%, ale nesplnilo předem zvolenéFPS/p95 meze. Pohybliví peers navíc měnili avatar LOD (Anear1/medium2, Bnear3), takže rozdílFPS nelze připsat stromoLOD. Kandidátní obrazová trasa nebyla po selhání zahájena. PůvodníA75 také vykazuje dlouhé záseky až7,54s při změněHigh; celková plynulost zůstává otevřená.

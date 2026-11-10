@@ -16,9 +16,9 @@ const object = (v: unknown): Record<string, any> => {
   return v as Record<string, any>;
 };
 const abortError = () => new DOMException("Tree loading disposed", "AbortError");
-function validateGeometry(positions: Float32Array, normals: Float32Array, uvs: Float32Array, indices: Uint16Array | Uint32Array) {
+function validateGeometry(positions: Float32Array, normals: Float32Array, uvs: Float32Array, indices: Uint16Array | Uint32Array, finiteAttributesValidated = false) {
   if (!positions.length || positions.length % 3 || normals.length !== positions.length || uvs.length !== positions.length / 3 * 2 || !indices.length || indices.length % 3) throw Error("Invalid tree geometry shape");
-  for (const a of [positions, normals, uvs]) for (const n of a) if (!Number.isFinite(n)) throw Error("Nonfinite tree vertex");
+  if (!finiteAttributesValidated) for (const a of [positions, normals, uvs]) for (const n of a) if (!Number.isFinite(n)) throw Error("Nonfinite tree vertex");
   for (const index of indices) if (index >= positions.length / 3) throw Error("Tree index outside vertices");
 }
 
@@ -49,7 +49,22 @@ export function decodeTreeRuntimeChunk(buffer: ArrayBuffer) {
   return { version: 1, id: metadata.id as string, lod: metadata.lod as number, primitives };
 }
 
+/** Public accessors revalidate their mutable JSON and source bytes on every call. */
 export function readTreeGlb(buffer: ArrayBuffer) {
+  return parseTreeGlb(buffer, false);
+}
+
+type TreeAccessorView = {
+  data: Float32Array | Uint16Array | Uint32Array;
+  normalized: boolean;
+  count: number;
+  componentType: number;
+};
+
+/** View reuse is private to one synchronous decode; no caller can mutate the
+ * parsed metadata between its validation and consumption. The returned parts
+ * keep only their typed arrays, never this parser or its temporary map. */
+function parseTreeGlb(buffer: ArrayBuffer, reuseValidatedViews: boolean) {
   if (buffer.byteLength < 28 || buffer.byteLength > MAX_BYTES) throw Error("Invalid tree GLB size");
   const view = new DataView(buffer);
   if (view.getUint32(0, true) !== 0x46546c67 || view.getUint32(4, true) !== 2 || view.getUint32(8, true) !== buffer.byteLength) throw Error("Invalid tree GLB header");
@@ -77,14 +92,20 @@ export function readTreeGlb(buffer: ArrayBuffer) {
     if (!json.meshes[integer(node.mesh)] || node.children?.length || node.skin !== undefined || node.camera !== undefined || node.extensions) throw Error("Unsupported tree node hierarchy");
     for (const [key, count] of [["translation", 3], ["rotation", 4], ["scale", 3], ["matrix", 16]] as const) if (node[key] !== undefined && (!Array.isArray(node[key]) || node[key].length !== count || !node[key].every((n: unknown) => typeof n === "number" && Number.isFinite(n)))) throw Error("Invalid tree node transform");
   }
-  const accessor = (index: number, type?: string, componentType?: number) => {
+  const validatedViews = reuseValidatedViews ? new Map<number, TreeAccessorView>() : undefined;
+  const accessor = (index: number, type?: string, componentType?: number): TreeAccessorView => {
     const a = object(json.accessors[integer(index)]), b = json.bufferViews[integer(a.bufferView)], sizes: Record<string, number> = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 }, components = sizes[a.type];
     if (!b || !components || a.sparse || a.extensions || ![5123, 5125, 5126].includes(a.componentType) || (type && a.type !== type) || (componentType && a.componentType !== componentType)) throw Error("Unsupported tree accessor");
     const bytes = a.componentType === 5123 ? 2 : 4, count = integer(a.count, 1), offset = integer(a.byteOffset ?? 0), start = binOffset + (b.byteOffset ?? 0) + offset;
     if (start % bytes || offset + count * components * bytes > b.byteLength) throw Error("Invalid tree accessor bounds");
+    // Caller expectations and bounds remain guards even for a validated view.
+    const existing = validatedViews?.get(index);
+    if (existing) return existing;
     const data = a.componentType === 5126 ? new Float32Array(buffer, start, count * components) : a.componentType === 5123 ? new Uint16Array(buffer, start, count * components) : new Uint32Array(buffer, start, count * components);
     if (a.componentType === 5126) for (const n of data) if (!Number.isFinite(n)) throw Error("Nonfinite tree GLB attribute");
-    return { data, normalized: a.normalized === true, count, componentType: a.componentType };
+    const result = { data, normalized: a.normalized === true, count, componentType: a.componentType };
+    validatedViews?.set(index, result);
+    return result;
   };
   for (let i = 0; i < json.accessors.length; i++) accessor(i);
   for (const mesh of json.meshes) {
@@ -93,7 +114,7 @@ export function readTreeGlb(buffer: ArrayBuffer) {
     if ((p.mode ?? 4) !== 4 || p.targets || p.extensions || (p.material !== undefined && !json.materials?.[integer(p.material)])) throw Error("Unsupported tree primitive/material");
     const positions = accessor(p.attributes?.POSITION, "VEC3", 5126).data as Float32Array, normals = accessor(p.attributes?.NORMAL, "VEC3", 5126).data as Float32Array, uvs = accessor(p.attributes?.TEXCOORD_0, "VEC2", 5126).data as Float32Array, indices = accessor(p.indices, "SCALAR");
     if (![5123, 5125].includes(indices.componentType)) throw Error("Invalid tree GLB index type");
-    validateGeometry(positions, normals, uvs, indices.data as Uint16Array | Uint32Array);
+    validateGeometry(positions, normals, uvs, indices.data as Uint16Array | Uint32Array, reuseValidatedViews);
     }
   }
   return { json, accessor, bin: { byteLength: binLength, readAsync: async (offset: number, length: number) => {
@@ -103,7 +124,7 @@ export function readTreeGlb(buffer: ArrayBuffer) {
 }
 
 export function decodeTreePrototype(buffer: ArrayBuffer, id: string, prototype: TreePrototype, onlyLod?: TreeLod) {
-  const glb = readTreeGlb(buffer), { json, accessor } = glb;
+  const glb = parseTreeGlb(buffer, true), { json, accessor } = glb;
   if (json.images?.length || json.materials?.length || json.textures?.length || !Array.isArray(json.nodes) || !Array.isArray(json.meshes)) throw Error("Pilot GLB must be geometry-only");
   const expected = new Set(onlyLod === undefined ? prototype.lods.flatMap(lod => lod.meshNames) : prototype.lods[onlyLod].meshNames), seen = new Set<string>();
   const usedAccessors = new Set<number>();

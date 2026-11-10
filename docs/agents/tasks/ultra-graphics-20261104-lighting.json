@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "id": "ultra-graphics-20261104-lighting",
+  "title": "Lazy a vypínatelné stíny i postprocessing s jedním vlastníkem",
+  "writePaths": [
+    "client/cinematic.ts",
+    "client/vehicle-lighting.ts",
+    "client/flashlight.ts",
+    "tests/cinematic.test.ts",
+    "tests/cinematic-pipeline.test.ts",
+    "tests/cinematic-fresnel-disposal.test.ts",
+    "tests/cinematic-atmosphere.test.ts",
+    "tests/vehicle-lighting.test.ts",
+    "tests/lighting-visual-settings.test.ts",
+    "docs/agents/handoffs/ultra-graphics-20261104-lighting.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Master shadowOff skutečně0pass prosolar/player/car, světla a funkcesvítilnyzachované.",
+    "ColdUltra nevytváříshadowgenerators/postpipeline. LiveOff drží nejvýše1sadu bezrender/update a žádnécachekombinací.",
+    "PostOff pouzeBloom/FXAA, základnítónování zachované; onresize/reenable/dispose a shaderreadiness pravdivé."
+  ],
+  "verification": [
+    "CílenéBJS9.30NullEngine/lifecycle testy, žádnéGPU/fullbuild.",
+    "Zachovat standardní defaultpresets a vlastnictví materiálů/RTT, no leaked observers/stale casts."
+  ],
+  "notes": [
+    "API initialfeatureflags + setter sdělitrootubrzy. Neunsafe detach; respektovatdoloženéBJSscene.postProcessesEnabled a ownedstate."
+  ]
+}

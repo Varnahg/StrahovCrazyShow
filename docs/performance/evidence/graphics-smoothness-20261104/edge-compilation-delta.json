@@ -1,0 +1,335 @@
+{
+  "method": "edge-before.compilation.end to edge-after.compilation.start. Same generation; cumulative fields only. Pending and maxima remain endpoint snapshots; last-frame and nested timings are not summed. Includes all work between different camera positions, not an isolated tree-only interval.",
+  "generation": [
+    1,
+    1
+  ],
+  "observerErrors": [
+    0,
+    0
+  ],
+  "delta": {
+    "glslToSpirv": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "spirvToWgsl": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "compilerLoad": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "shaderPreparation": {
+      "calls": 3,
+      "completed": 3,
+      "failures": 0,
+      "cpuTotalMs": 3,
+      "asyncTotalMs": 43.40000009536743
+    },
+    "shaderModule": {
+      "calls": 6,
+      "completed": 6,
+      "failures": 0,
+      "cpuTotalMs": 1.1000001430511475,
+      "asyncTotalMs": 0
+    },
+    "shaderValidation": {
+      "calls": 6,
+      "completed": 6,
+      "failures": 0,
+      "cpuTotalMs": 0.10000014305114746,
+      "asyncTotalMs": 941.8999998569489
+    },
+    "syncPipeline": {
+      "calls": 3,
+      "completed": 3,
+      "failures": 0,
+      "cpuTotalMs": 0.19999980926513672,
+      "asyncTotalMs": 0
+    },
+    "asyncPipeline": {
+      "calls": 0,
+      "completed": 0,
+      "failures": 0,
+      "cpuTotalMs": 0,
+      "asyncTotalMs": 0
+    },
+    "submit": {
+      "calls": 93925,
+      "completed": 93925,
+      "failures": 0,
+      "cpuTotalMs": 2026.29998254776,
+      "asyncTotalMs": 0
+    }
+  },
+  "cacheMissDelta": 3,
+  "start": {
+    "active": true,
+    "backend": "webgpu",
+    "generation": 1,
+    "attachedAfterDeviceCreation": true,
+    "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+    "metrics": {
+      "glslToSpirv": {
+        "calls": 0,
+        "completed": 0,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 0,
+        "cpuMaxMs": 0,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "spirvToWgsl": {
+        "calls": 0,
+        "completed": 0,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 0,
+        "cpuMaxMs": 0,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "compilerLoad": {
+        "calls": 0,
+        "completed": 0,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 0,
+        "cpuMaxMs": 0,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "shaderPreparation": {
+        "calls": 499,
+        "completed": 499,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 672.6999979019165,
+        "cpuMaxMs": 10.5,
+        "asyncTotalMs": 303014.90000772476,
+        "asyncMaxMs": 1872.1000001430511
+      },
+      "shaderModule": {
+        "calls": 998,
+        "completed": 998,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 251.9999976158142,
+        "cpuMaxMs": 8.399999856948853,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "shaderValidation": {
+        "calls": 998,
+        "completed": 998,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 24.200000762939453,
+        "cpuMaxMs": 1.2000000476837158,
+        "asyncTotalMs": 1033934.499985218,
+        "asyncMaxMs": 5903.5
+      },
+      "syncPipeline": {
+        "calls": 87,
+        "completed": 87,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 5.8999998569488525,
+        "cpuMaxMs": 1.3999998569488525,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "asyncPipeline": {
+        "calls": 919,
+        "completed": 919,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 240.8000020980835,
+        "cpuMaxMs": 148.39999985694885,
+        "asyncTotalMs": 1233698.9000020027,
+        "asyncMaxMs": 2931.5999999046326
+      },
+      "submit": {
+        "calls": 22736,
+        "completed": 22736,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 674.3000063896179,
+        "cpuMaxMs": 141.70000004768372,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      }
+    },
+    "hooks": {
+      "engine._initializeLimits": "installed",
+      "engine._compileRawShaderToSpirV": "installed",
+      "engine.prepareGlslangAndTintAsync": "installed",
+      "engine._preparePipelineContextAsync": "installed",
+      "engine._createPipelineStageDescriptor": "installed",
+      "tint.convertSpirV2WGSL": "not-created",
+      "device.createShaderModule": "installed",
+      "device.createRenderPipeline": "installed",
+      "device.createRenderPipelineAsync": "installed",
+      "queue.submit": "installed",
+      "module.getCompilationInfo": "installed"
+    },
+    "observerErrors": 0,
+    "shaderInventory": null,
+    "bundleCountersLastFrame": {
+      "numEnableEffects": 0,
+      "numEnableDrawWrapper": 484,
+      "numBundleCreationNonCompatMode": 0,
+      "numBundleReuseNonCompatMode": 0
+    },
+    "sharedCacheCounters": {
+      "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+      "values": {
+        "NumCacheHitWithoutHash": 1081837,
+        "NumCacheHitWithHash": 293117,
+        "NumCacheMiss": 1006,
+        "NumPipelineCreationLastFrame": 0
+      }
+    }
+  },
+  "end": {
+    "active": true,
+    "backend": "webgpu",
+    "generation": 1,
+    "attachedAfterDeviceCreation": true,
+    "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+    "metrics": {
+      "glslToSpirv": {
+        "calls": 0,
+        "completed": 0,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 0,
+        "cpuMaxMs": 0,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "spirvToWgsl": {
+        "calls": 0,
+        "completed": 0,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 0,
+        "cpuMaxMs": 0,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "compilerLoad": {
+        "calls": 0,
+        "completed": 0,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 0,
+        "cpuMaxMs": 0,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "shaderPreparation": {
+        "calls": 502,
+        "completed": 502,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 675.6999979019165,
+        "cpuMaxMs": 10.5,
+        "asyncTotalMs": 303058.30000782013,
+        "asyncMaxMs": 1872.1000001430511
+      },
+      "shaderModule": {
+        "calls": 1004,
+        "completed": 1004,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 253.09999775886536,
+        "cpuMaxMs": 8.399999856948853,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "shaderValidation": {
+        "calls": 1004,
+        "completed": 1004,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 24.3000009059906,
+        "cpuMaxMs": 1.2000000476837158,
+        "asyncTotalMs": 1034876.399985075,
+        "asyncMaxMs": 5903.5
+      },
+      "syncPipeline": {
+        "calls": 90,
+        "completed": 90,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 6.099999666213989,
+        "cpuMaxMs": 1.3999998569488525,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      },
+      "asyncPipeline": {
+        "calls": 919,
+        "completed": 919,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 240.8000020980835,
+        "cpuMaxMs": 148.39999985694885,
+        "asyncTotalMs": 1233698.9000020027,
+        "asyncMaxMs": 2931.5999999046326
+      },
+      "submit": {
+        "calls": 116661,
+        "completed": 116661,
+        "failures": 0,
+        "pending": 0,
+        "cpuTotalMs": 2700.599988937378,
+        "cpuMaxMs": 141.70000004768372,
+        "asyncTotalMs": 0,
+        "asyncMaxMs": 0
+      }
+    },
+    "hooks": {
+      "engine._initializeLimits": "installed",
+      "engine._compileRawShaderToSpirV": "installed",
+      "engine.prepareGlslangAndTintAsync": "installed",
+      "engine._preparePipelineContextAsync": "installed",
+      "engine._createPipelineStageDescriptor": "installed",
+      "tint.convertSpirV2WGSL": "not-created",
+      "device.createShaderModule": "installed",
+      "device.createRenderPipeline": "installed",
+      "device.createRenderPipelineAsync": "installed",
+      "queue.submit": "installed",
+      "module.getCompilationInfo": "installed"
+    },
+    "observerErrors": 0,
+    "shaderInventory": null,
+    "bundleCountersLastFrame": {
+      "numEnableEffects": 0,
+      "numEnableDrawWrapper": 284,
+      "numBundleCreationNonCompatMode": 0,
+      "numBundleReuseNonCompatMode": 0
+    },
+    "sharedCacheCounters": {
+      "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+      "values": {
+        "NumCacheHitWithoutHash": 4591212,
+        "NumCacheHitWithHash": 1146968,
+        "NumCacheMiss": 1009,
+        "NumPipelineCreationLastFrame": 0
+      }
+    }
+  }
+}

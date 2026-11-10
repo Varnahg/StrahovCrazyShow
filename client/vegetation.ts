@@ -4,6 +4,8 @@ import { TreeLitter, type TreeLitterStats } from "./tree-litter";
 import type { TreeRenderStats } from "./tree-renderer";
 import type { TreeAssetFile, TreePilotOptions } from "../shared/tree-asset-types";
 import type { TreeSeasonState } from "../shared/tree-season";
+import type { VisualFeatures } from "../shared/render-quality";
+export type VegetationVisualFeatures = Pick<VisualFeatures, "groundVegetation" | "trees">;
 export { TreeWindPlugin } from "./tree-wind";
 export { attachAuthoredTreeMesh } from "./tree-renderer";
 export { decodeTreeRuntimeChunk } from "./tree-asset-loader";
@@ -42,6 +44,7 @@ import type { Vec3 } from "../shared/types";
 import { drapeTriangles, groundHeight, groundNormal } from "../shared/terrain";
 
 export type VegetationTreeOptions = {
+  visualFeatures?: VegetationVisualFeatures;
   treePilot?: TreePilotOptions;
   treeCatalog?: TreeAssetFile;
 };
@@ -255,7 +258,9 @@ export class VegetationController {
   private preparationRevision?: { grass?: object; litter?: object };
   private sources: Mesh[] = [];
   private materials: (PBRMaterial | StandardMaterial)[] = [];
-  private grassMaterial: PBRMaterial;
+  private visualFeatures: VegetationVisualFeatures;
+  private readonly legacyGrass: boolean;
+  private photographicLoading?: Promise<void>;
   private grassIndexLevels!: {
     low: number[];
     medium: number[];
@@ -277,11 +282,34 @@ export class VegetationController {
   private disposed = false;
 
   constructor(private scene: Scene, options: VegetationTreeOptions & { skipLegacyGrass?: boolean } = {}) {
-    this.grassMaterial = createGrassMaterial(scene, this.grassWind);
-    this.materials.push(this.grassMaterial);
-    const patches = options.skipLegacyGrass ? [] : createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
+    this.visualFeatures = { groundVegetation: options.visualFeatures?.groundVegetation ?? true, trees: options.visualFeatures?.trees ?? "normal" };
+    this.legacyGrass = !options.skipLegacyGrass;
+    this.stats = {
+      treeInstances: 0,
+      mappedTrees: TREES.filter((t) => t.provenance === "mapped-osm-node")
+        .length,
+      inferredTrees: TREES.filter(
+        (t) => t.provenance === "inferred-within-mapped-forest",
+      ).length,
+      photoInterpretedTrees: TREES.filter(
+        (t) => t.provenance === "reference-interpreted-not-surveyed",
+      ).length,
+      grassTiles: 0,
+      grassClumps: 0,
+      visibleGrassTiles: 0,
+      visibleGrassClumps: 0,
+    };
+    this.treeRenderer = new TreeRenderer(scene, { treePilot: options.treePilot, treeCatalog: options.treeCatalog, stats: this.stats, detailMode: this.visualFeatures.trees });
+    if (this.legacyGrass && this.visualFeatures.groundVegetation) this.initializeLegacyGrass();
+  }
+  private initializeLegacyGrass() {
+    if (this.disposed || this.sources.length || this.photographicGrass || !this.legacyGrass) return;
+    const scene = this.scene;
+    const grassMaterial = createGrassMaterial(scene, this.grassWind);
+    this.materials.push(grassMaterial);
+    const patches = createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
     this.grassSelection = new GrassPatchSelection(patches);
-    const source = grassSource(scene, this.grassMaterial);
+    const source = grassSource(scene, grassMaterial);
     this.grassIndexLevels = source.metadata.grassIndicesByQuality;
     this.sources.push(source);
     const scaling = Vector3.One(),
@@ -334,47 +362,63 @@ export class VegetationController {
       mesh.setEnabled(false);
       this.patches.push({ mesh, patch, enabled: false });
     }
-    this.stats = {
-      treeInstances: 0,
-      mappedTrees: TREES.filter((t) => t.provenance === "mapped-osm-node")
-        .length,
-      inferredTrees: TREES.filter(
-        (t) => t.provenance === "inferred-within-mapped-forest",
-      ).length,
-      photoInterpretedTrees: TREES.filter(
-        (t) => t.provenance === "reference-interpreted-not-surveyed",
-      ).length,
-      grassTiles: patches.length,
-      grassClumps: patches.reduce((sum, patch) => sum + patch.points.length, 0),
-      visibleGrassTiles: 0,
-      visibleGrassClumps: 0,
-    };
-    this.treeRenderer = new TreeRenderer(scene, { treePilot: options.treePilot, treeCatalog: options.treeCatalog, stats: this.stats });
+    this.stats.grassTiles = patches.length;
+    this.stats.grassClumps = patches.reduce((sum, patch) => sum + patch.points.length, 0);
   }
 
-  async loadPhotographicGrass() {
-    const grass = await PhotographicGrass.load(this.scene);
-    if (this.disposed || this.scene.isDisposed) { grass.dispose(); return; }
-    this.photographicGrass = grass;
-    this.stats.photographicGrass = grass.stats;
-    for (const {mesh} of this.patches) mesh.dispose(false,false);
-    for (const source of this.sources) source.dispose(false,false);
-    for (const material of this.materials) material.dispose(false,true);
-    this.patches=[]; this.sources=[]; this.materials=[]; this.grassSelection=undefined;
+  /** Coalesce a single owned load. Disabling does not revive late batches. */
+  async loadPhotographicGrass(): Promise<void> {
+    if (this.disposed || this.scene.isDisposed || !this.visualFeatures.groundVegetation) return;
+    if (this.photographicGrass) { this.photographicGrass.setEnabled(true); await this.photographicGrass.ensureFlowersLoaded(); return; }
+    if (!this.photographicLoading) this.photographicLoading = (async () => {
+      const grass = await PhotographicGrass.load(this.scene, { isEnabled: () => !this.disposed && this.visualFeatures.groundVegetation });
+      if (this.disposed || this.scene.isDisposed) { grass.dispose(); return; }
+      grass.setEnabled(this.visualFeatures.groundVegetation);
+      this.photographicGrass = grass; this.stats.photographicGrass = grass.stats;
+      for (const { mesh } of this.patches) mesh.dispose(false, false);
+      for (const source of this.sources) source.dispose(false, false);
+      for (const material of this.materials) material.dispose(false, true);
+      this.patches = []; this.sources = []; this.materials = []; this.grassSelection = undefined;
+      // The feature may have returned On after a dormant load completed.
+      await grass.ensureFlowersLoaded();
+    })().finally(() => { this.photographicLoading = undefined; });
+    return this.photographicLoading;
   }
-
   async loadTrees() {
     await this.treeRenderer.load();
-    if (this.disposed || this.scene.isDisposed || this.treeLitter) return;
+    this.ensureTreeLitter();
+  }
+  private ensureTreeLitter() {
+    if (this.disposed || this.scene.isDisposed || !this.visualFeatures.groundVegetation || this.treeLitter) return;
     const materials = this.treeRenderer.litterMaterials;
-    // Baseline comparisons retain the legacy texture/load path. New ground
-    // litter borrows only the successfully loaded photographic tree maps.
     if (!materials) return;
     const litter = new TreeLitter(this.scene, materials);
     try { litter.setTrees(this.treeRenderer.litterSources()); }
     catch (error) { litter.dispose(); throw error; }
     this.treeLitter = litter; this.stats.treeLitter = litter.stats;
   }
+  async setVisualFeatures(features: VegetationVisualFeatures): Promise<void> {
+    if (this.disposed || this.scene.isDisposed) return;
+    const enabled = features.groundVegetation;
+    const changed = enabled !== this.visualFeatures.groundVegetation || features.trees !== this.visualFeatures.trees;
+    if (changed) {
+      this.visualFeatures = { groundVegetation: enabled, trees: features.trees };
+      this.treeRenderer.setDetailMode(features.trees);
+      this.photographicGrass?.setEnabled(enabled); this.treeLitter?.setEnabled(enabled);
+      this.lastSelection = -Infinity; this.previousQuality = "";
+      if (!enabled) {
+        for (const patch of this.patches) { patch.mesh.setEnabled(false); patch.enabled = false; }
+        this.stats.visibleGrassTiles = this.stats.visibleGrassClumps = 0;
+      }
+    }
+    if (!enabled) return;
+    if (this.legacyGrass && !this.photographicGrass && !this.photographicLoading) this.initializeLegacyGrass();
+    else await this.loadPhotographicGrass();
+    // Another call may have disabled this feature while its resources loaded.
+    if (this.disposed || !this.visualFeatures.groundVegetation) return;
+    this.ensureTreeLitter(); this.treeLitter?.setEnabled(true);
+  }
+
   setTreeTransform(id: string, position: Vec3, yaw = 0) {
     const changed = this.treeRenderer.setTreeTransform(id, position, yaw);
     if (changed) this.treeLitter?.setTrees(this.treeRenderer.litterSources());
@@ -388,6 +432,8 @@ export class VegetationController {
 
   update(input: VegetationInput) {
     if (this.disposed || this.scene.isDisposed) return;
+    this.treeRenderer.update(input);
+    if (!this.visualFeatures.groundVegetation) return;
     const length = Math.hypot(input.wind.x, input.wind.z);
     const speed = Number.isFinite(input.wind.speed)
       ? Math.max(0, Math.min(16, input.wind.speed))
@@ -398,8 +444,8 @@ export class VegetationController {
       length > 1e-6 ? (input.wind.z / length) * speed : 0,
     );
     this.player.set(input.player.x, input.player.y, input.player.z);
-    this.treeRenderer.update(input);
     this.treeLitter?.update(input);
+    if (!this.photographicGrass && !this.grassSelection) return;
     const qualityChanged = this.previousQuality !== input.quality;
     if (qualityChanged) {
       this.grassBudget = grassLod(input.quality);
@@ -461,6 +507,7 @@ export class VegetationController {
   }
 
   get grassPreparationRevision(): object | undefined {
+    if (!this.visualFeatures.groundVegetation) return undefined;
     const grass = this.photographicGrass?.shaderPreparationRevision, litter = this.treeLitter?.preparationRevision;
     if (!grass && !litter) return undefined;
     if (this.preparationRevision?.grass !== grass || this.preparationRevision?.litter !== litter)
@@ -468,7 +515,7 @@ export class VegetationController {
     return this.preparationRevision;
   }
   beginGrassPreparation(): (() => void) | undefined {
-    if (this.disposed || this.scene.isDisposed) return;
+    if (this.disposed || this.scene.isDisposed || !this.visualFeatures.groundVegetation) return;
     const restoreGrass = this.photographicGrass?.beginShaderPreparation();
     let restoreLitter: (() => void) | undefined;
     try { restoreLitter = this.treeLitter?.beginPreparation(); }

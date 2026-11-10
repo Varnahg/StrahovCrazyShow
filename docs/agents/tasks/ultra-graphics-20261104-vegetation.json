@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "id": "ultra-graphics-20261104-vegetation",
+  "title": "Vypínání drobné vegetace, FAR-only a vizuálních mraků",
+  "writePaths": [
+    "client/vegetation.ts",
+    "client/photographic-grass.ts",
+    "client/ground-flowers.ts",
+    "client/tree-litter.ts",
+    "client/tree-renderer.ts",
+    "client/sky-weather.ts",
+    "client/atmosphere-sky.ts",
+    "tests/vegetation-runtime.test.ts",
+    "tests/photo-grass.test.ts",
+    "tests/photo-grass-preparation.test.ts",
+    "tests/ground-flowers.test.ts",
+    "tests/tree-litter.test.ts",
+    "tests/tree-streaming.test.ts",
+    "tests/sky-weather.test.ts",
+    "tests/atmosphere-sky.test.ts",
+    "tests/vegetation-visual-settings.test.ts",
+    "docs/agents/handoffs/ultra-graphics-20261104-vegetation.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Off znamená skrytémeshe a žádné zbytečné updates/preparation/loading; cold off bezgrassIO.",
+    "FAR-only neodstraní kmeny/kolize, zastavínear/MIDfetch a při warmupu nepřepne detaily.",
+    "Cloud renderCoverage oddělená od reálnémeteorologie/CloudLightSampler; funguje i sun/moonshader.",
+    "Latecompletion nikdy nezapnevypnutoufunkci; zachovat boundedcache/owner/dispose a návratOn."
+  ],
+  "verification": [
+    "Lehké cílené NullEngine/lifecycle/mockIOtesty; skutečnéGPU a integraciprovádíroot."
+  ],
+  "notes": [
+    "API sdělitrootubrzy; optional constructor features aexplicit setter. Root ownsGame/worldintegration. Bezregeneraceassetů."
+  ]
+}

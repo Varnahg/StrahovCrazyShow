@@ -1,0 +1,51 @@
+{
+  "head": "e60d33a6796d6aacc8adf39e2ca8fae5baa3964a",
+  "sourceHash": "74780b517048cdf304643486912d2921cd7dff88e6b0c5d7ad9007ce05b6f4c2",
+  "sessionId": "021fdcd8-bfd5-4a2d-8100-e97eba3467a3",
+  "archivedAt": "2026-11-04T22:42:34.161Z",
+  "files": [
+    {
+      "name": "recording.jsonl.gz",
+      "source": ".cache/game-diagnostics/021fdcd8-bfd5-4a2d-8100-e97eba3467a3.jsonl",
+      "bytes": 2240147,
+      "sha256": "feb19932dcbb5462cd07415e1d4c2a6c59bc02d54a8cb1eb20a0bd6e7fef13af"
+    },
+    {
+      "name": "system.jsonl.gz",
+      "source": ".cache/ultra-graphics-20261104/candidate2-run1/system/samples.jsonl",
+      "bytes": 41844315,
+      "sha256": "ad332f7c0fada484038d08ca0a3fd22551b93c8017b89a803dc8f2747f472859"
+    },
+    {
+      "name": "build-identity.json.gz",
+      "source": ".cache/render-next-20261102/candidate2/build/identity.json",
+      "bytes": 3464096,
+      "sha256": "760e03963aa1c1185c4358dff7e2a7f9fd09702e7a9fd08ef6cf88354dfef39d"
+    }
+  ],
+  "records": 935,
+  "lastSeq": 934,
+  "readyAtUTC": "2026-11-04T22:20:00.694Z",
+  "lastRecord": {
+    "seq": 934,
+    "kind": "browser-state",
+    "atMs": 377004.3,
+    "data": {
+      "reason": "visibility",
+      "visibility": "hidden",
+      "focused": true
+    }
+  },
+  "benchmarkFiles": [],
+  "benchmarkCount": 0,
+  "outcome": "Partial functional startup only; no timed A/B performance samples, live Apply, movement acceptance or WebGL2 smoke.",
+  "interruption": "Computer Use ended the previous turn during native Edge window selection because it could not verify the current URL. No alternate UI channel was used.",
+  "cleanup": "Owned API/preview/sampler/SDK processes stopped and absent; inputs revalidated; 8080 preserved. User subsequently confirmed closing the exact test tab.",
+  "limits": [
+    "Foreground was not independently proven; approximately one-second frame intervals are not an accepted FPS sample.",
+    "The raw lifecycle tail ends with visibility:hidden, without a dispose/pagehide acknowledgement; user confirmation closes this cleanup uncertainty.",
+    "Viewport reset and restoring the prior High/60 preference were not performed after the UI safety stop. Test origin4179 retained Ultra/50%/60.",
+    "Screenshot proves the pre-entry controls, before viewport correction; viewport/backbuffer proof comes from the recorded Game context.",
+    "Old user session bc908fab continued non-game UI telemetry separately after API restart; it is excluded from this run."
+  ]
+}

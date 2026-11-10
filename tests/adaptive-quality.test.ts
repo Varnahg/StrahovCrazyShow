@@ -169,7 +169,9 @@ test("limited scaling still permits lower scene detail; presets and validators a
     assert.ok(RENDER_BUDGETS[key].architectureDetailMetres > RENDER_BUDGETS[key].grassRangeMetres);
   }
   assert.ok(isRenderQualityMode("auto"));
-  assert.ok(!isRenderQualityMode("ultra"));
+  assert.ok(isRenderQualityMode("ultra"));
+  assert.ok(isRenderQualityMode("custom"));
+  assert.ok(!isRenderQualityMode("unknown"));
   assert.ok(isRenderTargetFps(144));
   assert.ok(!isRenderTargetFps(30));
 });

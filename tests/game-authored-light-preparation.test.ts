@@ -1,3 +1,4 @@
+import { graphicsLifecycleFixture, graphicsFixtureEnvironment, graphicsFixtureMembers } from "./helpers/weather-door-render-fixture";
 import {AuthoredLightPreparation} from "../client/authored-light-preparation";
 import {unoccludedAtmosphereFixture} from "./helpers/weather-door-render-fixture";
 import test, {after} from "node:test";
@@ -97,11 +98,11 @@ test("actual authored factories retain browser texture metadata in bounded IO ad
 
 const gameSource=fs.readFileSync(new URL("../client/game.ts",import.meta.url),"utf8");
 const tree=ts.createSourceFile("game.ts",gameSource,ts.ScriptTarget.Latest,true),declaration=tree.statements.find((n):n is ts.ClassDeclaration=>ts.isClassDeclaration(n)&&n.name?.text==="Game")!;
-const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","effectiveWeather","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson"];
+const selected=[...graphicsFixtureMembers,"prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","effectiveWeather","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson"];
 const methods=declaration.members.filter(n=>n.name&&selected.includes(n.name.getText(tree)));assert.equal(methods.length,selected.length);
 report.methods=methods.map(n=>({name:n.name!.getText(tree),sha256:sha(n.getText(tree))}));
 const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)).join("\n")}}`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
-const make=new Script(`(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,clampOrbitPitch,performance,window,document}=env;${code};return ProofGame;}`).runInThisContext();
+const make=new Script(`(env)=>{const {createRenderPreferences,resolveVisualSettings,renderBudget,AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,clampOrbitPitch,performance,window,document}=env;${code};return ProofGame;}`).runInThisContext();
 const anchor=Date.parse("2026-10-18T12:45:00Z"),select=(mode:Parameters<typeof selectLightingPreview>[0])=>selectLightingPreview(mode,anchor);
 
 for(const initialQuality of ["low","medium"] as const) test(`native cold opposite fog view, initial ${initialQuality}`,async (t:import("node:test").TestContext)=>{
@@ -134,17 +135,17 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
   const routing={isWebGPU:true,get currentRenderPassId(){return engine.currentRenderPassId;},set currentRenderPassId(v){engine.currentRenderPassId=v;},
     runRenderLoop(next:()=>void){assert.equal(callback,undefined);callback=next;},stopRenderLoop(next:()=>void){if(callback===next)callback=undefined;},
     getHardwareScalingLevel:()=>engine.getHardwareScalingLevel(),setHardwareScalingLevel:(scale:number)=>engine.setHardwareScalingLevel(scale)};
-  const Game=make({AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,
+  const Game=make({...graphicsFixtureEnvironment,AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,
     arePreparationEffectsReady:()=>arePreparationEffectsReady(engine),selectLightingPreview:select,getTreeSeasonState,applyArtLighting,clampOrbitPitch,performance,
     window:{setTimeout,clearTimeout},document:{hidden:false,addEventListener(){},removeEventListener(){},pointerLockElement:null}});
   const requested=Object.freeze({quality:initialQuality,revision:7,hardwareScaling:1});
-  const game:any=Object.assign(new Game(),{engine:routing,scene,camera,sun,ambient,lights,lamps:new StandardMaterial("lamp fixture",scene),clouds:[],
+  const game:any=Object.assign(new Game(),{...graphicsLifecycleFixture(),engine:routing,scene,camera,sun,ambient,lights,lamps:new StandardMaterial("lamp fixture",scene),clouds:[],
     car,parkedCar:parked,vehicleLighting:beam,flashlight:torch,cinematic,stableLights:stable,gltfLightBudget:budget,
     actor,localId:"local",avatars:new Map([["local",rig]]),quality:initialQuality,adaptive:{state:requested},profile:Object.freeze({preset:0}),weather:Object.freeze({cloud:.99,rain:0,wind:0}),
     timeOverride:select("night").instant,flashlightOn:false,disposed:false,rendererFailed:false,firstPerson:false,yaw:preparedView?0:Math.PI,pitch:.28,distance:8,cameraArm:20,vehicleCameraSnap:true,
     sim:{cameraDistance:(from:Vector3,to:Vector3)=>Vector3.Distance(from,to)},
     renderHealth:{snapshot:()=>({errorCount:0,pendingPreparationOperations:0,phase:"preparing"})},compilationProfile:{setStage(value:string){stage=value;}},
-    skyWeather:{atmosphere:unoccludedAtmosphereFixture(skyMaterial),update:({instant}:{instant:number})=>({sun:sunState(instant),moon:moonState(instant),wind:{x:0,z:0}})},
+    skyWeather:{setCloudsEnabled(){},atmosphere:unoccludedAtmosphereFixture(skyMaterial),update:({instant}:{instant:number})=>({sun:sunState(instant),moon:moonState(instant),wind:{x:0,z:0}})},
     updateWorldPresentation(position:typeof pos){assert.equal(position,pos);f.architecture.update(position,game.quality);f.outdoor.update(position.x,position.z,game.quality);for(const mesh of scene.meshes)if(mesh.metadata?.sourcePack!==undefined&&!f.target.includes(mesh))mesh.setEnabled(false);},
     localAvatarPresentation:{update:()=>({visible:true,cameraLight:false,resetAnimation:false})},updateAvatarPresentation(){},
   });
@@ -229,11 +230,14 @@ function innerLifecycle(t: import("node:test").TestContext, webgpu = true,
   car.setEnabled(false);
   let now = 0, callback: (() => void) | undefined, stage = "", failEnvironment = false, healthError = false;
   const draws: { stage: string; flags: boolean[] }[] = [];
-  const Game = make({AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,
+  const graphics = graphicsLifecycleFixture();
+  graphics.adaptive.state.quality = "low";
+  graphics.adaptive.state.hardwareScaling = MANUAL_HARDWARE_SCALING.low;
+  const Game = make({...graphicsFixtureEnvironment,AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,
     MANUAL_HARDWARE_SCALING,arePreparationEffectsReady:()=>true,selectLightingPreview:select,getTreeSeasonState,applyArtLighting,clampOrbitPitch,
     performance:{now:()=>now},window:{setTimeout:()=>1,clearTimeout(){}},
     document:{hidden:false,addEventListener(){},removeEventListener(){}}});
-  const game:any=Object.assign(new Game(),{
+  const game:any=Object.assign(new Game(),{...graphics,
     engine:{isWebGPU:webgpu,runRenderLoop(next:()=>void){callback=next;},stopRenderLoop(next:()=>void){if(callback===next)callback=undefined;}},
     scene,camera,quality:"low",car,parkedCar:parked,actor:{position:{x:0,y:0,z:0},vehicle:false},avatars:new Map(),
     localId:"local",lights:[],flashlight:{},timeOverride:select("night").instant,flashlightOn:false,

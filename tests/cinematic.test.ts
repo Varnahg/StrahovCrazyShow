@@ -277,7 +277,7 @@ class ReflectionTestEngine extends NullEngine {
   }
 }
 
-test("cinematic quality creates one complete postprocess chain per activation and keeps it for medium/high", (t) => {
+test("cinematic quality creates one complete chain and suspends it without detach across low/medium/high", (t) => {
   const engine = new ReflectionTestEngine(), scene = new Scene(engine);
   const camera = new FreeCamera("pipeline observer", new Vector3(0, 3, -5), scene);
   scene.activeCamera = camera;
@@ -305,10 +305,13 @@ test("cinematic quality creates one complete postprocess chain per activation an
   assert.deepEqual(camera._postProcesses.filter(Boolean), postProcesses);
   assert.equal(atmosphere.stats.shadowMapSize, 2048);
   update("low");
-  assert.equal(camera._postProcesses.filter(Boolean).length, 0);
+  assert.equal(scene.postProcessesEnabled, false);
+  assert.equal(scene.autoClear, true, "the bypassed first postprocess no longer clears the frame");
+  assert.deepEqual(camera._postProcesses.filter(Boolean), postProcesses);
   assert.equal(atmosphere.stats.bloomWeight, 0);
   update("medium");
-  assert.equal(attachments, 2);
-  assert.equal(camera._postProcesses.filter(Boolean).length, postProcesses.length);
+  assert.equal(scene.postProcessesEnabled, true);
+  assert.equal(attachments, 1, "reactivation reuses the prepared owner rather than attaching another chain");
+  assert.deepEqual(camera._postProcesses.filter(Boolean), postProcesses);
   assert.equal(atmosphere.stats.shadowMapSize, 1024);
 });

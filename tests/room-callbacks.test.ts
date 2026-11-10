@@ -438,6 +438,7 @@ function fixture() {
     idRef: { current: "guest" },
     modeRef: { current: "multi" },
     profileRef: { current: {} },
+    renderPreferencesRef: { current: { version: 2, mode: "medium", targetFps: 60 } },
   };
   const fetches: ReturnType<typeof pendingFetch>[] = [];
   const joins: {
@@ -482,6 +483,7 @@ function fixture() {
       return true;
     };
   const environment: Record<string, any> = {
+    idleGraphicsState: { applying: false, phase: null, error: null, restartRequired: false },
     exports: {},
     ...refs,
     game: { current: game },
@@ -553,6 +555,7 @@ function fixture() {
     "RendererCompatibility",
     "RendererGeneration",
     "StartupStage",
+    "GraphicsState",
     "AiChatActive",
     "Channel",
     "Panel",
