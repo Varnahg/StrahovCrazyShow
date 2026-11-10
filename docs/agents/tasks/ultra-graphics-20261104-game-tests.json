@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "ultra-graphics-20261104-game-tests",
+  "title": "Regrese živého Game Apply a aktualizace jeho skutečných fixture",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/game-quality-preparation.test.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-light-lifecycle.test.ts",
+    "tests/game-preparation-baseline.test.ts",
+    "tests/game-authored-light-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    "tests/game-diagnostics.test.ts",
+    "tests/game-diagnostics-projection.test.ts",
+    "tests/game-graphics-application.test.ts",
+    "tests/helpers/weather-door-render-fixture.ts",
+    "docs/agents/handoffs/ultra-graphics-20261104-game-tests.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Ověřit skutečné Game metody, ne jejich kopii; novéManual/Ultra startup onlyselected vsAuto3pass a neutralnetwork-only běhemApply.",
+    "Zachovat stávajícíreadiness/lifecycle/timeout/controller aserce; fixture aktualizovat pro skutečné nové helpers/features."
+  ],
+  "verification": [
+    "Přímé cílené Game testy; bezfullbuild/GPU a bez změny Game implementace."
+  ],
+  "notes": [
+    "SPEC/CONTRACT Ultra; root aktuálně vlastníGame a může opravovatpodloženébugy, koordinovatstabilnícheckpoint testů."
+  ]
+}

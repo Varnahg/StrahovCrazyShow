@@ -9,6 +9,25 @@ import { MAX_LOCAL_BENCHMARK_FRAME_INTERVALS, projectLocalBenchmark } from "../s
 import { terrainReviewIdentity, TERRAIN_REVIEW_PRESETS } from "../client/terrain-review";
 const origin = "http://127.0.0.1:4179",
   snapshot = "a".repeat(64);
+test("Ultra/custom exports preserve actual features and applied revision without arbitrary fields", () => {
+  const features = { shadows: false, clouds: false, groundVegetation: false, trees: "far-only", postProcesses: false };
+  for (const mode of ["ultra", "custom"]) {
+    const input = { ...sample(), rendering: { ...sample().rendering, mode, renderScale: .5, hardwareScaling: 2,
+      features: { ...features, playerProfile: "must not survive" }, settingsRevision: 4, graphicsApplying: false, transitionPhase: null } };
+    const projected = projectLocalBenchmark(input);
+    assert.equal(projected.rendering.mode, mode);
+    assert.equal(projected.rendering.renderScale, .5);
+    assert.equal(projected.rendering.settingsRevision, 4);
+    assert.equal(projected.rendering.graphicsApplying, false);
+    assert.equal(projected.rendering.transitionPhase, null);
+    assert.deepEqual(projected.rendering.features, features);
+  }
+  for (const invalid of [{ ...features, shadows: "false" }, { ...features, trees: "hidden-colliders" }])
+    assert.throws(() => projectLocalBenchmark({ ...sample(), rendering: { ...sample().rendering, features: invalid } }));
+  for (const transitionPhase of ["preparing", "restoring"])
+    assert.equal(projectLocalBenchmark({ ...sample(), rendering: { ...sample().rendering, transitionPhase } }).rendering.transitionPhase, transitionPhase);
+  assert.throws(() => projectLocalBenchmark({ ...sample(), rendering: { ...sample().rendering, transitionPhase: "unconfirmed-success" } }));
+});
 function sample() {
   return {
     sourceSnapshotId: snapshot,

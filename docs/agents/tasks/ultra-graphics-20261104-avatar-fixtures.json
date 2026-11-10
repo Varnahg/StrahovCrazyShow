@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "ultra-graphics-20261104-avatar-fixtures",
+  "title": "Sladit skutečné avatarové Game fixtures s grafickým stavem",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/local-avatar-presentation.test.ts",
+    "tests/medium-plant-compensation.test.ts",
+    "tests/remote-jump-animation.test.ts",
+    "docs/agents/handoffs/ultra-graphics-20261104-avatar-fixtures.md"
+  ],
+  "resources": [],
+  "acceptance": ["Fixtures bez Game konstruktoru inicializují skutečný nový adaptive/visual stav; původní animace, pohyb, dotyky a shadow aserce zůstávají."],
+  "verification": ["Reprodukovat pět selhání z CI 4ad9725d a spustit pouze tři dotčené CPU soubory; bez produkční úpravy či oslabení přejímky."],
+  "notes": ["Koordinátor deleguje opravu konkrétních osmi CI selhání: tato větev vlastní pět avatarových chyb. Tři authored-light chyby řeší původní Game-tests task. Zdroj chyby a výsledky patří do handoffu."]
+}

@@ -1,3 +1,4 @@
+import { createRenderPreferences, type RenderPreferences, type GraphicsApplicationState } from "../shared/render-quality";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -79,11 +80,11 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(
-  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,seasonPreviewRef,weatherPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer,requestWebGlFallback,window,setRendererGeneration,setRendererCompatibility,room,connectionAttempt,disconnectRoom,doorConnectionRef,playersRef,carState,activity,networkProbeRef,connectedRef,reward,setStartupStage,observeStartupProgress,paintStartupStage}=env; ${compiled}; return runEffect(); })`,
+  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,renderPreferencesRef,setGraphicsState,idleGraphicsState,game,seasonPreviewRef,weatherPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer,requestWebGlFallback,window,setRendererGeneration,setRendererCompatibility,room,connectionAttempt,disconnectRoom,doorConnectionRef,playersRef,carState,activity,networkProbeRef,connectedRef,reward,setStartupStage,observeStartupProgress,paintStartupStage}=env; ${compiled}; return runEffect(); })`,
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function fixture(options: { constructionError?: boolean; startError?: boolean; startFailure?: Error; loseAfterStart?: boolean; weatherPreview?: WeatherScenarioId; network?: boolean; search?: string; pendingPaint?: Promise<void> } = {}) {
+function fixture(options: { constructionError?: boolean; startError?: boolean; startFailure?: Error; loseAfterStart?: boolean; weatherPreview?: WeatherScenarioId; network?: boolean; search?: string; pendingPaint?: Promise<void>; renderPreferences?: RenderPreferences } = {}) {
   let resolveEngine!: (engine: any) => void;
   let rejectEngine!: (reason: Error) => void;
   const resetPromise = () => new Promise((resolve, reject) => {
@@ -110,25 +111,28 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; s
   let publishGameStage = (_stage: string) => {};
   const canvas = { current: { dataset: {} as Record<string, string> } };
   const requestedCanvases: unknown[] = [], disconnects: unknown[][] = [];
+  const constructedPreferences: RenderPreferences[] = [], graphicsStates: GraphicsApplicationState[] = [];
   const location = { hostname: "example.com", search: options.search ?? "" }, fallbackSession = new RenderFallbackSession();
   let selected = fallbackSession.select(location), generation = 0, compatibility = false;
   const room = { current: { id: "same-room" } };
   class Game {
     weatherPreview: WeatherScenarioId | null = null;
     onRendererFailure?: (message: string) => void;
+    onGraphicsState?: (state: GraphicsApplicationState) => void;
     ready = false;
     network = false;
     networkTimeline = { setRtt() {} };
     renderHealth = { snapshot: () => ({ valid: this.ready, firstErrors: [] }) };
-    constructor(_canvas: unknown, _profile: unknown, prepared: unknown) {
+    constructor(_canvas: unknown, _profile: unknown, prepared: unknown, preferences: RenderPreferences) {
+      constructedPreferences.push(preferences);
       assert.equal(_canvas, requestedCanvases.at(-1));
       assert.equal(prepared, engine);
       if (options.constructionError) throw new Error("construction failed");
       gameCount++;
     }
     setLocalId() {}
-    setQuality() {}
-    setTargetFps() {}
+    setQuality() { throw new Error("Late quality must not replace constructor preferences"); }
+    setTargetFps() { throw new Error("Late goal must not replace constructor preferences"); }
     setWeatherPreview(id: WeatherScenarioId | null) { this.weatherPreview = id; }
     attachDoorTimeline() {}
     updatePlayers() {}
@@ -164,6 +168,9 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; s
     mode: options.network ? "multi" : "guest",
     canvas,
     profileRef: { current: {} },
+    renderPreferencesRef: { current: options.renderPreferences ?? createRenderPreferences("medium") },
+    setGraphicsState: (value: GraphicsApplicationState) => graphicsStates.push(value),
+    idleGraphicsState: { applying: false, phase: null, error: null, restartRequired: false },
     game: state,
     modeRef: { current: "menu" },
     seasonPreviewRef: { current: { instant: null } },
@@ -215,7 +222,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; s
     inputResets,
     stages, observers,
     state,
-    requestedCanvases, disconnects, room,
+    requestedCanvases, disconnects, room, constructedPreferences, graphicsStates,
     generation: () => generation,
     compatibility: () => compatibility,
     restart: () => { promise = resetPromise(); return make(environment) as () => void; },
@@ -447,4 +454,17 @@ test("actual UI transport gate rejects absent, preparing and failed Game owners"
   game.current.respawnPending = false;
   modeRef.current = "guest";
   assert.equal(gate(), false);
+});
+
+test("actual UI supplies Ultra before Game construction and retired graphics callbacks cannot overwrite a replacement", async () => {
+  const preferences = createRenderPreferences("ultra"), f = fixture({ renderPreferences: preferences });
+  await tick(); f.resolveEngine(f.engine); await tick();
+  assert.deepEqual(f.constructedPreferences, [preferences]);
+  const old = f.state.current!;
+  old.onGraphicsState?.({ applying: true, phase: "preparing", error: null, restartRequired: false });
+  assert.equal(f.graphicsStates.length, 1);
+  f.state.current = { ...old } as typeof old;
+  old.onGraphicsState?.({ applying: false, phase: null, error: null, restartRequired: false });
+  f.cleanup();
+  assert.equal(f.graphicsStates.length, 1, "old graphics callback and cleanup must not reset a replacement owner");
 });

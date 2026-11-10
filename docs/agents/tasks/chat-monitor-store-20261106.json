@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-monitor-store-20261106",
+  "title": "Soukromé ukládání přepisů, fronta a retence",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "server/chat-monitor-store.ts",
+    "server/chat-monitor-schema.sql",
+    "tests/chat-monitor-store.test.ts",
+    "docs/agents/handoffs/chat-monitor-store-20261106.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Idempotentní zápis přesné výměny, soukromé čtení s auditem, retence tři kalendářní měsíce a omezená fronta se ztrátovými čítači."
+  ],
+  "verification": [
+    "Cílené testy a předání se skutečnými výsledky. Integrační build a živý PostgreSQL serializuje koordinátor."
+  ],
+  "notes": [
+    "Výslovné zadání monitoring Crazy Typky 6. 11. 2026. Pouze kanonický checkout main."
+  ]
+}

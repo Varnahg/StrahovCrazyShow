@@ -1,0 +1,74 @@
+{
+  "source": "74780b517048cdf304643486912d2921cd7dff88e6b0c5d7ad9007ce05b6f4c2",
+  "coverage": {
+    "expected": 48,
+    "rows": 45,
+    "listedSlots": 45,
+    "evidenceCompleteSlots": 45,
+    "missing": [
+      "3/C/scenery",
+      "3/G/down",
+      "3/G/scenery"
+    ],
+    "partialOrInvalid": [],
+    "complete": false
+  },
+  "accepted": false,
+  "frameIntervals": 16668,
+  "sumFrameSeconds": 450.93259999990465,
+  "recordedSeconds": 450.8,
+  "durationDeltaRangeMs": [
+    -35.5,
+    31.40000009536743
+  ],
+  "fullHealthAllValid": true,
+  "shaderChanges": [],
+  "focusAllConfirmed": true,
+  "intervalIssues": [],
+  "worstFrames": [
+    {
+      "key": "1/D/scenery",
+      "max": 124.79999995231628,
+      "stalls": {
+        "50": 123,
+        "100": 11,
+        "250": 0,
+        "1000": 0
+      }
+    },
+    {
+      "key": "2/H/scenery",
+      "max": 102,
+      "stalls": {
+        "50": 42,
+        "100": 1,
+        "250": 0,
+        "1000": 0
+      }
+    },
+    {
+      "key": "2/F/scenery",
+      "max": 104.90000009536743,
+      "stalls": {
+        "50": 150,
+        "100": 1,
+        "250": 0,
+        "1000": 0
+      }
+    }
+  ],
+  "frameGateByView": {
+    "down": {
+      "failed": 9,
+      "passed": 14
+    },
+    "scenery": {
+      "failed": 22
+    }
+  },
+  "sourceScopeNotes": [
+    "Map provided by coordinator excludes busy earlier run, B1 scenery first tool-timeout attempt and orphan3/C/scenery. Inputs are preserved; no data-dependent exclusion performed here.",
+    "48-slot campaign incomplete. Complete A/H pairs permit descriptive criterion assessment but do not certify gameplay, movement or statistically stable causal effects.",
+    "No tests/build/browser/GPU commands ran during this offline analysis."
+  ]
+}

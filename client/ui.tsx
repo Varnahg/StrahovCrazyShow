@@ -1,5 +1,7 @@
 import { HudIcon } from "./hud-icons";
 import { WelcomeScreen } from "./welcome-screen";
+import { GraphicsSettingsPanel, GraphicsSettingsDialog, GraphicsApplyingOverlay, graphicsModeLabel } from "./graphics-settings";
+import "./graphics-settings.css";
 import { LoadingScreen } from "./loading-screen";
 import { observeStartupProgress, paintStartupStage } from "./startup-progress";
 import { CrazyTypkaChat, CrazyTypkaChatActions, useCrazyTypka } from "./crazy-typka";
@@ -87,10 +89,11 @@ import { projectLocalBenchmark } from "../shared/local-benchmark";
 import { PLACES, HUNT_POINTS } from "../shared/world";
 import type { Game, GameStats, Benchmark } from "./game";
 import {
-  isRenderQualityMode,
-  isRenderTargetFps,
-  type RenderQualityMode,
-  type RenderTargetFps,
+  createRenderPreferences,
+  parseRenderPreferences,
+  resolveVisualSettings,
+  type RenderPreferences,
+  type GraphicsApplicationState,
 } from "../shared/render-quality";
 import {
   GPU_SETTINGS_HELP_URL,
@@ -123,23 +126,11 @@ const readProfile = () => {
     return sanitizeProfile(fallback);
   }
 };
-const readRenderPreferences = (): {
-  mode: RenderQualityMode;
-  targetFps: RenderTargetFps;
-} => {
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("strahov.rendering") || "null",
-    );
-    return {
-      mode: isRenderQualityMode(saved?.mode) ? saved.mode : "auto",
-      targetFps: isRenderTargetFps(saved?.targetFps) ? saved.targetFps : 60,
-    };
-  } catch {
-    return { mode: "auto", targetFps: 60 };
-  }
+const readRenderPreferences = (): RenderPreferences => {
+  try { return parseRenderPreferences(JSON.parse(localStorage.getItem("strahov.rendering") || "null")); }
+  catch { return createRenderPreferences(); }
 };
-const qualityLabel = { low: "Úsporná", medium: "Střední", high: "Vysoká" };
+const idleGraphicsState: GraphicsApplicationState = Object.freeze({ applying: false, phase: null, error: null, restartRequired: false });
 const time = (t: number) =>
   formatDate(t, {
     timeZone: "Europe/Prague",
@@ -289,24 +280,26 @@ export function App() {
     [stats, setStats] = useState<GameStats | null>(null),
     [weather, setWeather] = useState<Weather | null>(null),
     [toast, setToast] = useState(""),
-    [quality, setQuality] = useState<RenderQualityMode>(
-      () => readRenderPreferences().mode,
-    ),
-    [targetFps, setTargetFps] = useState<RenderTargetFps>(
-      () => readRenderPreferences().targetFps,
-    ),
     [connected, setConnected] = useState(false);
+  const [renderPreferences, setRenderPreferences] = useState<RenderPreferences>(readRenderPreferences);
+  const renderPreferencesRef = useRef(renderPreferences);
+  renderPreferencesRef.current = renderPreferences;
+  const [graphicsState, setGraphicsState] = useState<GraphicsApplicationState>(idleGraphicsState);
+  const graphicsStateRef = useRef(graphicsState);
+  graphicsStateRef.current = graphicsState;
+  const [graphicsOpen, setGraphicsOpen] = useState(false);
+  const graphicsApplyOwner = useRef<Game | null>(null);
   const cadLocation = /^b0?([16]):([pn])(\d{2})$/.exec(stats?.zone ?? "");
   useEffect(() => {
     try {
       localStorage.setItem(
         "strahov.rendering",
-        JSON.stringify({ mode: quality, targetFps }),
+        JSON.stringify(renderPreferences),
       );
     } catch {
       /* Private mode can reject local preferences. */
     }
-  }, [quality, targetFps]);
+  }, [renderPreferences]);
   const [showForm, setShowForm] = useState(false),
     [editing, setEditing] = useState<EventItem | null>(null),
     [rewards, setRewards] = useState<string[]>(() => {
@@ -327,12 +320,29 @@ export function App() {
     weatherRef = useRef(weather),
     chatEnd = useRef<HTMLDivElement>(null),
     carState = useRef<any>(null);
+  const applyGraphicsPreferences = useCallback(async (next: RenderPreferences): Promise<boolean> => {
+    const current = game.current;
+    if (graphicsApplyOwner.current) return false;
+    if (current) {
+      graphicsApplyOwner.current = current;
+      try {
+        if (!await current.applyRenderPreferences(next) || game.current !== current) return false;
+      } catch { return false; }
+      finally { if (graphicsApplyOwner.current === current) graphicsApplyOwner.current = null; }
+    } else if (modeRef.current !== "menu") return false;
+    renderPreferencesRef.current = next;
+    setRenderPreferences(next);
+    return true;
+  }, []);
+  const cancelGraphicsApply = useCallback(() => graphicsApplyOwner.current?.cancelGraphicsApply(), []);
   const openFeedback = useCallback(() => {
     // Only one modal focus owner may remain active behind the native dialog.
+    setGraphicsOpen(false);
     setJournalOpen(false);
     setEmotesOpen(false);
     setShowForm(false);
-    setPanel("");
+    // Keep the pending Apply owner mounted; its unmount intentionally cancels.
+    if (!graphicsStateRef.current.applying) setPanel("");
     game.current?.setUiModal(true);
     if (document.pointerLockElement) document.exitPointerLock();
     setFeedbackOpen(true);
@@ -568,19 +578,23 @@ export function App() {
   }, [toast]);
   useEffect(() => {
     const listener = () => {
+      if (graphicsStateRef.current.applying) return;
       setJournalOpen(false);
       setEmotesOpen(false);
       setPanel((p) => (p === "map" ? "" : "map"));
     };
     const journal = () => {
+      if (graphicsStateRef.current.applying) return;
       setEmotesOpen(false);
       setJournalOpen((open) => !open);
     };
     const emotes = () => {
+      if (graphicsStateRef.current.applying) return;
       setJournalOpen(false);
       setEmotesOpen((open) => !open);
     };
     const close = () => {
+      if (graphicsStateRef.current.applying) { graphicsApplyOwner.current?.cancelGraphicsApply(); return; }
       setFeedbackOpen(false);
       setJournalOpen(false);
       setEmotesOpen(false);
@@ -599,8 +613,8 @@ export function App() {
     };
   }, []);
   useEffect(() => {
-    game.current?.setUiModal(feedbackOpen || journalOpen || emotesOpen || showForm || !!panel);
-  }, [feedbackOpen, journalOpen, emotesOpen, showForm, panel, ready]);
+    game.current?.setUiModal(graphicsState.applying || feedbackOpen || journalOpen || emotesOpen || showForm || !!panel);
+  }, [feedbackOpen, journalOpen, emotesOpen, showForm, panel, ready, graphicsState.applying]);
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ block: "nearest" });
   }, [messages, channel]);
@@ -659,7 +673,10 @@ export function App() {
     const disposeOwnedGame = () => {
       const owned = ownedGame;
       ownedGame = undefined;
-      if (game.current === owned) game.current = null;
+      if (game.current === owned) {
+        game.current = null;
+        setGraphicsState(idleGraphicsState);
+      }
       owned?.dispose();
     };
     modeRef.current = mode;
@@ -696,7 +713,7 @@ export function App() {
           pendingEngine.dispose();
           return;
         }
-        const g = new Game(startupCanvas, profileRef.current, pendingEngine);
+        const g = new Game(startupCanvas, profileRef.current, pendingEngine, renderPreferencesRef.current);
         pendingEngine = undefined;
         ownedGame = g;
         game.current = g;
@@ -714,6 +731,7 @@ export function App() {
         g.timeOverride = seasonPreviewRef.current.instant;
         g.setLocalId(idRef.current);
         g.onStats = setStats;
+        g.onGraphicsState = (value) => { if (!cancelled && game.current === g) setGraphicsState(value); };
         g.onBenchmark = (value) => {
           setBenchmark(value);
           if (userBenchmark.current) {
@@ -761,8 +779,6 @@ export function App() {
         };
         if (weatherRef.current) g.setWeather(weatherRef.current);
         g.setWeatherPreview(weatherPreviewRef.current);
-        g.setQuality(quality);
-        g.setTargetFps(targetFps);
         await g.start();
         if (cancelled || game.current !== g || canvas.current !== startupCanvas) return;
         const health = g.renderHealth.snapshot();
@@ -1215,10 +1231,12 @@ export function App() {
           feedback={<button type="button" className="home-quiet" onClick={openFeedback} aria-keyshortcuts="F8">
             {feedbackLocale === "cs" ? "Zpětná vazba" : "Feedback"}
           </button>}
+          graphics={<button type="button" className="home-quiet" disabled={busy} onClick={() => setGraphicsOpen(true)}>{t("Grafika")}</button>}
           assistant={<CrazyTypkaChat state={ai} locale={feedbackLocale} variant="compact" />}
           assistantActions={<CrazyTypkaChatActions state={ai} locale={feedbackLocale} />}
         />
         {feedbackDialog}
+        {graphicsOpen && <GraphicsSettingsDialog preferences={renderPreferences} onApply={applyGraphicsPreferences} onClose={() => setGraphicsOpen(false)} />}
       </>
     );
   return (
@@ -1241,6 +1259,7 @@ export function App() {
           }}>{t("Spustit v kompatibilním režimu (WebGL2)")}</button>}
         />
       )}
+      {graphicsState.applying && !feedbackOpen && <GraphicsApplyingOverlay state={graphicsState} onCancel={cancelGraphicsApply} />}
       <header className="game-top">
         <button
           className="brand game-brand"
@@ -2400,52 +2419,13 @@ export function App() {
             {panel === "settings" && (
               <>
                 <LanguagePicker />
-                <label>
-                  {t("Kvalita vykreslování")}
-                  <select
-                    value={quality}
-                    onChange={(e) => {
-                      if (!isRenderQualityMode(e.target.value)) return;
-                      setQuality(e.target.value);
-                      game.current?.setQuality(e.target.value);
-                    }}
-                  >
-                    <option value="auto">
-                      {t("Automaticky · podle výkonu")}
-                    </option>
-                    <option value="low">{t("Úsporná · běžný notebook")}</option>
-                    <option value="medium">{t("Střední detail")}</option>
-                    <option value="high">
-                      {t("Vyšší detail a rozlišení")}
-                    </option>
-                  </select>
-                </label>
-                <label>
-                  {t("Cíl snímkové frekvence")}
-                  <select
-                    value={targetFps}
-                    disabled={quality !== "auto"}
-                    onChange={(e) => {
-                      const fps = Number(e.target.value);
-                      if (!isRenderTargetFps(fps)) return;
-                      setTargetFps(fps);
-                      game.current?.setTargetFps(fps);
-                    }}
-                  >
-                    <option value={60}>60 FPS</option>
-                    <option value={120}>120 FPS</option>
-                    <option value={144}>144 FPS</option>
-                  </select>
-                </label>
-                <p className="small muted">
-                  {t(
-                    "Cíl řídí automatickou kvalitu. Snímkování není omezené na 60 FPS; vyšší frekvence potřebuje odpovídající monitor a prohlížeč.",
-                  )}
-                </p>
+                <GraphicsSettingsPanel preferences={renderPreferences}
+                  effective={game.current?.getEffectiveVisualSettings() ?? resolveVisualSettings(renderPreferences)}
+                  state={graphicsState} onApply={applyGraphicsPreferences} onCancel={cancelGraphicsApply} />
                 {stats?.rendering && (
                   <p className="small muted" data-rendering-status>
                     {t("Aktuálně")}{" "}
-                    {localizeText(qualityLabel[stats.rendering.quality])}{" "}
+                    {graphicsModeLabel(stats.rendering.mode)}{" "}
                     {t("· render")}{" "}
                     {Math.round(stats.rendering.renderScale * 100)} %.
                     {stats.rendering.presentationHz

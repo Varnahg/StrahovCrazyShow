@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-monitor-test-isolation-20261106",
+  "title": "KEY-75: Oddělit integrační server od produkční konfigurace monitoringu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/test-integration.mjs",
+    "tests/feedback-deployment.test.ts",
+    "docs/agents/handoffs/chat-monitor-test-isolation-20261106.md"
+  ],
+  "resources": [],
+  "acceptance": ["Izolovaný integrační server nikdy nezdědí CHAT_MONITOR_ prostředí, včetně různých velikostí písmen na Windows."],
+  "verification": ["Cílený test izolace prostředí. Plnou integraci provede koordinátor."],
+  "notes": ["Součást KEY-75. Produkční administrace spouští údržbu soukromé databáze už při startu, takže integrační launcher nesmí zdědit její konfiguraci."]
+}

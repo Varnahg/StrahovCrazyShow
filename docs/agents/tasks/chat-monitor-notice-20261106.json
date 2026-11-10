@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-monitor-notice-20261106",
+  "title": "Verzovaná informace o přepisech ve stávající bublince Crazy Typky",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/crazy-typka.tsx",
+    "shared/crazy-typka.ts",
+    "tests/crazy-typka-ui.test.ts",
+    "docs/agents/handoffs/chat-monitor-notice-20261106.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "CZ/EN upozornění v obou vstupních bodech, bez potvrzování, vazba na skutečné zobrazení a bezpečná kompatibilita."
+  ],
+  "verification": [
+    "Cílené testy a předání se skutečnými výsledky. Integrační build a živý PostgreSQL serializuje koordinátor."
+  ],
+  "notes": [
+    "Výslovné zadání monitoring Crazy Typky 6. 11. 2026. Pouze kanonický checkout main."
+  ]
+}

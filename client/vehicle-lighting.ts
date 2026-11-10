@@ -39,6 +39,7 @@ export class VehicleLighting {
   constructor(
     private scene: Scene,
     private readonly kind: "vehicle" | "player" = "vehicle",
+    private shadowsAllowed = true,
   ) {
     for (const point of manifest.lights.frontCentres)
       this.origin.addInPlace(Vector3.FromArray(point));
@@ -72,6 +73,16 @@ export class VehicleLighting {
       combinedHeadlamps: kind === "vehicle",
       localFlashlight: kind === "player",
     };
+  }
+  /** The beam stays active; only its owned shadow pass is suspended. */
+  setShadowsEnabled(enabled: boolean) {
+    if (this.disposed || this.shadowsAllowed === enabled) return;
+    this.shadowsAllowed = enabled;
+    this.lastSelection = -Infinity;
+    if (!enabled) {
+      this.light.shadowEnabled = false;
+      this.visibleCasters.length = 0;
+    }
   }
   update(
     root: TransformNode,
@@ -124,7 +135,7 @@ export class VehicleLighting {
     }
     // The close-range torch retains a small occlusion map even on low.
     this.light.shadowEnabled =
-      this.kind === "player" || resolvedQuality !== "low";
+      this.shadowsAllowed && (this.kind === "player" || resolvedQuality !== "low");
     if (!this.light.shadowEnabled) {
       this.lastSelection = -Infinity;
       return;

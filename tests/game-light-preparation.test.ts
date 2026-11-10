@@ -1,3 +1,4 @@
+import { graphicsLifecycleFixture, graphicsFixtureEnvironment, graphicsFixtureMembers } from "./helpers/weather-door-render-fixture";
 import { AuthoredLightPreparation } from "../client/authored-light-preparation";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -21,17 +22,18 @@ import { prepareLightVariants } from "../client/light-preparation";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 import { createEnvironmentProfile } from "../client/environment-profile";
 import { selectLightingPreview } from "../client/lighting-preview";
+import { createRenderPreferences, resolveVisualSettings } from "../shared/render-quality";
 
 const { source, gameClass: declaration, selectMembers } = readGameSource(
   process.env.GAME_PREPARATION_SOURCE,
 );
-const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera", "effectiveWeather"]);
+const members = selectMembers([...graphicsFixtureMembers, "prepareLightingVariants", "isMeshReadyForCamera", "effectiveWeather"]);
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(`(function(environment) {
-  const { AuthoredLightPreparation, PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document } = environment;
+  const { createRenderPreferences, resolveVisualSettings, renderBudget, AuthoredLightPreparation, PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document } = environment;
   ${compiled}
   return PreparationGame;
 })`).runInThisContext();
@@ -75,6 +77,7 @@ function fixture(t: import("node:test").TestContext) {
     pass: number;
   }[] = [];
   const Game = make({
+    ...graphicsFixtureEnvironment,
     AuthoredLightPreparation,
     PlayerFlashlight,
     Vector3,
@@ -119,6 +122,7 @@ function fixture(t: import("node:test").TestContext) {
     phase: "preparing",
   };
   const game = Object.assign(new Game(), {
+    ...graphicsLifecycleFixture(),
     scene,
     camera,
     engine,
@@ -288,6 +292,35 @@ test("actual Game light stages wait for pipeline and complete-frame readiness", 
   assert.equal(result.status, "complete");
   assert.equal(result.stages.length, 9);
   assert.ok(result.stages.every((stage: { renders: number }) => stage.renders >= 3));
+});
+
+test("actual light readiness waits for pending detail trees in normal mode", async t => {
+  const f = fixture(t), stats = { pendingTreeLoads: 3 };
+  Object.assign(f.game, { vegetation: { stats } });
+  const preparation = f.start();
+  for (let i = 0; i < 12; i++) f.tick();
+  assert.equal(f.states.length, 1, "normal mode cannot advance while required tree details are pending");
+  stats.pendingTreeLoads = 0;
+  f.finish();
+  assert.equal((await preparation).status, "complete");
+});
+
+test("actual FAR-only light readiness ignores retired detail loads without rewriting their telemetry", async t => {
+  const f = fixture(t), stats = { pendingTreeLoads: 3 };
+  Object.assign(f.game, { vegetation: { stats }, appliedVisualSettings: resolveVisualSettings(createRenderPreferences("ultra")) });
+  const preparation = f.start();
+  f.finish();
+  assert.equal((await preparation).status, "complete");
+  assert.equal(stats.pendingTreeLoads, 3, "unneeded requests remain truthfully reported until they settle");
+});
+
+test("actual FAR-only light readiness still rejects a current vegetation load error", async t => {
+  const f = fixture(t);
+  Object.assign(f.game, { vegetation: { stats: { pendingTreeLoads: 0, loadError: "missing FAR base" } },
+    appliedVisualSettings: resolveVisualSettings(createRenderPreferences("ultra")) });
+  const preparation = f.start();
+  f.finish();
+  assert.equal((await preparation).status, "failed");
 });
 
 test("local multiplayer records the actual last readiness gate without extra probes", async (t) => {

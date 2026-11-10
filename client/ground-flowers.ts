@@ -88,6 +88,7 @@ export class GroundFlowers {
   private preparationGeneration = 0;
   private observer: Observer<Scene> | null = null;
   private disposed = false;
+  private enabled = true;
   constructor(private scene: Scene, readonly pack: FlowerPack, loadTexture?: LoadTexture, placement?: ReturnType<typeof createGroundFlowerPlacement>) {
     validateFlowerPack(pack);
     this.placement = placement ?? createGroundFlowerPlacement(pack.radius);
@@ -127,7 +128,9 @@ export class GroundFlowers {
       this.observer = scene.onDisposeObservable.addOnce(() => this.dispose());
     } catch (error) { void Promise.allSettled(pending); this.dispose(); throw error; }
   }
-  static async load(scene: Scene) {
+  static load(scene: Scene): Promise<GroundFlowers>;
+  static load(scene: Scene, options: { isEnabled: () => boolean }): Promise<GroundFlowers | undefined>;
+  static async load(scene: Scene, options?: { isEnabled: () => boolean }) {
     const abort = new AbortController(), observer = scene.onDisposeObservable.addOnce(() => abort.abort());
     let controller: GroundFlowers | undefined;
     try {
@@ -135,8 +138,12 @@ export class GroundFlowers {
       if (!response.ok) throw Error("Flower geometry HTTP " + response.status);
       const pack = await response.json();
       if (scene.isDisposed) throw Error("Flower scene disposed during geometry load");
+      // The owning ground feature can retire while the scene stays alive.
+      // A later On retries this small JSON without allocating dormant GPU owners.
+      if (options && !options.isEnabled()) return undefined;
       controller = new GroundFlowers(scene, pack); await controller.ready;
       if (scene.isDisposed) throw Error("Flower scene disposed during texture load");
+      controller.setEnabled(options?.isEnabled() ?? true);
       return controller;
     } catch (error) { controller?.dispose(); throw error; }
     finally { scene.onDisposeObservable.remove(observer); }
@@ -152,8 +159,23 @@ export class GroundFlowers {
         metadata: { vegetation: "flowers", photographicGrass: false, groundFlowers: true, measuredSpecies: false } });
     } catch (error) { created?.dispose(false, false); throw error; }
   }
+  setEnabled(enabled: boolean) {
+    if (this.disposed || this.enabled === enabled) return;
+    this.enabled = enabled;
+    this.preparationGeneration++;
+    this.helper?.mesh.setEnabled(false);
+    this.lastQuality = ""; this.lastSelection = -Infinity;
+    if (!enabled) {
+      for (const root of this.roots.values()) this.remove(root);
+      for (const batch of this.batches.values()) batch.mesh.setEnabled(false);
+      this.wanted.clear(); this.demands.length = this.records.length = 0;
+      this.stats.draws = this.stats.instances = this.stats.triangles = 0;
+      this.stats.preparing = false;
+    }
+  }
   beginPreparation(): () => void {
     if (this.disposed) throw Error("Flowers disposed before preparation");
+    if (!this.enabled) return () => {};
     if (!this.helper) {
       const helper = this.batch("far", true); this.helper = helper;
       helper.mesh.metadata = { ...helper.mesh.metadata, flowerPreparation: true, photoGrassWind: createPhotoGrassWindState() };
@@ -166,7 +188,7 @@ export class GroundFlowers {
     return () => { if (!this.disposed && generation === this.preparationGeneration) { this.preparationGeneration++; this.helper!.mesh.setEnabled(false); } };
   }
   update(input: { time: number; quality: CandidateQuality; wind: { x: number; z: number }; focus?: { x: number; y: number; z: number }; flowerBloom?: number }) {
-    if (this.disposed || !this.stats.ready || !this.scene.activeCamera) return;
+    if (this.disposed || !this.enabled || !this.stats.ready || !this.scene.activeCamera) return;
     const camera = this.scene.activeCamera, view = camera.getViewMatrix(), projection = camera.getProjectionMatrix();
     const width = this.scene.getEngine().getRenderWidth(), height = this.scene.getEngine().getRenderHeight();
     const eye = camera.globalPosition, rawFocus = input.focus ?? eye, time = Number.isFinite(input.time) ? input.time : 0;

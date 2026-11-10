@@ -9,6 +9,7 @@ import {
 import { Community } from "./community";
 import { createPublicPresenceHandler } from "./public-presence";
 import { createOptionalCrazyTypkaService, attachCrazyTypkaHttpRoute } from "./crazy-typka";
+import { createOptionalChatMonitor } from "./chat-monitor";
 import {
   consumeRate,
   expireSessions,
@@ -609,9 +610,13 @@ const http = createServer();
 const listenHost = config.host;
 const sessionDiagnostics = createSessionDiagnosticsHandler({ listenHost });
 const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
-const crazyTypka = createOptionalCrazyTypkaService({}, () => {
-  console.warn("[AI] Invalid configuration; Crazy Typka is disabled.");
+const chatMonitor = createOptionalChatMonitor(process.env, () => {
+  console.warn("[AI] Invalid configuration; chat monitoring is disabled.");
 });
+const crazyTypka = createOptionalCrazyTypkaService(
+  { monitoring: chatMonitor?.monitoring },
+  () => console.warn("[AI] Invalid configuration; Crazy Typka is disabled."),
+);
 const feedback = await createFeedbackService({
   onDiagnostic(event) {
     // Projekce obsahuje jen stav konfigurace a sanitizované kódy, ne hlášení,
@@ -717,6 +722,7 @@ const server = new Server({
   transport: new WebSocketTransport({ server: http }),
   greet: false,
   express: (app) => {
+    if (chatMonitor) app.use(chatMonitor.admin);
     app.use((req: IncomingMessage, res: ServerResponse, next: () => void) => {
       if (req.url?.startsWith("/api/")) void handleApi(req, res);
       else next();
@@ -730,7 +736,11 @@ matchMaker.controller.exposedMethods = ["joinById"];
 server.onBeforeShutdown(async () => {
   readiness.stop();
   await crazyTypka.close();
-  await feedback.close();
+  try {
+    await feedback.close();
+  } finally {
+    await chatMonitor?.close();
+  }
 });
 server.define("strahov", StrahovRoom);
 await server.listen(config.port, listenHost);

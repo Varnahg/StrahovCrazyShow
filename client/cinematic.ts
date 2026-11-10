@@ -16,7 +16,8 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Frustum } from "@babylonjs/core/Maths/math.frustum";
 import type { Plane } from "@babylonjs/core/Maths/math.plane";
-import type { Observer } from "@babylonjs/core/Misc/observable";
+import { EventState, type Observer } from "@babylonjs/core/Misc/observable";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Material } from "@babylonjs/core/Materials/material";
 import type { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 import type { Scene } from "@babylonjs/core/scene";
@@ -27,7 +28,7 @@ import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Vec3 } from "../shared/types";
-import { renderBudget } from "../shared/render-quality";
+import { renderBudget, type VisualFeatures } from "../shared/render-quality";
 import {
   configureCampusGrade,
   campusExposure,
@@ -687,13 +688,34 @@ function readPostProcessDiagnostics(
  * It does not move astronomical bodies or simulate weather independently. */
 export class CinematicAtmosphere {
   private pipeline?: DefaultRenderingPipeline;
+  private postProcessesActive = false;
+  private postProcessesRequested?: boolean;
+  private shadowsRequested = true;
+  private readonly originalPostProcessesEnabled: boolean;
+  private readonly originalAutoClear: boolean;
+  private writtenPostProcessesEnabled?: boolean;
+  private writtenAutoClear?: boolean;
+  private pipelineAutoClear?: boolean;
+  private pipelineResizePending = false;
+  private pipelineResize?: {
+    observer: Observer<AbstractEngine>;
+    original: Observer<AbstractEngine>["callback"];
+    gated: Observer<AbstractEngine>["callback"];
+  };
+  private pipelineImageProcessing?: {
+    observer: Observer<ImageProcessingConfiguration>;
+    original: Observer<ImageProcessingConfiguration>["callback"];
+    gated: Observer<ImageProcessingConfiguration>["callback"];
+    syncExposure: () => void;
+  };
   private diagnosticBloom: boolean | undefined;
   private diagnosticCapture?: Promise<BloomDiagnostics>;
   private cancelDiagnosticCapture?: () => void;
   /** Ephemeral loopback QA control. It never changes saved quality preferences. */
   setDiagnosticBloom(enabled: boolean) {
     this.diagnosticBloom = enabled;
-    if (this.pipeline) this.pipeline.bloomEnabled = enabled;
+    if (this.pipeline && this.postProcessesActive)
+      this.pipeline.bloomEnabled = enabled;
   }
   /** Explicit loopback QA action: observe one naturally rendered frame, then
    * detach every observer. Never submits/skips a frame or modifies GL state. */
@@ -702,7 +724,7 @@ export class CinematicAtmosphere {
   ): Promise<BloomDiagnostics> {
     if (this.diagnosticCapture) return this.diagnosticCapture;
     const engine = this.scene.getEngine();
-    const posts = this.camera._postProcesses
+    const posts = (this.postProcessesActive && this.scene.postProcessesEnabled ? this.camera._postProcesses : [])
       .filter((post): post is PostProcess => post !== null)
       .slice(0, 8);
     const report: BloomDiagnostics = {
@@ -856,7 +878,7 @@ export class CinematicAtmosphere {
     });
     return capture;
   }
-  private shadow: ShadowGenerator;
+  private shadow?: ShadowGenerator;
   private environment: RawCubeTexture;
   private readonly reflection = new SkyReflectionSampler();
   private quality = "";
@@ -905,12 +927,22 @@ export class CinematicAtmosphere {
     private scene: Scene,
     private camera: Camera,
     private sun: DirectionalLight,
+    initialFeatures?: Pick<VisualFeatures, "shadows" | "postProcesses">,
   ) {
+    this.originalPostProcessesEnabled = scene.postProcessesEnabled;
+    this.originalAutoClear = scene.autoClear;
+    this.shadowsRequested = initialFeatures?.shadows ?? true;
+    this.postProcessesRequested = initialFeatures?.postProcesses;
     const config = scene.imageProcessingConfiguration;
     config.toneMappingEnabled = true;
     config.toneMappingType = ImageProcessingConfiguration.TONEMAPPING_ACES;
     applyCampusSkyIntensity(scene, 0);
     configureCampusGrade(config);
+    // The previous WebGPU all-quality warmup reached DefaultRenderingPipeline's
+    // imageProcessingEnabled=false setter, which also disables this scene flag.
+    // Preserve that production-ready colour path even when Ultra never creates it.
+    // WebGL Low only prepared its selected quality and keeps material grading.
+    if (scene.getEngine().isWebGPU) config.isEnabled = false;
     // The custom sky/foliage shaders already emit display colours. Standard/PBR
     // materials perform their own image processing: no second gamma over all.
     config.applyByPostProcess = false;
@@ -930,23 +962,17 @@ export class CinematicAtmosphere {
     this.environment.sphericalPolynomial = sky.polynomial;
     scene.environmentTexture = this.environment;
     scene.environmentIntensity = campusEnvironmentIntensity(0);
-    this.shadow = new ShadowGenerator(512, sun);
-    installStaticSubmeshShadowCull(
-      this.shadow,
-      shadowBoundsIntersectFrustum,
-      0.05,
-    );
-    this.shadow.usePercentageCloserFiltering = true;
-    this.shadow.filteringQuality = ShadowGenerator.QUALITY_LOW;
-    this.shadow.bias = 0.00022;
-    this.shadow.normalBias = 0.024;
-    this.shadow.frustumEdgeFalloff = 0.15;
-    this.shadow.transparencyShadow = false;
     sun.shadowFrustumSize = SHADOW_SPAN;
     sun.shadowMinZ = 0.1;
     sun.shadowMaxZ = 180;
     sun.autoCalcShadowZBounds = false;
     sun.autoUpdateExtends = false;
+    if (this.shadowsRequested) this.ensureShadow(512);
+    else {
+      sun.shadowEnabled = false;
+      this.stats.shadowMapSize = 0;
+    }
+    if (this.postProcessesRequested === false) this.setPostProcessesActive(false);
     this.addedMaterial = scene.onNewMaterialAddedObservable.add((material) => {
       if (!this.disposed) this.pendingGlass.add(material);
     });
@@ -959,8 +985,43 @@ export class CinematicAtmosphere {
     this.bindShadowMap();
   }
 
+  setVisualFeatures(features: Pick<VisualFeatures, "shadows" | "postProcesses">) {
+    if (this.disposed || this.scene.isDisposed) return;
+    if (this.shadowsRequested === features.shadows &&
+        this.postProcessesRequested === features.postProcesses) return;
+    this.shadowsRequested = features.shadows;
+    this.postProcessesRequested = features.postProcesses;
+    if (!features.shadows) {
+      this.shadowsEnabled = false;
+      this.sun.shadowEnabled = false;
+      this.visibleCasters.length = 0;
+      this.shadowSource = "none";
+      this.stats.shadowSource = "none";
+      this.stats.shadowCasters = this.stats.alphaCasters = this.stats.shadowCandidates = 0;
+      this.stats.shadowStrength = this.stats.shadowMapSize = 0;
+    }
+    // A cold owner has no active quality yet. Never allocate a guessed preset.
+    if (this.quality) this.configure(this.quality);
+    else if (!features.postProcesses) this.setPostProcessesActive(false);
+    this.timer = 1;
+  }
+
+  private ensureShadow(size: number): ShadowGenerator {
+    if (this.shadow) return this.shadow;
+    const shadow = new ShadowGenerator(size, this.sun);
+    this.shadow = shadow;
+    installStaticSubmeshShadowCull(shadow, shadowBoundsIntersectFrustum, 0.05);
+    shadow.usePercentageCloserFiltering = true;
+    shadow.filteringQuality = ShadowGenerator.QUALITY_LOW;
+    shadow.bias = 0.00022;
+    shadow.normalBias = 0.024;
+    shadow.frustumEdgeFalloff = 0.15;
+    shadow.transparencyShadow = false;
+    return shadow;
+  }
+
   private bindShadowMap() {
-    const map = this.shadow.getShadowMap();
+    const shadow = this.shadow, map = shadow?.getShadowMap();
     if (!map || this.shadowMap === map) return;
     this.shadowMap = map;
     if (map) {
@@ -974,9 +1035,10 @@ export class CinematicAtmosphere {
         this.visibleCasters.length = 0;
         this.stats.shadowFrustumRejected = 0;
         this.stats.shadowInactiveRejected = 0;
-        if (!this.shadowsEnabled || !candidates) return this.visibleCasters;
+        if (this.disposed || !this.shadowsRequested || !this.shadowsEnabled || !candidates)
+          return this.visibleCasters;
         Frustum.GetPlanesToRef(
-          this.shadow.getTransformMatrix(),
+          shadow!.getTransformMatrix(),
           this.shadowPlanes,
         );
         let alpha = 0;
@@ -1044,56 +1106,143 @@ export class CinematicAtmosphere {
     return this.reflection.update(this.lastSky, this.lastHorizon);
   }
 
+  private installPipelineResizeGate(pipeline: DefaultRenderingPipeline) {
+    // Pinned Babylon 9.30 registers exactly this owned observer. Its resize
+    // callback updates bloomKernel even when scene postprocessing is disabled.
+    // Keep the observer identity/lifecycle; only defer our callback while OFF.
+    const observer = (pipeline as unknown as {
+      _resizeObserver: Observer<AbstractEngine> | null;
+    })._resizeObserver;
+    if (!observer) throw new Error("Owned Babylon 9.30 pipeline resize observer is missing.");
+    const original = observer.callback;
+    const gated: typeof original = (engine, state) => {
+      if (this.disposed) return;
+      if (this.postProcessesActive) original(engine, state);
+      else this.pipelineResizePending = true;
+    };
+    observer.callback = gated;
+    this.pipelineResize = { observer, original, gated };
+  }
+
+  private installPipelineImageProcessingGate(pipeline: DefaultRenderingPipeline) {
+    // Pinned Babylon 9.30 couples the public imageProcessingEnabled setter and
+    // its owned observer to scene material grading. Our chain must contain only
+    // bloom/FXAA: isolate its flag before prepare, retaining just the observer's
+    // exposure sync. Never notify or replace other configuration observers.
+    const owned = pipeline as unknown as {
+      _imageProcessingEnabled: boolean;
+      _imageProcessingConfigurationObserver: Observer<ImageProcessingConfiguration> | null;
+      bloom: { _downscale: { _exposure: number } };
+    };
+    const observer = owned._imageProcessingConfigurationObserver;
+    if (!observer) throw new Error("Owned Babylon 9.30 image processing observer is missing.");
+    owned._imageProcessingEnabled = false;
+    const original = observer.callback;
+    const syncExposure = () => {
+      owned.bloom._downscale._exposure = this.scene.imageProcessingConfiguration.exposure;
+    };
+    const gated: typeof original = () => {
+      if (!this.disposed && this.postProcessesActive) syncExposure();
+    };
+    observer.callback = gated;
+    this.pipelineImageProcessing = { observer, original, gated, syncExposure };
+  }
+
+  private setPostProcessesActive(enabled: boolean) {
+    this.postProcessesActive = enabled;
+    this.scene.postProcessesEnabled = enabled;
+    this.writtenPostProcessesEnabled = enabled;
+    // A built pipeline delegates colour clearing to its first pass. When that
+    // pass is bypassed, restore the scene's original clear behaviour.
+    const autoClear = enabled ? this.pipelineAutoClear ?? this.originalAutoClear : this.originalAutoClear;
+    this.scene.autoClear = autoClear;
+    this.writtenAutoClear = autoClear;
+    if (!this.pipeline) return;
+    this.pipeline.automaticBuild = enabled;
+    // OFF skips bloom updates. Catch current exposure once when preparing ON,
+    // including a newly created/recreated extractor, without changing materials.
+    if (enabled) this.pipelineImageProcessing?.syncExposure();
+    if (enabled && this.pipelineResizePending && this.pipelineResize) {
+      this.pipelineResizePending = false;
+      // Catch up once to the current scale under the caller's readiness phase.
+      this.pipelineResize.original(this.scene.getEngine(), new EventState(-1));
+    }
+  }
+
+  private releasePipelineResizeGate() {
+    const resize = this.pipelineResize;
+    if (resize && resize.observer.callback === resize.gated)
+      resize.observer.callback = resize.original;
+    this.pipelineResize = undefined;
+    this.pipelineResizePending = false;
+  }
+
+  private releasePipelineImageProcessingGate() {
+    const imageProcessing = this.pipelineImageProcessing;
+    if (imageProcessing && imageProcessing.observer.callback === imageProcessing.gated)
+      imageProcessing.observer.callback = imageProcessing.original;
+    this.pipelineImageProcessing = undefined;
+  }
+
   private configure(quality: string) {
+    // Preserve the previous Medium/High material-colour policy separately from
+    // bloom/FXAA. A same-quality post toggle must never change material grading.
+    if (quality !== this.quality && (quality === "medium" || quality === "high"))
+      this.scene.imageProcessingConfiguration.isEnabled = false;
     this.quality = quality;
     const budget = renderBudget(quality),
       size = budget.shadowMapSize;
-    if (this.shadow.mapSize !== size) this.shadow.mapSize = size;
-    this.bindShadowMap();
-    this.stats.shadowMapSize = size;
-    this.shadow.filteringQuality =
-      quality === "high"
-        ? ShadowGenerator.QUALITY_MEDIUM
-        : ShadowGenerator.QUALITY_LOW;
-    if (!budget.postProcesses) {
-      this.pipeline?.dispose();
-      this.pipeline = undefined;
-    } else if (!this.pipeline) {
-      // The default pipeline keeps its BloomEffect private. Identify only the
-      // extractor newly constructed by this owner in the public engine list.
-      const engine = this.scene.getEngine();
-      const existingPostProcesses = new Set(engine.postProcesses);
-      this.pipeline = new DefaultRenderingPipeline(
-        "cinematic campus",
-        true,
-        this.scene,
-        [this.camera],
-        false,
-      );
-      this.pipeline.imageProcessingEnabled = false;
-      // A recreated Babylon 9.30 pipeline initially assumes image processing
-      // is enabled, even if the previous one already disabled scene config.
-      // In that case the setter has no notification; synchronize its public
-      // configuration observable before preparing the chain (no extra build).
-      const imageProcessing = this.scene.imageProcessingConfiguration;
-      if (this.pipeline.imageProcessingEnabled !== imageProcessing.isEnabled)
-        imageProcessing.onUpdateParameters.notifyObservers(imageProcessing);
-      this.pipeline.fxaaEnabled = true;
-      this.pipeline.bloomEnabled = true;
-      this.pipeline.bloomScale = 0.5;
-      this.pipeline.bloomKernel = 32;
-      this.pipeline.bloomThreshold = 0.96;
-      this.pipeline.bloomWeight = 0.1;
-      const extractors = engine.postProcesses.filter(post =>
-        !existingPostProcesses.has(post) && post.getEffectName() === "extractHighlights");
-      if (extractors.length !== 1)
-        throw new Error("Expected one owned Babylon 9.30 bloom extractor before preparation.");
-      installCampusBloomExtraction(extractors[0]);
-      // Compile/attach the final chain once, rather than rebuilding for each
-      // option above. Retain automatic updates after this initial transaction.
-      this.pipeline.prepare();
-      this.pipeline.automaticBuild = true;
+    if (this.shadowsRequested) {
+      const shadow = this.ensureShadow(size);
+      if (shadow.mapSize !== size) shadow.mapSize = size;
+      this.bindShadowMap();
+      this.stats.shadowMapSize = size;
+      shadow.filteringQuality = quality === "high"
+        ? ShadowGenerator.QUALITY_MEDIUM : ShadowGenerator.QUALITY_LOW;
+    } else this.stats.shadowMapSize = 0;
+    const postProcesses = this.postProcessesRequested ?? budget.postProcesses;
+    if (postProcesses && !this.pipeline) {
+      try {
+        // The default pipeline keeps its BloomEffect private. Identify only the
+        // extractor newly constructed by this owner in the public engine list.
+        const engine = this.scene.getEngine();
+        const existingPostProcesses = new Set(engine.postProcesses);
+        this.pipeline = new DefaultRenderingPipeline(
+          "cinematic campus",
+          true,
+          this.scene,
+          [this.camera],
+          false,
+        );
+        this.installPipelineImageProcessingGate(this.pipeline);
+        this.pipeline.fxaaEnabled = true;
+        this.pipeline.bloomEnabled = true;
+        this.pipeline.bloomScale = 0.5;
+        this.pipeline.bloomKernel = 32;
+        this.pipeline.bloomThreshold = 0.96;
+        this.pipeline.bloomWeight = 0.1;
+        const extractors = engine.postProcesses.filter(post =>
+          !existingPostProcesses.has(post) && post.getEffectName() === "extractHighlights");
+        if (extractors.length !== 1)
+          throw new Error("Expected one owned Babylon 9.30 bloom extractor before preparation.");
+        installCampusBloomExtraction(extractors[0]);
+        // Compile/attach the final chain once, rather than rebuilding for each
+        // option above. Retain automatic updates after this initial transaction.
+        this.pipeline.prepare();
+        this.pipeline.automaticBuild = true;
+        this.pipelineAutoClear = this.scene.autoClear;
+        this.installPipelineResizeGate(this.pipeline);
+      } catch (error) {
+        this.releasePipelineResizeGate();
+        this.releasePipelineImageProcessingGate();
+        this.pipeline?.dispose();
+        this.pipeline = undefined;
+        this.pipelineAutoClear = undefined;
+        this.setPostProcessesActive(false);
+        throw error;
+      }
     }
+    this.setPostProcessesActive(postProcesses);
     this.scene.imageProcessingConfiguration.applyByPostProcess = false;
   }
 
@@ -1127,7 +1276,8 @@ export class CinematicAtmosphere {
   }
 
   private selectCasters(input: AtmosphereInput) {
-    const map = this.shadow.getShadowMap();
+    if (!this.shadowsRequested) return;
+    const map = this.shadow?.getShadowMap();
     if (!map) return;
     const avatarMeshes = new Set<AbstractMesh>();
     const ownMeshes = new Set<AbstractMesh>();
@@ -1196,17 +1346,17 @@ export class CinematicAtmosphere {
       input.rain,
       input.cloudOcclusionApplied,
     );
-    this.shadow.setDarkness(response.darkness);
-    const shadows = response.enabled && this.sun.isEnabled();
+    if (this.shadowsRequested) this.shadow?.setDarkness(response.darkness);
+    const shadows = this.shadowsRequested && response.enabled && this.sun.isEnabled();
     const shadowsStarted =
       shadows && (!this.shadowsEnabled || this.shadowSource !== source);
     this.shadowsEnabled = shadows;
     this.shadowSource = shadows ? source : "none";
     this.stats.shadowSource = this.shadowSource;
     this.stats.shadowStrength = shadows ? response.strength : 0;
-    this.stats.shadowDarkness = response.darkness;
+    this.stats.shadowDarkness = this.shadowsRequested ? response.darkness : 1;
     this.sun.shadowEnabled = shadows;
-    if (shadows) {
+    if (shadows && this.shadow) {
       const { focus, direction } = writeSnappedShadowFocus(
         input.player,
         this.sun.direction,
@@ -1221,7 +1371,7 @@ export class CinematicAtmosphere {
     } else {
       this.stats.shadowCasters = this.stats.alphaCasters = 0;
     }
-    if (this.pipeline) {
+    if (this.pipeline && this.postProcessesActive) {
       if (
         this.diagnosticBloom !== undefined &&
         this.pipeline.bloomEnabled !== this.diagnosticBloom
@@ -1272,14 +1422,27 @@ export class CinematicAtmosphere {
     this.scene.onNewMaterialAddedObservable.remove(this.addedMaterial);
     this.scene.onMaterialRemovedObservable.remove(this.removedMaterial);
     this.pendingGlass.clear();
-    this.pipeline?.dispose();
-    this.shadow.dispose();
+    this.releasePipelineResizeGate();
+    this.releasePipelineImageProcessingGate();
+    // Babylon 9.30 pipeline.dispose() writes autoClear=true unconditionally.
+    // Resolve ownership first, while a foreign override is still observable.
+    const currentAutoClear = this.scene.autoClear;
+    const finalAutoClear = this.writtenAutoClear !== undefined && currentAutoClear === this.writtenAutoClear
+      ? this.originalAutoClear : currentAutoClear;
+    try { this.pipeline?.dispose(); }
+    finally {
+      if (this.scene.autoClear !== finalAutoClear) this.scene.autoClear = finalAutoClear;
+    }
+    this.shadow?.dispose();
     for (const material of this.wrappers.keys())
       this.releaseShadowWrapper(material);
     for (const [material, ownership] of this.glass)
       releaseWindowSkyReflection(material, this.environment, ownership);
     this.glass.clear();
     this.sun.shadowEnabled = false;
+    if (this.writtenPostProcessesEnabled !== undefined &&
+        this.scene.postProcessesEnabled === this.writtenPostProcessesEnabled)
+      this.scene.postProcessesEnabled = this.originalPostProcessesEnabled;
     if (this.scene.environmentTexture === this.environment)
       this.scene.environmentTexture = null;
     this.environment.dispose();

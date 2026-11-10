@@ -24,7 +24,7 @@ Provozní limity jsou poslední ochrana, ne autentizace veřejného uživatele. 
 
 Výchozí strop je 500 pokusů generování na proces; `CRAZY_TYPKA_GENERATIONS_PER_PROCESS` jej může snížit. Počítají se i neúspěšné upstream pokusy, žádný automatický placený retry. Další výchozí hranice: 4 aktivní requesty, 1 generování na relaci, 6 zpráv/min na relaci, 30 requestů/min na IP, 120 requestů/min globálně, 1 500 znaků ve zprávě a 600 výstupních tokenů. Vhodnost modelu pro tento krátký výstup je nutné ověřit živým evalem; model s velkou potřebou reasoning tokenů může vrátit neúplnou odpověď, která se bezpečně odmítne.
 
-AI tokeny a historie jsou dočasné. Restart serveru nebo vypršení relace konverzaci ukončí. „Nový chat“ smaže serverovou historii daného tokenu a zneplatní její rozpracovanou odpověď. Nezapisují se vlastní logy dotazů ani celé upstream chyby. OpenAI `store:false` vypíná ukládání response state v tomto použití, ale není zárukou nulové retence poskytovatele; viz [aktuální data controls](https://developers.openai.com/api/docs/guides/your-data).
+AI tokeny a historie relace jsou dočasné. Restart serveru nebo vypršení relace konverzaci ukončí. „Nový chat“ vyčistí kontext daného tokenu a zneplatní jeho rozpracovanou odpověď. Výchozí režim aplikace dotazy neloguje. Volitelný [správcovský monitoring](../../deployment/chat-monitor.md) se zapíná samostatně a informuje hráče před záznamem nové relace. Celé upstream chyby se nezapisují. OpenAI `store:false` vypíná ukládání response state v tomto použití. Rozsah dalšího uchování u poskytovatele popisují [aktuální data controls](https://developers.openai.com/api/docs/guides/your-data).
 
 ## Obnova podkladů
 

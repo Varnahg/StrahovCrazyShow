@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "ultra-graphics-20261104-validation",
+  "title": "Finální serializovaná přejímka Ultra grafiky",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/main-replay-consolidation-20261029/",
+    ".cache/discord-kb-20261103/evaluation-tool/",
+    ".cache/docker-rag-packaging-20261029/",
+    ".cache/docker-rag-bootstrap-20261029/",
+    ".cache/rag-vector-20261028-store/",
+    ".cache/rag-auto-store-20261028/cli-fixtures/",
+    ".cache/docker-packaging-tests/",
+    ".cache/docker-runtime-tests/",
+    ".cache/trees-catalog-export-20261026/runs/",
+    ".cache/trees-far-clusters-20261026/test-fixtures/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4179"
+  ],
+  "acceptance": [
+    "Pouze stabilní Ultra checkpoint, celý test/build/SDK a skutečnéEdge srovnání dle schváleného plánu.",
+    "Původní8080 a cizívalidace nepřerušit; běhemGPU žádnývlastníbuild/test."
+  ],
+  "verification": [
+    "Úplnélogy/manifesty/source identity a kvalitativní/kvantitativnípřejímka."
+  ],
+  "notes": [
+    "Root tuto rezervaci získá až po uvolnění C AI validačního okna; existence ready tasku není důkaz vlastnictví.",
+    "Cache rozsah zahrnuje existující syntetické fixtures plné sady, nikoli další kopii projektu. Náhodné mkdtemp fixtures vytváří a čistí pouze vlastní testovací proces; cizí existující cache se neupravuje. GAME_DIAGNOSTICS_TEST_CACHE směřovat do rootem rezervované .cache/ultra-graphics-20261104/."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-monitor-admin-20261106",
+  "title": "Přehled Crazy Typky na /admin a GitHub OAuth",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "server/chat-monitor-admin.ts",
+    "tests/chat-monitor-admin.test.ts",
+    "docs/agents/handoffs/chat-monitor-admin-20261106.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Ochrana podle číselného GitHub ID, serverové vykreslení prostého textu, bezpečná relace, ochrana proti načítání přepisů z herní stránky."
+  ],
+  "verification": [
+    "Cílené testy a předání se skutečnými výsledky. Integrační build a živý PostgreSQL serializuje koordinátor."
+  ],
+  "notes": [
+    "Výslovné zadání monitoring Crazy Typky 6. 11. 2026. Pouze kanonický checkout main."
+  ]
+}

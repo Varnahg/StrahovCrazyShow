@@ -5,7 +5,11 @@ import { mkdir, mkdtemp, writeFile, rm } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { resolve, relative, isAbsolute } from "node:path";
+import { Script } from "node:vm";
+import ts from "typescript";
 import { zoneAt } from "../shared/world";
+import { AdaptiveQualityController } from "../client/adaptive-quality";
+import * as quality from "../shared/render-quality";
 // @ts-expect-error Test-only JavaScript module.
 import { createReplayEnvironment, createReplayBuildPlugin, parseReplayArguments, readReplaySourceManifest, saveVerifiedReplayReport } from "./replay/runner-config.mjs";
 // @ts-expect-error Test-only JavaScript module.
@@ -165,6 +169,79 @@ const sample = (atMs: number, value = state(), seq = atMs) => ({
   seq,
   type: "sample",
   state: value,
+});
+
+test("actual replay frame freezes adaptation and renders recorded scales without an interactive Apply", () => {
+  const readSource = (path: string) => ts.createSourceFile(path, readFileSync(new URL(path, import.meta.url), "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const browser = readSource("./replay/browser-entry.ts"), gameSource = readSource("../client/game.ts");
+  let wrapper: ts.FunctionExpression | undefined;
+  const visit = (node: ts.Node) => {
+    if (ts.isBinaryExpression(node) && node.left.getText(browser) === "prototype.frame" && ts.isFunctionExpression(node.right)) wrapper = node.right;
+    ts.forEachChild(node, visit);
+  };
+  visit(browser); assert.ok(wrapper);
+  const gameClass = gameSource.statements.find((node): node is ts.ClassDeclaration => ts.isClassDeclaration(node) && node.name?.text === "Game")!;
+  const methods = gameClass.members.filter(ts.isMethodDeclaration);
+  const method = (name: string) => { const found = methods.find(node => node.name.getText(gameSource) === name); assert.ok(found?.body); return found; };
+  const frame = method("frame");
+  const adaptiveStep = frame.body!.statements.find(node => ts.isExpressionStatement(node) && ts.isCallExpression(node.expression) && node.expression.expression.getText(gameSource) === "this.applyAdaptiveQuality");
+  const graphicsGate = frame.body!.statements.find(node => ts.isIfStatement(node) && node.expression.getText(gameSource) === "this.graphicsApplying");
+  assert.ok(adaptiveStep); assert.ok(graphicsGate);
+  const compile = (text: string) => new Script(ts.transpileModule(text, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText);
+  const QualityMethods = compile("class ReplayQualityFixture {" + ["setQuality", "applyAdaptiveQuality", "applyRenderQuality"].map(name => method(name).getText(gameSource)).join("\n") + "} ReplayQualityFixture;")
+    .runInNewContext(quality);
+  let now = 1000, renderedFrames = 0, scaling = 1, interactiveApplies = 0;
+  let recorded = state();
+  const failures: unknown[] = [];
+  const env: Record<string, any> = {
+    performance: { now: () => now }, document: { hidden: false }, published: false, startedAt: 0, lastFrameAt: 0,
+    active: undefined, latest: undefined, lastState: undefined, renderedSky: undefined, renderedTorch: undefined,
+    lastTextAt: Infinity, finishAt: 0, startupDeadline: 0, clearTimeout() {}, speed: 1, scenario: { durationMs: 100000 },
+    report: { frames: 0, settingsCheckedFrames: 0, maxPositionErrorMetres: 0, maxCameraErrorMetres: 0 },
+    requestedBackend: "webgl2", assertReplayBackend, assertRenderedReplayState, recordedWeather: undefined,
+    cursor: { advance: () => ({ state: recorded, done: false }) }, applyRecordedWeather: () => undefined,
+    sessionDiagnostics: { isRecording: false }, show() {}, fail: (error: unknown) => failures.push(error),
+  };
+  // Execute the real per-frame adaptive application and early-return gate. GPU,
+  // physics and scene rendering stay fixture-owned; this proves control flow only.
+  env.originalFrame = compile("(function () { const frameStarted = performance.now(), rawFrameMs = 100, simulationEnded = frameStarted; " + adaptiveStep.getText(gameSource) + graphicsGate.getText(gameSource) + " this.scene.render(); })")
+    .runInNewContext(env);
+  const game = Object.assign(new QualityMethods(), {
+    ready: true, disposed: false, rendererFailed: false, graphicsApplying: false, network: false,
+    adaptive: new AdaptiveQualityController({ mode: "auto" }),
+    actor: { vehicle: false, position: recorded.position }, camera: { globalPosition: { x: recorded.camera.x, y: recorded.camera.y, z: recorded.camera.z } },
+    flashlightOn: false, renderErrorCount: 0, assetLoadErrorCount: 0,
+    renderHealth: { rendererId: "replay-test", snapshot: () => ({ valid: true, phase: "ready", errorCount: 0 }) },
+    engine: { isWebGPU: false, getHardwareScalingLevel: () => scaling, setHardwareScalingLevel: (value: number) => { scaling = value; } },
+    scene: { isDisposed: false, getFrameId: () => renderedFrames, render() {
+      renderedFrames++; env.renderedSky = { instant: game.timeOverride, quality: game.quality, weather: undefined };
+    } },
+    publishVisualFeatures() {}, finishDiagnosticCallback() {},
+    applyRenderPreferences() { interactiveApplies++; this.graphicsApplying = true; return Promise.resolve(true); },
+  });
+  const replayFrame = compile("(" + wrapper.getText(browser) + ")").runInNewContext(env) as (this: typeof game) => void;
+  for (const [detail, scale] of [["low", 1.65], ["low", 2], ["high", 1.2], ["high", 1.45], ["medium", 1.3]] as const) {
+    recorded = { ...state(), rendering: { quality: detail, hardwareScaling: scale } };
+    now += 10000;
+    const before = renderedFrames;
+    replayFrame.call(game);
+    assert.equal(renderedFrames, before + 1);
+    assert.equal(game.adaptive.state.mode, detail);
+    assert.equal(game.quality, detail);
+    assert.equal(scaling, scale, "the frame must retain its recorded scale, even inside one quality");
+    assert.equal(game.appliedQualityRevision, game.adaptive.state.revision);
+    assert.equal(game.graphicsApplying, false);
+  }
+  assert.equal(interactiveApplies, 0);
+  assert.equal(env.report.settingsCheckedFrames, 5);
+  assert.deepEqual(failures, []);
+  // Negative control: the real interactive setter takes the same fixture's
+  // render gate, reproducing the pre-fix synchronous replay failure mechanism.
+  game.setQuality("low");
+  const before = renderedFrames;
+  env.originalFrame.call(game);
+  assert.equal(interactiveApplies, 1);
+  assert.equal(renderedFrames, before);
 });
 
 test("replay never skips a recorded sample or action after a long render stall", () => {

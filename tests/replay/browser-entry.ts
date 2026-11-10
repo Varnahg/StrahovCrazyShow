@@ -299,7 +299,8 @@ prototype.frame = function (this: Game) {
       if (this.actor.vehicle !== state.vehicle)
         this.actor.setVehicle(state.vehicle);
       if (!lastState || lastState.rendering.quality !== state.rendering.quality)
-        this.setQuality(state.rendering.quality);
+        // Freeze Auto without starting an interactive graphics transaction.
+        this.applyAdaptiveQuality((this as any).adaptive.setMode(state.rendering.quality));
       (this as any).applyRenderQuality(
         state.rendering.quality,
         state.rendering.hardwareScaling,

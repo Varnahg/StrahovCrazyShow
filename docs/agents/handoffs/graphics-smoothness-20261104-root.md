@@ -1,0 +1,12 @@
+# Grafické záseky · aktuální checkpoint D
+
+- Root graphics-d-20261104-root; výslovně zadaný D:/CodexWorkspaces/StrahovCrazyShow-graphics-20261104, codex/graphics-smoothness-20261104, base6805bcd4396eeb6abd17f724914a054b06fa86bc. Cmain a8080 se nemění. Root drží disjunktnímetadata/evidence a explicitníheavy/GPU/port rezervaci; decoderleaf vlastní jeho source/test/handoff.
+- Prostředí:609LFS a frozeninstall hotové, supply-chain kontrolaPASS. Offline metadatafail zachovaný; žádnézměnylockfile/assetů. Appattach nenípodporovanýpro ručníworktree; všechnycommandsmajíexplicitnícwdD.
+- Doložené dvě třídy záseků: post-fetch stromovéCPU112–529ms a samostatné4–7,5smezery sGPUprocesemkolemjednohoCPUjádra/malýmJS. Serverclockdrop vdanýchA75 špičkáchneroste. Přesnéseq/časy jsou vresearch.md; recovery může býtnásledekklientskéhozastavení.
+- Rozhodnutí: profil skutečnýchGLB032/033 ukázaldecode183/131ms protiseason31/16ms; vybrán lokálníreusevalidovanýchaccessorviews. Counting-sort, worker aHighpipelineretence se nemíchajídojednézměny. SPECašestibodovýPLAN jsou v _bmad-output/implementation-artifacts/graphics-smoothness-20261104/.
+- Před implementací: baselineCPU7opakování+prvnístudené,6produkčníchGLB/12částíbyteparita zachovaná. Runtimezměnu/testy dokončujeleafstreaming_hitch_research, tasktree-decode-validation-20261104. Zatímneprohlašovatpřínos neboherníPASS.
+- Další krok: převzítstabilníleaf, nezávisléreview, byteparita+stejnýCPUprofil. PřijetíCPU předem≥20%decode a≥15%celkovéhoCPU naobouMID, malýFARbezregrese max10%/0,5ms; potomstabilníbuild/fulltest/SDK a1cílenýEdgeprůchod snehybnýmiSDKpeers. NullEngine neníGPUdůkaz a4–7,5sdriverhypotézazůstáváotevřená.
+
+## Konečný checkpoint
+
+Přijat přesnýCPUdecoder celek, source/tests3fe11a12ebd947e03581444e08f1b15b707f34abd6ec827badcb236841ef6132.6GLB/12částíbyteparita; decode−54%, wholeCPU−39–45%;3085PASS/0FAIL/5SKIP, celýTS/produkčníbuild/SDK/reviewPASS. Edge1startready,4novéGLB/43,94MB, healthvalid0faults. CelkovýgameplayINCONCLUSIVE(exit3): overlap1,2ms,durationnesoulady,pohybjen17,41skonzervativně; snímkynevyhovují včetně6,08smax. Přesnáomezení ačasovédelty report README zachovává. STOP a revalidacePASS, peers/samplerAPI/karta/viewportuklizené, portyvolné. Po commitu uvolnitvlastníclaims. Dalšíkrok prošíršísmoothness: časověsvázanýGPU-processtraceaopravaověřenéhočasovéhorecorderu v samostatnémrozsahu; žádnépředstíránívyššíhoFPS zNodečasu.

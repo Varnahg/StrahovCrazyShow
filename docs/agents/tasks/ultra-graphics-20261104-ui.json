@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "id": "ultra-graphics-20261104-ui",
+  "title": "PreferenceV2, resolver, adaptivní režimy a společný panel Grafika",
+  "writePaths": [
+    "shared/render-quality.ts",
+    "client/adaptive-quality.ts",
+    "client/graphics-settings.tsx",
+    "client/graphics-settings.css",
+    "client/ui.tsx",
+    "client/welcome-screen.tsx",
+    "client/i18n-messages.ts",
+    "tests/adaptive-quality.test.ts",
+    "tests/render-preferences.test.ts",
+    "tests/graphics-settings.test.ts",
+    "tests/welcome-screen.test.ts",
+    "tests/door-connection.test.ts",
+    "tests/feedback-ui.test.ts",
+    "tests/game-render-engine.test.ts",
+    "tests/recorded-walkthrough-replay.test.ts",
+    "tests/replay/browser-entry.ts",
+    "tests/room-callbacks.test.ts",
+    "tests/terrain-review.test.ts",
+    "tests/weather-preview-ui.test.ts",
+    "docs/agents/handoffs/ultra-graphics-20261104-ui.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zachovat interní3kvality, novémodeultra/custom; čistýresolver a kompatibilní migrace legacy localStorage.",
+    "Stejný přístupnýpanel předhrou/ve hře: draft/Použít/zahodit, presetsreset, manualAuto→Custom, uložitjenpo potvrzeníGame.",
+    "Ultra lowbase/scale.5/allfeaturesoff+far-only, starépresetybezezměny."
+  ],
+  "verification": [
+    "Cílené preference/adaptive/React/VM regrese, žádný fullbuild/GPU.",
+    "První checkpoint sdělit rootu stabilníshared API; root vlastníGame a telemetry."
+  ],
+  "notes": [
+    "Přímý leaf úkol; žádný další BMAD. Scopejen uvedené soubory, implementace+refaktor+testypředatspolečně."
+  ]
+}

@@ -248,3 +248,18 @@ test("source validation is transactional and source/quality metadata cannot trig
   const moved = { ...source, x: source.x + .5 }; f.litter.setTrees([moved]); assert.equal(first.isDisposed(), true); f.warm();
   assert.ok(patches(f).every(m => m.metadata.sourceTreeId === moved.id)); assert.equal(f.load.mock.callCount(), 0);
 });
+
+
+test("disabled litter stops patch work and helper readiness without releasing borrowed maps", t => {
+  const f = fixture(t); f.litter.setTrees([source]); f.warm();
+  assert.ok(f.litter.stats.activeItems > 0); const cached = f.litter.stats.cachedPatches;
+  const stop = f.litter.beginPreparation(); f.litter.setEnabled(false); stop();
+  assert.equal(f.litter.preparationRevision, undefined);
+  assert.equal(f.litter.stats.activeItems, 0); assert.equal(f.litter.stats.triangles, 0);
+  assert.equal(f.litter.stats.preparing, false); assert.equal(f.litter.stats.cachedPatches, cached);
+  assert.ok(f.scene.meshes.filter(m => m.metadata?.treeLitter || m.metadata?.litterPreparation).every(m => !m.isEnabled()));
+  const generated = f.litter.stats.generatedPatches;
+  f.litter.beginPreparation()(); for (let i = 0; i < 10; i++) f.update();
+  assert.equal(f.litter.stats.generatedPatches, generated); assert.equal(f.disposedMaps(), 0);
+  f.litter.setEnabled(true); f.warm(); assert.ok(f.litter.stats.activeItems > 0);
+});

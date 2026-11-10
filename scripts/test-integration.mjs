@@ -12,7 +12,8 @@ export function createIsolatedIntegrationEnvironment(environment, directory) {
   );
   const isolated = Object.fromEntries(
     Object.entries(environment).filter(
-      ([key]) => !/^(?:LINEAR_|FEEDBACK_|OPENAI_|CRAZY_TYPKA_|RAG_)/i.test(key),
+      ([key]) =>
+        !/^(?:LINEAR_|FEEDBACK_|OPENAI_|CRAZY_TYPKA_|RAG_|CHAT_MONITOR_)/i.test(key),
     ),
   );
   return {

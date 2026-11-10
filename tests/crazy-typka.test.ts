@@ -1069,6 +1069,7 @@ import {
   type CrazyTypkaServiceOptions,
 } from "../server/crazy-typka";
 import {
+  CRAZY_TYPKA_MONITORING_NOTICE_VERSION,
   isCrazyTypkaResponse,
   isCrazyTypkaSession,
   isCrazyTypkaChatResponse,
@@ -2272,6 +2273,88 @@ test("private server history is retained per session and reset never touches mul
     401,
   );
   await f.service.close();
+});
+test("monitoring records a new informed session exactly once per finalized response", async () => {
+  type Monitor = NonNullable<CrazyTypkaServiceOptions["monitoring"]>;
+  const records: Parameters<Monitor["enqueue"]>[0][] = [];
+  const notice: Monitor["notice"] = {
+    noticeVersion: CRAZY_TYPKA_MONITORING_NOTICE_VERSION,
+    privacyUrl: "https://example.test/privacy",
+  };
+  const f = fixture({ monitoring: { notice, enqueue: (record) => records.push(record) } });
+  const session = (body: unknown) => f.send("/api/ai/session", body);
+  try {
+    assert.deepEqual((await f.send("/api/ai/status", undefined, "GET")).body, {
+      enabled: true,
+      monitoring: notice,
+    });
+    for (const legacy of [{}, { monitoringNoticeVersion: notice.noticeVersion + 1 }]) {
+      const { body } = await session(legacy);
+      assert.equal((await f.send("/api/ai/chat", {
+        token: body.token, requestSeq: 1, message: "Ahoj", locale: "cs",
+      })).status, 200);
+    }
+    assert.equal(records.length, 0);
+    for (const bad of [{ monitoringNoticeVersion: "1" }, { capture: true }])
+      assert.equal((await session(bad)).status, 400);
+
+    const eligible = { monitoringNoticeVersion: notice.noticeVersion };
+    const token = (await session(eligible)).body.token;
+    const first = { token, requestSeq: 1, message: "Ahoj", locale: "cs" };
+    const final = await f.send("/api/ai/chat", first);
+    assert.equal(final.status, 200);
+    assert.deepEqual((await f.send("/api/ai/chat", first)).body, final.body);
+    const next = { token, requestSeq: 2, message: "Kdo jsi?\nJak funguješ?", locale: "cs" };
+    const second = await f.send("/api/ai/chat", next);
+    assert.equal(second.status, 200);
+    assert.equal(records.length, 2);
+    assert.match(records[0].conversationId, /^[\da-f-]{36}$/i);
+    assert.equal(records[0].conversationId, records[1].conversationId);
+    assert.deepEqual(records.map(({ question, answer }) => [question, answer]), [
+      [first.message, final.body],
+      [next.message, second.body],
+    ]);
+    assert.ok(!JSON.stringify(records).includes(token));
+
+    assert.equal((await f.send("/api/ai/session", undefined, "DELETE", {
+      authorization: `Bearer ${token}`,
+    })).status, 204);
+    assert.equal((await f.send("/api/ai/chat", { ...next, requestSeq: 3 })).status, 401);
+    const freshToken = (await session(eligible)).body.token;
+    await f.send("/api/ai/chat", { ...first, token: freshToken });
+    assert.equal(records.length, 3);
+    assert.notEqual(records[2].conversationId, records[0].conversationId);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("unconfigured monitoring and an unavailable monitor leave AI responses usable", async () => {
+  const monitoring: NonNullable<CrazyTypkaServiceOptions["monitoring"]> = {
+    notice: {
+      noticeVersion: CRAZY_TYPKA_MONITORING_NOTICE_VERSION,
+      privacyUrl: "https://example.test/privacy",
+    },
+    enqueue() { throw new Error("monitor unavailable"); },
+  };
+  for (const option of [undefined, monitoring]) {
+    const f = fixture({ monitoring: option });
+    try {
+      const status = await f.send("/api/ai/status", undefined, "GET");
+      assert.equal(Boolean(status.body.monitoring), Boolean(option));
+      const issued = await f.send("/api/ai/session", {
+        monitoringNoticeVersion: monitoring.notice.noticeVersion,
+      });
+      assert.equal(issued.status, 201);
+      const result = await f.send("/api/ai/chat", {
+        token: issued.body.token, requestSeq: 1, message: "Ahoj", locale: "cs",
+      });
+      assert.equal(result.status, 200);
+      assert.ok(isCrazyTypkaChatResponse(result.body));
+    } finally {
+      await f.service.close();
+    }
+  }
 });
 test("client history/roles and invalid messages are rejected before provider calls", async () => {
   const f = fixture();

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-monitor-20261106",
+  "title": "Integrace a ověření produkčního monitoringu Crazy Typky",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "server/index.ts",
+    "server/crazy-typka.ts",
+    "server/chat-monitor.ts",
+    "tests/crazy-typka.test.ts",
+    "tests/chat-monitor.test.ts",
+    "docs/deployment/chat-monitor.md",
+    "docs/home-ai/20261027/deployment.md",
+    "docs/verification.md",
+    "docs/agents/handoffs/chat-monitor-20261106.md",
+    ".cache/chat-monitor-20261106/",
+    "_bmad/render/bmad-build/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568",
+    "port:5548",
+    "port:4278",
+    "gpu"
+  ],
+  "acceptance": [
+    "Sběr vypnutý bez výslovné konfigurace. Nové relace pouze po zobrazené verzi sdělení. Uzavřený /admin, lokální PostgreSQL a produkční balíček prakticky ověřené."
+  ],
+  "verification": [
+    "Cílené testy a předání se skutečnými výsledky. Integrační build a živý PostgreSQL serializuje koordinátor."
+  ],
+  "notes": [
+    "Výslovné zadání monitoring Crazy Typky 6. 11. 2026. Pouze kanonický checkout main."
+  ]
+}
