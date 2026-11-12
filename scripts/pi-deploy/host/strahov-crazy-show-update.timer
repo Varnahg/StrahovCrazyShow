@@ -1,0 +1,10 @@
+[Unit]
+Description=Check StrahovCrazyShow releases every minute
+
+[Timer]
+OnBootSec=30s
+OnCalendar=minutely
+AccuracySec=1us
+
+[Install]
+WantedBy=timers.target

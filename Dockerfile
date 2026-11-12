@@ -24,17 +24,18 @@ CMD ["status"]
 FROM dependencies AS build
 RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --store-dir=/pnpm/store
-COPY . .
+COPY --exclude=public . .
 # Catch accidental broad .dockerignore exceptions before authoring archives
 # silently become part of the build stage.
 RUN test ! -d assets/blender
-RUN node scripts/check-runtime-assets.mjs
+RUN --mount=type=bind,source=public,target=/app/public node scripts/check-runtime-assets.mjs
 # The TypeScript check can exhaust the builder's default V8 heap.
 ENV NODE_OPTIONS=--max-old-space-size=3072
 # The SDK resolves / against the browser origin, including HTTPS and its port.
 # The frozen install/cache key above already verifies manifests and patches.
 # COPY may refresh identical input mtimes; do not let pnpm 11 reinstall them.
-RUN VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=false run build
+RUN --mount=type=bind,source=public,target=/app/public \
+    VITE_MULTIPLAYER_URL=/ STRAHOV_DOCKER_COPY_PUBLIC=0 pnpm --config.verify-deps-before-run=false run build
 
 FROM node:24-bookworm-slim AS runtime
 WORKDIR /app
@@ -43,6 +44,10 @@ ENV NODE_ENV=production \
     PORT=2567 \
     STATIC_DIR=/app/dist \
     FEEDBACK_DIR=/data/feedback
+# Keep stable public files ahead of dependencies and mutable application code.
+COPY --link --chown=1000:1000 public/models/vegetation/seasonal-catalog/ ./dist/models/vegetation/seasonal-catalog/
+COPY --link --chown=1000:1000 --exclude=seasonal-catalog public/models/vegetation/ ./dist/models/vegetation/
+COPY --link --chown=1000:1000 --exclude=models/vegetation public/ ./dist/
 COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/package.json /app/tsconfig.json ./
 COPY --from=build --chown=node:node /app/server ./server

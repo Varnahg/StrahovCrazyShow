@@ -1,0 +1,11 @@
+[Unit]
+Description=Apply a verified StrahovCrazyShow release
+Requires=docker.service
+Wants=network-online.target
+After=docker.service network-online.target strahov-crazy-show.service
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/strahov-crazy-show/update.py update
+TimeoutStartSec=45min

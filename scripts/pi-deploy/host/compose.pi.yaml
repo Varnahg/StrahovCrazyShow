@@ -1,0 +1,23 @@
+services:
+  game:
+    build: !reset null
+    image: ${STRAHOV_GAME_IMAGE:?}
+    pull_policy: never
+    restart: on-failure
+  rag-secrets:
+    build: !reset null
+    image: ${STRAHOV_TOOLS_IMAGE:?}
+    pull_policy: never
+  rag-bootstrap:
+    build: !reset null
+    image: ${STRAHOV_TOOLS_IMAGE:?}
+    pull_policy: never
+  rag-db:
+    image: ${STRAHOV_DB_IMAGE:?}
+    pull_policy: never
+    restart: on-failure
+
+volumes:
+  rag-data:
+    name: ${STRAHOV_RAG_DATA_VOLUME:?}
+    external: true
