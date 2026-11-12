@@ -1,0 +1,180 @@
+name: Raspberry Pi release
+
+on:
+  workflow_run:
+    workflows: [CI, Source secret hygiene, Feedback browser]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/raspberry-release.yml
+      - Dockerfile
+      - vite.config.ts
+      - scripts/pi-deploy/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('raspberry-pr-{0}', github.event.pull_request.number) || 'raspberry-production' }}
+  queue: max
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: node --test scripts/pi-deploy/release/*.test.mjs
+      - run: docker buildx build --platform linux/arm64 --target runtime --check .
+
+  gate:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      commit: ${{ steps.check.outputs.commit }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Require all three checks for the current main SHA
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/pi-deploy/release/gate.mjs select
+
+  game:
+    needs: gate
+    if: needs.gate.outputs.commit != ''
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 50
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.image.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          lfs: true
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Build and upload candidate game image
+        id: image
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+        run: bash scripts/pi-deploy/release/build-image.sh game
+
+  tools:
+    needs: gate
+    if: needs.gate.outputs.commit != ''
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.image.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          persist-credentials: false
+      - name: Build and upload candidate RAG tools image
+        id: image
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+        run: bash scripts/pi-deploy/release/build-image.sh tools
+
+  smoke:
+    needs: [gate, game, tools]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - name: Start exact digests and verify RAG readiness and two players
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+          RELEASE_GAME_DIGEST: ${{ needs.game.outputs.digest }}
+          RELEASE_TOOLS_DIGEST: ${{ needs.tools.outputs.digest }}
+        run: bash scripts/pi-deploy/release/smoke.sh
+
+  publish:
+    needs: [gate, game, tools, smoke]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+      packages: write
+    env:
+      RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+      RELEASE_GAME_DIGEST: ${{ needs.game.outputs.digest }}
+      RELEASE_TOOLS_DIGEST: ${{ needs.tools.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: bash scripts/pi-deploy/release/install-oras.sh
+      - name: Measure candidate layers and promote one private manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/pi-deploy/release/gate.mjs assert
+          bash scripts/pi-deploy/release/assert-private.sh strahovcrazyshow-game strahovcrazyshow-rag-tools strahovcrazyshow-release
+          printf '%s\n' "$GH_TOKEN" | oras login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          release_dir=$(mktemp -d)
+          node scripts/pi-deploy/release/manifest.mjs "$release_dir/release.json"
+          node scripts/pi-deploy/release/gate.mjs assert
+          cd "$release_dir"
+          oras push --artifact-type application/vnd.strahov.release.v1+json \
+            --annotation "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+            "ghcr.io/varnahg/strahovcrazyshow-release:production" release.json:application/json
+          printf 'Published %s\n' "$RELEASE_COMMIT"

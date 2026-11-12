@@ -28,11 +28,13 @@ test("Docker build runs the frozen dependency tree without an implicit pnpm inst
     new URL("../Dockerfile", import.meta.url),
     "utf8",
   );
-  const invocation = dockerfile.match(
-    /^RUN VITE_MULTIPLAYER_URL=\/ pnpm ([^\r\n]+)$/m,
-  )?.[1];
-  assert.ok(invocation);
-  const arguments_ = invocation.trim().split(/\s+/);
+  // BuildKit can mount public assets on the same logical RUN instruction.
+  const instructions = dockerfile.replace(/[ \t]*\\\r?\n[ \t]*/g, " ");
+  const invocations = [...instructions.matchAll(
+    /^RUN(?: --mount=\S+)* VITE_MULTIPLAYER_URL=\/(?: STRAHOV_DOCKER_COPY_PUBLIC=0)? pnpm ([^\r\n]+)$/gm,
+  )];
+  assert.equal(invocations.length, 1);
+  const arguments_ = invocations[0]![1]!.trim().split(/\s+/);
   assert.ok(arguments_.every((value) => /^[-a-zA-Z0-9_.=]+$/.test(value)));
   const pnpmEntry = process.env.npm_execpath;
   // pnpm run exports npm_execpath; targeted pnpm exec on Windows may not.

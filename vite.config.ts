@@ -37,6 +37,7 @@ export default defineConfig({
     },
   },
   build: {
+    copyPublicDir: process.env.STRAHOV_DOCKER_COPY_PUBLIC !== "0",
     chunkSizeWarningLimit: 1100,
     rolldownOptions: {
       output: {

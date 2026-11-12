@@ -1,0 +1,14 @@
+[Unit]
+Description=StrahovCrazyShow last verified local deployment
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/strahov-crazy-show/update.py boot
+TimeoutStartSec=10min
+
+[Install]
+WantedBy=multi-user.target
