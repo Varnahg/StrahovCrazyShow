@@ -36,6 +36,7 @@ jobs:
           node-version: '24'
           package-manager-cache: false
       - run: node --test scripts/pi-deploy/release/*.test.mjs
+      - run: bash scripts/pi-deploy/release/assert-private.test.sh
       - run: docker buildx build --platform linux/arm64 --target runtime --check .
 
   gate:
@@ -65,8 +66,34 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/pi-deploy/release/gate.mjs select
 
-  game:
+  registry:
     needs: gate
+    if: >-
+      always() && ((needs.gate.result == 'success' && needs.gate.outputs.commit != '') ||
+      (github.event_name == 'workflow_dispatch' && github.actor == 'Varnahg' && github.triggering_actor == 'Varnahg' &&
+      github.ref == 'refs/heads/codex/raspberry-pi-deploy'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.commit || github.sha }}
+          persist-credentials: false
+      - run: bash scripts/pi-deploy/release/install-oras.sh
+      - name: Require private packages before uploading release content
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$GH_TOKEN" | oras login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          bash scripts/pi-deploy/release/assert-private.sh --prepare \
+            strahovcrazyshow-game strahovcrazyshow-rag-tools strahovcrazyshow-release
+
+  game:
+    needs: [gate, registry]
     if: needs.gate.outputs.commit != ''
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 50
@@ -93,7 +120,7 @@ jobs:
         run: bash scripts/pi-deploy/release/build-image.sh game
 
   tools:
-    needs: gate
+    needs: [gate, registry]
     if: needs.gate.outputs.commit != ''
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
