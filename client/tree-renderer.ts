@@ -21,12 +21,15 @@ import sourceMaterials from "../shared/data/assets/tree-materials-manifest.json"
 import bark from "../shared/data/assets/tree-bark-material.json";
 import { TreeAssetLoader, decodeTreeRuntimeChunk, decodeTreePrototype, treePrototypeFoliageRanks, uniqueTreeSourceBytes } from "./tree-asset-loader";
 import { parseTreeClusterBank, type TreeClusterBank } from "../shared/tree-cluster-types";
-import { decodeTreeClusterGeometry } from "./tree-cluster-geometry";
+import { decodeFarTriangleGeometry, decodeTreeClusterGeometry, parseFarTriangleAtlas } from "./tree-cluster-geometry";
 import { applyTreeCrownShading, configureTreeMaterial } from "./tree-appearance";
 import { TreeWindPlugin, type TreeWindState } from "./tree-wind";
 import { createWebGpuShadowDepthWrapper } from "./webgpu-shadow-readiness";
 import { createTreeSeasonGeometryPlan, applyTreeSeasonGeometry, type TreeSeasonGeometryPlan } from "./tree-season-geometry";
 import { TreeSeasonMaterialPlugin, setTreeSeasonMaterialState } from "./tree-season-material";
+import { sessionDiagnostics } from "./session-diagnostics";
+import type { DetailParts } from "./tree-detail-prepare";
+import { createYieldingScheduler, runCoroutineAsync, runCoroutineSync } from "@babylonjs/core/Misc/coroutine";
 
 export const TREE_DETAIL_CACHE_LIMIT = 32;
 export const TREE_DETAIL_BYTES_LIMIT = 64 * 1024 * 1024;
@@ -48,9 +51,10 @@ export function treeDetailForProjection(distance: number, quality: string, profi
   if (quality === "low") return normalized < lowFullCoverageFarDistance ? 1 : 2;
   return treeDetailLevel(normalized, quality) === 2 ? 2 : 1;
 }
-type TreeGroup = { id: string; x: number; z: number; root: TransformNode; lods: Mesh[][]; active: number; desired: number; family: TreeFamily; seed: number; pilot: boolean; lodProfile?: TreeLodProfile; phenology?: TreePhenology; stream?: { id: string; prototype: TreePrototype } };
-type PilotParts = (ReturnType<typeof decodeTreePrototype>[number] & { clusterKey?: string })[];
+type TreeGroup = { id: string; x: number; z: number; root: TransformNode; lods: Mesh[][]; active: number; desired: number; family: TreeFamily; seed: number; pilot: boolean; lodProfile?: TreeLodProfile; phenology?: TreePhenology; stream?: { id: string; prototype: TreePrototype; mid?: MidClusterStream; farRanks?: readonly number[]; detailLeafKeys: ReadonlyMap<string, string> } };
+type PilotParts = DetailParts;
 type ClusterBankEntry = { key: string; file: TreeAssetFile; bank: TreeClusterBank };
+type MidClusterStream = { bank: ClusterBankEntry; ranks: readonly number[] };
 type ClusterTextureEntry = { file: TreeAssetFile; pending: Promise<Texture>; texture?: Texture };
 type ClusterStage = {
   banks: Map<string, ClusterBankEntry>; materials: Map<string, PBRMaterial>;
@@ -86,7 +90,8 @@ function padWindBounds(mesh: Mesh) {
 /** Owns tree lifetime only. Grass/landcover never enter this cache. */
 export class TreeRenderer {
   readonly stats: TreeRenderStats;
-  private readonly loader = new TreeAssetLoader();
+  private readonly loader: TreeAssetLoader;
+  private readonly useDetailWorker: boolean;
   private treeContainer?: AssetContainer;
   private detailMode: "normal" | "far-only";
   private baseLoadError?: string;
@@ -110,6 +115,7 @@ export class TreeRenderer {
   private readonly detailCache = new Map<string, number>();
   private readonly detailBytes = new Map<string, number>();
   private readonly reservations = new Map<string, number>();
+  private readonly uploadScheduler = createYieldingScheduler<Mesh[]>(4);
   private readonly pilotBytes = new Map<string, PilotBytes>();
   private pilotMetricsDirty = true;
   private readonly player = Vector3.Zero();
@@ -122,6 +128,8 @@ export class TreeRenderer {
   private selections: Readonly<Record<string, string>>;
   private disposed = false;
   constructor(private readonly scene: Scene, private readonly options: { treePilot?: TreePilotOptions; treeCatalog?: TreeAssetFile; stats?: TreeRenderStats; detailMode?: "normal" | "far-only" } = {}) {
+    this.useDetailWorker = !scene.getEngine().isWebGPU && import.meta.env?.VITE_WEBGL2_TREE_DETAIL_WORKER === "1";
+    this.loader = new TreeAssetLoader(this.useDetailWorker);
     this.detailMode = options.detailMode ?? "normal";
     this.stats = options.stats ?? { treeInstances: 0 };
     this.selections = Object.freeze({ ...options.treePilot?.selections });
@@ -367,23 +375,44 @@ export class TreeRenderer {
   private async prepareClusterBanks(manifest: TreePilotManifest, ids: string[], stage: ClusterStage) {
     const selected = ids.map(id => manifest.prototypes[this.selections[id]]);
     const banks = new Map<string, ClusterBankEntry>(), files: TreeAssetFile[] = [];
-    if (manifest.version !== 4) return banks;
-    for (const prototype of selected) {
-      files.push(prototype.lods[2]);
-      const cluster = prototype.farCluster;
-      if (!cluster) continue;
-      const file = manifest.banks![cluster.bankId], key = assetKey(file);
+    let visual: { entry: ClusterBankEntry; atlas: ReturnType<typeof parseFarTriangleAtlas>; source: ClusterBankEntry } | undefined;
+    if (manifest.version !== 4) return { banks, visual };
+    const loadBank = async (bankId: string) => {
+      if (banks.has(bankId)) return;
+      const file = manifest.banks![bankId], key = assetKey(file);
       let entry = this.clusterBanks.get(key) ?? stage.banks.get(key);
       if (!entry) {
         entry = { key, file, bank: parseTreeClusterBank(await this.loader.jsonAsset(file)) };
         if (!this.alive()) throw new DOMException("Tree bank disposed", "AbortError");
         stage.banks.set(key, entry);
       }
-      banks.set(cluster.bankId, entry);
-      files.push(file, cluster.placements, ...Object.values(entry.bank.textures));
+      banks.set(bankId, entry);
+      files.push(file, ...Object.values(entry.bank.textures));
+    };
+    for (const prototype of selected) {
+      files.push(prototype.lods[2]);
+      for (const lod of prototype.lods) if (lod.leafBankId) await loadBank(lod.leafBankId);
+      const cluster = prototype.farCluster;
+      if (!cluster) continue;
+      await loadBank(cluster.bankId);
+      files.push(cluster.placements);
+      if (prototype.midCluster?.bankId) await loadBank(prototype.midCluster.bankId);
+      if (prototype.farVisual) {
+        const source = banks.get(cluster.bankId)!;
+        if (!visual) {
+          const file = manifest.farVisualAtlas!;
+          const atlas = parseFarTriangleAtlas(await this.loader.jsonAsset(file), source.bank, source.file.sha256);
+          if (!this.alive()) throw new DOMException("FAR visual atlas disposed", "AbortError");
+          const entry = { key: assetKey(file), file, bank: atlas.material };
+          visual = { entry, atlas, source };
+          stage.banks.set(entry.key, entry);
+          files.push(file, ...Object.values(entry.bank.textures));
+        } else if (visual.source !== source) throw Error("FAR visual atlas cannot use a second source bank");
+        files.push(prototype.farVisual);
+      }
     }
     if (uniqueTreeSourceBytes(files) > TREE_PILOT_BYTES_LIMIT) throw Error("Tree FAR bank/assets exceed byte budget");
-    return banks;
+    return { banks, visual };
   }
   private clusterTexture(file: TreeAssetFile, gamma: boolean, level: number, stage: ClusterStage) {
     const key = assetKey(file) + ":" + gamma + ":" + level;
@@ -406,7 +435,8 @@ export class TreeRenderer {
   }
   private async loadPilotGeometry(manifest: TreePilotManifest, ids: string[], stage: ClusterStage) {
     const selections = this.selections;
-    const banks = manifest.version === 4 ? await this.prepareClusterBanks(manifest, ids, stage) : new Map<string, ClusterBankEntry>();
+    const { banks, visual } = manifest.version === 4 ? await this.prepareClusterBanks(manifest, ids, stage)
+      : { banks: new Map<string, ClusterBankEntry>(), visual: undefined };
     // Validate the admitted initial set before allocating meshes. V3/v4 never
     // fetches near/mid here, and even a complete far population uses two workers.
     const decode = async (id: string) => {
@@ -417,18 +447,33 @@ export class TreeRenderer {
       const parts: PilotParts = decodeTreePrototype(buffer, prototypeId, prototype, manifest.version === 2 ? undefined : 2);
       let sourceBytes = file.bytes;
       const sourceFiles = [file as TreeAssetFile];
+      let mid: MidClusterStream | undefined;
+      let farRanks: readonly number[] | undefined;
+      const detailLeafKeys = new Map(prototype.lods.flatMap(lod => lod.leafBankId ? [[lod.leafBankId, banks.get(lod.leafBankId)!.key] as const] : []));
       if (prototype.farCluster) {
         const cluster = prototype.farCluster, entry = banks.get(cluster.bankId)!;
-        const placementBytes = await this.loader.asset(cluster.placements);
+        const [placementBytes, recipe] = await Promise.all([this.loader.asset(cluster.placements),
+          prototype.farVisual ? this.loader.asset(prototype.farVisual) : undefined]);
         if (!this.alive()) throw new DOMException("Tree clusters disposed", "AbortError");
-        const geometry = decodeTreeClusterGeometry(placementBytes, entry.bank,
-          { groupCount: cluster.groupCount, exactRanks: treePrototypeFoliageRanks(parts) });
+        const coverage = { groupCount: cluster.groupCount, exactRanks: treePrototypeFoliageRanks(parts) };
+        const triangles = recipe ? decodeFarTriangleGeometry(placementBytes, entry.bank, coverage, visual!.atlas, recipe) : undefined;
+        const geometry = triangles ?? decodeTreeClusterGeometry(placementBytes, entry.bank, coverage);
         sourceBytes += placementBytes.byteLength;
         sourceFiles.push(cluster.placements);
-        if (geometry.indices.length) parts.push({ ...geometry, name: prototypeId + "__lod2__cluster-foliage", lod: 2, role: "foliage",
-          materialKey: prototype.family === "evergreen-conifer" ? "fir_tree_01" : "LeafSet024", clusterKey: entry.key });
+        if (recipe) {
+          sourceBytes += recipe.byteLength;
+          sourceFiles.push(prototype.farVisual!);
+        }
+        if (geometry.indices.length) parts.push({ positions: geometry.positions, normals: geometry.normals,
+          indices: geometry.indices, uvs: geometry.uvs, colors: geometry.colors, name: prototypeId + "__lod2__cluster-foliage", lod: 2, role: "foliage",
+          materialKey: prototype.family === "evergreen-conifer" ? "fir_tree_01" : "LeafSet024", clusterKey: triangles ? visual!.entry.key : entry.key });
+        if (prototype.midCluster || detailLeafKeys.size) farRanks = triangles?.ranks ?? treePrototypeFoliageRanks(parts);
+        if (prototype.midCluster) mid = {
+          bank: prototype.midCluster.bankId ? banks.get(prototype.midCluster.bankId)! : entry,
+          ranks: farRanks!,
+        };
       }
-      return { id, prototypeId, prototype, parts, sourceBytes, sourceFiles };
+      return { id, prototypeId, prototype, parts, sourceBytes, sourceFiles, mid, farRanks, detailLeafKeys };
     };
     const decoded: Awaited<ReturnType<typeof decode>>[] = [];
     if (manifest.version === 2) decoded.push(...await Promise.all(ids.map(decode)));
@@ -451,7 +496,10 @@ export class TreeRenderer {
     }
     for (const key of materialKeys) await this.pilotMaterial(key);
     const usedBanks = new Set(decoded.flatMap(d => d.parts.flatMap(p => p.clusterKey ? [p.clusterKey] : [])));
+    for (const { mid } of decoded) if (mid) usedBanks.add(mid.bank.key);
+    for (const { detailLeafKeys } of decoded) for (const key of detailLeafKeys.values()) usedBanks.add(key);
     for (const entry of banks.values()) if (usedBanks.has(entry.key)) await this.clusterMaterial(entry, stage);
+    if (visual && usedBanks.has(visual.entry.key)) await this.clusterMaterial(visual.entry, stage);
     if (!this.alive()) return;
     uniqueTreeSourceBytes([...this.textureSources.values(), ...[...stage.textures.values()].map(entry => entry.file)]);
     const staged: { group: TreeGroup; meshes: Mesh[]; fresh: boolean; item: typeof decoded[number] }[] = [];
@@ -472,7 +520,8 @@ export class TreeRenderer {
       }
       this.pilotBytes.delete(group.id + ":all");
       group.lods = [0, 1, 2].map(lod => meshes.filter(m => m.metadata.detailLevel === lod)); group.family = item.prototype.family; group.pilot = true; group.lodProfile = item.prototype.lodProfile; group.phenology = undefined;
-      group.stream = manifest.version !== 2 ? { id: item.prototypeId, prototype: item.prototype } : undefined;
+      group.stream = manifest.version !== 2 ? { id: item.prototypeId, prototype: item.prototype, mid: item.mid,
+        farRanks: item.farRanks, detailLeafKeys: item.detailLeafKeys } : undefined;
       this.pilotBytes.set(group.id + ":" + (manifest.version !== 2 ? 2 : "all"), this.measurePilot(item.parts, meshes, item.sourceBytes, item.sourceFiles));
       if (fresh) this.treeGroups.push(group);
       this.trees = this.trees.filter(m => !m.isDisposed()); this.trees.push(...meshes);
@@ -495,19 +544,42 @@ export class TreeRenderer {
   /** One constructor path preserves winding, local normals, root ownership and
    * partial-allocation cleanup for both bootstrap and streamed geometry. */
   private createPilotMeshes(group: TreeGroup, parts: PilotParts, stagedMaterials?: Map<string, PBRMaterial>) {
+    return runCoroutineSync(this.createPilotMeshSteps(group, parts, stagedMaterials));
+  }
+  private *createPilotMeshSteps(group: TreeGroup, parts: PilotParts, stagedMaterials?: Map<string, PBRMaterial>,
+    current = () => true): Generator<void, Mesh[], void> {
     const meshes: Mesh[] = [];
     try {
+      const originalRoot = group.root.computeWorldMatrix(true).clone();
       for (const part of parts) {
+        if (!current()) throw new DOMException("Tree detail retired during mesh upload", "AbortError");
         const mesh = new Mesh(part.name, this.scene); meshes.push(mesh);
+        mesh.setEnabled(false);
+        mesh.parent = group.root;
         mesh.sideOrientation = this.scene.useRightHandedSystem ? Material.CounterClockWiseSideOrientation : Material.ClockWiseSideOrientation;
         const data = new VertexData(); data.positions = part.positions; data.normals = part.normals; data.uvs = part.uvs; data.colors = part.colors ?? null;
-        const plan = part.colors ? createTreeSeasonGeometryPlan(part.indices, part.colors) : undefined;
-        data.indices = plan?.indices ?? part.indices; data.applyToMesh(mesh);
+        const plan = part.seasonPlan ?? (part.colors ? createTreeSeasonGeometryPlan(part.indices, part.colors) : undefined);
+        data.indices = plan?.indices ?? part.indices;
+        const upload = data._applyToCoroutine(mesh, false, true);
+        for (;;) {
+          if (!current()) throw new DOMException("Tree detail retired during mesh upload", "AbortError");
+          const step = upload.next();
+          if (step.done) break;
+          yield;
+        }
         if (plan) this.plans.set(mesh, plan);
         mesh.material = part.clusterKey ? stagedMaterials?.get(part.clusterKey) ?? this.clusterMaterials.get(part.clusterKey)! : this.materials.get(part.materialKey)!;
         if (!mesh.material) throw Error("Tree material owner missing");
         this.describe(mesh, group, part.lod, part.role === "foliage", true);
         if (part.clusterKey) mesh.metadata.treeClusterBank = part.clusterKey;
+        yield;
+      }
+      if (!current()) throw new DOMException("Tree detail retired before publication", "AbortError");
+      if (!originalRoot.equals(group.root.computeWorldMatrix(true))) {
+        for (const mesh of meshes) {
+          attachAuthoredTreeMesh(mesh, group.root);
+          if (mesh.metadata?.windDeformed) padWindBounds(mesh);
+        }
       }
       return meshes;
     } catch (error) { for (const mesh of meshes) mesh.dispose(false, false); throw error; }
@@ -575,7 +647,8 @@ export class TreeRenderer {
         if (!asset || tree.lods[lod].length || this.failedTrees.has(key)) continue;
         // V3 counts immutable source bytes. V1 retains its conservative extra
         // chunk allowance for derived crown normals; neither is total VRAM.
-        const reservation = asset.bytes * (stream ? 1 : 2);
+        const midPlacements = lod === 1 ? stream?.prototype.midCluster?.placements : undefined;
+        const reservation = stream ? asset.bytes + (midPlacements?.bytes ?? 0) : asset.bytes * 2;
         if (reservation > TREE_DETAIL_BYTES_LIMIT) continue;
         this.trimDetailCache(1, reservation);
         if (this.detailCache.size + this.reservations.size >= TREE_DETAIL_CACHE_LIMIT || this.bytes() + this.reservedBytes() + reservation > TREE_DETAIL_BYTES_LIMIT) continue;
@@ -599,17 +672,69 @@ export class TreeRenderer {
     return this.alive() && this.treeGroups.includes(tree) && tree.stream === stream && (!!stream || !tree.pilot);
   }
   private async loadDetail(tree: TreeGroup, lod: TreeLod, asset: TreeAssetFile, stream: TreeGroup["stream"]) {
-    const buffer = await this.loader.asset(asset), key = tree.id + ":" + lod;
-    if (!this.currentDetail(tree, stream) || this.detailMode === "far-only") return;
+    const cluster = lod === 1 ? stream?.prototype.midCluster : undefined;
+    const mid = stream?.mid;
+    if (lod === 2) throw Error("Invalid streamed detail level");
+    if (cluster && (!mid || !this.clusterMaterials.has(mid.bank.key))) throw Error("Tree mid bank missing from far pool");
+    const prepared = stream ? await this.loader.prepareDetail({
+      id: stream.id, lod, prototype: stream.prototype,
+      groups: cluster && mid ? { key: mid.bank.key, bank: mid.bank.bank, ranks: mid.ranks } : undefined,
+    }, () => this.currentDetail(tree, stream) && this.detailMode === "normal") : undefined;
+    const buffer = stream ? undefined : await this.loader.asset(asset);
+    const key = tree.id + ":" + lod;
+    if (!this.currentDetail(tree, stream) || this.detailMode === "far-only" || (stream && !prepared)) return;
     let meshes: Mesh[], retainedBytes: number;
-    if (stream) {
-      const parts = decodeTreePrototype(buffer, stream.id, stream.prototype, lod);
+    let meshMs = 0, meshMaxStepMs = 0, meshWallMs = 0;
+    if (prepared) {
+      const { parts } = prepared;
+      const leafBankId = stream?.prototype.lods[lod].leafBankId;
+      // Bind the material owned by the already-loaded catalog, never by GLB data.
+      if (stream && leafBankId) {
+        const clusterKey = stream.detailLeafKeys.get(leafBankId);
+        if (!clusterKey || !this.clusterMaterials.has(clusterKey)) throw Error("Tree detail leaf bank missing from far pool");
+        const farRanks = stream.farRanks;
+        if (farRanks) {
+          const ranks = treePrototypeFoliageRanks(parts);
+          if (ranks.length !== farRanks.length || ranks.some((rank, i) => rank !== farRanks[i]))
+            throw Error("Tree detail rank coverage differs from far");
+        }
+        for (const part of parts) if (part.role === "foliage") part.clusterKey = clusterKey;
+      }
       // All roles use the same preloaded pool as far. Detail does no texture IO.
-      if (parts.some(part => !this.materials.has(part.materialKey))) throw Error("Streamed tree material missing from far pool");
-      meshes = this.createPilotMeshes(tree, parts); retainedBytes = buffer.byteLength;
-      this.pilotBytes.set(key, this.measurePilot(parts, meshes, retainedBytes, [asset]));
+      if (parts.some(part => !part.clusterKey && !this.materials.has(part.materialKey))) throw Error("Streamed tree material missing from far pool");
+      const sourceFiles = [asset];
+      retainedBytes = asset.bytes;
+      if (cluster) {
+        sourceFiles.push(cluster.placements);
+        retainedBytes += cluster.placements.bytes;
+      }
+      const meshStarted = performance.now();
+      const steps = this.createPilotMeshSteps(tree, parts, undefined,
+        () => this.currentDetail(tree, stream) && this.detailMode === "normal");
+      function* measuredSteps(): Generator<void, Mesh[], void> {
+        for (;;) {
+          const start = performance.now();
+          let step: IteratorResult<void, Mesh[]>;
+          try { step = steps.next(); }
+          finally {
+            const elapsed = performance.now() - start;
+            meshMs += elapsed;
+            meshMaxStepMs = Math.max(meshMaxStepMs, elapsed);
+          }
+          if (step.done) return step.value;
+          yield;
+        }
+      }
+      meshes = await runCoroutineAsync(measuredSteps(), this.uploadScheduler);
+      meshWallMs = performance.now() - meshStarted;
+      if (!this.currentDetail(tree, stream) || this.detailMode !== "normal") {
+        for (const mesh of meshes) mesh.dispose(false, false);
+        return;
+      }
+      this.pilotBytes.set(key, this.measurePilot(parts, meshes, retainedBytes, sourceFiles));
       this.pilotMetricsDirty = true;
     } else {
+      if (!buffer) throw Error("Missing legacy detail buffer");
         const decoded = decodeTreeRuntimeChunk(buffer);
         if (decoded.id !== tree.id || decoded.lod !== lod || decoded.primitives.some((p: { material: number }) => !this.sharedTreeMaterials[p.material])) throw Error("Tree detail identity/material mismatch");
         meshes = [];
@@ -624,6 +749,12 @@ export class TreeRenderer {
     this.reservations.delete(key); this.detailBytes.set(key, retainedBytes); this.detailCache.set(key, ++this.revision);
     tree.lods[lod] = meshes; this.trees.push(...meshes);
     this.applyVisibility();
+    if (prepared) sessionDiagnostics.event("tree-detail-prepared", {
+      model: stream?.id, lod, worker: prepared.worker, prepareMs: prepared.prepareMs,
+      seasonPlanMs: prepared.seasonPlanMs, meshMs, meshMaxStepMs, meshWallMs, bytes: retainedBytes,
+      ...(stream?.prototype.lods[lod].leafBankId ? { leafBank: stream.prototype.lods[lod].leafBankId,
+        assetSha256: asset.sha256, triangles: meshes.reduce((count, mesh) => count + mesh.getTotalIndices() / 3, 0) } : {}),
+    });
   }
   private applyVisibility() {
     if (!this.alive()) return;

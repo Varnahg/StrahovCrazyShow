@@ -9,7 +9,10 @@ import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { GLTFFileLoader } from "@babylonjs/loaders/glTF/glTFFileLoader";
-import { TreeAssetLoader, decodeTreePrototype, decodeTreeRuntimeChunk, readTreeGlb } from "../client/tree-asset-loader";
+import { TreeAssetLoader, decodeTreePrototype, decodeTreeRuntimeChunk, readTreeGlb, treePrototypeFoliageRanks } from "../client/tree-asset-loader";
+import type { TreeDetailReply, TreeDetailRequest } from "../client/tree-detail-worker";
+import { createTreeSeasonGeometryPlan } from "../client/tree-season-plan";
+import type { TreeSeasonGeometryPlan } from "../client/tree-season-plan";
 import { TreeRenderer, TREE_DETAIL_CACHE_LIMIT } from "../client/tree-renderer";
 import { parseTreePilotManifest, parseLegacyTreeManifest, type TreePrototype } from "../shared/tree-asset-types";
 import { getTreeSeasonState } from "../shared/tree-season";
@@ -22,6 +25,46 @@ const hash = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("h
 const asBuffer = (bytes: Uint8Array) => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 const source = TREES.find(t => t.reconstruction?.appearance === "broadleaf") ?? TREES.find(t => t.reconstruction?.appearance !== "conifer")!;
 const prototypeId = "test-broadleaf";
+test("cooperative detail upload remains hidden and cleans allocations when retired between attributes", t => {
+  const engine = new NullEngine(), scene = new Scene(engine), renderer = new TreeRenderer(scene), r = renderer as any;
+  t.after(() => { renderer.dispose(); scene.dispose(); engine.dispose(); });
+  const f = fixture(1), prototype = f.manifest.prototypes[prototypeId] as TreePrototype;
+  const parts = decodeTreePrototype(asBuffer(f.bytes), prototypeId, prototype, 1);
+  const group = r.createGroup(source.osmId);
+  r.treeGroups.push(group);
+  let current = true;
+  const upload = r.createPilotMeshSteps(group, parts, undefined, () => current);
+  assert.equal(upload.next().done, false);
+  assert.equal(scene.meshes.length, 1);
+  assert.equal(scene.meshes[0].isEnabled(), false);
+  assert.equal(scene.meshes[0].parent, group.root);
+  current = false;
+  assert.throws(() => upload.next(), { name: "AbortError" });
+  assert.equal(scene.meshes.length, 0);
+  assert.deepEqual(group.lods, [[], [], []]);
+  assert.equal(r.detailCache.size, 0);
+});
+
+test("a moved tree root reaches every mesh before cooperative upload is published", t => {
+  const engine = new NullEngine(), scene = new Scene(engine), renderer = new TreeRenderer(scene), r = renderer as any;
+  t.after(() => { renderer.dispose(); scene.dispose(); engine.dispose(); });
+  const f = fixture(1), prototype = f.manifest.prototypes[prototypeId] as TreePrototype;
+  const parts = decodeTreePrototype(asBuffer(f.bytes), prototypeId, prototype, 1);
+  for (const part of parts) r.materials.set(part.materialKey, new PBRMaterial(part.materialKey, scene));
+  const group = r.createGroup(source.osmId);
+  r.treeGroups.push(group);
+  const upload = r.createPilotMeshSteps(group, parts);
+  while (!scene.meshes[0]?.metadata?.treeRole) assert.equal(upload.next().done, false);
+  const position = { x: group.x + 7, y: group.root.position.y + 2, z: group.z - 3 };
+  assert.ok(renderer.setTreeTransform(group.id, position, 0));
+  let step = upload.next();
+  while (!step.done) step = upload.next();
+  for (const mesh of step.value) {
+    const p = mesh.getAbsolutePosition();
+    assert.ok(Math.abs(p.x - position.x) < 0.001 && Math.abs(p.y - position.y) < 0.001 && Math.abs(p.z - position.z) < 0.001);
+    assert.equal(mesh.isEnabled(), false);
+  }
+});
 test("source bark descriptor stays identical to the public provenance and original channels", () => {
   const original = JSON.parse(readFileSync("public/models/vegetation/realistic/texture-manifest.json", "utf8"));
   assert.deepEqual(barkSource, original.assets.find((asset: any) => asset.id === "Bark012"));
@@ -30,7 +73,7 @@ test("source bark descriptor stays identical to the public provenance and origin
     assert.equal(bytes.length, channel.bytes); assert.equal(hash(bytes), channel.sha256);
   }
 });
-function fixture() {
+function fixture(onlyLod?: number) {
   const chunks: Uint8Array[] = [], views: any[] = [], accessors: any[] = [], nodes: any[] = [], meshes: any[] = []; let offset = 0;
   const append = (data: Float32Array | Uint16Array, type: string, normalized = false) => {
     const bytes = new Uint8Array(data.buffer); const padding = new Uint8Array((4 - bytes.length % 4) % 4);
@@ -39,6 +82,7 @@ function fixture() {
     accessors.push({ bufferView: views.length - 1, componentType: data instanceof Float32Array ? 5126 : 5123, count: data.length / components[type], type, ...(normalized ? { normalized: true } : {}) }); return accessors.length - 1;
   };
   for (let lod = 0; lod < 3; lod++) for (const role of ["wood", "foliage"]) {
+    if (onlyLod !== undefined && onlyLod !== lod) continue;
     const name = `${prototypeId}__lod${lod}__${role}`;
     const attributes: any = {
       POSITION: append(new Float32Array([0,0,0, 1,0,0, 0,1,0, 0,0,1, 1,0,1, 0,1,1]), "VEC3"),
@@ -86,6 +130,46 @@ test("v1 rejects malformed late primitives and unsupported accessors, retaining 
   const f=fixture();f.json.bufferViews.at(-1)!.byteLength=1;assert.throws(()=>readTreeGlb(asBuffer(f.encode())),/bounds/);
 });
 
+test("v4 detail leaf banks are tied to a foliage mesh and mutually exclusive with mid sidecars", () => {
+  const f = fixture();
+  const lods = f.prototype.lods.map((file, lod) => ({ ...file,
+    url: `/models/vegetation/seasonal/lod${lod}.glb`, leafBankId: lod === 1 ? "leaf" : undefined }));
+  const manifest = { ...f.manifest, version: 4, banks: { leaf: { ...f.file, bytes: 128 } },
+    prototypes: { [prototypeId]: { ...f.prototype, lods } } };
+  assert.equal(parseTreePilotManifest(manifest).prototypes[prototypeId].lods[1].leafBankId, "leaf");
+  lods[2].leafBankId = "leaf";
+  assert.throws(() => parseTreePilotManifest(manifest), /detail leaf bank/);
+  lods[2].leafBankId = undefined;
+  lods[1].leafBankId = "missing";
+  assert.throws(() => parseTreePilotManifest(manifest), /detail leaf bank/);
+  lods[1].leafBankId = "leaf";
+  const mixed = { ...manifest, prototypes: { [prototypeId]: { ...manifest.prototypes[prototypeId], midCluster: {} } } };
+  assert.throws(() => parseTreePilotManifest(mixed), /detail leaf bank/);
+});
+
+test("streamed quarter foliage binds its owned atlas and preserves FAR ranks", async t => {
+  const f = fixture(), engine = new NullEngine(), scene = new Scene(engine);
+  const renderer = new TreeRenderer(scene), internals = renderer as any;
+  t.after(() => { renderer.dispose(); scene.dispose(); engine.dispose(); });
+  const bark = new PBRMaterial("bark", scene), atlas = new PBRMaterial("quarter atlas", scene);
+  internals.materials.set("Bark012", bark);
+  internals.clusterMaterials.set("owned-atlas", atlas);
+  const prototype = { ...f.prototype, lods: f.prototype.lods.map((file, lod) => lod === 1 ? { ...file, leafBankId: "leaf" } : file) };
+  const group = internals.createGroup(source.osmId);
+  group.pilot = true;
+  group.desired = 1;
+  const parts = decodeTreePrototype(asBuffer(f.bytes), prototypeId, f.prototype).filter(part => part.lod === 1);
+  group.stream = { id: prototypeId, prototype, detailLeafKeys: new Map([["leaf", "owned-atlas"]]), farRanks: treePrototypeFoliageRanks(parts) };
+  internals.treeGroups.push(group);
+  t.mock.method(internals.loader, "prepareDetail", async () => ({ parts, worker: true, prepareMs: 1, seasonPlanMs: 1 }));
+  await internals.loadDetail(group, 1, prototype.lods[1], group.stream);
+  assert.equal(group.active, 1);
+  assert.equal(group.lods[1].find((mesh: Mesh) => mesh.metadata.treeRole === "foliage").material, atlas);
+  assert.equal(group.lods[1].find((mesh: Mesh) => mesh.metadata.treeRole === "wood").material, bark);
+  group.stream.farRanks = [];
+  await assert.rejects(internals.loadDetail(group, 1, prototype.lods[1], group.stream), /rank coverage differs/);
+});
+
 test("identical requests coalesce; integrity and response caps fail without retained cache", async t => {
   const f=fixture(),loader=new TreeAssetLoader();let calls=0;
   t.mock.method(globalThis,"fetch",async()=>{calls++;return new Response(f.bytes);});
@@ -102,6 +186,178 @@ test("synchronous transport rejection does not remain in the coalescing registry
   t.mock.method(globalThis,"fetch",()=>{calls++;throw Error("transport failed");});
   await assert.rejects(loader.asset(f.file),/transport/);await assert.rejects(loader.asset(f.file),/transport/);
   assert.equal(calls,2);assert.equal(loader.stats.pending,0);loader.dispose();
+});
+
+test("retired direct detail finishes its transfer without decoding or publishing", async t => {
+  const loader = new TreeAssetLoader(), f = fixture(1), bytes = Uint8Array.of(1, 2, 3, 4);
+  const file = { ...f.file, bytes: bytes.length, sha256: hash(bytes) };
+  const prototype = { ...f.prototype, lods: f.prototype.lods.map(lod => ({ ...lod, ...file })) };
+  let finish!: (response: Response) => void;
+  t.mock.method(globalThis, "fetch", () => new Promise<Response>(resolve => { finish = resolve; }));
+  t.after(() => loader.dispose());
+  let current = true;
+  const pending = loader.prepareDetail({ id: prototypeId, prototype, lod: 1 }, () => current);
+  current = false;
+  finish(new Response(bytes));
+  assert.equal(await pending, undefined, "invalid GLB would throw if the retired detail reached decoding");
+  assert.equal(loader.stats.pending, 0);
+});
+
+test("detail worker verifies and transfers bytes, shares a request and stops with its loader", async t => {
+  const originals = ["self", "Worker"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
+  t.after(() => {
+    for (const [key, descriptor] of originals) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    }
+  });
+  let worker: MockWorker | undefined;
+  let lastTransfer: ArrayBuffer | undefined;
+  const scope = {
+    onmessage: undefined as undefined | ((event: { data: TreeDetailRequest }) => Promise<void>),
+    postMessage(reply: TreeDetailReply, transfer?: Transferable[]) {
+      lastTransfer = transfer?.[0] as ArrayBuffer | undefined;
+      const data = structuredClone(reply, { transfer });
+      worker?.onmessage?.({ data });
+    },
+  };
+  class MockWorker {
+    onmessage?: (event: { data: TreeDetailReply }) => void;
+    terminated = false;
+    requests = 0;
+    constructor(readonly url: URL) {
+      assert.match(url.pathname, /tree-detail-worker\.ts$/);
+      assert.equal(worker, undefined, "one worker per loader");
+      worker = this;
+    }
+    postMessage(data: TreeDetailRequest) {
+      this.requests++;
+      void scope.onmessage!({ data: structuredClone(data) });
+    }
+    terminate() { this.terminated = true; }
+  }
+  Object.defineProperty(globalThis, "self", { configurable: true, value: scope });
+  Object.defineProperty(globalThis, "Worker", { configurable: true, value: MockWorker });
+  await import("../client/tree-detail-worker");
+
+  const bytes = Uint8Array.of(1, 2, 3, 4);
+  const file = { url: "/models/vegetation/detail.glb", bytes: bytes.length, sha256: hash(bytes) };
+  const streamed = fixture(1);
+  const stream = streamed.manifest.prototypes[prototypeId] as TreePrototype;
+  const placement = new ArrayBuffer(32), view = new DataView(placement);
+  view.setUint16(0, 1234, true);
+  view.setFloat32(28, 1, true);
+  const sidecar = { url: "/models/vegetation/groups.bin", bytes: placement.byteLength, sha256: hash(new Uint8Array(placement)) };
+  let fetches = 0;
+  let held!: (response: Response) => void;
+  t.mock.method(globalThis, "fetch", async (url: string) => {
+    if (url === streamed.file.url) return new Response(streamed.bytes);
+    if (url === sidecar.url) return new Response(placement);
+    fetches++;
+    return fetches === 3 ? new Promise<Response>(resolve => { held = resolve; }) : new Response(bytes);
+  });
+  const loader = new TreeAssetLoader(true);
+  t.after(() => loader.dispose());
+  assert.equal(Boolean(worker), false, "do not start a worker during bootstrap");
+  const first = loader.detailAsset(file);
+  assert.equal(loader.detailAsset(file), first);
+  assert.equal(loader.asset(file), first, "same verified bytes share the in-flight request");
+  assert.deepEqual(new Uint8Array(await first), bytes);
+  assert.equal(lastTransfer?.byteLength, 0, "the source buffer must detach on transfer");
+  assert.equal(worker!.requests, 1);
+  await assert.rejects(loader.detailAsset({ ...file, sha256: "0".repeat(64) }), /SHA-256 mismatch/);
+  assert.equal(loader.stats.bytesFetched, 8);
+
+  const prepared = await loader.prepareDetail({
+    id: prototypeId, lod: 1,
+    prototype: { ...stream, midCluster: { placements: sidecar, groupCount: 1 } },
+    groups: {
+      key: "test-bank", ranks: [1, 1234, 65534],
+      bank: {
+        version: 1, units: "metres", coordinateSpace: "gltf-y-up", alphaCutoff: .5, normalMapStrength: 1,
+        textures: { color: file, opacity: file, normalGL: file, roughness: file },
+        prototypes: [{ id: 0, cards: [{ positions: [0,0,0, 1,0,0, 1,1,0, 0,1,0],
+          normals: [0,0,1, 0,0,1, 0,0,1, 0,0,1], uvs: [0,0, 1,0, 1,1, 0,1] }] }],
+      },
+    },
+  });
+  assert.ok(prepared);
+  assert.equal(prepared.worker, true);
+  const original = decodeTreePrototype(asBuffer(streamed.bytes), prototypeId, stream, 1);
+  for (let i = 0; i < original.length; i++) {
+    const seasonPlan: TreeSeasonGeometryPlan | undefined = prepared.parts[i].seasonPlan;
+    const { seasonPlan: _plan, ...part } = prepared.parts[i];
+    if (original[i].colors) {
+      const expected = createTreeSeasonGeometryPlan(original[i].indices, original[i].colors!);
+      assert.deepEqual(seasonPlan, expected);
+      assert.equal(part.indices, seasonPlan!.indices, "GPU upload shares the prepared index buffer");
+      assert.deepEqual(part, { ...original[i], indices: expected.indices });
+    } else assert.deepEqual(part, original[i]);
+  }
+  assert.equal(prepared.parts[2].clusterKey, "test-bank");
+  assert.deepEqual([...prepared.parts[2].indices], [0, 1, 2, 0, 2, 3]);
+  assert.deepEqual([...prepared.parts[2].seasonPlan!.ranks], [1234]);
+  assert.deepEqual([...prepared.parts[2].seasonPlan!.indexEnds], [6]);
+  assert.equal(lastTransfer?.byteLength, 0, "prepared buffers must detach on transfer");
+  assert.equal(loader.stats.bytesFetched, 8 + streamed.bytes.length + placement.byteLength);
+
+  const pending = loader.detailAsset(file);
+  assert.equal(loader.stats.pending, 1);
+  loader.dispose();
+  await assert.rejects(pending, { name: "AbortError" });
+  held(new Response(bytes));
+  assert.equal(worker!.terminated, true);
+  assert.equal(loader.stats.pending, 0);
+  assert.throws(() => loader.detailAsset(file), { name: "AbortError" });
+});
+
+test("detail assets still use verified loading without worker support", async t => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "Worker");
+  Object.defineProperty(globalThis, "Worker", { configurable: true, value: undefined });
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "Worker", original);
+    else Reflect.deleteProperty(globalThis, "Worker");
+  });
+  const bytes = Uint8Array.of(1, 2, 3);
+  const file = { url: "/models/vegetation/detail.glb", bytes: bytes.length, sha256: hash(bytes) };
+  t.mock.method(globalThis, "fetch", async () => new Response(bytes));
+  const loader = new TreeAssetLoader(true);
+  t.after(() => loader.dispose());
+  assert.deepEqual(new Uint8Array(await loader.detailAsset(file)), bytes);
+  await assert.rejects(loader.detailAsset({ ...file, sha256: "0".repeat(64) }), /SHA-256 mismatch/);
+});
+
+test("a failed worker falls back for the already shared detail request", async t => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "Worker");
+  let fail!: () => void;
+  let started = 0;
+  class UnavailableWorker {
+    onerror?: (event: { message: string; preventDefault(): void }) => void;
+    constructor() { started++; }
+    postMessage() {
+      fail = () => this.onerror!({ message: "module worker unavailable", preventDefault() {} });
+    }
+    terminate() {}
+  }
+  Object.defineProperty(globalThis, "Worker", { configurable: true, value: UnavailableWorker });
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "Worker", original);
+    else Reflect.deleteProperty(globalThis, "Worker");
+  });
+  const bytes = Uint8Array.of(1, 2, 3);
+  const file = { url: "/models/vegetation/detail.glb", bytes: bytes.length, sha256: hash(bytes) };
+  let fetches = 0;
+  t.mock.method(globalThis, "fetch", async () => { fetches++; return new Response(bytes); });
+  const loader = new TreeAssetLoader(true);
+  t.after(() => loader.dispose());
+  const pending = loader.detailAsset(file);
+  fail();
+  assert.equal(loader.detailAsset(file), pending);
+  assert.deepEqual(new Uint8Array(await pending), bytes);
+  assert.equal(fetches, 1);
+  assert.equal(loader.stats.requests, 1);
+  await assert.rejects(loader.detailAsset({ ...file, sha256: "0".repeat(64) }), /SHA-256 mismatch/);
+  assert.equal(started, 1, "do not restart an unavailable worker");
 });
 
 test("HTTP-compatible integrity still rejects corruption and aborts cooperative hashing", async t => {
