@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Strahov Crazy Show — maketa herního chatu</title>
+  <style>
+    @font-face{font-family:Manrope;src:url("../../../../../public/fonts/manrope/Manrope-Variable.ttf") format("truetype");font-weight:200 800;font-display:swap}
+    :root{color-scheme:dark;--ink:#fff3e4;--muted:#cfbfb2;--accent:#ffcf92;--button-ink:#49301d;--line:#a18370;--panel:#251b1a;--recess:#1a1414;font-family:Manrope,system-ui,sans-serif;color:var(--ink);background:#342c27}
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    body{margin:0;min-height:100dvh}
+    button,input,select{font:inherit}
+    button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+    button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+    :focus:not(:focus-visible){outline:none}
+    button,select{color:inherit}
+    svg{display:block}
+    .icons{position:absolute;width:0;height:0;overflow:hidden}
+    .world{position:fixed;inset:0;background:linear-gradient(180deg,#17100b68,transparent 25%,transparent 57%,#17100ba6),url("../../../../../docs/verification-evidence/feedback-20261020/final-no-hud.webp") center 54%/cover no-repeat}
+    .hud{position:relative;min-height:100dvh;pointer-events:none}
+    .hud button{pointer-events:auto}
+    .surface{border:1px solid #f3c89c65;box-shadow:0 12px 34px #170e0e5e,inset 0 1px #fff3e412;background:rgb(37 27 26 / .88);border-radius:14px}
+    .top{position:absolute;inset:20px 24px auto;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .place,.weather{display:flex;align-items:center;gap:11px;padding:9px 13px;font-size:13px}
+    .place strong,.weather strong{display:block;font-weight:800}
+    .place small,.weather small{display:block;color:var(--muted);font-size:.75rem}
+    .monogram{display:grid;place-items:center;width:33px;height:33px;border-radius:9px;background:#ffcf9224;color:var(--accent);font-weight:800;font-size:17px}
+    .mock-mark{position:absolute;top:84px;right:24px;color:var(--ink);font-size:11px;font-weight:800;background:rgb(37 27 26 / .88);padding:4px 7px;border-radius:5px}
+    .west{position:absolute;left:24px;bottom:24px;display:grid;justify-items:start;gap:12px;width:min(350px,34vw)}
+    .preview{position:relative;width:100%;overflow:hidden}
+    .preview-head{width:100%;display:flex;align-items:center;gap:8px;background:transparent;border:0;padding:9px 11px;text-align:left;font-weight:800;min-height:44px}
+    .preview-head::after{content:"";position:absolute;inset:0}
+    .preview-head:focus-visible{outline-offset:-4px}
+    .preview-head svg,.tool svg,.close svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    .preview-head svg,.dock .active,.badge{color:var(--accent)}
+    .badge{margin-left:auto;padding:2px 7px;border-radius:999px;background:#ffcf9224;font-size:.75rem;white-space:nowrap}
+    .shortcut{position:absolute;right:24px;top:113px;display:flex;align-items:center;gap:6px;padding:5px 8px;pointer-events:auto;background:var(--panel);border-radius:8px;font-size:.75rem}
+    .shortcut input{accent-color:var(--accent);margin:0}
+    kbd{font:700 11px Manrope,system-ui,sans-serif;background:var(--recess);border:1px solid var(--line);border-radius:5px;padding:2px 6px;color:var(--ink)}
+    .preview-list{list-style:none;margin:0;padding:0 11px 9px;display:grid;gap:5px}
+    .preview-list li{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:.875rem}
+    .preview-list span{color:var(--muted);font-size:.75rem;font-weight:800;margin-right:5px}
+    .map{width:190px;overflow:hidden;font-size:11px}
+    .map-head,.map-foot{padding:5px 9px;display:flex;justify-content:space-between;color:var(--muted)}
+    .map-body{width:100%;height:122px;background:#263c39}
+    .dock{position:absolute;bottom:24px;left:50%;translate:-50%;display:flex;padding:5px;gap:4px}
+    .tool{min-width:58px;min-height:48px;border-radius:8px;display:grid;justify-items:center;align-content:center;gap:3px;font-size:10px;color:var(--muted);background:none;border:1px solid transparent}
+    .dock .active{border-color:var(--accent);background:#ffcf9220;font-weight:800}
+    .dock .active::after{content:"";width:12px;height:2px;border-radius:2px;background:var(--accent)}
+    .tool .count{display:none}
+    .tool:disabled{opacity:1}
+    dialog{width:min(720px,calc(100% - 32px));height:min(620px,calc(100dvh - 36px));max-width:none;max-height:none;padding:0;margin:auto;color:var(--ink);border:1px solid #f3c89c80;border-radius:20px;background:rgb(37 27 26 / .96);box-shadow:0 30px 90px #0a0708a3}
+    dialog[open]{display:grid;grid-template-rows:auto auto auto minmax(7rem,1fr) auto auto;overflow:auto;overscroll-behavior:contain}
+    dialog::backdrop{background:#140d0d65}
+    .dialog-head{display:flex;align-items:center;gap:12px;padding:18px 22px 12px}
+    .dialog-head h1{font-size:1.5rem;line-height:1.25;margin:1px 0 0;font-weight:800}
+    .eyebrow{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--accent)}
+    .close{margin-left:auto;flex:none;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--recess)}
+    .channels{display:flex;flex-wrap:wrap;gap:6px;padding:0 22px 8px}
+    .channel,.reply,.cancel,.jump-new{border:1px solid var(--line);border-radius:8px;background:var(--recess);font-weight:800}
+    .channel{min-height:36px;padding:5px 10px;font-size:.8125rem}
+    .channel[aria-pressed="true"]{background:var(--accent);color:var(--button-ink);border-color:var(--accent)}
+    .channel.ai{margin-left:auto}
+    .audience{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:0 22px 9px;color:var(--muted);font-size:.8125rem;border-bottom:1px solid #f3c89c32}
+    .audience strong{color:var(--ink)}
+    select{background:var(--recess);border:1px solid var(--line);border-radius:7px;padding:4px 7px}
+    .log{min-height:0;overflow:auto;padding:8px 22px 10px;overscroll-behavior:contain;scrollbar-color:var(--line) var(--panel)}
+    .message{padding:9px 0 10px;border-bottom:1px solid #f3c89c2c;overflow-wrap:anywhere}
+    .message:last-child{border-bottom:0}
+    .message:focus{box-shadow:inset 3px 0 var(--accent);padding-left:8px;background:#ffcf9214}
+    .message-top{display:flex;align-items:center;gap:8px}
+    .message-top strong{font-size:.9375rem;font-weight:800}
+    .message-top time{font-size:.75rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+    .message-top .self{font-size:11px;font-weight:800;color:var(--accent)}
+    .message p{font-size:.9375rem;line-height:1.5;font-weight:500;margin:3px 0 0}
+    .reply{margin-left:auto;padding:3px 7px;min-height:28px;font-size:.75rem;color:var(--muted)}
+    .reply:hover,.quote:hover{color:var(--accent)}
+    .quote{display:block;text-align:left;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);border:0;border-left:2px solid var(--accent);border-radius:4px;background:#ffcf9214;padding:5px 8px;margin:5px 0;font-size:.75rem}
+    .empty{color:var(--muted);font-size:14px}
+    .jump-new{justify-self:end;margin:4px 22px 0;padding:5px 9px;color:var(--accent);font-size:12px}
+    .compose{min-width:0;display:grid;gap:8px;padding:10px 22px 14px;border-top:1px solid #f3c89c32;background:#251b1a}
+    .reference{display:flex;min-width:0;align-items:center;gap:8px;padding-left:9px;border-left:2px solid var(--accent);background:#ffcf9214;border-radius:5px;font-size:12px}
+    .reference span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cancel{padding:4px 8px;min-height:30px;font-size:12px}
+    .compose-row{display:flex;gap:8px;min-width:0}
+    .compose-row input{flex:1;min-width:0;font-size:1rem;border:1px solid var(--line);background:var(--recess);border-radius:8px;padding:8px 10px;color:var(--ink)}
+    .compose-row input::placeholder{color:var(--muted)}
+    .send{min-height:44px;border:0;border-radius:8px;padding:0 13px;font-weight:800;background:var(--accent);color:var(--button-ink)}
+    .hint{color:var(--muted);font-size:11px}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+    @media(max-width:760px),(max-height:540px){
+      .west{left:12px;bottom:80px}
+      .preview{display:none}
+      .map{width:125px}
+      .map-body{height:80px}
+      .dock{bottom:12px;gap:1px}
+      .tool{min-width:48px}
+      .tool .count{display:inline;font-size:9px;color:var(--accent)}
+      .top{inset:12px 12px auto}
+      .mock-mark{right:12px;top:70px}
+      .shortcut{right:12px;top:97px}
+      dialog{width:calc(100% - 16px);height:calc(100dvh - 16px);border-radius:14px}
+      .dialog-head{padding:10px 12px 7px}
+      .dialog-head h1{font-size:1.25rem}
+      .channels,.audience,.log,.compose{padding-left:12px;padding-right:12px}
+      .channel.ai{margin-left:0}
+      .channel,.reply,.cancel{min-height:44px}
+      .compose{padding-bottom:max(10px,env(safe-area-inset-bottom))}
+    }
+  </style>
+</head>
+<body>
+  <svg class="icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5Zm4 4h8m-8 4h6"/></symbol>
+    <symbol id="icon-map" viewBox="0 0 24 24"><path d="m3 6 6-2 6 3 6-2v13l-6 2-6-3-6 2V6Zm6-2v13m6-10v13"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2m1-15a3 3 0 0 1 0 6m1 3a5 5 0 0 1 4 5v1"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><path d="M4 6h16v14H4zm0 4h16M8 4v4m8-4v4"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M5 5h14M5 12h14M5 19h14M8 3v4m8 3v4m-7 3v4"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  </svg>
+  <div class="world" aria-hidden="true"></div>
+  <main class="hud" aria-label="Ukázka herního rozhraní">
+    <div class="top">
+      <div class="place surface"><span class="monogram" aria-hidden="true">S.</span><div><strong>Strahov Crazy Show</strong><small>Mezi bloky</small></div></div>
+      <div class="weather surface"><div><strong>Praha · 16:42</strong><small>Ukázková scéna</small></div></div>
+    </div>
+    <span class="mock-mark">UX MAKETA · FIKTIVNÍ ZPRÁVY</span>
+    <label class="shortcut"><input id="shortcut" type="checkbox" checked> Zkratka T pro chat</label>
+    <div class="west">
+      <section class="preview surface" aria-label="Poslední zprávy">
+        <button class="preview-head" id="preview-open" type="button" aria-haspopup="dialog" aria-label="Otevřít herní chat" aria-describedby="unread">
+          <svg aria-hidden="true"><use href="#icon-chat"/></svg> Chat <kbd id="shortcut-hint">T</kbd><span class="badge" aria-hidden="true"></span>
+        </button>
+        <ul class="preview-list" id="preview-messages"></ul>
+      </section>
+      <div class="map surface" aria-hidden="true">
+        <div class="map-head"><span>Mezi bloky</span><span>↑ S</span></div>
+        <svg class="map-body" viewBox="0 0 190 122" preserveAspectRatio="none">
+          <path fill="#374842" d="M0 12h190v17H0zm0 58h190v19H0zm43-70h20v122H43zm77 0h12v122h-12z"/>
+          <path fill="#637566" stroke="#829184" d="M9 35h29v22H9zm62 0h38v17H71zm72 1h36v22h-36zM8 95h29v18H8zm61 0h41v17H69zm72 1h37v17h-37z"/>
+          <path stroke="#9f987c" stroke-width="1.6" fill="none" d="M0 80h90l14-15h85"/>
+          <circle cx="98" cy="71" r="10" fill="#251b1a"/><path fill="#ffcf92" d="m92 72 10-6-3 11-2-5z"/>
+        </svg>
+        <div class="map-foot"><span>Schéma</span><span>Blok 6</span></div>
+      </div>
+    </div>
+    <nav class="dock surface" aria-label="Herní lišta v maketě">
+      <button class="tool" disabled><svg aria-hidden="true"><use href="#icon-calendar"/></svg>Akce</button>
+      <button class="tool" disabled><svg aria-hidden="true"><use href="#icon-map"/></svg>Mapa</button>
+      <button class="tool" disabled><svg aria-hidden="true"><use href="#icon-people"/></svg>Lidé</button>
+      <button class="tool active" id="dock-open" type="button" aria-haspopup="dialog" aria-describedby="unread"><svg aria-hidden="true"><use href="#icon-chat"/></svg><span>Chat <span class="count" aria-hidden="true"></span></span></button>
+      <button class="tool" disabled><svg aria-hidden="true"><use href="#icon-settings"/></svg>Nastavení</button>
+    </nav>
+    <span id="unread" class="sr-only"></span>
+  </main>
+  <dialog id="chat" aria-labelledby="chat-title">
+    <header class="dialog-head">
+      <div><div class="eyebrow">STRAHOV · KOMUNITA</div><h1 id="chat-title" tabindex="-1">Chat na Strahově</h1></div>
+      <button class="close" id="close" type="button" aria-label="Zavřít chat"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </header>
+    <div class="channels" role="group" aria-label="Chatové kanály">
+      <button type="button" class="channel" data-channel="global">Celý Strahov</button>
+      <button type="button" class="channel" data-channel="local">V okolí</button>
+      <button type="button" class="channel" data-channel="dm">Soukromé</button>
+      <button type="button" class="channel" data-channel="event">Akce</button>
+      <button type="button" class="channel ai" data-channel="ai">Crazy Typka · AI</button>
+    </div>
+    <div class="audience">
+      <span id="audience"></span>
+      <label id="conversations" hidden>Konverzace <select id="conversation"></select></label>
+    </div>
+    <div class="log" id="log" role="log" aria-label="Zprávy" tabindex="0"></div>
+    <button class="jump-new" id="jump-new" type="button" hidden>Na konec konverzace ↓</button>
+    <form class="compose" id="composer">
+      <div class="reference" id="reference" hidden><span id="reference-text"></span><button class="cancel" id="cancel" type="button" aria-label="Zrušit odpověď">Zrušit</button></div>
+      <div class="compose-row"><label class="sr-only" for="text">Zpráva</label><input id="text" maxlength="500" autocomplete="off" placeholder="Napiš zprávu…"><button class="send" type="submit">Odeslat</button></div>
+      <div class="hint">Zprávy zůstávají v maketě. <kbd>Esc</kbd> zavře chat.</div>
+    </form>
+  </dialog>
+  <script>
+    const q = selector => document.querySelector(selector);
+    const chat = q("#chat"), input = q("#text"), log = q("#log"), composer = q("#composer");
+    const channels = [...document.querySelectorAll("[data-channel]")];
+    const fixture = [
+      ["g1","global","Nela","16:39","Za chvíli jsem u hřiště. Jde někdo taky?"],
+      ["g2","global","Adam","16:40","Jo, potkáme se u brány."],
+      ["l1","local","Kuba","16:41","Kudy se jde do čajovny v šestce?"],
+      ["g3","global","Eliška","16:42","Potkáme se v sedm u šestky?"],
+      ["l3","local","Adam","16:42","U hřiště už je volno."],
+      ["d1","dm:nela","Nela","16:42","Mám ti podržet místo?"],
+      ["e1","event:tea","Adam","16:41","Začínáme v sedm v čajovně."]
+    ];
+    const messages = fixture.map(([id,key,author,at,text]) => ({id,key,author,at,text}));
+    const choices = {dm:[["dm:nela","Nela"],["dm:kuba","Kuba"]],event:[["event:tea","Čajovna"]]};
+    const active = {dm:"dm:nela",event:"event:tea"};
+    const labels = {global:"Celý Strahov · všichni připojení hráči",local:"V okolí · stejná zóna, méně než 40 m",dm:"Soukromě · pouze vy a vybraný kontakt",event:"Akce · přihlášení účastníci",ai:"Crazy Typka · samostatná AI konverzace"};
+    const drafts = new Map();
+    const unread = new Set(["d1"]);
+    const dock = q("#dock-open"), previewOpen = q("#preview-open"), shortcut = q("#shortcut");
+    let channel = "global", lastHumanChannel = "global", opener, sequence = 0;
+    const currentKey = () => active[channel] || channel;
+    const draft = () => {
+      if (!drafts.has(currentKey())) drafts.set(currentKey(), {text:"",reply:null});
+      return drafts.get(currentKey());
+    };
+    function node(tag, text, className){
+      const element = document.createElement(tag);
+      if (text) element.textContent = text;
+      if (className) element.className = className;
+      return element;
+    }
+    function renderPreview(){
+      const items = messages.filter(m => m.key === "global" || m.key === "local").slice(-3);
+      q("#preview-messages").replaceChildren(...items.map(m => {
+        const row = node("li");
+        row.append(node("span",m.key === "local" ? "V okolí" : "Strahov"),node("strong",m.author + ": "),document.createTextNode(m.text));
+        return row;
+      }));
+    }
+    function showReference(){
+      const original = draft().reply;
+      q("#reference").hidden = !original;
+      q("#reference-text").textContent = original ? "↪ Odpovídáš: " + original.author + " · " + original.text : "";
+    }
+    function renderUnread(){
+      const count = unread.size;
+      q(".badge").textContent = count ? "1 soukromá" : "";
+      q(".badge").hidden = !count;
+      q(".count").textContent = count ? "· " + count : "";
+      q("#unread").textContent = count ? "1 nepřečtená soukromá zpráva" : "";
+    }
+    function updateReadState(){
+      const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 2;
+      q("#jump-new").hidden = atBottom;
+      if (!chat.open || !atBottom) return;
+      for (const message of messages) {
+        if (message.key === currentKey()) unread.delete(message.id);
+      }
+      renderUnread();
+    }
+    function bottom(){
+      log.scrollTop = log.scrollHeight;
+      updateReadState();
+    }
+    function renderChannel(){
+      for (const button of channels) button.setAttribute("aria-pressed", String(button.dataset.channel === channel));
+      const title = node("strong",channel === "ai" ? "AI pohled: " : "Píšeš do: ");
+      q("#audience").replaceChildren(title,document.createTextNode(labels[channel]));
+      q("#conversations").hidden = !choices[channel];
+      q("#conversation").replaceChildren(...(choices[channel] || []).map(([value,label]) => new Option(label,value)));
+      if (choices[channel]) q("#conversation").value = currentKey();
+      composer.hidden = channel === "ai";
+      input.value = draft().text;
+      showReference();
+      const visible = messages.filter(m => m.key === currentKey());
+      log.replaceChildren(...visible.map(renderMessage));
+      if (!visible.length) log.append(node("p",channel === "ai" ? "Maketa AI pouze odděluje od hráčů. Crazy Typku zde nespouští." : "V této konverzaci zatím nejsou žádné zprávy.","empty"));
+      bottom();
+    }
+    function renderMessage(m){
+      const row = node("article","","message");
+      row.id = m.id;
+      row.tabIndex = -1;
+      const top = node("div","","message-top");
+      top.append(node("strong",m.author),node("time",m.at));
+      if (m.self) top.append(node("span","Ty","self"));
+      const reply = node("button","↪ Odpovědět","reply");
+      reply.type = "button";
+      reply.setAttribute("aria-label","Odpovědět na zprávu od " + m.author);
+      reply.setAttribute("aria-describedby",m.id + "-text");
+      reply.addEventListener("click",() => { draft().reply = m; showReference(); input.focus(); });
+      top.append(reply);
+      row.append(top);
+      if (m.reply){
+        const ref = node("button","↪ " + m.reply.author + ": " + m.reply.text,"quote");
+        ref.type = "button";
+        ref.addEventListener("click",() => {
+          const original = document.getElementById(m.reply.id);
+          if (!original || !log.contains(original)) return;
+          original.scrollIntoView({block:"nearest"});
+          original.focus({preventScroll:true});
+          updateReadState();
+        });
+        row.append(ref);
+      }
+      const text = node("p",m.text);
+      text.id = m.id + "-text";
+      row.append(text);
+      return row;
+    }
+    function open(trigger, keyboard = false){
+      if (chat.open) return;
+      opener = trigger;
+      if (keyboard) channel = lastHumanChannel;
+      renderChannel();
+      chat.showModal();
+      bottom();
+      if (keyboard && channel !== "ai") input.focus();
+      else {
+        chat.scrollTop = 0;
+        q("#chat-title").focus({preventScroll:true});
+      }
+    }
+    previewOpen.addEventListener("click",e => open(e.currentTarget));
+    dock.addEventListener("click",e => open(e.currentTarget));
+    q("#close").addEventListener("click",() => chat.close());
+    chat.addEventListener("close",() => (opener?.getClientRects().length ? opener : dock).focus());
+    chat.addEventListener("keydown",e => {
+      if (e.key !== "Tab") return;
+      const controls = [...chat.querySelectorAll("button, select, input, [tabindex='0']")]
+        .filter(element => !element.disabled && element.getClientRects().length);
+      const first = controls[0], last = controls.at(-1);
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === q("#chat-title"))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    function updateShortcut(){
+      q("#shortcut-hint").hidden = !shortcut.checked;
+      for (const button of [previewOpen,dock]) {
+        if (shortcut.checked) button.setAttribute("aria-keyshortcuts","T");
+        else button.removeAttribute("aria-keyshortcuts");
+      }
+    }
+    shortcut.addEventListener("change",updateShortcut);
+    document.addEventListener("keydown",e => {
+      if (!shortcut.checked || chat.open || e.defaultPrevented || e.repeat || e.isComposing ||
+          e.ctrlKey || e.metaKey || e.altKey || e.code !== "KeyT" ||
+          e.target.closest?.("input,select,textarea,[contenteditable]")) return;
+      e.preventDefault();
+      open(dock,true);
+    });
+    for (const button of channels) button.addEventListener("click",() => {
+      channel = button.dataset.channel;
+      if (channel !== "ai") lastHumanChannel = channel;
+      renderChannel();
+    });
+    log.addEventListener("scroll",updateReadState);
+    q("#conversation").addEventListener("change",e => {active[channel] = e.target.value; renderChannel(); q("#conversation").focus();});
+    input.addEventListener("input",() => {draft().text = input.value;});
+    input.addEventListener("keydown",e => {if (e.key === "Enter" && e.isComposing) e.preventDefault();});
+    q("#cancel").addEventListener("click",() => {draft().reply = null; showReference(); input.focus();});
+    q("#jump-new").addEventListener("click",() => {bottom(); log.focus();});
+    composer.addEventListener("submit",e => {
+      e.preventDefault();
+      if (!input.value.trim() || channel === "ai") return;
+      const item = {id:"demo-" + ++sequence,key:currentKey(),author:"Mia",self:true,at:"16:43",text:input.value.trim(),reply:draft().reply};
+      messages.push(item);
+      drafts.delete(currentKey());
+      if (log.querySelector(".empty")) log.replaceChildren();
+      log.append(renderMessage(item));
+      input.value = "";
+      showReference();
+      renderPreview();
+      bottom();
+      input.focus();
+    });
+    renderPreview();
+    renderUnread();
+    updateShortcut();
+  </script>
+</body>
+</html>

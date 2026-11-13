@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-hud-ux-review-20261113",
+  "title": "KEY-78: Ověřit čitelnost, opravit maketu a předat ji přes GitHub",
+  "status": "done",
+  "dependsOn": ["chat-hud-ux-20261113"],
+  "writePaths": [
+    "_bmad-output/planning-artifacts/ux-designs/ux-StrahovCrazyShow-2026-11-13/",
+    "docs/agents/handoffs/chat-hud-ux-review-20261113.md",
+    ".cache/chat-hud-ux-review-20261113/"
+  ],
+  "resources": ["external:raspberrypi-strahov", "port:18082", "port:18083"],
+  "acceptance": [
+    "Měřit kontrast textu a ovladačů přes světlou i tmavou scénu, prověřit ovládání a opravit reprodukovatelné chyby.",
+    "Publikovat samostatný PR návrhu proti GitHub main a ověřit přesné soubory makety obsloužené z ARM64 Raspberry Pi."
+  ],
+  "verification": [
+    "Browserová kontrola referencí, fokusu, klávesnice, zoomu, kontrastu a assetů; na Pi izolovaný server na loopbacku."
+  ],
+  "notes": ["https://linear.app/gigeconomy/issue/KEY-78", "Pracovní změny na lokálním main; samostatný vzdálený head pouze pro vyžádaný PR."]
+}
