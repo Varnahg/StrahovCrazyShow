@@ -1,5 +1,6 @@
 import { HudIcon } from "./hud-icons";
 import { WelcomeScreen } from "./welcome-screen";
+import { readAccount, saveAccountProfile, type AccountStatus } from "./account";
 import { GraphicsSettingsPanel, GraphicsSettingsDialog, GraphicsApplyingOverlay, graphicsModeLabel } from "./graphics-settings";
 import "./graphics-settings.css";
 import { LoadingScreen } from "./loading-screen";
@@ -130,6 +131,18 @@ const readRenderPreferences = (): RenderPreferences => {
   try { return parseRenderPreferences(JSON.parse(localStorage.getItem("strahov.rendering") || "null")); }
   catch { return createRenderPreferences(); }
 };
+function authMessage(code: string) {
+  switch (code) {
+    case "denied": return t("Přihlášení přes Google bylo zrušeno.");
+    case "expired": return t("Přihlášení vypršelo. Přihlas se znovu přes Google.");
+    case "login-required": return t("Pro multiplayer se přihlas přes Google.");
+    case "profile-save-failed": return t("Profil se nepodařilo uložit. Zkus to znovu.");
+    case "account-already-playing": return t("Tento účet už hraje v jiném okně nebo zařízení.");
+    case "unavailable": return t("Přihlášení je dočasně nedostupné.");
+    case "busy": return t("Příliš mnoho pokusů o přihlášení. Zkus to za minutu.");
+    default: return t("Přihlášení se nepodařilo. Zkus to znovu.");
+  }
+}
 const idleGraphicsState: GraphicsApplicationState = Object.freeze({ applying: false, phase: null, error: null, restartRequired: false });
 const time = (t: number) =>
   formatDate(t, {
@@ -250,6 +263,39 @@ export function App() {
     [busy, setBusy] = useState(false),
     [ready, setReady] = useState(false),
     [error, setError] = useState("");
+  const [accountStatus, setAccountStatus] = useState<AccountStatus>({ mode: "loading", account: null });
+  const [accountRewards, setAccountRewards] = useState<string[]>([]);
+  const [editAccount, setEditAccount] = useState(false);
+  const [accountProfile, setAccountProfile] = useState<Profile | null>(null);
+  const dirtyAccountProfile = useRef(false);
+  const accountDraft = useRef<Profile | null>(null);
+  const profileWrite = useRef(Promise.resolve());
+  const accountRef = useRef(accountStatus);
+  accountRef.current = accountStatus;
+  useEffect(() => {
+    const request = new AbortController();
+    const url = new URL(location.href);
+    const result = url.searchParams.get("auth");
+    if (result) {
+      url.searchParams.delete("auth");
+      history.replaceState(history.state, "", url);
+      if (result !== "success") setError(authMessage(result));
+    }
+    void readAccount(request.signal).then(status => {
+      if (request.signal.aborted) return;
+      setAccountStatus(status);
+      if (status.account) {
+        const draft = readProfile();
+        accountDraft.current = status.account.profile ?? { ...draft, avatar: { ...draft.avatar, badge: "" } };
+        setAccountProfile(accountDraft.current);
+        setAccountRewards(status.account.rewards);
+        setEditAccount(result === "success");
+      }
+    }).catch(() => {
+      if (!request.signal.aborted) setAccountStatus({ mode: "closed", account: null });
+    });
+    return () => request.abort();
+  }, []);
   const [rendererGeneration, setRendererGeneration] = useState(0);
   const [rendererCompatibility, setRendererCompatibility] = useState(false);
   const [panel, setPanel] = useState(""),
@@ -309,12 +355,24 @@ export function App() {
         return [];
       }
     });
+  const multiplayerProfile = (editAccount || mode === "multi") && accountStatus.account && accountProfile;
+  const activeProfile = multiplayerProfile || profile;
+  const visibleRewards = multiplayerProfile ? accountRewards : rewards;
+  const persistProfile = (next: Profile) => {
+    const id = accountRef.current.account?.id;
+    const write = profileWrite.current.then(async () => {
+      if (!id || id !== accountRef.current.account?.id) throw Error("login-required");
+      return saveAccountProfile(id, next);
+    });
+    profileWrite.current = write.then(() => {}, () => {});
+    return write;
+  };
   const canvas = useRef<HTMLCanvasElement>(null),
     game = useRef<Game | null>(null),
     room = useRef<Room | null>(null),
     connectionAttempt = useRef(0),
     playersRef = useRef<Player[]>([]),
-    profileRef = useRef(profile),
+    profileRef = useRef(activeProfile),
     idRef = useRef("guest"),
     modeRef = useRef(mode),
     weatherRef = useRef(weather),
@@ -532,14 +590,25 @@ export function App() {
     notice(t("Odměna: {name}", { name: localizeText(name) }));
   };
   useEffect(() => {
-    profileRef.current = profile;
-    localStorage.setItem("strahov.profile", JSON.stringify(profile));
-    game.current?.setProfile(profile);
+    try { localStorage.setItem("strahov.profile", JSON.stringify(profile)); }
+    catch { /* Local storage may be disabled. */ }
+  }, [profile]);
+  useEffect(() => {
+    profileRef.current = activeProfile;
+    game.current?.setProfile(activeProfile);
     const timeout = setTimeout(() => {
-      if (connectedRef.current) room.current?.send("profile", profile);
+      if (!connectedRef.current) return;
+      if (!multiplayerProfile) { room.current?.send("profile", activeProfile); return; }
+      if (!dirtyAccountProfile.current) return;
+      void persistProfile(activeProfile).then(saved => {
+        if (accountDraft.current !== activeProfile) return;
+        dirtyAccountProfile.current = false;
+        accountDraft.current = saved;
+        setAccountProfile(saved);
+      }, () => notice(authMessage("profile-save-failed")));
     }, 300);
     return () => clearTimeout(timeout);
-  }, [profile]);
+  }, [activeProfile, multiplayerProfile]);
   useEffect(() => {
     connectedRef.current = connected;
     if (!connected) {
@@ -909,6 +978,7 @@ export function App() {
       });
     });
     callbacks.onMessage("welcome", (data: any) => {
+      if (Array.isArray(data.rewards)) setAccountRewards(data.rewards);
       idRef.current = data.id;
       setSelfId(data.id);
       game.current?.setLocalId(data.id);
@@ -977,7 +1047,12 @@ export function App() {
       game.current?.setFound(a.hunt);
     });
     callbacks.onMessage("notice", notice);
-    callbacks.onMessage("reward", reward);
+    callbacks.onMessage("reward", name => {
+      if (typeof name !== "string") return;
+      if (!accountRef.current.account) { reward(name); return; }
+      setAccountRewards(previous => previous.includes(name) ? previous : [...previous, name]);
+      notice(t("Odměna: {name}", { name: localizeText(name) }));
+    });
     callbacks.onMessage("car", (data: any) => {
       carState.current = data;
       game.current?.setCar(data);
@@ -1016,6 +1091,10 @@ export function App() {
         currentGame.updatePlayers([currentGame.localPlayer]);
       }
       setConnected(false);
+      if (code === 4401) {
+        expireAccount();
+        return;
+      }
       notice(t("Spojení přerušeno. Použij Obnovit spojení."));
     });
     callbacks.onError((code: number, text?: string) => {
@@ -1027,9 +1106,11 @@ export function App() {
     sessionDiagnostics.event("network-connecting", { attempt });
     let joinedRoom: Room | null = null;
     try {
-      const response = await fetch("/api/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const expected = accountRef.current.account?.id;
+      const response = await fetch("/api/session", accountRef.current.mode === "google" ? {
+        method: "POST", headers: expected ? { "X-Strahov-Account": expected } : undefined,
+      } : {
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode: "multiplayer",
           profile: profileRef.current,
@@ -1039,19 +1120,25 @@ export function App() {
       if (attempt !== connectionAttempt.current) return false;
       const data = await response.json();
       if (attempt !== connectionAttempt.current) return false;
+      if (accountRef.current.mode === "google" && (response.status === 401 || data.error === "account-changed")) {
+        expireAccount();
+        return false;
+      }
+      if (accountRef.current.mode === "google" && response.status === 503)
+        throw Error(authMessage("unavailable"));
       if (!response.ok)
         throw new Error(data.error || t("Server není dostupný."));
       const client = new Client(
         import.meta.env.VITE_MULTIPLAYER_URL || `${location.origin}/realtime`,
       );
       joinedRoom = await client.joinById(data.worldId, {
-        token: data.token,
+        ...(data.ticket ? { ticket: data.ticket } : { token: data.token }),
         protocol: PROTOCOL_VERSION,
       });
       if (attempt !== connectionAttempt.current) return false;
       const identityChanged =
         (game.current?.localId ?? idRef.current) !== data.id;
-      sessionStorage.setItem("strahov.session", data.token);
+      if (data.token) sessionStorage.setItem("strahov.session", data.token);
       idRef.current = data.id;
       setSelfId(data.id);
       if (identityChanged) {
@@ -1089,7 +1176,7 @@ export function App() {
     }
   };
   const enter = async (next: "guest" | "multi") => {
-    if (next === "guest") leave();
+    if (next === "guest") { leave(); setEditAccount(false); }
     const attempt =
       next === "multi"
         ? ++connectionAttempt.current
@@ -1098,6 +1185,21 @@ export function App() {
     setError("");
     try {
       if (next === "multi") {
+        if (accountRef.current.mode === "google") {
+          if (!accountRef.current.account || !accountProfile) throw Error(authMessage("login-required"));
+          const expectedId = accountRef.current.account.id;
+          const refreshed = await readAccount();
+          if (refreshed.account?.id !== expectedId) throw Error("login-required");
+          const saved = dirtyAccountProfile.current || !refreshed.account.profile
+            ? await persistProfile(accountProfile) : refreshed.account.profile;
+          if (attempt !== connectionAttempt.current) return;
+          if (!saved) throw Error(authMessage("login-required"));
+          dirtyAccountProfile.current = false;
+          accountDraft.current = saved;
+          setAccountProfile(saved);
+          setAccountStatus({ mode: "google", account: { ...refreshed.account, profile: saved } });
+          profileRef.current = saved;
+        }
         if (!(await connect(attempt)) || attempt !== connectionAttempt.current)
           return;
       } else {
@@ -1111,16 +1213,30 @@ export function App() {
       modeRef.current = next;
     } catch (e) {
       if (attempt !== connectionAttempt.current) return;
-      setError(
-        t("Multiplayer se nepřipojil. Zkontroluj spuštění serveru. {error}", {
-          error: localizeNotice(e instanceof Error ? e.message : String(e)),
-        }),
-      );
+      const message = e instanceof Error ? e.message : String(e);
+      if (message === "login-required" && accountRef.current.mode === "google") {
+        expireAccount();
+        return;
+      }
+      const detail = ["profile-save-failed", "account-already-playing"].includes(message)
+        ? authMessage(message) : localizeNotice(message);
+      setError(accountRef.current.mode === "google" ? detail :
+        t("Multiplayer se nepřipojil. Zkontroluj spuštění serveru. {error}", { error: detail }));
     } finally {
       if (attempt === connectionAttempt.current) setBusy(false);
     }
   };
   const leave = () => {
+    if (modeRef.current === "multi" && accountRef.current.account && dirtyAccountProfile.current) {
+      const pending = accountDraft.current ?? profileRef.current;
+      void persistProfile(pending).then(saved => {
+        if (accountDraft.current === pending) {
+          dirtyAccountProfile.current = false;
+          accountDraft.current = saved;
+          setAccountProfile(saved);
+        }
+      }, () => setError(authMessage("profile-save-failed")));
+    }
     sessionDiagnostics.event("network-left", {});
     disconnectRoom("leave");
     modeRef.current = "menu";
@@ -1129,6 +1245,34 @@ export function App() {
     setReady(false);
     setJournalOpen(false);
     setEmotesOpen(false);
+  };
+  const expireAccount = () => {
+    dirtyAccountProfile.current = false;
+    accountDraft.current = null;
+    leave();
+    setEditAccount(false);
+    setAccountProfile(null);
+    setAccountRewards([]);
+    setAccountStatus({ mode: "google", account: null });
+    setError(authMessage("expired"));
+  };
+  const logout = async () => {
+    setBusy(true);
+    let profileFailed = false;
+    try {
+      if (modeRef.current === "multi" && dirtyAccountProfile.current) {
+        try { await persistProfile(accountDraft.current ?? profileRef.current); }
+        catch { profileFailed = true; }
+        dirtyAccountProfile.current = false;
+      }
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (!response.ok) throw Error("logout");
+      expireAccount();
+      setError(profileFailed ? authMessage("profile-save-failed") : "");
+    } catch {
+      setError(authMessage("unavailable"));
+      notice(authMessage("unavailable"));
+    } finally { setBusy(false); }
   };
   const send = (action: string, data?: unknown) => {
     if (mode !== "multi" || !connected) {
@@ -1211,11 +1355,18 @@ export function App() {
       ? `${formatNumber(weather.temperature, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} °C`
       : t("Počasí…");
   const updateAvatar = (key: string, value: any) =>
-    setProfile((p) => ({ ...p, avatar: { ...p.avatar, [key]: value } }));
+    changeProfile((p) => ({ ...p, avatar: { ...p.avatar, [key]: value } }));
+  const changeProfile = (next: Profile | ((previous: Profile) => Profile)) => {
+    if (!multiplayerProfile) { setProfile(next); return; }
+    dirtyAccountProfile.current = true;
+    const current = accountDraft.current ?? activeProfile;
+    accountDraft.current = typeof next === "function" ? next(current) : next;
+    setAccountProfile(accountDraft.current);
+  };
   const avatarEditor = (
     <AvatarEditor
-      profile={profile}
-      onChange={setProfile}
+      profile={activeProfile}
+      onChange={changeProfile}
       compact={mode !== "menu"}
     />
   );
@@ -1225,7 +1376,12 @@ export function App() {
     return (
       <>
         <WelcomeScreen
-          profile={profile} enter={enter} busy={busy}
+          profile={activeProfile} enter={enter} busy={busy}
+          authMode={accountStatus.mode}
+          signedIn={Boolean(accountStatus.account)}
+          openProfile={editAccount}
+          onProfileChange={setEditAccount}
+          logout={logout}
           error={error ? localizeNotice(error) : undefined} locale={feedbackLocale}
           editor={avatarEditor} language={<LanguagePicker />}
           feedback={<button type="button" className="home-quiet" onClick={openFeedback} aria-keyshortcuts="F8">
@@ -1353,7 +1509,7 @@ export function App() {
             title={t("Tvoje postava")}
             onClick={() => togglePanel("avatar")}
           >
-            {profile.nickname.slice(0, 1).toUpperCase()}
+            {activeProfile.nickname.slice(0, 1).toUpperCase()}
           </button>
         </div>
       </header>
@@ -2002,10 +2158,10 @@ export function App() {
                     <button
                       key={localizeText(tag)}
                       className={
-                        profile.interests.includes(tag) ? "chosen" : ""
+                        activeProfile.interests.includes(tag) ? "chosen" : ""
                       }
                       onClick={() =>
-                        setProfile((p) => ({
+                        changeProfile((p) => ({
                           ...p,
                           interests: p.interests.includes(tag)
                             ? p.interests.filter((t) => t !== tag)
@@ -2020,9 +2176,9 @@ export function App() {
                 <label className="check">
                   <input
                     type="checkbox"
-                    checked={profile.social}
+                    checked={activeProfile.social}
                     onChange={(e) =>
-                      setProfile({ ...profile, social: e.target.checked })
+                      changeProfile({ ...activeProfile, social: e.target.checked })
                     }
                   />{" "}
                   {t("Rád se seznámím")}
@@ -2030,28 +2186,28 @@ export function App() {
                 <label className="check">
                   <input
                     type="checkbox"
-                    checked={profile.firstTime}
+                    checked={activeProfile.firstTime}
                     onChange={(e) =>
-                      setProfile({ ...profile, firstTime: e.target.checked })
+                      changeProfile({ ...activeProfile, firstTime: e.target.checked })
                     }
                   />{" "}
                   {t("Jdu poprvé")}
                 </label>
                 <h3>{t("Tvoje odměny")}</h3>
-                {rewards.length ? (
-                  rewards.map((r) => (
+                {visibleRewards.length ? (
+                  visibleRewards.map((r) => (
                     <button
                       className="reward"
                       key={r}
                       onClick={() =>
                         updateAvatar(
                           "badge",
-                          profile.avatar.badge === r ? "" : r,
+                          activeProfile.avatar.badge === r ? "" : r,
                         )
                       }
                     >
                       ✧ {localizeText(r)} ·{" "}
-                      {profile.avatar.badge === r
+                      {activeProfile.avatar.badge === r
                         ? t("Odznak nasazený")
                         : t("Nasadit odznak")}
                     </button>
@@ -2060,6 +2216,9 @@ export function App() {
                   <p className="muted">
                     {t("Odměny získáš za průzkum a kvíz.")}
                   </p>
+                )}
+                {mode === "multi" && accountStatus.account && (
+                  <button type="button" className="secondary" disabled={busy} onClick={logout}>{t("Odhlásit se")}</button>
                 )}
               </>
             )}
@@ -2081,7 +2240,7 @@ export function App() {
                     {social.requests.map((id) => (
                       <div className="request" key={id}>
                         <strong>
-                          {players.find((p) => p.id === id)?.nickname ||
+                          {players.find((p) => p.id === id)?.nickname || social.names?.[id] ||
                             t("Účastník")}
                         </strong>{" "}
                         {t("žádá o soukromý kontakt.")}
@@ -2206,7 +2365,7 @@ export function App() {
                       {social.contacts.map((id) => (
                         <option key={id} value={"dm:" + id}>
                           {t("Soukromě:")}{" "}
-                          {players.find((p) => p.id === id)?.nickname ||
+                          {players.find((p) => p.id === id)?.nickname || social.names?.[id] ||
                             t("Odpojený kontakt")}
                         </option>
                       ))}

@@ -82,6 +82,11 @@ export type WelcomeScreenProps = {
   graphics?: ReactNode;
   assistant?: ReactNode;
   assistantActions?: ReactNode;
+  authMode?: "loading" | "local" | "closed" | "google";
+  signedIn?: boolean;
+  openProfile?: boolean;
+  onProfileChange?: (open: boolean) => void;
+  logout?: () => void;
   /** Optional externally supplied snapshot, also useful for static rendering. */
   presence?: PublicPresenceState;
 };
@@ -138,10 +143,20 @@ export function WelcomeScreen({
   graphics,
   assistant,
   assistantActions,
+  authMode = "local",
+  signedIn = false,
+  openProfile,
+  onProfileChange,
+  logout,
   presence,
 }: WelcomeScreenProps) {
   const viewport = useViewportHeight<HTMLElement>();
-  const [screen, setScreen] = useState<"home" | "profile">("home");
+  const [internalScreen, setInternalScreen] = useState<"home" | "profile">("home");
+  const screen = openProfile === undefined ? internalScreen : openProfile ? "profile" : "home";
+  const setScreen = (next: "home" | "profile") => {
+    setInternalScreen(next);
+    onProfileChange?.(next === "profile");
+  };
   const [chatOpen, setChatOpen] = useState(false);
   const [info, setInfo] = useState<"controls" | "about" | null>(null);
   const [invalidName, setInvalidName] = useState(false);
@@ -254,6 +269,9 @@ export function WelcomeScreen({
           </button>
         )}
         <div className="home-nav-actions">
+          {signedIn && <button type="button" className="home-quiet" disabled={busy} onClick={logout}>
+            {cs ? "Odhlásit se" : "Sign out"}
+          </button>}
           {language}
           {graphics}
           {feedback}
@@ -266,15 +284,31 @@ export function WelcomeScreen({
               Strahov<span>Crazy Show</span>
             </h1>
             <div className="home-entry">
-              <button
-                ref={entry}
-                type="button"
-                className="home-primary home-enter"
-                disabled={busy}
-                onClick={() => setScreen("profile")}
-              >
-                {cs ? "Pusť mě dovnitř" : "Let me in"}
-              </button>
+              <div className="home-play-actions">
+                {authMode === "google" && !signedIn ? (
+                  <form action="/api/auth/google/start" method="post">
+                    <button ref={entry} className="home-google" type="submit" disabled={busy}>
+                      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 48 48">
+                        <path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5h6.6c3.8-3.5 6.1-8.7 6.1-14.9z"/>
+                        <path fill="#34A853" d="M24 44c5.5 0 10.2-1.8 13.5-4.6l-6.6-5c-1.8 1.2-4.1 2-6.9 2-5.4 0-9.9-3.7-11.5-8.6H5.7v5.2A20 20 0 0 0 24 44z"/>
+                        <path fill="#FBBC05" d="M12.5 27.8a12 12 0 0 1 0-7.6V15H5.7a20 20 0 0 0 0 18z"/>
+                        <path fill="#EA4335" d="M24 11.6c3 0 5.7 1 7.8 3.1l5.8-5.8A19.2 19.2 0 0 0 24 4 20 20 0 0 0 5.7 15l6.8 5.2A12.1 12.1 0 0 1 24 11.6z"/>
+                      </svg>
+                      {cs ? "Přihlásit se přes Google" : "Sign in with Google"}
+                    </button>
+                  </form>
+                ) : (signedIn || authMode === "local") && (
+                  <button ref={entry} type="button" className="home-primary home-enter" disabled={busy}
+                    onClick={() => setScreen("profile")}>
+                    {signedIn ? (cs ? "Hrát multiplayer" : "Play multiplayer") : (cs ? "Pusť mě dovnitř" : "Let me in")}
+                  </button>
+                )}
+                <button type="button" className="home-quiet home-solo" disabled={busy}
+                  ref={authMode === "closed" || authMode === "loading" ? entry : undefined}
+                  onClick={() => enter("guest")}>
+                  {cs ? "Hrát sólo" : "Play solo"}
+                </button>
+              </div>
               <p
                 className={"home-presence home-glass " + count.status}
                 role="status"
@@ -293,6 +327,9 @@ export function WelcomeScreen({
                 {countLabel}
               </p>
             </div>
+            {authMode === "closed" && <p className="home-error" role="status">
+              {cs ? "Přihlášení je dočasně nedostupné." : "Sign-in is temporarily unavailable."}
+            </p>}
             {error && (
               <p className="home-error" role="alert">
                 {error}
@@ -318,6 +355,7 @@ export function WelcomeScreen({
                 <HomeIcon kind="info" />
                 {cs ? "O projektu" : "About"}
               </button>
+              <a className="home-quiet" href="/privacy.html">{cs ? "Ochrana soukromí" : "Privacy"}</a>
             </nav>
           </section>
         ) : (
@@ -487,13 +525,13 @@ export function WelcomeScreen({
             <div className="home-about">
               <p>
                 {cs
-                  ? "Strahov Crazy Show je společný virtuální Strahov v prohlížeči. Bez účtu a hesla. Přezdívka ani bydliště se neověřují."
-                  : "Strahov Crazy Show is a shared virtual Strahov in your browser. No account or password. Nicknames and residency are not verified."}
+                  ? "Strahov Crazy Show je virtuální Strahov v prohlížeči. Sólo je otevřené všem. Multiplayer používá herní účet přihlášený přes Google."
+                  : "Strahov Crazy Show is a virtual Strahov in your browser. Solo play is open to everyone. Multiplayer uses a game account signed in through Google."}
               </p>
               <p>
                 {cs
-                  ? "Online počet představuje připojené hráčské relace; NPC a AI se nezapočítávají. Ukázkové akce jsou fiktivní. Vzhled a přezdívka zůstávají uložené v tomto prohlížeči."
-                  : "The online count represents connected player sessions; NPCs and AI are excluded. Demo events are fictional. Appearance and nickname are saved in this browser."}
+                  ? "Počet online zahrnuje připojené hráčské relace. Ukázkové akce jsou fiktivní. Sólová postava je uložená v prohlížeči, multiplayerová postava v herním účtu."
+                  : "The online count shows connected player sessions. Demo events are fictional. Your solo character is saved in this browser and your multiplayer character in your game account."}
               </p>
               <p>
                 {cs ? "Mapa podle " : "Map based on "}

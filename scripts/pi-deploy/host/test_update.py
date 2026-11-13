@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import update
@@ -194,12 +195,39 @@ class UpdaterTests(unittest.TestCase):
 
 
 class DockerTests(unittest.TestCase):
+    def test_first_gate_rollback_reuses_candidate_in_closed_mode(self):
+        docker = update.Docker()
+        old = deployment(release('a'))
+        candidate = deployment(release('b'))
+        with tempfile.TemporaryDirectory() as directory, patch.object(update, 'CONFIG', Path(directory)), \
+                patch.object(docker, 'stop_helper'), patch.object(docker, 'compose'), \
+                patch.object(docker, 'has_google_gate', return_value=False), patch.object(docker, 'start') as start:
+            update.Docker.mark_google_gate(Path(directory) / 'google-gate-active')
+            self.assertEqual(docker.restore(old, candidate), candidate)
+            start.assert_called_once_with(candidate, force_closed=True)
+
+    def test_gate_marker_prevents_pre_google_image(self):
+        docker = update.Docker()
+        candidate = deployment(release())
+        with tempfile.TemporaryDirectory() as directory, patch.object(update, 'CONFIG', Path(directory)), \
+                patch.object(docker, 'docker'), patch.object(docker, 'has_google_gate', return_value=False), \
+                patch.object(docker, 'compose') as compose:
+            (Path(directory) / 'google-gate-active').touch()
+            with self.assertRaisesRegex(RuntimeError, 'anonymní multiplayer'):
+                docker.start(candidate)
+            compose.assert_not_called()
+
     def test_offline_start_uses_local_images_and_never_runs_bootstrap(self):
         docker = update.Docker()
         candidate = deployment(release())
-        with patch.object(docker, 'compose') as compose, patch.object(update.urllib.request, 'urlopen',
-                side_effect=[io.BytesIO(b'{"ok":true}'), io.BytesIO(b'{"enabled":true}')]):
+        with tempfile.TemporaryDirectory() as directory, patch.object(update, 'CONFIG', Path(directory)), \
+                patch.object(docker, 'docker', return_value=SimpleNamespace(stdout='')) as engine, \
+                patch.object(docker, 'compose') as compose, \
+                patch.object(update.urllib.request, 'urlopen',
+                    side_effect=[io.BytesIO(b'{"ok":true}'), io.BytesIO(b'{"enabled":true}')]):
             docker.start(candidate)
+            self.assertEqual(engine.call_args_list[0].args, ('volume', 'create', 'strahov-crazy-show-player-accounts'))
+            self.assertTrue((Path(directory) / 'google').is_dir())
         invocations = [call.args[1:] for call in compose.call_args_list]
         self.assertEqual([args[-1] for args in invocations], ['rag-db', 'game'])
         for args in invocations:

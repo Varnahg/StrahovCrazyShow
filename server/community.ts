@@ -18,6 +18,7 @@ export class Community {
   contacts = new Map<string, Set<string>>();
   requests = new Map<string, Set<string>>();
   blocks = new Map<string, Set<string>>();
+  knownNames = new Map<string, string>();
   rates = new Map<string, number[]>();
   activity: ActivityState = {
     hunt: [],
@@ -36,11 +37,16 @@ export class Community {
     return map.get(id)!;
   }
   privateState(id: string): SocialState {
+    const contacts = [...(this.contacts.get(id) ?? [])];
+    const blocked = [...(this.blocks.get(id) ?? [])];
+    const names = Object.fromEntries([...new Set([...contacts, ...blocked])]
+      .flatMap(target => this.knownNames.has(target) ? [[target, this.knownNames.get(target)!]] : []));
     return {
       attendance: this.attendance.filter((a) => this.players.has(a.playerId)),
-      contacts: [...(this.contacts.get(id) || [])],
+      contacts,
       requests: [...(this.requests.get(id) || [])],
-      blocked: [...(this.blocks.get(id) || [])],
+      blocked,
+      ...(Object.keys(names).length ? { names } : {}),
     };
   }
   blocked(a: string, b: string) {
@@ -64,12 +70,12 @@ export class Community {
     return true;
   }
   /** Called only after the reconnect window expires, never on disconnect. */
-  forgetIdentities(expired: Iterable<string>) {
+  forgetIdentities(expired: Iterable<string>, keepRelationships = false) {
     const ids = new Set([...expired].filter((id) => !this.players.has(id)));
     let social = false,
       activity = false;
     if (!ids.size) return { social, activity };
-    for (const map of [this.contacts, this.requests, this.blocks]) {
+    for (const map of keepRelationships ? [this.requests] : [this.contacts, this.requests, this.blocks]) {
       for (const [owner, edges] of map) {
         if (ids.has(owner)) {
           social = map.delete(owner) || social;
@@ -109,25 +115,32 @@ export class Community {
     return changed;
   }
   contact(from: string, to: string, accept = false) {
+    const change = this.prepareContact(from, to, accept);
+    if (!change) return false;
+    change();
+    return true;
+  }
+  prepareContact(from: string, to: string, accept: boolean) {
     this.requirePlayer(from);
     if (from === to || !this.players.has(to) || this.blocked(from, to))
       throw new Error("Kontakt není dostupný.");
-    if (this.contacts.get(from)?.has(to)) return false;
+    if (this.contacts.get(from)?.has(to)) return;
     if (accept) {
       if (!this.requests.get(from)?.has(to))
         throw new Error("Žádost už není platná.");
       this.action(from);
-      this.removeEdge(this.requests, from, to);
-      this.removeEdge(this.requests, to, from);
-      this.set(this.contacts, from).add(to);
-      this.set(this.contacts, to).add(from);
+      return () => {
+        this.removeEdge(this.requests, from, to);
+        this.removeEdge(this.requests, to, from);
+        this.set(this.contacts, from).add(to);
+        this.set(this.contacts, to).add(from);
+      };
     } else {
-      if (this.requests.get(to)?.has(from)) return false;
+      if (this.requests.get(to)?.has(from)) return;
       if (!this.rate(from, "request", 4, 30000))
         throw new Error("Počkej před další žádostí.");
-      this.set(this.requests, to).add(from);
+      return () => this.set(this.requests, to).add(from);
     }
-    return true;
   }
   decline(from: string, to: string) {
     if (!this.requests.get(from)?.has(to)) return false;
@@ -135,10 +148,16 @@ export class Community {
     return this.removeEdge(this.requests, from, to);
   }
   block(from: string, to: string, enabled: boolean) {
+    const change = this.prepareBlock(from, to, enabled);
+    if (!change) return false;
+    change();
+    return true;
+  }
+  prepareBlock(from: string, to: string, enabled: boolean) {
     this.requirePlayer(from);
     if (from === to) throw new Error("Kontakt není dostupný.");
     if (enabled) {
-      if (this.blocks.get(from)?.has(to)) return false;
+      if (this.blocks.get(from)?.has(to)) return;
       if (
         !this.players.has(to) &&
         !this.contacts.get(from)?.has(to) &&
@@ -146,17 +165,30 @@ export class Community {
       )
         throw new Error("Kontakt není dostupný.");
       this.action(from);
-      this.set(this.blocks, from).add(to);
-      this.removeEdge(this.contacts, from, to);
-      this.removeEdge(this.contacts, to, from);
-      this.removeEdge(this.requests, from, to);
-      this.removeEdge(this.requests, to, from);
+      return () => {
+        this.set(this.blocks, from).add(to);
+        this.removeEdge(this.contacts, from, to);
+        this.removeEdge(this.contacts, to, from);
+        this.removeEdge(this.requests, from, to);
+        this.removeEdge(this.requests, to, from);
+      };
     } else {
-      if (!this.blocks.get(from)?.has(to)) return false;
+      if (!this.blocks.get(from)?.has(to)) return;
       this.action(from);
-      this.removeEdge(this.blocks, from, to);
+      return () => this.removeEdge(this.blocks, from, to);
     }
-    return true;
+  }
+  restoreRelationships(data: {
+    contacts: { a: string; b: string }[];
+    blocks: { owner: string; target: string }[];
+    names: { id: string; nickname: string }[];
+  }) {
+    for (const { a, b } of data.contacts) {
+      this.set(this.contacts, a).add(b);
+      this.set(this.contacts, b).add(a);
+    }
+    for (const { owner, target } of data.blocks) this.set(this.blocks, owner).add(target);
+    for (const { id, nickname } of data.names) this.knownNames.set(id, nickname);
   }
   chat(
     id: string,

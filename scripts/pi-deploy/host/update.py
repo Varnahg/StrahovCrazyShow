@@ -216,12 +216,13 @@ class Docker:
                                '--host', 'unix:///var/run/docker.sock', *args],
                               text=True, capture_output=capture, check=check, timeout=timeout, env=env)
 
-    def compose(self, deployment, *args, **kwargs):
+    def compose(self, deployment, *args, auth_mode='google', **kwargs):
         images = refs(deployment)
         env = dict(os.environ, STRAHOV_GAME_IMAGE=images['game'], STRAHOV_TOOLS_IMAGE=images['tools'],
                    STRAHOV_DB_IMAGE=images['db'], STRAHOV_RAG_DATA_VOLUME=deployment['volume'],
                    BIND_ADDRESS='127.0.0.1', HTTP_PORT='8081', OPENAI_SECRET_FILE=str(CONFIG / 'openai_api_key'),
                    CRAZY_TYPKA_ALLOWED_ORIGINS=ORIGIN, FEEDBACK_ALLOWED_ORIGINS=ORIGIN,
+                   STRAHOV_PI_AUTH_MODE=auth_mode,
                    RAG_BOOTSTRAP_MAX_INPUTS='0', RAG_BOOTSTRAP_MAX_BYTES='0')
         return self.docker('compose', '--project-directory', str(APP), '--project-name', PROJECT,
                            '--env-file', '/dev/null', '-f', str(APP / 'compose.full.yaml'),
@@ -290,19 +291,59 @@ class Docker:
                 raise RuntimeError('pomocný kontejner nepatří updateru')
             self.docker('rm', '--force', name)
 
-    def start(self, deployment, bootstrap=False):
+    def has_google_gate(self, deployment):
+        result = self.docker('image', 'inspect', '--format',
+                             '{{index .Config.Labels "cz.reomnik.strahov.multiplayer-auth"}}',
+                             refs(deployment)['game'], capture=True)
+        return result.stdout.strip() == 'google-v1'
+
+    def start(self, deployment, bootstrap=False, force_closed=False):
+        # Persistent across RAG data clones and game image rollbacks.
+        self.docker('volume', 'create', 'strahov-crazy-show-player-accounts', capture=True)
+        google = CONFIG / 'google'
+        google.mkdir(mode=0o750, exist_ok=True)
+        if not google.is_dir() or google.is_symlink():
+            raise RuntimeError('Neplatný adresář Google přihlášení')
+        gated = self.has_google_gate(deployment)
+        marker = CONFIG / 'google-gate-active'
+        if gated and (google / 'client_id').is_file() and (google / 'client_secret').is_file():
+            self.mark_google_gate(marker)
+        if marker.exists() and not gated:
+            raise RuntimeError('Starší obraz by zpřístupnil anonymní multiplayer')
         if bootstrap:
             self.run_setup(deployment, 'rag-secrets', 90)
         up = ('up', '-d', '--no-deps', '--no-build', '--pull', 'never', '--wait', '--wait-timeout', '120')
         self.compose(deployment, *up, 'rag-db', timeout=150)
         if bootstrap:
             self.run_setup(deployment, 'rag-bootstrap', 240)
-        self.compose(deployment, *up, 'game', timeout=150)
+        mode = 'closed' if force_closed else 'google'
+        self.compose(deployment, *up, 'game', timeout=150, auth_mode=mode)
         for route, field in (('/api/health', 'ok'), ('/api/ai/status', 'enabled')):
             with urllib.request.urlopen(f'http://127.0.0.1:8081{route}', timeout=10) as response:
                 body = json.loads(response.read(8192))
             if not isinstance(body, dict) or body.get(field) is not True:
                 raise RuntimeError(f'kontrola připravenosti {route} selhala')
+        if gated:
+            with urllib.request.urlopen('http://127.0.0.1:8081/api/auth/session', timeout=10) as response:
+                auth = json.loads(response.read(8192))
+            if not isinstance(auth, dict) or auth.get('mode') not in ('google', 'closed') or auth.get('account') is not None:
+                raise RuntimeError('Kontrola režimu multiplayerového přihlášení selhala')
+            if force_closed and auth['mode'] != 'closed':
+                raise RuntimeError('Nouzový režim musí uzavřít multiplayer')
+            if auth['mode'] == 'google' and not marker.exists():
+                self.mark_google_gate(marker)
+
+    @staticmethod
+    def mark_google_gate(marker):
+        with marker.open('a') as handle:
+            handle.flush()
+            os.fsync(handle.fileno())
+        if os.name == 'posix':
+            descriptor = os.open(marker.parent, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(descriptor)
+            finally:
+                os.close(descriptor)
 
     def run_setup(self, deployment, service, timeout):
         self.compose(deployment, 'run', '--rm', '--no-deps', '--pull', 'never', '--label', VOLUME_LABEL,
@@ -312,6 +353,14 @@ class Docker:
         for helper in ('copy', 'rag-secrets', 'rag-bootstrap'):
             self.stop_helper(candidate['volume'] + '-' + helper)
         self.compose(candidate, 'stop', '--timeout', '30', 'game', 'rag-db', timeout=90)
+        if (CONFIG / 'google-gate-active').exists() and active is not None and not self.has_google_gate(active):
+            print('Návrat před Google bránu přeskočen. Obnovuji režim sólo.', file=sys.stderr)
+            try:
+                self.start(candidate, force_closed=True)
+                return candidate
+            except OP_ERRORS as error:
+                print(f'Nouzové sólo se nespustilo: {error}', file=sys.stderr)
+                return False
         if active is not None:
             self.start(active)
         else:
@@ -364,16 +413,26 @@ class Updater:
         switching = pending['phase'] == 'switching'
         if switching:
             print(f'Obnovuji poslední funkční vydání po neúspěchu {candidate["release"]["commit"]}.')
-            self.docker.restore(state['active'], candidate)
+            restored = self.docker.restore(state['active'], candidate)
+            if restored is False:
+                state['retired'].append(state['active'])
+                state['active'] = None
+            elif restored is not None:
+                state['retired'].append(state['active'])
+                state['active'] = restored
             state['rejected'] = release_key(candidate['release'])
-        state['retired'].append(candidate)
+        if state['active'] != candidate:
+            state['retired'].append(candidate)
         state['pending'] = None
         self.state.save(state)
         return switching and state['active'] is not None
 
     def boot(self, state):
         if not self.recover(state) and state['active'] is not None:
-            self.docker.start(state['active'])
+            if state['rejected'] == release_key(state['active']['release']):
+                self.docker.start(state['active'], force_closed=True)
+            else:
+                self.docker.start(state['active'])
         self.collect(state)
 
     def space(self, release, active, previous, clone):
@@ -391,7 +450,8 @@ class Updater:
         self.collect(state)
         active = state['active']
         release = fetch_release()
-        if (active is not None and release == active['release']) or (
+        if (active is not None and release == active['release'] and
+                (not retry or release_key(release) != state['rejected'])) or (
                 not retry and release_key(release) == state['rejected']):
             return
         clone = new_database(active, release)

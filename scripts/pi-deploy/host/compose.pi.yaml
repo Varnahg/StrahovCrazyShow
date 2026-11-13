@@ -4,6 +4,21 @@ services:
     image: ${STRAHOV_GAME_IMAGE:?}
     pull_policy: never
     restart: on-failure
+    environment:
+      STRAHOV_AUTH_MODE: ${STRAHOV_PI_AUTH_MODE:-google}
+      STRAHOV_LOCAL_TEST_ONLY: "0"
+      STRAHOV_AUTH_ORIGIN: https://strahov.reomnik.com
+      STRAHOV_AUTH_TRUST_CLOUDFLARE: "1"
+      STRAHOV_AUTH_CONFIG_DIR: /run/strahov-google
+      STRAHOV_ACCOUNTS_DB: /data/accounts/accounts.sqlite
+    volumes:
+      - player-accounts:/data/accounts
+      - type: bind
+        source: /etc/strahov-crazy-show/google
+        target: /run/strahov-google
+        read_only: true
+        bind:
+          create_host_path: false
   rag-secrets:
     build: !reset null
     image: ${STRAHOV_TOOLS_IMAGE:?}
@@ -18,6 +33,9 @@ services:
     restart: on-failure
 
 volumes:
+  player-accounts:
+    name: strahov-crazy-show-player-accounts
+    external: true
   rag-data:
     name: ${STRAHOV_RAG_DATA_VOLUME:?}
     external: true

@@ -210,6 +210,28 @@ html:has(.welcome-screen) {
   align-items: center;
   width: min(310px, 100%);
 }
+.home-play-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.welcome-screen .home-google {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #747775;
+  border-radius: 4px;
+  background: #fff;
+  color: #1f1f1f;
+  font: 500 14px/20px "Google Sans", Roboto, sans-serif;
+  cursor: pointer;
+}
+.welcome-screen .home-google:hover { background: #f8faff; }
+.welcome-screen .home-google svg { flex: none; }
+.welcome-screen .home-solo { white-space: nowrap; }
 .welcome-screen .home-primary {
   display: inline-flex;
   align-items: center;
