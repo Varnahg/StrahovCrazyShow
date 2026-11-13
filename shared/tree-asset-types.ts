@@ -6,6 +6,7 @@ export type TreeRole = "wood" | "foliage";
 export type TreeLodProfile = "full-coverage";
 export type TreeMaterialKey = "Bark012" | "LeafSet024" | "fir_tree_01";
 export type TreeAssetFile = Readonly<{ url: string; bytes: number; sha256: string }>;
+type TreeLodFile = TreeAssetFile & { meshNames: readonly string[]; leafBankId?: string };
 export type LegacyTreeManifest = Readonly<{
   version: 1; bootstrap: string; bootstrapBytes: number; bootstrapSha256: string;
   materialNames: string[]; trees: Record<string, Record<string, TreeAssetFile>>;
@@ -15,12 +16,17 @@ export type TreePrototype = Readonly<{
   nominalCrownDiameter: number; trunkRadius: number;
   lodProfile?: TreeLodProfile;
   farCluster?: Readonly<{ bankId: string; placements: TreeAssetFile; groupCount: number }>;
-  lods: readonly (TreeAssetFile & { meshNames: readonly string[] })[];
+  /** Visual subset. Canonical FAR groups still validate MID and exact leaves. */
+  farVisual?: TreeAssetFile;
+  /** LOD1 preserves the FAR rank population, with an optional separate bank. */
+  midCluster?: Readonly<{ bankId?: string; placements: TreeAssetFile; groupCount: number }>;
+  lods: readonly TreeLodFile[];
 }>;
 export type TreePilotManifest = Readonly<{
   /** v4 adds shared FAR banks to the separate v3 LOD payloads. */
   version: 2 | 3 | 4; units: "metres"; rankEncoding: "uint16-normalized";
   banks?: Readonly<Record<string, TreeAssetFile>>;
+  farVisualAtlas?: TreeAssetFile;
   prototypes: Readonly<Record<string, TreePrototype>>;
   placements: readonly Readonly<{
     sourceTreeId: string; sourceRootXZ: readonly [number, number];
@@ -68,6 +74,9 @@ export function parseLegacyTreeManifest(value: unknown): LegacyTreeManifest {
 export function parseTreePilotManifest(value: unknown): TreePilotManifest {
   const raw=record(value);
   if(![2,3,4].includes(raw.version as number)||raw.units!=="metres"||raw.rankEncoding!=="uint16-normalized")throw Error("Unsupported seasonal tree manifest");
+  const farVisualAtlas = raw.farVisualAtlas === undefined ? undefined : assetFile(raw.farVisualAtlas);
+  if (farVisualAtlas && (raw.version !== 4 || farVisualAtlas.bytes > 2 * 1024 * 1024))
+    throw Error("Invalid FAR visual atlas");
   const banks: Record<string, TreeAssetFile> = Object.create(null);
   if (raw.version === 4) {
     const entries = Object.entries(record(raw.banks));
@@ -85,7 +94,11 @@ export function parseTreePilotManifest(value: unknown): TreePilotManifest {
     const lods=p.lods.map((item,lod)=>{const r=record(item),file=assetFile(item);
       if(!Array.isArray(r.meshNames)||r.meshNames.length<1||r.meshNames.length>2||!r.meshNames.every(n=>typeof n==="string"&&n.startsWith(id+"__lod"+lod+"__")&&/__(wood|foliage)$/.test(n))||new Set(r.meshNames).size!==r.meshNames.length)throw Error("Invalid prototype mesh names");
       if(!r.meshNames.some(n=>(n as string).endsWith("__wood")))throw Error("Prototype LOD lacks wood");
-      return {...file,meshNames:[...r.meshNames] as string[]};});
+      const leafBankId = r.leafBankId === undefined ? undefined : identifier(r.leafBankId);
+      if (leafBankId !== undefined && (raw.version !== 4 || lod === 2 || !Object.hasOwn(banks, leafBankId) ||
+        !r.meshNames.some(n => (n as string).endsWith("__foliage")) || (lod === 1 && p.midCluster !== undefined)))
+        throw Error("Invalid detail leaf bank");
+      return {...file,meshNames:[...r.meshNames] as string[], ...(leafBankId === undefined ? {} : { leafBankId })};});
     if(raw.version===2&&lods.some(l=>l.url!==lods[0].url||l.sha256!==lods[0].sha256||l.bytes!==lods[0].bytes))throw Error("Pilot LODs must share one immutable GLB");
     if(raw.version!==2&&new Set(lods.map(l=>l.url)).size!==3)throw Error("Streamed LODs require separate immutable GLBs");
     if(p.lodProfile!==undefined&&p.lodProfile!=="full-coverage")throw Error("Invalid tree LOD profile");
@@ -97,9 +110,29 @@ export function parseTreePilotManifest(value: unknown): TreePilotManifest {
       if (!banks[bankId] || !Number.isInteger(groupCount) || placements.bytes !== groupCount * 32) throw Error("Invalid tree cluster placement descriptor");
       farCluster = { bankId, placements, groupCount };
     }
+    const farVisual = p.farVisual === undefined ? undefined : assetFile(p.farVisual);
+    if (farVisual && (!farVisualAtlas || !farCluster || p.family !== "deciduous-broadleaf" ||
+      farVisual.bytes < 9 || farVisual.bytes > 8 + Math.ceil(farCluster.groupCount / 4) + farCluster.groupCount * 24 ||
+      farVisual.url === farCluster.placements.url || farVisual.url === farVisualAtlas.url))
+      throw Error("Invalid FAR visual recipe descriptor");
+    let midCluster: TreePrototype["midCluster"];
+    if (p.midCluster !== undefined) {
+      if (!farCluster) throw Error("Tree mid groups require the FAR rank population");
+      const cluster = record(p.midCluster);
+      const bankId = cluster.bankId === undefined ? undefined : identifier(cluster.bankId);
+      const placements = assetFile(cluster.placements);
+      const groupCount = finite(cluster.groupCount, 1, farCluster.groupCount);
+      if ((bankId !== undefined && !Object.hasOwn(banks, bankId)) ||
+          !Number.isInteger(groupCount) || placements.bytes !== groupCount * 32 || placements.url === farCluster.placements.url)
+        throw Error("Invalid tree mid cluster placement descriptor");
+      midCluster = { ...(bankId === undefined ? {} : { bankId }), placements, groupCount };
+    }
     prototypes[id]={sourceTreeId:identifier(p.sourceTreeId),family:p.family as TreeFamily,nominalHeight:finite(p.nominalHeight,.1,100),nominalCrownDiameter:finite(p.nominalCrownDiameter,.1,100),trunkRadius:finite(p.trunkRadius,.01,5),lods,
-      ...(p.lodProfile===undefined?{}:{lodProfile:p.lodProfile as TreeLodProfile}), ...(farCluster ? { farCluster } : {})};
+      ...(p.lodProfile===undefined?{}:{lodProfile:p.lodProfile as TreeLodProfile}), ...(farCluster ? { farCluster } : {}),
+      ...(midCluster ? { midCluster } : {}), ...(farVisual ? { farVisual } : {})};
   }
+  if (farVisualAtlas && !Object.values(prototypes).some(p => p.farVisual))
+    throw Error("Unused FAR visual atlas");
   if(!Array.isArray(raw.placements)||raw.placements.length<1||raw.placements.length>2048)throw Error("Invalid pilot placements");
   const seen=new Set<string>();
   const placements=raw.placements.map(value=>{const p=record(value),sourceTreeId=identifier(p.sourceTreeId);
@@ -110,5 +143,6 @@ export function parseTreePilotManifest(value: unknown): TreePilotManifest {
     if(p.selectedPrototypeId!==null&&!candidates.includes(p.selectedPrototypeId as string))throw Error("Invalid selected prototype");
     return {sourceTreeId,sourceRootXZ:[finite(p.sourceRootXZ[0],-1e6,1e6),finite(p.sourceRootXZ[1],-1e6,1e6)] as [number,number],prototypeCandidates:candidates,selectedPrototypeId:p.selectedPrototypeId as string|null,
       ...(p.positionUncertaintyMetres===undefined?{}:{positionUncertaintyMetres:finite(p.positionUncertaintyMetres,0,100)})};});
-  return {version:raw.version as 2|3|4,units:"metres",rankEncoding:"uint16-normalized",prototypes,placements,...(raw.version===4?{banks}:{})};
+  return {version:raw.version as 2|3|4,units:"metres",rankEncoding:"uint16-normalized",prototypes,placements,...(raw.version===4?{banks}:{}),
+    ...(farVisualAtlas ? { farVisualAtlas } : {})};
 }

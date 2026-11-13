@@ -19,7 +19,7 @@ import { RenderHealth } from "../client/render-health";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 import { resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity } from "../client/terrain-review";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import treeCatalog from "../shared/data/assets/tree-catalog.json";
+import treeCatalog from "../shared/data/assets/tree-quarter-rollout-20261113.json";
 
 const { source, gameClass, selectMembers } = readGameSource(
   process.env.GAME_STARTUP_SOURCE,

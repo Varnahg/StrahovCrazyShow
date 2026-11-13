@@ -27,7 +27,7 @@ import { StartupMaterialReadiness } from "./startup-material-readiness";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
 import { getTreeSeasonState } from "../shared/tree-season";
-import treeCatalog from "../shared/data/assets/tree-catalog.json";
+import treeCatalog from "../shared/data/assets/tree-quarter-rollout-20261113.json";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
