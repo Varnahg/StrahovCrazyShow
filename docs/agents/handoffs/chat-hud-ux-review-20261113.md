@@ -1,0 +1,14 @@
+# KEY-78 · Revize makety chatu
+
+1. **Problém.** Ověřit čitelnost a ovládání návrhu před publikací a zkontrolovat ho ze skutečného Pi.
+2. **Mechanismus.** V původní maketě Edge při prvním Shift+Tab přesunul fokus mimo dialog. Po změně rozměru a zavření zůstával fokus na stránce místo na launcheru. T po použití AI otevřelo skrytý editor v AI pohledu. Log měl při výšce 240 px jen 18 px. Odznak neměnil stav po přečtení a jeho hodnota chyběla v přístupném popisu desktopového tlačítka.
+3. **Změna.** Opravit problematické stavy v původní maketě. Zachovat Jantar a zesílit okraje skutečných ovladačů a aktivní značku na liště. Při malé výšce může rolovat i celý dialog, takže log udrží čitelnou výšku. Jedna pevná výška by ořezala obsah a zmenšování písma by zhoršilo čitelnost.
+4. **Měření.** Skutečně vykreslené barevné dvojice proti simulované bílé a černé scéně, čitelnost při zvětšení, číselné meze logu a průchod odpovědí z přesných souborů kandidáta.
+5. **Správnost.** Text nejméně 4,5:1 a potřebné hranice ovladačů nejméně 3:1. Dostupný editor, čtení, zavření a návrat fokusu. Maketa zůstává izolovaná a běží s lokálním fontem a fiktivními zprávami.
+6. **Přijetí.** Ověřit uvedené regrese v prohlížeči a na Raspberry Pi s ARM64. GitHub PR vychází přímo z GitHub main a obsahuje pouze soubory návrhu.
+
+Na bílé scéně má text náhledu 10,67:1, štítky kanálů 6,53:1, text odznaku 5,74:1 a hlavní text dialogu 13,78:1. Nejslabší měřená hranice ovladače vyšla 4,30:1. Jantarová značka a hranice aktivní položky proti její výplni mají 5,96:1. Na černé scéně byly odpovídající poměry vyšší. Měření skládá CSS barvy a průhlednost z obou prohlížečů. Prahy vycházejí z [WCAG pro text](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) a [WCAG pro ovladače](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html).
+
+Edge 157.0.4341.46 na Windows a Chromium 156.0.8078.79 přímo na Raspberry Pi ARM64 prošly stejnou kontrolou. Rozměry byly 1366×768, 390×844, 844×390, 320×568, 320×256, 844×205 a 640×512 se zdvojenou základní velikostí písma. Prošel výběr odpovědi, udržení konceptu po změně kanálu, odeslání v maketě, skok na originál, klávesnice i návrat fokusu po změně rozměru. Snímky v návrhu byly aktualizovány.
+
+Na Pi obsloužil tři soubory dočasný HTTP server na loopbacku. SHA-256 HTML je `dfddf011656a6e29e967f8908bbe2300409833d2f8c36fb328f20c051172fc92`, Manrope `3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6` a snímku `23a23beda3872f6c74c6625f35d790f0aabf5a66e1a74c4803639aad490fddf4`. Oba procesy a zkušební adresář byly odstraněny. Herní služba na portu 8081 při závěrečné kontrole vrátila `{"ok":true,"demo":true}`. Předmět této přejímky je HTML maketa s fiktivními zprávami. Ověření živého herního klienta a skutečné mobilní klávesnice patří do implementace.
