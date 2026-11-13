@@ -21,6 +21,14 @@ const hash = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("h
 const asBuffer = (bytes: Uint8Array) => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 const source = TREES.find(tree => tree.osmId === "ipr-crown-014")!;
 const settle = async () => { for (let i = 0; i < 8; i++) await new Promise<void>(resolve => setImmediate(resolve)); };
+async function waitUntil(ready: () => boolean) {
+  const deadline = performance.now() + 2000;
+  while (!ready()) {
+    assert.ok(performance.now() < deadline, "streaming did not reach the expected completion state");
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
+  }
+}
+
 const input = (overrides: Record<string, unknown> = {}) => ({ time: 1, quality: "high", player: { x: source.x, y: 0, z: source.z }, wind: { x: 0, z: 0, speed: 0 }, ...overrides });
 
 test("full MID profile is explicit and scales its thresholds with the real projection", () => {
@@ -118,7 +126,7 @@ function harness(t: any, fixtures = [fixture()], engine = new NullEngine(), deta
   const calls: string[] = [];
   t.mock.method(r.loader, "asset", async (file: TreeAssetFile) => { calls.push(file.url); assert.ok(byUrl.has(file.url)); return byUrl.get(file.url)!; });
   t.after(() => { renderer.dispose(); scene.dispose(); engine.dispose(); });
-  return { engine, scene, renderer, r, manifest, selections, byUrl, calls, load: () => r.loadPilot(manifest, Object.keys(selections)) };
+  return { engine, scene, renderer, r, manifest, selections, byUrl, calls, load: () => r.loadPilot(manifest, Object.keys(selections)), settleDetails: async () => { await settle(); await waitUntil(() => r.loadingTrees.size === 0 && r.loader.stats.pending === 0); } };
 }
 
 test("low renderer retains FAR without a MID request until the real camera projection needs detail", async t => {
@@ -128,20 +136,20 @@ test("low renderer retains FAR without a MID request until the real camera proje
   const player = { x: source.x - 90, y: 0, z: source.z };
   const camera = new FreeCamera("low tree projection", new Vector3(player.x, 2, player.z), h.scene); camera.fov = .85;
   const group = h.r.treeGroups[0], far = [...group.lods[2]];
-  h.renderer.update(input({ quality: "low", player })); await settle();
+  h.renderer.update(input({ quality: "low", player })); await h.settleDetails();
   assert.equal(group.desired, 2); assert.equal(group.active, 2);
   assert.deepEqual(h.calls, [f.streamed.lods[2].url], "beyond 75 projected metres low must not request MID");
   assert.equal(h.renderer.stats.treeDetailReservedBytes, 0);
   assert.ok(far.every(mesh => mesh.isEnabled()));
 
   camera.fov = .42;
-  h.renderer.update(input({ time: 1.2, quality: "low", player })); await settle();
+  h.renderer.update(input({ time: 1.2, quality: "low", player })); await h.settleDetails();
   assert.equal(group.desired, 1); assert.equal(group.active, 1, "zoom must still request and display a detailed crown");
   assert.deepEqual(h.calls, [f.streamed.lods[2].url, f.streamed.lods[1].url]);
   assert.ok(far.every(mesh => !mesh.isEnabled()));
 
   camera.fov = .85;
-  h.renderer.update(input({ time: 1.4, quality: "low", player })); await settle();
+  h.renderer.update(input({ time: 1.4, quality: "low", player })); await h.settleDetails();
   assert.equal(group.active, 2); assert.ok(far.every(mesh => mesh.isEnabled()));
   assert.ok(group.lods[1].every((mesh: Mesh) => !mesh.isEnabled()));
   assert.equal(h.calls.length, 2, "returning to FAR must not issue another geometry request");
@@ -164,7 +172,7 @@ for (const finishDuring of ["low", "high"] as const) {
     h.renderer.update(input({ time: 1.2, quality: "low", player }));
     assert.equal(group.desired, 2); assert.equal(group.active, 2);
     if (finishDuring === "high") h.renderer.update(input({ time: 1.4, player }));
-    finish(asBuffer(f.files[1])); await settle();
+    finish(asBuffer(f.files[1])); await h.settleDetails();
 
     const mid = [...group.lods[1]], current = finishDuring === "low" ? 2 : 1;
     assert.equal(group.active, current);
@@ -174,7 +182,7 @@ for (const finishDuring of ["low", "high"] as const) {
     assert.equal(h.renderer.stats.treeDetailCacheEntries, 1);
     h.renderer.update(input({ time: 1.6, quality: "low", player }));
     assert.equal(group.active, 2); assert.ok(mid.every(mesh => !mesh.isEnabled()));
-    h.renderer.update(input({ time: 1.8, player })); await settle();
+    h.renderer.update(input({ time: 1.8, player })); await h.settleDetails();
     assert.equal(group.active, 1); assert.deepEqual(group.lods[1], mid);
     assert.ok(mid.every(mesh => mesh.isEnabled() && !mesh.isDisposed()));
     assert.ok(far.every(mesh => !mesh.isEnabled() && !mesh.isDisposed()));
@@ -195,7 +203,7 @@ test("full-coverage detail admission uses camera focus before distant-player can
   assert.deepEqual(pending.map(p=>p.url),[fixtures[0].streamed.lods[0].url,fixtures[1].streamed.lods[0].url]);
   assert.equal(h.renderer.stats.treeDetailReservedBytes,TREE_DETAIL_BYTES_LIMIT);
   h.renderer.update(input({time:1.2,player:{x:0,y:0,z:0}}));assert.equal(pending.length,2);
-  h.renderer.dispose();for(const request of pending)request.reject(new DOMException("test retirement","AbortError"));await settle();
+  h.renderer.dispose();for(const request of pending)request.reject(new DOMException("test retirement","AbortError"));await h.settleDetails();
   assert.equal(h.renderer.stats.treeDetailReservedBytes,0);
 });
 
@@ -245,7 +253,7 @@ test("v3 initial load is far only; late detail obeys current season, quality and
   assert.ok(h.renderer.setTreeTransform(source.osmId, moved, .8));
   const winter = getTreeSeasonState(Date.UTC(2026, 0, 15));
   h.renderer.update(input({ time: 1.2, quality: "low", player: { x: source.x + 1000, y: 0, z: source.z }, season: winter }));
-  finish(asBuffer(f.files[0])); await settle();
+  finish(asBuffer(f.files[0])); await h.settleDetails();
   assert.equal(group.active, 2); assert.equal(h.renderer.stats.treeDetailReservedBytes, 0);
   for (const mesh of group.lods[0]) {
     assert.equal(mesh.parent, group.root); assert.equal(mesh.isEnabled(), false); assert.equal(mesh.hasVertexAlpha, false);
@@ -263,7 +271,7 @@ test("initial far queue and detail queue are each bounded to two; detail priorit
   const pending: { url: string; finish: (buffer: ArrayBuffer) => void }[] = [];
   t.mock.method(h.r.loader, "asset", (file: TreeAssetFile) => new Promise<ArrayBuffer>(finish => pending.push({ url: file.url, finish })));
   const loading = h.load(); await settle(); assert.equal(pending.length, 2);
-  pending[0].finish(h.byUrl.get(pending[0].url)!); await settle(); assert.equal(pending.length, 3);
+  pending[0].finish(h.byUrl.get(pending[0].url)!); await waitUntil(() => pending.length === 3); assert.equal(pending.length, 3);
   pending[1].finish(h.byUrl.get(pending[1].url)!); pending[2].finish(h.byUrl.get(pending[2].url)!); await loading;
   pending.length = 0;
   const groups = h.r.treeGroups;
@@ -272,9 +280,9 @@ test("initial far queue and detail queue are each bounded to two; detail priorit
   groups[2].x = 2; groups[2].z = 0; groups[2].desired = 0;
   h.r.player.set(0,0,0); h.r.startDetailLoads(); assert.equal(pending.length, 2); assert.equal(h.r.loadingTrees.size, 2);
   assert.equal(pending[0].url, groups[2].stream.prototype.lods[0].url); assert.equal(pending[1].url, groups[1].stream.prototype.lods[0].url);
-  pending[0].finish(h.byUrl.get(pending[0].url)!); await settle(); assert.equal(pending.length, 3); assert.equal(pending[2].url, groups[0].stream.prototype.lods[1].url);
+  pending[0].finish(h.byUrl.get(pending[0].url)!); await waitUntil(() => pending.length === 3); assert.equal(pending.length, 3); assert.equal(pending[2].url, groups[0].stream.prototype.lods[1].url);
   assert.equal(h.r.detailCache.size + h.r.reservations.size, 3, "settled cache entry does not also retain its reservation");
-  pending[1].finish(h.byUrl.get(pending[1].url)!); pending[2].finish(h.byUrl.get(pending[2].url)!); await settle();
+  pending[1].finish(h.byUrl.get(pending[1].url)!); pending[2].finish(h.byUrl.get(pending[2].url)!); await h.settleDetails();
   assert.equal(h.r.loadingTrees.size, 0); assert.equal(h.r.reservations.size, 0);
 });
 
@@ -284,7 +292,7 @@ test("hard cache reservations retain far fallback; eviction frees geometry but p
   h.r.startDetailLoads(); assert.equal(h.calls.length, 1); assert.equal(group.active, 2);
   h.r.reservations.clear(); h.r.reservations.set("peer", TREE_DETAIL_BYTES_LIMIT);
   h.r.startDetailLoads(); assert.equal(h.calls.length, 1); h.r.reservations.clear();
-  h.r.startDetailLoads(); await settle(); assert.equal(group.active, 0); assert.equal(h.r.detailCache.size, 1);
+  h.r.startDetailLoads(); await h.settleDetails(); assert.equal(group.active, 0); assert.equal(h.r.detailCache.size, 1);
   const detail = [...group.lods[0]], material = detail[1].material, geometryCount = h.scene.geometries.length;
   group.desired = 2; h.r.applyVisibility(); h.r.trimDetailCache(0, TREE_DETAIL_BYTES_LIMIT);
   assert.equal(h.r.detailCache.size, 0); assert.equal(h.r.detailBytes.size, 0); assert.ok(detail.every(mesh => mesh.isDisposed()));
@@ -297,7 +305,7 @@ test("failed partial detail allocation disposes both role meshes, preserves far 
   t.mock.method(h.r, "describe", (mesh: Mesh, ...args: any[]) => { if (mesh.name.includes("__lod0__foliage")) throw Error("injected partial allocation"); return original(mesh, ...args); });
   group.desired = 0;
   // Block fallback to inspect the failed transaction without a succeeding mid.
-  h.r.failedTrees.add(group.id + ":1"); h.r.startDetailLoads(); await settle();
+  h.r.failedTrees.add(group.id + ":1"); h.r.startDetailLoads(); await h.settleDetails();
   assert.equal(group.active, 2); assert.deepEqual(group.lods.map((meshes: Mesh[]) => meshes.length), [0,0,2]);
   assert.equal(h.scene.meshes.length, 2); assert.equal(h.scene.geometries.length, 2); assert.equal(h.scene.materials.length, 2);
   assert.equal(h.r.reservations.size, 0); assert.equal(h.r.loadingTrees.size, 0); assert.equal(h.r.detailCache.size, 0);
@@ -315,7 +323,7 @@ test("legacy and v3 share two detail slots and an old legacy rejection cannot po
   h.r.startDetailLoads(); assert.equal(h.r.loadingTrees.size, 1);
   h.r.failedTrees.add(source.osmId + ":1");
   await h.load(); assert.equal(h.r.treeGroups[0], legacyGroup); assert.equal(h.r.failedTrees.has(source.osmId + ":1"), false);
-  rejectOld(Error("old generation failure")); await settle();
+  rejectOld(Error("old generation failure")); await h.settleDetails();
   assert.equal(h.r.failedTrees.has(source.osmId + ":0"), false); assert.equal(legacyGroup.active, 0);
   assert.equal(h.renderer.stats.loadError, undefined); assert.ok(h.calls.includes(f.streamed.lods[0].url));
 
@@ -327,7 +335,7 @@ test("legacy and v3 share two detail slots and an old legacy rejection cannot po
   t.mock.method(h.r.loader, "asset", () => new Promise<ArrayBuffer>(resolve => pending.push(resolve)));
   h.r.startDetailLoads(); assert.equal(h.r.loadingTrees.size, 2); assert.equal(pending.length, 2);
   assert.ok(h.r.loadingTrees.has(peer.id + ":0")); assert.ok(h.r.loadingTrees.has(source.osmId + ":1"));
-  h.renderer.dispose(); for (const finish of pending) finish(new ArrayBuffer(0)); await settle();
+  h.renderer.dispose(); for (const finish of pending) finish(new ArrayBuffer(0)); await h.settleDetails();
   assert.equal(h.r.loadingTrees.size, 0);
 });
 
@@ -343,7 +351,7 @@ test("wood-only far preloads declared foliage material for later detail without 
   });
   await h.load(); assert.deepEqual(keys, ["Bark012", "LeafSet024"]); assert.equal(h.calls.length, 1);
   const group = h.r.treeGroups[0]; assert.equal(group.lods[2].length, 1);
-  group.desired = 0; h.r.startDetailLoads(); await settle();
+  group.desired = 0; h.r.startDetailLoads(); await h.settleDetails();
   assert.equal(group.active, 0); assert.equal(group.lods[0][1].material, h.r.materials.get("LeafSet024")); assert.equal(keys.length, 2);
 });
 
@@ -351,7 +359,7 @@ test("oversized or corrupt near can use mid; corruption allocates no partial geo
   const h = harness(t), f = fixture(); await h.load(); const group = h.r.treeGroups[0];
   const original = h.r.loader.asset.bind(h.r.loader);
   t.mock.method(h.r.loader, "asset", (file: TreeAssetFile) => file.url === f.streamed.lods[0].url ? Promise.resolve(new ArrayBuffer(32)) : original(file));
-  group.desired = 0; h.r.startDetailLoads(); await settle();
+  group.desired = 0; h.r.startDetailLoads(); await h.settleDetails();
   assert.equal(group.active, 1); assert.equal(group.lods[0].length, 0); assert.equal(h.scene.geometries.length, 4);
   assert.ok(h.r.failedTrees.has(group.id + ":0")); assert.equal(h.r.reservations.size, 0);
   assert.equal(h.renderer.stats.treeDetailCacheBytes, f.streamed.lods[1].bytes);
@@ -364,7 +372,7 @@ test("dispose aborts detail fetch; even ignored abort response creates no new me
   let finish!: (response: Response) => void, signal: AbortSignal | undefined;
   t.mock.method(globalThis, "fetch", async (_: unknown, options?: RequestInit) => { signal = options?.signal ?? undefined; return new Promise<Response>(resolve => finish = resolve); });
   group.desired = 0; h.r.startDetailLoads(); assert.equal(h.r.loadingTrees.size, 1);
-  h.renderer.dispose(); assert.ok(signal?.aborted); finish(new Response(asBuffer(f.files[0]))); await settle();
+  h.renderer.dispose(); assert.ok(signal?.aborted); finish(new Response(asBuffer(f.files[0]))); await h.settleDetails();
   assert.equal(h.scene.meshes.length, 0); assert.equal(h.scene.geometries.length, 0); assert.equal(h.r.reservations.size, 0); assert.equal(h.r.loadingTrees.size, 0); assert.equal(h.r.loader.stats.pending, 0);
 });
 
@@ -387,12 +395,12 @@ test("actual streamed export is byte-identical to every referenced R4 accessor",
 test("FAR-only survives all quality warmup passes without detail requests and keeps visible wood", async t => {
   const f = fixture(), h = harness(t, [f], new NullEngine(), "far-only"); await h.load();
   for (const [index, quality] of ["low", "medium", "high"].entries()) {
-    h.renderer.update(input({ time: index + 1, quality })); await settle();
+    h.renderer.update(input({ time: index + 1, quality })); await h.settleDetails();
     assert.equal(h.r.treeGroups[0].desired, 2); assert.equal(h.r.treeGroups[0].active, 2);
   }
   assert.deepEqual(h.calls, [f.streamed.lods[2].url]);
   assert.ok(h.r.treeGroups[0].lods[2].some((m: any) => m.metadata.treeRole === "wood" && m.isEnabled()));
-  h.renderer.setDetailMode("normal"); h.renderer.update(input({ time: 5 })); await settle();
+  h.renderer.setDetailMode("normal"); h.renderer.update(input({ time: 5 })); await h.settleDetails();
   assert.equal(h.r.treeGroups[0].active, 0); assert.ok(h.calls.includes(f.streamed.lods[0].url));
 });
 
@@ -406,17 +414,17 @@ test("late MID completion cannot allocate or show detail after FAR-only, then no
     return Promise.resolve(asBuffer(f.files[1]));
   });
   h.renderer.update(input({ player })); assert.equal(h.r.loadingTrees.size, 1);
-  h.renderer.setDetailMode("far-only"); finish(asBuffer(f.files[1])); await settle();
+  h.renderer.setDetailMode("far-only"); finish(asBuffer(f.files[1])); await h.settleDetails();
   assert.equal(group.active, 2); assert.equal(group.lods[1].length, 0);
   assert.equal(h.r.loadingTrees.size, 0); assert.equal(h.renderer.stats.treeDetailReservedBytes, 0);
-  h.renderer.setDetailMode("normal"); h.renderer.update(input({ time: 3, player })); await settle();
+  h.renderer.setDetailMode("normal"); h.renderer.update(input({ time: 3, player })); await h.settleDetails();
   assert.equal(group.active, 1); assert.equal(h.calls.length, 3);
 });
 
 test("FAR-only retires only detail failures while preserving a failed tree foundation", async t => {
   const f = fixture(), h = harness(t, [f]); await h.load();
   t.mock.method(h.r.loader, "asset", async () => { throw Error("requested MID failed"); });
-  h.renderer.update(input({ player: { x: source.x - 90, y: 0, z: source.z } })); await settle();
+  h.renderer.update(input({ player: { x: source.x - 90, y: 0, z: source.z } })); await h.settleDetails();
   assert.match(h.renderer.stats.loadError!, /MID failed/);
   h.renderer.setDetailMode("far-only"); assert.equal(h.renderer.stats.loadError, undefined);
   h.r.error(Error("FAR foundation failed")); h.renderer.setDetailMode("normal"); h.renderer.setDetailMode("far-only");
