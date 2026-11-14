@@ -70,6 +70,8 @@ test("the released 4314257259 uses verified quarter exports and preserves season
   };
   const id = "catalog-4314257259";
   const catalog = parseTreePilotManifest(JSON.parse(pinned(rollout).toString("utf8")));
+  const { banks } = catalog;
+  assert.ok(banks);
   assert.equal(Object.keys(catalog.prototypes).length, 110);
   assert.ok(Object.values(catalog.prototypes).every(({ lods }) =>
     lods.slice(0, 2).every(file => file.url.includes("/quarter-20261113/"))));
@@ -80,7 +82,7 @@ test("the released 4314257259 uses verified quarter exports and preserves season
   const ranks = ([0, 1] as const).map(lod => {
     const file = tree.lods[lod];
     assert.equal(file.leafBankId, lod === 0 ? "quarter-leaf-050" : "quarter-leaf-4314257259");
-    const bank = parseTreeClusterBank(JSON.parse(pinned(catalog.banks[file.leafBankId!]).toString("utf8")));
+    const bank = parseTreeClusterBank(JSON.parse(pinned(banks[file.leafBankId!]).toString("utf8")));
     assert.equal(bank.alphaCutoff, .5);
     for (const texture of Object.values(bank.textures)) pinned(texture);
     const parts = decodeTreePrototype(Uint8Array.from(pinned(file)).buffer, id, tree, lod);

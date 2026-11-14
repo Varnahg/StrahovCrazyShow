@@ -2,7 +2,7 @@
 title: 'Čtvrtinové LOD posledního stromu 4314257259'
 type: 'bugfix'
 created: '2026-11-14'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '0ca9a080871a5b632db1264f71251f358cb6e614'
 review_loop_iteration: 0
@@ -30,4 +30,8 @@ review_loop_iteration: 0
 
 ## Implementation Notes
 
+Kandidát uchoval 8 591 pozic listových karet a všech 3 214 ranků. Oba exporty a čtyři atlasové mapy jsou bitově reprodukovatelné. Edge WebGL2 přijal 36 pohledů a čtyři stíny.
+
 ## Review Triage Log
+
+Nezávislá kontrola diffu fe8e6d1c bez nálezů.
