@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-live-smoke-20261114",
+  "status": "ready",
+  "dependsOn": [
+    "chat-hud-ux-review-20261113"
+  ],
+  "title": "KEY-78: Živý smoke test hráčských citací",
+  "writePaths": [
+    "scripts/integration-player-chat.ts",
+    "docs/agents/handoffs/chat-live-smoke-20261114.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Znovupoužitelný smoke vůči izolovanému běžícímu serveru se třemi hráči."
+  ],
+  "verification": [
+    "Cílené kontroly a předání; náročné běhy serializuje integrátor."
+  ],
+  "notes": [
+    "https://linear.app/gigeconomy/issue/KEY-78"
+  ]
+}

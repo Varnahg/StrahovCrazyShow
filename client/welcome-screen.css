@@ -1,23 +1,18 @@
-@font-face {
-  font-family: Manrope;
-  src: url("/fonts/manrope/Manrope-Variable.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 200 800;
-  font-display: swap;
-}
+@import "./jantar-theme.css";
+
 .welcome-screen,
 .startup-screen {
-  --home-text: #fff3e4;
-  --home-muted: #cfbfb2;
-  --home-accent: #ffcf92;
-  --home-button-ink: #49301d;
-  --home-tint: 243, 200, 156;
-  --home-panel: rgba(37, 27, 26, 0.93);
+  --home-text: var(--jantar-ink);
+  --home-muted: var(--jantar-muted);
+  --home-accent: var(--jantar-accent);
+  --home-button-ink: var(--jantar-accent-ink);
+  --home-tint: var(--jantar-tint);
+  --home-panel: rgba(var(--jantar-panel), 0.93);
   --ink: var(--home-text);
   --line: rgba(var(--home-tint), 0.22);
   color: var(--home-text);
   color-scheme: dark;
-  font-family: Manrope, system-ui, sans-serif;
+  font-family: var(--jantar-font);
 }
 .welcome-screen {
   position: fixed;

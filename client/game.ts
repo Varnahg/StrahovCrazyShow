@@ -2307,6 +2307,7 @@ export class Game {
   };
   keyDown = (e: KeyboardEvent) => {
     if (textEntryTarget(e.target) || e.defaultPrevented) return;
+    if (this.uiModal && (e.target as Element | null)?.closest?.(".player-chat-dialog")) return;
     if (!this.ready) return;
     if (!e.repeat && ["KeyM", "KeyJ", "KeyG", "Escape"].includes(e.code)) {
       e.preventDefault();

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-live-20261114",
+  "status": "ready",
+  "dependsOn": [
+    "chat-hud-ux-review-20261113"
+  ],
+  "title": "KEY-78: Herní okno, HUD a integrace do živého multiplayeru",
+  "writePaths": [
+    "client/ui.tsx",
+    "client/game.ts",
+    "client/player-chat.tsx",
+    "client/player-chat.css",
+    "client/world-dock.tsx",
+    "client/jantar-theme.css",
+    "client/welcome-screen.css",
+    "client/hud.css",
+    "client/style.css",
+    "client/i18n-messages.ts",
+    "tests/room-callbacks.test.ts",
+    "docs/verification.md",
+    "docs/agents/handoffs/chat-live-20261114.md",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/chat-live-20261114/",
+    ".cache/chat-live-20261114/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "port:2568",
+    "port:18082",
+    "external:raspberrypi-strahov"
+  ],
+  "acceptance": [
+    "Herní náhled, středový chat, Jantar HUD, citace a soukromí, PR proti main a živá přejímka na Pi."
+  ],
+  "verification": [
+    "Cílené kontroly a předání; náročné běhy serializuje integrátor."
+  ],
+  "notes": [
+    "https://linear.app/gigeconomy/issue/KEY-78"
+  ]
+}

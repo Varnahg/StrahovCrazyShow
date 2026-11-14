@@ -58,6 +58,7 @@ const callbackNames = [
   "reconnect",
   "enter",
   "leave",
+  "openChat",
   "openHumanChat",
     "expireAccount",
 ];
@@ -470,6 +471,7 @@ function fixture() {
   };
   for (const method of [
     "setLocalId",
+    "setUiModal",
     "resetDiagnosticContext",
     "updatePlayers",
     "syncMotion",
@@ -492,6 +494,17 @@ function fixture() {
     exports: {},
     ...refs,
     game: { current: game },
+    chat: {
+      reset: () => { state.messages = []; effects.push("chat.reset"); },
+      receive: (message: unknown) => { state.messages.push(message); effects.push("chat.receive"); },
+      result: (result: unknown) => { state.chatResult = result; effects.push("chat.result"); },
+      fail: (reason: string) => { state.chatFailure = reason; effects.push("chat.fail"); },
+    },
+    chatOpener: { current: null },
+    chatKeyboardOpen: { current: false },
+    useCallback: (callback: unknown) => callback,
+    document: { activeElement: null },
+    HTMLElement: class {},
     currentRoomCallbacks,
     requestWebGlFallback,
     window: { location: { hostname: "localhost", search: "" } },
@@ -547,12 +560,12 @@ function fixture() {
   };
   for (const name of [
     "Connected",
+    "PlayerChatSupported",
     "SelfId",
     "Players",
     "Events",
     "Activity",
     "Social",
-    "Messages",
     "WorldSelection",
     "Mode",
     "Ready",
@@ -647,7 +660,7 @@ function payloads(id = "self") {
     doorSnapshot: {...doorIdentity,revision:0,tick:0,states:[{id:fixtureDoor.id,open:false,revision:0,changedAtTick:0}]},
     doorDelta: {...doorIdentity,revision:1,tick:1,door:{id:fixtureDoor.id,open:true,revision:1,changedAtTick:1}},
     doorResult: {...doorIdentity,status:"rejected",reason:"occupied",requestId:1,revision:1},
-    welcome: { id, players: [player], events: [], activity: { hunt: [] } },
+    welcome: { id, players: [player], events: [], activity: { hunt: [] }, playerChatVersion: 1 },
     presence: [player],
     motion: new MotionEncoder().encode({
       time: 1000,
@@ -670,6 +683,7 @@ function payloads(id = "self") {
     reward: "multiplayer reward",
     car: { id: "campus-car" },
     chat: { id: "message", text: "multiplayer chat" },
+    "chat-result": { requestId: "fixture", ok: true },
     emote: { id, emote: "wave" },
     networkProbe: { nonce: 1, serverTick: 120, serverTimeMs: 1000 },
   };
@@ -708,6 +722,8 @@ test("every current room UI subscription still applies its message", () => {
   }
   assert.equal(ui.playersById.current.get("self").x, 5);
   assert.equal(ui.playersById.current.get("self").emote, "wave");
+  assert.equal(ui.state.playerChatSupported, true);
+  assert.deepEqual(ui.state.chatResult, { requestId: "fixture", ok: true });
   room.error();
   assert.equal(ui.state.notice, "socket error");
   room.message("motion", { v: 1, s: 3, t: 1100, n: 3, p: 1, r: [] });
@@ -786,7 +802,7 @@ test("leave invalidates before the handshake and all retained callbacks remain i
   assert.equal(ui.state.mode, "menu");
   assert.equal(ui.state.messages.length, 0);
   assert.equal(ui.state.social.contacts.length, 0);
-  assert.equal(room.messages.size, 16, "transport still retains all old and door listeners");
+  assert.equal(room.messages.size, Object.keys(payloads()).length, "transport still retains all room listeners");
   for (const mode of ["menu", "guest"]) {
     ui.modeRef.current = mode;
     const before = ui.snapshot();
@@ -880,7 +896,7 @@ test("a current multiplayer entry commits identity and token only after its join
   assert.equal(ui.storage.get("strahov.session"), "token-joined-self");
   assert.equal(ui.state.mode, "multi");
   assert.equal(ui.state.busy, false);
-  assert.equal(room.messages.size, 16);
+  assert.equal(room.messages.size, Object.keys(payloads()).length);
 });
 
 test("leave then guest cancels a pending session fetch without reading its body or joining", async () => {

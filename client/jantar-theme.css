@@ -1,0 +1,19 @@
+@font-face {
+  font-family: Manrope;
+  src: url("/fonts/manrope/Manrope-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+:is(.welcome-screen, .startup-screen, .game-shell) {
+  --jantar-font: Manrope, system-ui, sans-serif;
+  --jantar-ink: #fff3e4;
+  --jantar-muted: #cfbfb2;
+  --jantar-accent: #ffcf92;
+  --jantar-accent-ink: #49301d;
+  --jantar-tint: 243, 200, 156;
+  --jantar-panel: 37, 27, 26;
+  --jantar-recess: #1a1414;
+  --jantar-control-line: #a18370;
+}

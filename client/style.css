@@ -934,45 +934,6 @@ kbd {
   font-size: 10px;
   margin-top: 10px;
 }
-.chat-log {
-  height: calc(100% - 235px);
-  min-height: 150px;
-  overflow: auto;
-  padding: 8px 0;
-  margin-bottom: 12px;
-}
-.chat-message {
-  padding: 11px;
-  background: #e9eee0;
-  border-radius: 10px;
-  margin-bottom: 8px;
-}
-.chat-message.own {
-  background: #dceac8;
-}
-.chat-message strong {
-  font-size: 10px;
-}
-.chat-message small {
-  float: right;
-  font-size: 8px;
-  opacity: 0.5;
-}
-.chat-message p {
-  font-size: 12px;
-  margin: 5px 0 0;
-  overflow-wrap: anywhere;
-}
-.chat-form {
-  display: flex;
-  gap: 6px;
-}
-.chat-form input {
-  font-size: 12px;
-}
-.chat-form button {
-  font-size: 20px;
-}
 .activity-card {
   padding: 18px;
   background: #edf2e2;
@@ -1305,7 +1266,7 @@ kbd {
 }
 
 /* In-world panels share one restrained material; no per-frame blur/filter. */
-.game-shell button:not(.brand):not(.dock button):not(.profile-button):not(:where(.startup-screen *)),
+.game-shell button:not(.brand):not(.dock button):not(.profile-button):not(:where(.startup-screen *, .player-chat-dialog *, .player-chat-preview *)),
 .game-shell input,
 .game-shell select,
 .game-shell textarea {

@@ -1,12 +1,12 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { Server, Room, matchMaker, ServerError, ErrorCode, type AuthContext, type Client } from "@colyseus/core";
-import { WebSocketTransport } from "@colyseus/ws-transport";
+import { Server, Room, matchMaker, ServerError, ErrorCode, ClientState, type AuthContext, type Client } from "@colyseus/core";
+import { WebSocketClient, WebSocketTransport } from "@colyseus/ws-transport";
 import {
   createServer,
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import { Community } from "./community";
+import { ChatRejected, Community } from "./community";
 import { configureGateway, isAccountPath, reply } from "./accounts/gateway";
 import type { Account, Checkpoint, Login } from "./accounts/database";
 import { createPublicPresenceHandler } from "./public-presence";
@@ -31,7 +31,7 @@ import { SPAWN } from "../shared/world";
 import { groundHeight } from "../shared/terrain";
 import { vehicleExitAllowed } from "../shared/vehicle";
 import { makeDemoEvents, dateKey } from "../shared/events";
-import type { Player, Profile } from "../shared/types";
+import type { ChatSendResult, Player, Profile } from "../shared/types";
 import { getWeather } from "./weather";
 import { createLocalBenchmarkHandler } from "./local-benchmarks";
 import { createSessionDiagnosticsHandler } from "./session-diagnostics";
@@ -209,17 +209,7 @@ class StrahovRoom extends Room {
         this.broadcastPresence();
       }),
     );
-    this.onMessage("chat", (c, data) =>
-      this.safe(c, () => {
-        const { message, recipients } = store.chat(
-          c.auth.id,
-          data?.channel,
-          data?.text,
-        );
-        for (const id of recipients)
-          this.connections.get(id)?.send("chat", message);
-      }),
-    );
+    this.onMessage("chat", (c, data) => this.receiveChat(c, data));
     this.onMessage("contact", (c, d) =>
       this.safe(c, () => {
         const to = cleanText(d?.to, 80);
@@ -472,6 +462,7 @@ class StrahovRoom extends Room {
       );
       if (changes.social) this.syncSocial();
       if (changes.activity) this.broadcast("activity", store.activity);
+      store.pruneChatOrigins();
       pruneRateWindows(issueRates, SESSION_ISSUE_WINDOW_MS);
       void gateway?.prune().catch(reportAccountFailure);
     }, 30000);
@@ -564,6 +555,7 @@ class StrahovRoom extends Room {
     this.sendDoorSnapshot(client);
     client.send("welcome", {
       id: p.id,
+      playerChatVersion: 1,
       players: [...store.players.values()],
       events: store.events,
       activity: store.activity,
@@ -627,7 +619,10 @@ class StrahovRoom extends Room {
   onDispose() {
     this.doorInteractions?.dispose();
     this.sim.dispose();
-    if (singletonRoomId === this.roomId) singletonRoomId = undefined;
+    if (singletonRoomId === this.roomId) {
+      store.clearChatOrigins();
+      singletonRoomId = undefined;
+    }
     if (activeRoom === this) activeRoom = undefined;
   }
   updateAccountProfile(id: string, profile: Profile) {
@@ -694,6 +689,59 @@ class StrahovRoom extends Room {
     for (const id of this.connections.keys()) this.captureCheckpoint(id);
     await this.saveCheckpoints();
     await this.socialWrites;
+  }
+  private receiveChat(client: Client, data: {
+    channel?: unknown;
+    text?: unknown;
+    requestId?: unknown;
+    replyTo?: unknown;
+  } | null | undefined) {
+    const sender = client.auth?.id;
+    if (typeof sender !== "string" || this.connections.get(sender) !== client) return;
+    const unavailable = "Zprávu se nepodařilo odeslat.";
+    const requestId = data?.requestId;
+    if (
+      requestId !== undefined &&
+      (typeof requestId !== "string" || requestId.length < 1 ||
+        requestId.length > 80 || /[^a-zA-Z0-9_-]/.test(requestId))
+    ) {
+      client.send("notice", unavailable);
+      return;
+    }
+    let reason: string | undefined;
+    try {
+      const accepted = store.deliverChat(sender, data?.channel, data?.text, data?.replyTo, (to, message) => {
+        const target = this.connections.get(to);
+        if (
+          !(target instanceof WebSocketClient) ||
+          target.readyState !== target.ref.OPEN
+        ) return false;
+        try {
+          if (target.state === ClientState.JOINING && to !== sender) {
+            // Preserve the join queue without recording an audience grant
+            // before the original message can reach an established socket.
+            target.send("chat", message.reply ? { ...message, reply: { unavailable: true } } : message);
+            return false;
+          }
+          if (target.state !== ClientState.JOINED) return false;
+          target.send("chat", message);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      if (!accepted) reason = unavailable;
+    } catch (error) {
+      reason = error instanceof ChatRejected ? error.message : unavailable;
+    }
+    if (requestId !== undefined) {
+      const result: ChatSendResult = reason
+        ? { requestId, ok: false, reason }
+        : { requestId, ok: true };
+      client.send("chat-result", result);
+    } else if (reason) {
+      client.send("notice", reason);
+    }
   }
   safe(c: Client, action: () => void) {
     try {

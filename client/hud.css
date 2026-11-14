@@ -1,12 +1,17 @@
-/* Scoped above legacy HUD selectors; opaque surfaces keep contrast independent
-   of the current sky, camera or lighting preview. No blur or filter effects. */
+/* Opaque foreground surfaces keep contrast independent of the 3D scene. */
+.game-shell {
+  font-family: var(--jantar-font);
+}
+.game-shell :is(h1, h2, h3) { font-family: inherit; }
 .game-shell .world-status {
   min-width: 0;
   flex-wrap: wrap;
   font-size: 12px;
   line-height: 1.4;
-  background: #111d28;
-  color: #d9e1dd;
+  background: rgb(var(--jantar-panel));
+  color: var(--jantar-ink);
+  border-color: rgba(var(--jantar-tint), .4);
+  border-radius: 12px;
 }
 .game-shell .world-status > i {
   flex: none;
@@ -17,8 +22,8 @@
   display: inline-block;
   font-size: 12px;
   line-height: 1.3;
-  color: #e3c990;
-  background: #263a41;
+  color: var(--jantar-accent);
+  background: var(--jantar-recess);
 }
 .game-shell .top-right {
   gap: 12px;
@@ -28,10 +33,11 @@
   flex: none;
 }
 .game-shell .top-right :is(.weather, .clock) {
-  background: #111d28;
-  border-radius: 4px;
+  background: rgb(var(--jantar-panel));
+  border: 1px solid rgba(var(--jantar-tint), .4);
+  border-radius: 10px;
   padding: 6px 8px;
-  color: #e1e7df;
+  color: var(--jantar-ink);
   font-size: 13px;
   line-height: 1.4;
   white-space: nowrap;
@@ -40,12 +46,14 @@
 .game-shell .top-right :is(.weather, .clock) small {
   display: block;
   font-size: 12px;
-  color: #b9c6c8;
+  color: var(--jantar-muted);
 }
 .game-shell .dock.world-dock {
   gap: 4px;
   padding: 6px;
-  background: #111d28;
+  background: rgb(var(--jantar-panel));
+  border-color: rgba(var(--jantar-tint), .4);
+  border-radius: 14px;
 }
 .game-shell .world-dock button {
   width: 74px;
@@ -56,7 +64,8 @@
   flex-direction: column;
   justify-content: center;
   gap: 4px;
-  color: #d9e1dd;
+  color: var(--jantar-muted);
+  border-radius: 8px;
 }
 .game-shell .world-dock button .dock-label {
   font-size: 12px;
@@ -68,7 +77,26 @@
 }
 .game-shell .world-dock button.active,
 .game-shell .world-dock button:hover {
-  color: #e7c985;
+  color: var(--jantar-accent);
+}
+.game-shell .world-dock button.active {
+  border-color: var(--jantar-accent);
+  background: #ffcf9220 !important;
+}
+.game-shell .world-dock button.active::after { background: var(--jantar-accent); }
+.game-shell .world-dock button:focus-visible { outline-color: var(--jantar-accent); }
+.game-shell :is(.side-panel, .map-panel, .target-card) {
+  --ink: var(--jantar-ink);
+  --muted: var(--jantar-muted);
+  --paper: rgb(var(--jantar-panel));
+  --line: rgba(var(--jantar-tint), .36);
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--line);
+  border-radius: 16px;
+}
+.game-shell :is(.side-panel, .map-panel, .target-card) .eyebrow {
+  color: var(--jantar-accent);
 }
 .game-shell .world-dock b {
   font-size: 12px;
@@ -150,10 +178,6 @@
 .game-shell .interaction {
   font-size: 12px;
   background: #152833;
-}
-.game-shell .minimap > .minimap-attribution {
-  font-size: 12px;
-  color: #b9c6c8;
 }
 .game-shell .stat-grid {
   display: grid;
@@ -276,10 +300,14 @@
 @media (max-width: 380px) {
   .game-shell .dock.world-dock {
     gap: 2px;
+    padding-inline: 4px;
+    width: calc(100% - 16px);
+    justify-content: space-between;
   }
   .game-shell .world-dock button {
-    width: 40px;
-    min-width: 40px;
+    width: auto;
+    flex: 1;
+    min-width: 0;
   }
   .game-shell .minimap {
     width: 110px;
