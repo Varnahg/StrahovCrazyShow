@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-live-server-20261114",
+  "status": "ready",
+  "dependsOn": [
+    "chat-hud-ux-review-20261113"
+  ],
+  "title": "KEY-78: Serverové reference na multiplayerové zprávy",
+  "writePaths": [
+    "server/community.ts",
+    "server/index.ts",
+    "shared/types.ts",
+    "tests/player-chat-replies.test.ts",
+    "docs/agents/handoffs/chat-live-server-20261114.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Reference nikdy nerozšíří publikum originálu, adresná potvrzení, omezená životnost, regresní testy."
+  ],
+  "verification": [
+    "Cílené kontroly a předání; náročné běhy serializuje integrátor."
+  ],
+  "notes": [
+    "https://linear.app/gigeconomy/issue/KEY-78"
+  ]
+}

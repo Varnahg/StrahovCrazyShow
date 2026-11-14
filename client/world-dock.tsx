@@ -18,11 +18,17 @@ export const WorldDock = memo(function WorldDock({
   panel,
   journalOpen,
   requestCount,
+  chatCount = 0,
+  chatNarrowCount = 0,
+  chatShortcut = false,
   onToggle,
 }: {
   panel: string;
   journalOpen: boolean;
   requestCount: number;
+  chatCount?: number;
+  chatNarrowCount?: number;
+  chatShortcut?: boolean;
   onToggle: (panel: string) => void;
 }) {
   const locale = useLocale();
@@ -36,7 +42,8 @@ export const WorldDock = memo(function WorldDock({
         const label = item.id === "feedback" ? locale === "cs" ? "Zpětná vazba" : "Feedback" : t(item.label);
         const active =
           panel === item.id || (item.id === "journal" && journalOpen);
-        const shortcut = "shortcut" in item ? item.shortcut : undefined;
+        const chat = item.id === "chat";
+        const shortcut = "shortcut" in item ? item.shortcut : chat && chatShortcut ? "T" : undefined;
         const requests = item.id === "people" && requestCount > 0;
         return (
           <button
@@ -52,6 +59,9 @@ export const WorldDock = memo(function WorldDock({
                 : label
             }
             aria-pressed={active}
+            aria-haspopup={chat ? "dialog" : undefined}
+            aria-describedby={chat && chatNarrowCount > 0 ? "dock-chat-unread" : undefined}
+            data-world-chat={chat ? "" : undefined}
             aria-keyshortcuts={shortcut}
           >
             <HudIcon name={item.id} />
@@ -60,6 +70,11 @@ export const WorldDock = memo(function WorldDock({
               {shortcut && <kbd>{shortcut}</kbd>}
             </span>
             {requests && <b aria-hidden="true">{requestCount}</b>}
+            {chat && chatCount > 0 && <b className="dock-chat-count" aria-hidden="true">{chatCount}</b>}
+            {chat && chatNarrowCount > 0 && <>
+              <b className="dock-chat-count-narrow" aria-hidden="true">{chatNarrowCount}</b>
+              <span id="dock-chat-unread" className="player-chat-sr-only">{t("Nepřečtené zprávy: {count}", { count: chatNarrowCount })}</span>
+            </>}
           </button>
         );
       })}

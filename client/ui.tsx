@@ -27,6 +27,7 @@ import {
   createBenchmarkDownloads,
 } from "./benchmark-presentation";
 import { WorldDock } from "./world-dock";
+import { ChatPreview, PlayerChatDialog, readChatPreferences, usePlayerChat } from "./player-chat";
 import { HudWeather } from "./hud-status";
 import {
   LIGHTING_PREVIEWS,
@@ -75,6 +76,7 @@ import {
   type Player,
   type EventItem,
   type ChatMessage,
+  type ChatSendResult,
   type SocialState,
   type ActivityState,
 } from "../shared/types";
@@ -315,10 +317,25 @@ export function App() {
       requests: [],
       blocked: [],
     }),
-    [messages, setMessages] = useState<ChatMessage[]>([]),
     [channel, setChannel] = useState("global"),
-    [message, setMessage] = useState(""),
     [muted, setMuted] = useState<string[]>([]);
+  const chat = usePlayerChat(selfId, muted, social.blocked);
+  const { forget: forgetChatChannels } = chat;
+  const chatEventOccurrences = useRef(new Map<string, number>());
+  useEffect(() => {
+    const next = new Map(events.filter(event => !event.owner).map(event => ["event:" + event.id, event.startsAt]));
+    const expired = new Set([...chatEventOccurrences.current].filter(([key, start]) => next.get(key) !== start).map(([key]) => key));
+    chatEventOccurrences.current = next;
+    if (expired.size) forgetChatChannels(expired);
+  }, [events, forgetChatChannels]);
+  const [playerChatSupported, setPlayerChatSupported] = useState(false);
+  const [chatPreferences, setChatPreferences] = useState(readChatPreferences);
+  const chatOpener = useRef<HTMLElement | null>(null);
+  const chatKeyboardOpen = useRef(false);
+  useEffect(() => {
+    try { localStorage.setItem("strahov.chat", JSON.stringify(chatPreferences)); }
+    catch { /* Chat preferences still apply in the current tab. */ }
+  }, [chatPreferences]);
   const [activity, setActivity] = useState<ActivityState>(initialActivity),
     [team, setTeam] = useState("lime"),
     [answerSent, setAnswerSent] = useState(-1),
@@ -376,7 +393,6 @@ export function App() {
     idRef = useRef("guest"),
     modeRef = useRef(mode),
     weatherRef = useRef(weather),
-    chatEnd = useRef<HTMLDivElement>(null),
     carState = useRef<any>(null);
   const applyGraphicsPreferences = useCallback(async (next: RenderPreferences): Promise<boolean> => {
     const current = game.current;
@@ -434,7 +450,7 @@ export function App() {
     const rejected = () => record("unhandled-rejection", "Asynchronous operation failed");
     const key = (event: KeyboardEvent) => {
       if (event.code !== "F8" || event.repeat || event.defaultPrevented ||
-          (event.target as Element | null)?.closest("input,textarea,select,[contenteditable]")) return;
+          (event.target as Element | null)?.closest("input,textarea,select,[contenteditable],.player-chat-dialog")) return;
       event.preventDefault();
       openFeedback();
     };
@@ -519,7 +535,7 @@ export function App() {
     carState.current = null;
     setConnected(false);
     setPlayers([]);
-    setMessages([]);
+    chat.reset();
     setSocial({ attendance: [], contacts: [], requests: [], blocked: [] });
     setWorldSelection(null);
     try { void previousRoom?.leave().catch(() => {}); }
@@ -684,9 +700,6 @@ export function App() {
   useEffect(() => {
     game.current?.setUiModal(graphicsState.applying || feedbackOpen || journalOpen || emotesOpen || showForm || !!panel);
   }, [feedbackOpen, journalOpen, emotesOpen, showForm, panel, ready, graphicsState.applying]);
-  useEffect(() => {
-    chatEnd.current?.scrollIntoView({ block: "nearest" });
-  }, [messages, channel]);
   useEffect(() => {
     let cancelled = false;
     let active: AbortController | undefined;
@@ -931,6 +944,7 @@ export function App() {
     bootstrapAuthorityRef.current = null;
     resetConnectionDiagnostics();
     connectedRef.current = true;
+    setPlayerChatSupported(false);
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
     let deferredDoorResync = false;
@@ -978,6 +992,7 @@ export function App() {
       });
     });
     callbacks.onMessage("welcome", (data: any) => {
+      setPlayerChatSupported(data.playerChatVersion === 1);
       if (Array.isArray(data.rewards)) setAccountRewards(data.rewards);
       idRef.current = data.id;
       setSelfId(data.id);
@@ -1057,9 +1072,8 @@ export function App() {
       carState.current = data;
       game.current?.setCar(data);
     });
-    callbacks.onMessage("chat", (m: ChatMessage) =>
-      setMessages((previous) => [...previous, m].slice(-200)),
-    );
+    callbacks.onMessage("chat", (message: ChatMessage) => chat.receive(message));
+    callbacks.onMessage("chat-result", (result: ChatSendResult) => chat.result(result));
     callbacks.onMessage(
       "emote",
       ({ id, emote }: { id: string; emote: string }) => {
@@ -1091,6 +1105,7 @@ export function App() {
         currentGame.updatePlayers([currentGame.localPlayer]);
       }
       setConnected(false);
+      chat.fail("Chat je odpojený. Rozepsaný text zůstává v poli.");
       if (code === 4401) {
         expireAccount();
         return;
@@ -1142,6 +1157,9 @@ export function App() {
       idRef.current = data.id;
       setSelfId(data.id);
       if (identityChanged) {
+        chat.reset();
+        setChannel("global");
+        setAiChatActive(false);
         bootstrapAuthorityRef.current = null;
         authorityBufferRef.current?.reset();
         resetConnectionDiagnostics();
@@ -1245,6 +1263,7 @@ export function App() {
     setReady(false);
     setJournalOpen(false);
     setEmotesOpen(false);
+    setPanel("");
   };
   const expireAccount = () => {
     dirtyAccountProfile.current = false;
@@ -1281,14 +1300,45 @@ export function App() {
     }
     room.current?.send(action, data);
   };
+  const openChat = useCallback((opener: HTMLElement | null, keyboard = false) => {
+    chatOpener.current = opener;
+    chatKeyboardOpen.current = keyboard;
+    game.current?.setUiModal(true);
+    setJournalOpen(false);
+    setEmotesOpen(false);
+    setPanel("chat");
+  }, []);
+  const closeChat = useCallback(() => setPanel(""), []);
   const openHumanChat = (nextChannel: string) => {
     setAiChatActive(false);
     setChannel(nextChannel);
-    setPanel("chat");
+    openChat(document.activeElement instanceof HTMLElement ? document.activeElement : null);
   };
+  const openChatPreview = useCallback((opener: HTMLButtonElement) => {
+    setAiChatActive(false);
+    openChat(opener);
+  }, [openChat]);
+  useEffect(() => {
+    if (mode !== "multi" || !ready || !chatPreferences.shortcut || panel || journalOpen ||
+        emotesOpen || feedbackOpen || showForm || graphicsState.applying) return;
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.code !== "KeyT" || event.defaultPrevented || event.repeat || event.isComposing ||
+          event.ctrlKey || event.metaKey || event.altKey ||
+          (event.target as Element | null)?.closest?.("input,textarea,select,button,a,[contenteditable]")) return;
+      event.preventDefault();
+      setAiChatActive(false);
+      openChat(null, true);
+    };
+    document.addEventListener("keydown", keyboard);
+    return () => document.removeEventListener("keydown", keyboard);
+  }, [mode, ready, chatPreferences.shortcut, panel, journalOpen, emotesOpen, feedbackOpen, showForm, graphicsState.applying, openChat]);
   const togglePanel = useCallback((value: string) => {
     if (value === "feedback") {
       openFeedback();
+      return;
+    }
+    if (value === "chat") {
+      openChat(document.activeElement instanceof HTMLElement ? document.activeElement : null);
       return;
     }
     game.current?.blur();
@@ -1300,7 +1350,7 @@ export function App() {
     }
     setJournalOpen(false);
     setPanel((p) => (p === value ? "" : value));
-  }, [openFeedback]);
+  }, [openFeedback, openChat]);
   const openJournal = (id?: string) => {
     game.current?.blur();
     if (document.pointerLockElement) document.exitPointerLock();
@@ -1548,9 +1598,17 @@ export function App() {
         panel={panel}
         journalOpen={journalOpen}
         requestCount={social.requests.length}
+        chatCount={mode === "multi" && chatPreferences.preview !== "hidden"
+          ? chatPreferences.preview === "badge" ? chat.unread.length : chat.privateCount : 0}
+        chatNarrowCount={mode === "multi" && chatPreferences.preview !== "hidden" ? chat.unread.length : 0}
+        chatShortcut={mode === "multi" && chatPreferences.shortcut}
         onToggle={togglePanel}
       />
       <div className="minimap">
+        {mode === "multi" && ready && connected && chatPreferences.preview === "recent" &&
+          (!panel || panel === "chat") && !journalOpen && !emotesOpen && !feedbackOpen && !showForm && !graphicsState.applying &&
+          <ChatPreview entries={chat.visible} count={chat.privateCount} shortcut={chatPreferences.shortcut} open={openChatPreview} />}
+        <div className="minimap-frame">
         <MapView
           self={stats || undefined}
           players={
@@ -1571,6 +1629,7 @@ export function App() {
         >
           © OSM / IPR
         </span>
+        </div>
       </div>
       <div
         className="controls world-keybar"
@@ -1748,7 +1807,26 @@ export function App() {
           )}
         </section>
       )}
-      {panel && (
+      {panel === "chat" && (
+        <PlayerChatDialog chat={chat} self={selfId} channel={channel} changeChannel={setChannel}
+          destinations={mode === "multi" ? [
+            ...social.contacts.filter(id => !social.blocked.includes(id)).map(id => {
+              const player = players.find(item => item.id === id);
+              return { key: "dm:" + id, label: player?.nickname || social.names?.[id] || t("Odpojený kontakt"), available: !!player };
+            }),
+            ...events.filter(event => attendance(event.id)).map(event => ({ key: "event:" + event.id, label: demoEventText(event, "title") })),
+          ] : []}
+          connected={connected} supported={playerChatSupported} guest={mode === "guest"} aiActive={aiChatActive} showAi={setAiChatActive}
+          aiActions={<CrazyTypkaChatActions state={ai} locale={feedbackLocale} />}
+          aiContent={<CrazyTypkaChat state={ai} locale={feedbackLocale} />}
+          opener={chatOpener.current} fallback={canvas} keyboardOpen={chatKeyboardOpen.current} close={closeChat}
+          send={payload => {
+            if (!playerChatSupported || !connectedRef.current || !room.current || modeRef.current !== "multi") return false;
+            room.current.send("chat", payload);
+            return true;
+          }} />
+      )}
+      {panel && panel !== "chat" && (
         <div
           className={panel === "map" ? "map-overlay" : "panel-container"}
           onPointerDown={(e) => {
@@ -1772,7 +1850,6 @@ export function App() {
                       events: t("Co se děje"),
                       map: t("Najdi svoje místo"),
                       people: t("Lidé na kopci"),
-                      chat: t("Dej se do řeči"),
                       activities: t("Zkus něco společně"),
                       avatar: t("Tvoje postava"),
                       settings: t("Po tvém"),
@@ -1782,9 +1859,6 @@ export function App() {
                 </h2>
               </div>
               <div className="crazy-panel-actions">
-                {panel === "chat" && aiChatActive && (
-                  <CrazyTypkaChatActions state={ai} locale={feedbackLocale} />
-                )}
                 <button
                   className="close"
                   ref={mapClose}
@@ -2334,108 +2408,6 @@ export function App() {
                 )}
               </>
             )}
-            {panel === "chat" && (
-              <>
-                <div className="crazy-channel-switch" role="group" aria-label={feedbackLocale === "cs" ? "Volba chatu" : "Chat type"}>
-                  <button type="button" aria-pressed={!aiChatActive} onClick={() => setAiChatActive(false)}>{feedbackLocale === "cs" ? "Hráči" : "Players"}</button>
-                  <button type="button" aria-pressed={aiChatActive} onClick={() => setAiChatActive(true)}>Crazy Typka <span className="crazy-ai-badge">AI</span></button>
-                </div>
-                {aiChatActive ? <div className="game-ai-chat"><CrazyTypkaChat state={ai} locale={feedbackLocale} /></div> : mode === "guest" ? (
-                  <p className="empty">
-                    {t(
-                      "Samostatná prohlídka není připojená k žádnému multiplayerovému chatu.",
-                    )}
-                  </p>
-                ) : (
-                  <>
-                    <select
-                      aria-label={t("Chatový kanál")}
-                      value={channel}
-                      onChange={(e) => setChannel(e.target.value)}
-                    >
-                      <option value="global">{t("Celý Strahov")}</option>
-                      <option value="local">{t("V okolí · do 40 m")}</option>
-                      {events
-                        .filter((e) => attendance(e.id))
-                        .map((e) => (
-                          <option key={e.id} value={"event:" + e.id}>
-                            {t("Akce:")} {demoEventText(e, "title")}
-                          </option>
-                        ))}
-                      {social.contacts.map((id) => (
-                        <option key={id} value={"dm:" + id}>
-                          {t("Soukromě:")}{" "}
-                          {players.find((p) => p.id === id)?.nickname || social.names?.[id] ||
-                            t("Odpojený kontakt")}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="small muted">
-                      {t(
-                        "Místní chat sdílí pouze stejné patro / venkovní prostor. Soukromé zprávy vyžadují přijatý kontakt.",
-                      )}
-                    </p>
-                    <div className="chat-log">
-                      {messages
-                        .filter((m) => {
-                          if (
-                            muted.includes(m.sender) ||
-                            social.blocked.includes(m.sender)
-                          )
-                            return false;
-                          if (channel.startsWith("dm:"))
-                            return (
-                              (m.sender === channel.slice(3) &&
-                                m.channel === "dm:" + selfId) ||
-                              (m.sender === selfId && m.channel === channel)
-                            );
-                          return m.channel === channel;
-                        })
-                        .map((m) => (
-                          <div
-                            key={m.id}
-                            className={
-                              m.sender === selfId
-                                ? "chat-message own"
-                                : "chat-message"
-                            }
-                          >
-                            <strong>{m.nickname}</strong>
-                            <small>{time(m.at)}</small>
-                            <p>{m.text}</p>
-                          </div>
-                        ))}
-                      <div ref={chatEnd} />
-                    </div>
-                    <form
-                      className="chat-form"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (message.trim()) {
-                          send("chat", { channel, text: message });
-                          setMessage("");
-                        }
-                      }}
-                    >
-                      <input
-                        aria-label={t("Zpráva")}
-                        placeholder={t("Napiš něco…")}
-                        maxLength={500}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                      />
-                      <button
-                        className="primary"
-                        disabled={!connected}
-                        aria-label={t("Odeslat zprávu")}
-                      >
-                        ↗
-                      </button>
-                    </form>
-                  </>
-                )}
-              </>
-            )}
             {panel === "activities" && (
               <>
                 <div className="activity-card">
@@ -2578,6 +2550,22 @@ export function App() {
             {panel === "settings" && (
               <>
                 <LanguagePicker />
+                {mode === "multi" && <fieldset className="player-chat-settings">
+                  <legend>{t("Chat")}</legend>
+                  <label>{t("Náhled chatu")}
+                    <select value={chatPreferences.preview} onChange={event => {
+                      const preview = event.target.value;
+                      if (preview === "recent" || preview === "badge" || preview === "hidden")
+                        setChatPreferences(previous => ({ ...previous, preview }));
+                    }}>
+                      <option value="recent">{t("Poslední zprávy")}</option>
+                      <option value="badge">{t("Jen odznak")}</option>
+                      <option value="hidden">{t("Skrýt náhled")}</option>
+                    </select>
+                  </label>
+                  <label><input type="checkbox" checked={chatPreferences.shortcut}
+                    onChange={event => setChatPreferences(previous => ({ ...previous, shortcut: event.target.checked }))} /> {t("Zkratka T pro chat")}</label>
+                </fieldset>}
                 <GraphicsSettingsPanel preferences={renderPreferences}
                   effective={game.current?.getEffectiveVisualSettings() ?? resolveVisualSettings(renderPreferences)}
                   state={graphicsState} onApply={applyGraphicsPreferences} onCancel={cancelGraphicsApply} />

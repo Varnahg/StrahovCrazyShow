@@ -7,10 +7,29 @@ import type {
   ActivityState,
   Attendance,
   ChatMessage,
+  ChatReply,
   EventItem,
   Player,
   SocialState,
 } from "../shared/types";
+
+const CHAT_ORIGIN_TTL_MS = 10 * 60_000;
+const MAX_CHAT_ORIGINS = 512;
+const MAX_CHAT_ORIGIN_GRANTS = 8192;
+const MAX_CHAT_QUOTE_LENGTH = 140;
+const CHAT_ORIGIN_UNAVAILABLE = "Původní zpráva není dostupná.";
+const CHAT_ORIGIN_ID = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
+
+type ChatQuote = Extract<ChatReply, { id: string }>;
+type ChatOrigin = {
+  quote: ChatQuote;
+  conversation: string;
+  recipients: ReadonlySet<string>;
+  expiresAt: number;
+};
+
+export class ChatRejected extends Error {}
+
 export class Community {
   players = new Map<string, Player>();
   events: EventItem[] = makeDemoEvents();
@@ -32,6 +51,11 @@ export class Community {
   };
   answered = new Set<string>();
   teams = new Map<string, string>();
+  private readonly chatOrigins = new Map<string, ChatOrigin>();
+  private chatOriginGrants = 0;
+
+  constructor(private readonly chatClock = () => performance.now()) {}
+
   private set(map: Map<string, Set<string>>, id: string) {
     if (!map.has(id)) map.set(id, new Set());
     return map.get(id)!;
@@ -198,8 +222,8 @@ export class Community {
     const p = this.players.get(id),
       body = cleanText(text, 500),
       ch = cleanText(channel, 80);
-    if (!p || !body) throw new Error("Prázdná zpráva.");
-    if (!this.rate(id)) throw new Error("Nejvýše 5 zpráv za 10 sekund.");
+    if (!p || !body) throw new ChatRejected("Prázdná zpráva.");
+    if (!this.rate(id)) throw new ChatRejected("Nejvýše 5 zpráv za 10 sekund.");
     let recipients: string[] = [];
     if (ch === "global") recipients = [...this.players.keys()];
     else if (ch === "local")
@@ -213,7 +237,7 @@ export class Community {
       if (
         !this.attendance.some((a) => a.playerId === id && a.eventId === eventId)
       )
-        throw new Error("Nejprve se přidej k události.");
+        throw new ChatRejected("Nejprve se přidej k události.");
       recipients = this.attendance
         .filter((a) => a.eventId === eventId && this.players.has(a.playerId))
         .map((a) => a.playerId);
@@ -224,9 +248,9 @@ export class Community {
         this.blocked(id, to) ||
         !this.players.has(to)
       )
-        throw new Error("Soukromý kontakt není přijatý nebo je nedostupný.");
+        throw new ChatRejected("Soukromý kontakt není přijatý nebo je nedostupný.");
       recipients = [id, to];
-    } else throw new Error("Neznámý kanál.");
+    } else throw new ChatRejected("Neznámý kanál.");
     return {
       message: {
         id: randomUUID(),
@@ -238,6 +262,104 @@ export class Community {
       },
       recipients: recipients.filter((to) => !this.blocked(id, to)),
     };
+  }
+  deliverChat(
+    id: string,
+    channel: unknown,
+    text: unknown,
+    replyTo: unknown,
+    send: (to: string, message: ChatMessage) => boolean,
+  ): boolean {
+    const { message, recipients } = this.chat(id, channel, text);
+    const now = this.chatClock();
+    this.pruneChatOrigins(now);
+    const conversation = this.chatConversation(message);
+    let origin: ChatOrigin | undefined;
+    if (replyTo !== undefined) {
+      if (typeof replyTo === "string" && replyTo.length === 36 && CHAT_ORIGIN_ID.test(replyTo)) {
+        origin = this.chatOrigins.get(replyTo);
+      }
+      if (
+        !origin ||
+        origin.conversation !== conversation ||
+        !origin.recipients.has(id) ||
+        this.blocked(id, origin.quote.sender)
+      ) {
+        throw new ChatRejected(CHAT_ORIGIN_UNAVAILABLE);
+      }
+    }
+    const withQuote: ChatMessage = origin ? { ...message, reply: origin.quote } : message;
+    const withoutQuote: ChatMessage = origin ? { ...message, reply: { unavailable: true } } : message;
+    // Echo first so a failed sender connection cannot leave a delivered message
+    // behind while the sender is told to retain the unsent draft.
+    if (!recipients.includes(id) || !send(id, withQuote)) return false;
+    const delivered = new Set([id]);
+    let overflow = false;
+    for (const recipient of recipients) {
+      if (recipient === id) continue;
+      const mayQuote =
+        origin?.recipients.has(recipient) && !this.blocked(recipient, origin.quote.sender);
+      if (send(recipient, mayQuote ? withQuote : withoutQuote) && !overflow) {
+        if (delivered.size < MAX_CHAT_ORIGIN_GRANTS) delivered.add(recipient);
+        else overflow = true;
+      }
+    }
+    // The oversized delivery still succeeds. No partial permissions are stored.
+    if (!overflow) this.rememberChatOrigin(message, conversation, delivered, now);
+    return true;
+  }
+  private chatConversation(message: ChatMessage): string {
+    const { channel, sender } = message;
+    if (channel === "local") return "local:" + this.players.get(sender)!.zone;
+    if (channel.startsWith("dm:"))
+      return "dm:" + JSON.stringify([sender, channel.slice(3)].sort());
+    if (channel.startsWith("event:")) {
+      const eventId = channel.slice(6);
+      const event = this.events.find(({ id }) => id === eventId);
+      // A new scheduled demo occurrence reuses the same public event ID.
+      if (event && !event.owner) return JSON.stringify([channel, event.startsAt]);
+    }
+    return channel;
+  }
+  private rememberChatOrigin(
+    { id, sender, nickname, text }: ChatMessage,
+    conversation: string,
+    recipients: ReadonlySet<string>,
+    now: number,
+  ) {
+    while (
+      this.chatOrigins.size >= MAX_CHAT_ORIGINS ||
+      this.chatOriginGrants + recipients.size > MAX_CHAT_ORIGIN_GRANTS
+    ) {
+      const oldest = this.chatOrigins.keys().next().value;
+      if (oldest === undefined) return;
+      this.removeChatOrigin(oldest);
+    }
+    const excerpt = text.length > MAX_CHAT_QUOTE_LENGTH
+      ? text.slice(0, MAX_CHAT_QUOTE_LENGTH).replace(/[\uD800-\uDBFF]$/, "") + "…"
+      : text;
+    this.chatOrigins.set(id, {
+      quote: { id, sender, nickname, text: excerpt },
+      conversation,
+      recipients,
+      expiresAt: now + CHAT_ORIGIN_TTL_MS,
+    });
+    this.chatOriginGrants += recipients.size;
+  }
+  private removeChatOrigin(id: string) {
+    const origin = this.chatOrigins.get(id)!;
+    this.chatOriginGrants -= origin.recipients.size;
+    this.chatOrigins.delete(id);
+  }
+  pruneChatOrigins(now = this.chatClock()) {
+    for (const [id, origin] of this.chatOrigins) {
+      if (origin.expiresAt > now) break;
+      this.removeChatOrigin(id);
+    }
+  }
+  clearChatOrigins() {
+    this.chatOrigins.clear();
+    this.chatOriginGrants = 0;
   }
   attend(id: string, eventId: string, enabled: boolean, company: boolean) {
     this.requirePlayer(id);

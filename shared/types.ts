@@ -72,7 +72,14 @@ export type ChatMessage = {
   text: string;
   channel: string;
   at: number;
+  reply?: ChatReply;
 };
+export type ChatReply =
+  | { id: string; sender: string; nickname: string; text: string }
+  | { unavailable: true };
+export type ChatSendResult =
+  | { requestId: string; ok: true }
+  | { requestId: string; ok: false; reason: string };
 export type SocialState = {
   attendance: Attendance[];
   contacts: string[];
