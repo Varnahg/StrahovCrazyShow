@@ -59,6 +59,7 @@ const callbackNames = [
   "enter",
   "leave",
   "openHumanChat",
+    "expireAccount",
 ];
 const callbackSource = callbackNames.map((name) => {
   const declaration = declarations.find(
@@ -431,6 +432,7 @@ function fixture() {
     },
     authorityBufferRef: { current: new AuthorityBuffer() },
     bootstrapAuthorityRef: { current: null as ReceivedAuthority | null },
+    wireTraceRef: { current: null },
     doorConnectionRef: { current: null as DoorConnection | null },
     playersRef: { current: [] },
     playersById: { current: new Map<string, any>() },
@@ -438,6 +440,9 @@ function fixture() {
     idRef: { current: "guest" },
     modeRef: { current: "multi" },
     profileRef: { current: {} },
+    accountRef: { current: { mode: "local", account: null } },
+    dirtyAccountProfile: { current: false },
+    accountDraft: { current: null },
     renderPreferencesRef: { current: { version: 2, mode: "medium", targetFps: 60 } },
   };
   const fetches: ReturnType<typeof pendingFetch>[] = [];
@@ -505,6 +510,9 @@ function fixture() {
     testImportMeta: { env: {} },
     location: { origin: "http://test.invalid" },
     localizeNotice: (text: string) => text,
+    authMessage: (text: string) => text,
+    localizeText: (text: string) => text,
+    observeBrowserWire: () => null,
     makeDemoEvents: () => [{ id: "guest-demo" }],
     initialActivity: { hunt: [] },
     sessionStorage: {
@@ -559,6 +567,10 @@ function fixture() {
     "AiChatActive",
     "Channel",
     "Panel",
+    "EditAccount",
+    "AccountProfile",
+    "AccountStatus",
+    "AccountRewards",
   ]) {
     const key = name[0].toLowerCase() + name.slice(1);
     environment[`set${name}`] = (value: any) => {

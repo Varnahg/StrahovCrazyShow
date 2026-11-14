@@ -1,5 +1,5 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { Server, Room, matchMaker, type Client } from "@colyseus/core";
+import { Server, Room, matchMaker, ServerError, ErrorCode, type AuthContext, type Client } from "@colyseus/core";
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import {
   createServer,
@@ -7,6 +7,8 @@ import {
   type ServerResponse,
 } from "node:http";
 import { Community } from "./community";
+import { configureGateway, isAccountPath, reply } from "./accounts/gateway";
+import type { Account, Checkpoint, Login } from "./accounts/database";
 import { createPublicPresenceHandler } from "./public-presence";
 import { createOptionalCrazyTypkaService, attachCrazyTypkaHttpRoute } from "./crazy-typka";
 import { createOptionalChatMonitor } from "./chat-monitor";
@@ -59,6 +61,23 @@ import {
   type MotionPacket,
 } from "../shared/netcode";
 const config = readServerConfig();
+const store = new Community();
+let activeRoom: StrahovRoom | undefined;
+let { mode: authMode, gateway } = await configureGateway(config.host, (id, profile) => {
+  if (store.knownNames.has(id)) store.knownNames.set(id, profile.nickname);
+  activeRoom?.updateAccountProfile(id, profile);
+});
+if (gateway) {
+  try { store.restoreRelationships(await gateway.database.run("relationships")); }
+  catch {
+    await gateway.database.close();
+    gateway = undefined;
+    authMode = "closed";
+    reportAccountFailure();
+  }
+}
+const accounts = gateway?.database;
+  ["127.0.0.1", "::1"].includes(config.host) ? randomBytes(8).toString("hex") : undefined;
 const staticClient = config.staticDir
   ? await createStaticClientHandler(config.staticDir)
   : undefined;
@@ -70,7 +89,6 @@ const sessions = new Map<
 const issueRates = new Map<string, number[]>();
 let worldId = "";
 let singletonRoomId: string | undefined;
-const store = new Community();
 const publicPresence = createPublicPresenceHandler(() => store.players.size);
 await initPhysics();
 class StrahovRoom extends Room {
@@ -99,6 +117,9 @@ class StrahovRoom extends Room {
     );
   }
   emoteExpiry = new Map<string, number>();
+  private readonly accountCheckpoints = new Map<string, Checkpoint>();
+  private socialWrites = Promise.resolve();
+  private checkpointWrite: Promise<void> | undefined;
   doorInteractions!: ServerDoorInteractions<Client>;
   onCreate() {
     if (singletonRoomId)
@@ -106,6 +127,7 @@ class StrahovRoom extends Room {
         "Demo používá jediný společný svět. Připoj se k existující instanci.",
       );
     singletonRoomId = this.roomId;
+    activeRoom = this;
     this.doorInteractions = new ServerDoorInteractions(
       this.sim,
       CAD_DOOR_DEFINITIONS,
@@ -174,6 +196,7 @@ class StrahovRoom extends Room {
     });
     this.onMessage("profile", (c, p) =>
       this.safe(c, () => {
+        if (accounts) return;
         if (!store.rate(c.auth.id, "profile", 5, 1000)) return;
         const profile = sanitizeProfile(p);
         if (
@@ -200,12 +223,31 @@ class StrahovRoom extends Room {
     this.onMessage("contact", (c, d) =>
       this.safe(c, () => {
         const to = cleanText(d?.to, 80);
+        if (accounts) {
+          this.changeSocial(c, to, async () => {
+            const accept = d?.accept === true;
+            const change = store.prepareContact(c.auth.id, to, accept);
+            if (!change) return;
+            if (accept) this.rememberContactNames(c.auth.id, to);
+            if (accept && !(await accounts.run("contact", c.auth.id, to))) return;
+            change();
+            this.syncSocial([c.auth.id, to]);
+          });
+          return;
+        }
         if (store.contact(c.auth.id, to, d?.accept === true))
           this.syncSocial([c.auth.id, to]);
       }),
     );
     this.onMessage("decline", (c, d) =>
       this.safe(c, () => {
+        if (accounts) {
+          const to = cleanText(d?.to, 80);
+          this.changeSocial(c, to, () => {
+            if (store.decline(c.auth.id, to)) this.syncSocial([c.auth.id]);
+          });
+          return;
+        }
         if (store.decline(c.auth.id, cleanText(d?.to, 80)))
           this.syncSocial([c.auth.id]);
       }),
@@ -213,6 +255,18 @@ class StrahovRoom extends Room {
     this.onMessage("block", (c, d) =>
       this.safe(c, () => {
         const to = cleanText(d?.to, 80);
+        if (accounts) {
+          this.changeSocial(c, to, async () => {
+            const enabled = d?.enabled !== false;
+            const change = store.prepareBlock(c.auth.id, to, enabled);
+            if (!change) return;
+            if (enabled) this.rememberContactNames(c.auth.id, to);
+            await accounts.run("block", c.auth.id, to, enabled);
+            change();
+            this.syncSocial([c.auth.id, to]);
+          });
+          return;
+        }
         if (store.block(c.auth.id, to, d?.enabled !== false))
           this.syncSocial([c.auth.id, to]);
       }),
@@ -315,9 +369,7 @@ class StrahovRoom extends Room {
     this.onMessage("find", (c, d) =>
       this.safe(c, () => {
         const result = store.findChange(c.auth.id, Number(d));
-        if (result.completed)
-          for (const client of this.clients)
-            client.send("reward", "Průzkumník kopce");
+        if (result.completed) this.award("Průzkumník kopce");
         if (result.changed) this.broadcast("activity", store.activity);
       }),
     );
@@ -373,8 +425,7 @@ class StrahovRoom extends Room {
       }
       if (store.tick()) {
         this.broadcast("activity", store.activity);
-        if (!store.activity.quiz.running)
-          for (const c of this.clients) c.send("reward", "Kvízový nadšenec");
+        if (!store.activity.quiz.running) this.award("Kvízový nadšenec");
       }
       if (result.dropped > 0)
         for (const [id, queue] of this.inputQueues)
@@ -417,15 +468,49 @@ class StrahovRoom extends Room {
       }
       const changes = store.forgetIdentities(
         expireSessions(sessions, this.connections),
+        Boolean(accounts),
       );
       if (changes.social) this.syncSocial();
       if (changes.activity) this.broadcast("activity", store.activity);
       pruneRateWindows(issueRates, SESSION_ISSUE_WINDOW_MS);
+      void gateway?.prune().catch(reportAccountFailure);
     }, 30000);
+    if (gateway) {
+      this.clock.setInterval(() => {
+        for (const [id, client] of this.connections) {
+          if (client.auth.login?.expires <= Date.now()) this.kickClient(client.sessionId, 4401);
+          else this.captureCheckpoint(id);
+        }
+      }, 1000);
+      this.clock.setInterval(() => {
+        if (this.checkpointWrite) return;
+        void this.saveCheckpoints();
+      }, 15000);
+    }
   }
-  onAuth(_c: Client, options: any) {
+  static async onAuth(_token: string, options: any, context: AuthContext) {
+    if (authMode === "local") return true;
+    if (!gateway || !gateway.validMatchmakingOrigin(context.headers) || options?.protocol !== PROTOCOL_VERSION)
+      throw new ServerError(ErrorCode.AUTH_FAILED, "login-required");
+    const login = await gateway.session(context.headers);
+    if (login && activeRoom?.connections.has(login.id))
+      throw new ServerError(ErrorCode.AUTH_FAILED, "account-already-playing");
+    if (!login || !gateway.reserve(options?.ticket, login))
+      throw new ServerError(ErrorCode.AUTH_FAILED, "login-required");
+    // Returning true leaves authData empty so the instance validates at consumption.
+    return true;
+  }
+  async onAuth(_c: Client, options: any, context: AuthContext) {
     if (options?.protocol !== PROTOCOL_VERSION)
       throw new Error("Herní protokol se změnil. Obnov stránku.");
+    if (gateway && accounts && gateway.sameOrigin(context.headers)) {
+      const login = await gateway.session(context.headers);
+      if (login && gateway.consume(options?.ticket, login) && !this.connections.has(login.id)) {
+        const account = await accounts.run("account", login.id);
+        if (account?.profile && gateway.live(login)) return { id: account.id, profile: account.profile, account, login };
+      }
+    }
+    if (authMode !== "local") throw new Error("login-required");
     const token = typeof options?.token === "string" ? options.token : "";
     const s = sessions.get(token);
     if (!s || s.expires < Date.now() || this.connections.has(s.id))
@@ -433,6 +518,11 @@ class StrahovRoom extends Room {
     return { ...s, token };
   }
   onJoin(client: Client) {
+    const login: Login | undefined = client.auth?.login;
+    const account: Account | undefined = client.auth.account;
+    if (login && !gateway?.live(login))
+      throw new Error("login-required");
+    if (this.connections.has(client.auth.id)) throw new Error("account-already-playing");
     const s = client.auth,
       n = this.clients.length - 1;
     this.connections.set(s.id, client);
@@ -446,6 +536,14 @@ class StrahovRoom extends Room {
     });
     const saved = sessions.get(s.token)?.savedState;
     if (saved) actor.restore(saved);
+    if (account?.checkpoint) {
+      const { position, yaw } = account.checkpoint;
+      const safe = Number.isFinite(yaw) && this.sim.safeWalkingPosition(actor, position);
+      if (safe) actor.resetOnFoot(safe, yaw);
+    }
+    if (account) {
+      sessions.set(login!.hash, { id: s.id, profile: s.profile, expires: Date.now() + SESSION_RECONNECT_TTL_MS });
+    }
     this.inputQueues.set(
       s.id,
       new TimelineInputQueue(++this.nextInputEpoch, this.simulationClock.tick),
@@ -469,6 +567,7 @@ class StrahovRoom extends Room {
       players: [...store.players.values()],
       events: store.events,
       activity: store.activity,
+      ...(account ? { rewards: account.rewards } : {}),
     });
     client.send("car", {
       ...this.carPosition,
@@ -482,8 +581,16 @@ class StrahovRoom extends Room {
     this.sendMotionKeyframe(client);
   }
   onLeave(client: Client) {
-    const id = client.auth.id,
+    const id = client.auth?.id,
       a = this.sim.actors.get(id);
+    if (this.connections.get(id) !== client) return;
+    const login: Login | undefined = client.auth.login;
+    if (login) {
+      this.captureCheckpoint(id);
+      void this.saveCheckpoints();
+      const tracked = sessions.get(login.hash);
+      if (tracked) tracked.expires = Date.now() + SESSION_RECONNECT_TTL_MS;
+    }
     const session = sessions.get(client.auth.token);
     if (a && session) {
       session.savedState = a.capture();
@@ -521,6 +628,72 @@ class StrahovRoom extends Room {
     this.doorInteractions?.dispose();
     this.sim.dispose();
     if (singletonRoomId === this.roomId) singletonRoomId = undefined;
+    if (activeRoom === this) activeRoom = undefined;
+  }
+  updateAccountProfile(id: string, profile: Profile) {
+    const client = this.connections.get(id);
+    if (client?.auth.login) {
+      Object.assign(store.players.get(id)!, profile);
+      this.broadcastPresence();
+    }
+    this.syncSocial();
+  }
+  private rememberContactNames(...ids: string[]) {
+    for (const id of ids) {
+      const nickname = store.players.get(id)?.nickname;
+      if (nickname) store.knownNames.set(id, nickname);
+    }
+  }
+  private changeSocial(c: Client, target: string, change: () => void | Promise<void>) {
+    const id = c.auth.id;
+    if (!store.rate(id, "social-queue", 12, 10000)) return;
+    this.socialWrites = this.socialWrites.then(async () => {
+      if (this.connections.get(id) === c && target !== id) await change();
+    }).catch(error => {
+      c.send("notice", error instanceof Error ? error.message : "account-storage-unavailable");
+    });
+  }
+  private award(name: string) {
+    if (!accounts) {
+      for (const client of this.clients) client.send("reward", name);
+      return;
+    }
+    const ids = [...this.connections.keys()];
+    if (!ids.length) return;
+    void accounts.run("reward", ids, name).then(awarded => {
+      for (const id of awarded) this.connections.get(id)?.send("reward", name);
+    }, reportAccountFailure);
+  }
+  private captureCheckpoint(id: string) {
+    const actor = this.sim.actors.get(id);
+    if (!actor?.grounded || actor.vehicle) return;
+    const previous = this.accountCheckpoints.get(id);
+    if (previous && Math.hypot(actor.position.x - previous.position.x,
+      actor.position.z - previous.position.z, actor.position.y - previous.position.y) < 0.1 &&
+      Math.abs(actor.yaw - previous.yaw) < 0.05) return;
+    const position = this.sim.safeWalkingPosition(actor, actor.position);
+    if (position && Number.isFinite(actor.yaw)) this.accountCheckpoints.set(id, { position, yaw: actor.yaw });
+  }
+  saveCheckpoints(): Promise<void> {
+    if (this.checkpointWrite) return this.checkpointWrite;
+    if (!accounts || !this.accountCheckpoints.size) return Promise.resolve();
+    const entries = [...this.accountCheckpoints];
+    this.accountCheckpoints.clear();
+    this.checkpointWrite = accounts.run("checkpoints", entries).then(() => {
+      this.checkpointWrite = undefined;
+      return this.saveCheckpoints();
+    }, () => {
+      this.checkpointWrite = undefined;
+      for (const [id, checkpoint] of entries)
+        if (!this.accountCheckpoints.has(id)) this.accountCheckpoints.set(id, checkpoint);
+      reportAccountFailure();
+    });
+    return this.checkpointWrite;
+  }
+  async flushAccountWrites() {
+    for (const id of this.connections.keys()) this.captureCheckpoint(id);
+    await this.saveCheckpoints();
+    await this.socialWrites;
   }
   safe(c: Client, action: () => void) {
     try {
@@ -607,6 +780,12 @@ class StrahovRoom extends Room {
   }
 }
 const http = createServer();
+function reportAccountFailure() { console.warn("[account] account storage operation failed"); }
+gateway?.onRevoke(hash => {
+  if (!activeRoom) return;
+  for (const client of activeRoom.connections.values())
+    if (client.auth.login?.hash === hash) activeRoom.kickClient(client.sessionId, 4401);
+});
 const listenHost = config.host;
 const sessionDiagnostics = createSessionDiagnosticsHandler({ listenHost });
 const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
@@ -629,6 +808,21 @@ const feedback = await createFeedbackService({
   },
 });
 const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
+  const path = req.url?.split("?")[0];
+  if (isAccountPath(path) || (path === "/api/session" && authMode !== "local")) {
+    try {
+      if (path === "/api/session" && req.method === "POST" && gateway)
+        await gateway.issue(req, res, worldId);
+      else if (gateway && await gateway.handle(req, res)) return;
+      else if (path === "/api/auth/session" && req.method === "GET")
+        reply(res, 200, { mode: authMode, account: null });
+      else reply(res, gateway ? 404 : 503, { error: gateway ? "not-found" : "auth-unavailable" });
+    } catch {
+      reportAccountFailure();
+      if (!res.writableEnded) reply(res, 503, { error: "auth-unavailable" });
+    }
+    return;
+  }
   if (await feedback.handle(req, res)) return;
   if (await sessionDiagnostics(req, res)) return;
   if (await localBenchmarks(req, res)) return;
@@ -719,7 +913,20 @@ const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
   }
 };
 const server = new Server({
-  transport: new WebSocketTransport({ server: http }),
+  transport: new WebSocketTransport({
+    server: http,
+    beforeUpgrade: async (_request, context) => {
+      if (authMode === "local") return;
+      if (!gateway) return new Response(null, { status: 503 });
+      try {
+        if (!gateway.sameOrigin(context.headers) || !await gateway.session(context.headers))
+          return new Response(null, { status: 401 });
+      } catch {
+        reportAccountFailure();
+        return new Response(null, { status: 503 });
+      }
+    },
+  }),
   greet: false,
   express: (app) => {
     if (chatMonitor) app.use(chatMonitor.admin);
@@ -733,8 +940,16 @@ const server = new Server({
 // Colyseus dispatches matchmaking before Express. Enforce this at its controller,
 // before a rejected create request can construct a second physics simulation.
 matchMaker.controller.exposedMethods = ["joinById"];
+if (authMode !== "local") {
+  matchMaker.controller.getCorsHeaders = (headers): Record<string, string> =>
+    gateway?.sameOrigin(headers) ? {
+      "Access-Control-Allow-Origin": headers.get("origin")!,
+      Vary: "Origin",
+    } : { "Access-Control-Allow-Origin": "null", "Access-Control-Allow-Credentials": "false" };
+}
 server.onBeforeShutdown(async () => {
   readiness.stop();
+  await activeRoom?.flushAccountWrites();
   await crazyTypka.close();
   try {
     await feedback.close();
@@ -742,6 +957,7 @@ server.onBeforeShutdown(async () => {
     await chatMonitor?.close();
   }
 });
+server.onShutdown(async () => { await accounts?.close(); });
 server.define("strahov", StrahovRoom);
 await server.listen(config.port, listenHost);
 attachCrazyTypkaHttpRoute(http, crazyTypka);

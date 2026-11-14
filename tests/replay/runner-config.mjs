@@ -31,8 +31,7 @@ function replaceOnce(source, before, after, contract) {
   return source.replace(before, after);
 }
 
-/** All guest/bootstrap changes exist only in this isolated test build. Exact
- * source guards refuse UI drift instead of silently starting multiplayer. */
+/** The isolated build uses the public solo action and replaces its bootstrap. */
 export function createReplayBuildPlugin(root, sourceHash) {
   if (!/^[a-f0-9]{64}$/.test(sourceHash)) throw new Error("Invalid replay source hash");
   const welcome = resolve(root, "client/welcome-screen.tsx").replaceAll("\\", "/");
@@ -41,10 +40,8 @@ export function createReplayBuildPlugin(root, sourceHash) {
     enforce: "pre",
     transform(code, id) {
       if (id.split("?")[0].replaceAll("\\", "/") !== welcome) return null;
-      return {
-        code: replaceOnce(code, 'enter("multi")', 'enter("guest")', "Guest entry"),
-        map: null,
-      };
+      replaceOnce(code, 'enter("guest")', 'enter("guest")', "Guest entry");
+      return null;
     },
     transformIndexHtml: {
       order: "pre",

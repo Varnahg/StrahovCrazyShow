@@ -433,6 +433,20 @@ export class Simulation {
       ? ray.origin.y - hit.timeOfImpact
       : undefined;
   }
+  safeWalkingPosition(actor: Actor, position: Vec3): Vec3 | undefined {
+    const { x, y, z } = position;
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z) ||
+      x < BOUNDS.minX || x > BOUNDS.maxX || z < BOUNDS.minZ || z > BOUNDS.maxZ) return;
+    const foot = y - CHARACTER_HALF_HEIGHT - CHARACTER_RADIUS;
+    const floor = this.floorHeight(x, z, foot, actor);
+    if (floor === undefined || Math.abs(floor - foot) > 0.28) return;
+    const pose = { x, y: floor + CHARACTER_HALF_HEIGHT + CHARACTER_RADIUS + 0.04, z };
+    if (!this.world.intersectionWithShape(
+      pose, { x: 0, y: 0, z: 0, w: 1 },
+      new RAPIER.Capsule(CHARACTER_HALF_HEIGHT, CHARACTER_RADIUS),
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS, undefined, actor.collider, actor.body,
+    )) return pose;
+  }
   add(id: string, p: Vec3 = SPAWN) {
     if (p === SPAWN && this.photogrammetry)
       p = { ...SPAWN, y: this.surfaceHeight(SPAWN.x, SPAWN.z) + 1 };

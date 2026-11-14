@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { spawn, fork } from "node:child_process";
 import { createServer } from "node:net";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { mkdtemp, writeFile, unlink, rmdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
@@ -172,7 +174,11 @@ async function main() {
   let clientClosed;
   let clientDeadline;
   let upAttempted = false;
+  const fixture = await mkdtemp(join(tmpdir(), "strahov-docker-local-"));
+  const override = join(fixture, "compose.test.yaml");
   try {
+    await writeFile(override, "services:\n  game:\n    environment:\n      STRAHOV_AUTH_MODE: local\n      STRAHOV_LOCAL_TEST_ONLY: '1'\n");
+    compose.push("--file", override);
     await dc("config", "--quiet");
     upAttempted = true;
     await run(
@@ -328,6 +334,8 @@ async function main() {
     }
     process.removeListener("SIGINT", interrupt);
     process.removeListener("SIGTERM", interrupt);
+    await unlink(override).catch(error => { if (error.code !== "ENOENT") throw error; });
+    await rmdir(fixture);
   }
 }
 if (

@@ -78,6 +78,7 @@ export type SocialState = {
   contacts: string[];
   requests: string[];
   blocked: string[];
+  names?: Record<string, string>;
 };
 export type ActivityState = {
   hunt: string[];

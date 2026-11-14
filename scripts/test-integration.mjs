@@ -13,7 +13,7 @@ export function createIsolatedIntegrationEnvironment(environment, directory) {
   const isolated = Object.fromEntries(
     Object.entries(environment).filter(
       ([key]) =>
-        !/^(?:LINEAR_|FEEDBACK_|OPENAI_|CRAZY_TYPKA_|RAG_|CHAT_MONITOR_)/i.test(key),
+        !/^(?:LINEAR_|FEEDBACK_|OPENAI_|CRAZY_TYPKA_|RAG_|CHAT_MONITOR_|STRAHOV_AUTH_|STRAHOV_GOOGLE_|STRAHOV_ACCOUNTS_)/i.test(key),
     ),
   );
   return {

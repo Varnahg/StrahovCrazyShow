@@ -93,17 +93,16 @@ test("report save rechecks actual checkout sources and public assets, rejecting 
   assert.equal(existsSync(rejected), false);
 });
 
-test("test build changes only the actual welcome guest callback and bootstrap, rejecting source drift", () => {
+test("test build uses the public solo callback and changes only the bootstrap, rejecting source drift", () => {
   const root = resolve(import.meta.dirname, ".."),
     welcomePath = resolve(root, "client/welcome-screen.tsx"),
     source = readFileSync(welcomePath, "utf8"),
     html = readFileSync(resolve(root, "index.html"), "utf8"),
     plugin = createReplayBuildPlugin(root, "a".repeat(64));
-  const changed = plugin.transform(source, welcomePath + "?test");
-  assert.equal(changed.code.replace('enter("guest")', 'enter("multi")'), source);
+  assert.equal(plugin.transform(source, welcomePath + "?test"), null);
   assert.equal(plugin.transform(source, resolve(root, "client/ui.tsx")), null);
-  assert.throws(() => plugin.transform(source.replace('enter("multi")', 'enter("changed")'), welcomePath), /refused/);
-  assert.throws(() => plugin.transform(source + '\nenter("multi")', welcomePath), /refused/);
+  assert.throws(() => plugin.transform(source.replace('enter("guest")', 'enter("changed")'), welcomePath), /refused/);
+  assert.throws(() => plugin.transform(source + '\nenter("guest")', welcomePath), /refused/);
   const transformed = plugin.transformIndexHtml.handler(html);
   assert.ok(transformed.includes('src="/tests/replay/browser-entry.ts"'));
   assert.ok(transformed.includes('name="replay-source" content="' + "a".repeat(64) + '"'));

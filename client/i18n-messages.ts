@@ -1,5 +1,14 @@
 /** Czech source strings are stable typed keys; English never changes content identifiers. */
 export const messages = {
+  "Přihlášení přes Google bylo zrušeno.": "Google sign-in was cancelled.",
+  "Přihlášení vypršelo. Přihlas se znovu přes Google.": "Your session expired. Sign in with Google again.",
+  "Pro multiplayer se přihlas přes Google.": "Sign in with Google to play multiplayer.",
+  "Profil se nepodařilo uložit. Zkus to znovu.": "Your profile could not be saved. Try again.",
+  "Přihlášení je dočasně nedostupné.": "Sign-in is temporarily unavailable.",
+  "Příliš mnoho pokusů o přihlášení. Zkus to za minutu.": "Too many sign-in attempts. Try again in a minute.",
+  "Přihlášení se nepodařilo. Zkus to znovu.": "Sign-in failed. Try again.",
+  "Odhlásit se": "Sign out",
+  "Tento účet už hraje v jiném okně nebo zařízení.": "This account is already playing in another window or on another device.",
   "Po dobu přípravy je pohyb pozastavený; připojení zůstává aktivní.": "Movement is paused during preparation; the connection stays active.",
   "Zavřít grafiku": "Close graphics",
   "Zrušit změny": "Discard changes",

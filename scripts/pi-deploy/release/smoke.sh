@@ -35,6 +35,9 @@ services:
     image: ${SMOKE_TOOLS_REF:?}
   game:
     image: ${SMOKE_GAME_REF:?}
+    environment:
+      STRAHOV_AUTH_MODE: local
+      STRAHOV_LOCAL_TEST_ONLY: "1"
 YAML
 
 df -h . /var/lib/docker
@@ -59,3 +62,4 @@ check_container_image rag-bootstrap "$SMOKE_TOOLS_REF"
 check_container_image game "$SMOKE_GAME_REF"
 curl --fail --silent --show-error --max-time 10 "$STRAHOV_TEST_URL/api/ai/status" | jq -e '.enabled == true'
 node --import tsx scripts/integration-docker.ts
+STRAHOV_AUTH_TEST_DIR="$tmp" node --import tsx scripts/integration-google-auth.ts

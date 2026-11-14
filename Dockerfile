@@ -38,6 +38,7 @@ RUN --mount=type=bind,source=public,target=/app/public \
     VITE_MULTIPLAYER_URL=/ STRAHOV_DOCKER_COPY_PUBLIC=0 pnpm --config.verify-deps-before-run=false run build
 
 FROM node:24-bookworm-slim AS runtime
+LABEL cz.reomnik.strahov.multiplayer-auth=google-v1
 WORKDIR /app
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
@@ -54,7 +55,7 @@ COPY --from=build --chown=node:node /app/server ./server
 COPY --from=build --chown=node:node /app/shared ./shared
 COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/scripts/docker-game-entrypoint.mjs /app/scripts/docker-rag-secrets.mjs ./scripts/
-RUN mkdir -p /data/feedback && chown node:node /data/feedback
+RUN mkdir -p /data/feedback /data/accounts && chown node:node /data/feedback /data/accounts
 USER node
 EXPOSE 2567
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
