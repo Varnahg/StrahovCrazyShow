@@ -80,7 +80,7 @@
 }
 .game-shell .player-chat-dialog {
   width: min(720px, calc(100vw - 32px));
-  height: min(620px, calc(var(--player-chat-height, 100dvh) - 32px));
+  height: min(620px, calc(100dvh - 32px), calc(var(--player-chat-height, 100dvh) - 32px));
   inset-block: var(--player-chat-y, 0) var(--player-chat-bottom, 0);
   max-width: none;
   max-height: none;
@@ -214,7 +214,7 @@
   .game-shell .world-dock .dock-chat-count-narrow { display: block; }
   .game-shell .player-chat-dialog {
     width: calc(100vw - 16px);
-    height: calc(var(--player-chat-height, 100dvh) - 16px);
+    height: min(calc(100dvh - 16px), calc(var(--player-chat-height, 100dvh) - 16px));
     border-radius: 14px;
   }
   .player-chat-header, .player-chat-channels, .player-chat-audience, .player-chat-log, .player-chat-composer, .player-chat-content {
