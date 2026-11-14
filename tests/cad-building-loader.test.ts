@@ -12,6 +12,11 @@ import { loadCadBuildings, type CadBuildingAsset } from "../client/cad-buildings
 import { Script } from "node:vm";
 import ts from "typescript";
 import { readGameSource } from "./helpers/game-source";
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
+import { CAD_BUILDINGS } from "../shared/cad-buildings";
+import repairs from "../shared/data/assets/cad-surface-repair-20261114.json";
 
 const asset: CadBuildingAsset = {
   id: "b01", identity: osmAssetIdentity("building", "way", "53929063"),
@@ -49,6 +54,24 @@ function deferred<T>() {
   const promise = new Promise<T>((done) => { resolve = done; });
   return { promise, resolve };
 }
+
+test("actual CAD repair GLBs keep their loader identity and byte pins", async (t) => {
+  const scene = sceneFixture(t);
+  const controller = await loadCadBuildings(scene, CAD_BUILDINGS, {
+    async loadContainer(url) {
+      const repair = Object.values(repairs).find((value) => url === `${value.url}?v=${value.sha256}`)!;
+      assert.ok(repair, url);
+      const bytes = await readFile("public" + repair.url);
+      assert.equal(bytes.length, repair.bytes);
+      assert.equal(createHash("sha256").update(bytes).digest("hex"), repair.sha256);
+      return LoadAssetContainerAsync(new Uint8Array(bytes), scene, { pluginExtension: ".glb" });
+    },
+  });
+  assert.equal(controller.stats.buildings, 2);
+  for (const [id, pin] of Object.entries(repairs))
+    assert.ok(scene.meshes.some((mesh) => mesh.metadata?.cadBuilding === id && mesh.metadata.renderGlbSha256 === pin.sha256));
+  controller.dispose();
+});
 
 test("CAD loader zachová native geometrii, materiál a jediný world transform", async (t) => {
   const scene = sceneFixture(t), native = containerFixture(scene);

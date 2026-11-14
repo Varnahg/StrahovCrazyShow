@@ -70,7 +70,9 @@ const source = {
     entrances: plan.entrances,
   },
 };
-const out = path.resolve("docs/reality-pack/landmarks/geometry-source.json");
+const [output, extra] = process.argv.slice(2);
+if (extra !== undefined) throw new Error("Expected at most one output path");
+const out = path.resolve(output ?? "docs/reality-pack/landmarks/geometry-source.json");
 fs.writeFileSync(out, JSON.stringify(source));
 console.log(
   JSON.stringify(

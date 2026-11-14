@@ -9,13 +9,14 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { buildingFoundationData } from "../client/terrain-renderer";
 import { architectureEdges } from "../client/architecture-reality";
-import { BUILDINGS, blockNumber } from "../shared/world";
+import { BUILDINGS, TERRAIN_COVERAGE, blockNumber } from "../shared/world";
 import {
   buildingBaseHeight,
   groundHeight,
   type GroundPoint,
 } from "../shared/terrain";
 import { B6_LAYOUT } from "../shared/b6-interior";
+import { hasCadBuilding } from "../shared/cad-buildings";
 
 function verifyOutsideFaces(points: GroundPoint[], baseY: number) {
   const engine = new NullEngine(),
@@ -73,8 +74,8 @@ function verifyOutsideFaces(points: GroundPoint[], baseY: number) {
       for (const p of triangle) {
         const lower = Math.min(baseY - 0.05, groundHeight(p.x, p.z) - 0.15);
         assert(
-          Math.abs(p.y - baseY) < 1e-9 || Math.abs(p.y - lower) < 1e-9,
-          "only the original foundation anchor and sampled lower boundary are used",
+          Math.abs(p.y - baseY) < 1e-9 || p.y <= lower + 1e-9,
+          "the foundation reaches the original anchor and remains buried below each sampled endpoint",
         );
       }
       camera.position.copyFrom(
@@ -115,6 +116,24 @@ test("foundation stays opaque from outside for either open or closed footprint w
     [...ring, ring[0]].reverse(),
   ])
     verifyOutsideFaces(points, 4);
+});
+
+test("foundation chords cover terrain troughs across the mapped world", () => {
+  const { minX, maxX, minZ, maxZ } = TERRAIN_COVERAGE;
+  for (const building of BUILDINGS) {
+    if (hasCadBuilding(building.id)) continue; // Native CAD uses exact site geometry and cutouts.
+    const data = buildingFoundationData(building.points, buildingBaseHeight(building.points));
+    for (let i = 0; i < data.positions.length; i += 12) {
+      const [ax, ay, az, bx, by, bz] = data.positions.slice(i, i + 6);
+      for (let k = 0; k <= 64; k++) {
+        const t = k / 64;
+        const x = ax + (bx - ax) * t, z = az + (bz - az) * t;
+        if (x < minX || x > maxX || z < minZ || z > maxZ) continue;
+        const burial = groundHeight(x, z) - (ay + (by - ay) * t);
+        assert.ok(burial > 0.149, `${building.id} skirt burial ${burial} m at ${x},${z}`);
+      }
+    }
+  }
 });
 
 test("actual B3/B4/B5/B6/B8/B10 skirts retain terrain boundary and outward RH front faces", () => {

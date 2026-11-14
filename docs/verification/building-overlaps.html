@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="cs">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontrola překryvů budov</title>
+<style>
+  body { margin: 0; background: #111; color: white; font: 14px system-ui; }
+  canvas { display: block; width: 100vw; height: calc(100vh - 86px); }
+  nav { padding: 8px; display: flex; gap: 14px; align-items: center; }
+  output { padding: 0 8px; display: block; overflow-wrap: anywhere; }
+</style>
+<nav aria-label="Diagnostika překryvů">
+  <label>Záběr <select id="view">
+    <option value="menza">Menza · severozápadní roh</option>
+    <option value="menza-side">Menza · šikmý pohled</option>
+    <option value="menza-south">Menza · jižní sokl</option>
+    <option value="b5">B5 · západní sokl</option>
+    <option value="b5-entry">B5 · schody</option>
+    <option value="b4">B4 · roh fasády</option>
+    <option value="b4-far">B4 · vzdálená fasáda</option>
+    <option value="roof">B4 · střecha</option>
+    <option value="slope-roof">Střecha ve svahu</option>
+    <option value="b1">B1 · parapety</option>
+    <option value="b6">B6 · styk podlaží</option>
+    <option value="stadium">Stadion · východní pavilon</option>
+    <option value="b8">B8 · západní fasáda</option>
+    <option value="menza-far">Menza · vzdálená fasáda</option>
+  </select></label>
+  <label><input id="terrain" type="checkbox" checked> Terén</label>
+  <label><input id="shadows" type="checkbox" checked> Stíny</label>
+  <label><input id="textures" type="checkbox" checked> Textury</label>
+</nav>
+<output aria-live="polite">Příprava hry…</output>
+<canvas aria-label="Kontrolní herní snímek"></canvas>
+<div data-label-layer hidden></div>
+<script type="module" src="./building-overlaps.ts"></script>
+</html>

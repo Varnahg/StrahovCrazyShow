@@ -274,15 +274,44 @@ export function buildingFoundationData(
       length = Math.hypot(b[0] - a[0], b[1] - a[1]);
     if (length < 1e-5) continue;
     const count = Math.ceil(length / 4);
+    // The shared terrain is piecewise planar. Sample a narrow strip that
+    // straddles this edge so the clipped terrain contains every height break
+    // along the wall, including the grid diagonal and local terrain patches.
+    // Deepen both knots around a trough without adding any triangles.
+    const knots = Array.from({ length: count + 1 }, (_, segment) => {
+      const t = segment / count;
+      const x = a[0] + (b[0] - a[0]) * t;
+      const z = a[1] + (b[1] - a[1]) * t;
+      return { x, z, y: Math.min(baseY - 0.05, groundHeight(x, z) - 0.15), deepen: 0 };
+    });
+    const dx = (b[1] - a[1]) / length * 0.01;
+    const dz = (a[0] - b[0]) / length * 0.01;
+    const alongX = (b[0] - a[0]) / length;
+    const alongZ = (b[1] - a[1]) / length;
+    const span = length / count;
+    const profileTriangles = [0, 1, 2, 0, 2, 3];
+    for (let segment = 0; segment < count; segment++) {
+      const start = knots[segment], end = knots[segment + 1];
+      const samples = drapeTriangles([
+        [start.x - dx, start.z - dz], [end.x - dx, end.z - dz],
+        [end.x + dx, end.z + dz], [start.x + dx, start.z + dz],
+      ], profileTriangles).positions;
+      let deficit = 0;
+      for (let i = 0; i < samples.length; i += 3) {
+        const t = ((samples[i] - start.x) * alongX + (samples[i + 2] - start.z) * alongZ) / span;
+        const bottom = start.y + (end.y - start.y) * t;
+        deficit = Math.max(deficit, bottom - (samples[i + 1] - 0.15));
+      }
+      start.deepen = Math.max(start.deepen, deficit);
+      end.deepen = Math.max(end.deepen, deficit);
+    }
     for (let segment = 0; segment < count; segment++) {
       const from = segment / count,
         to = (segment + 1) / count,
-        x1 = a[0] + (b[0] - a[0]) * from,
-        z1 = a[1] + (b[1] - a[1]) * from,
-        x2 = a[0] + (b[0] - a[0]) * to,
-        z2 = a[1] + (b[1] - a[1]) * to,
-        y1 = Math.min(baseY - 0.05, groundHeight(x1, z1) - 0.15),
-        y2 = Math.min(baseY - 0.05, groundHeight(x2, z2) - 0.15),
+        { x: x1, z: z1, y: bottom1, deepen: deepen1 } = knots[segment],
+        { x: x2, z: z2, y: bottom2, deepen: deepen2 } = knots[segment + 1],
+        y1 = bottom1 - deepen1,
+        y2 = bottom2 - deepen2,
         start = positions.length / 3;
       positions.push(x1, y1, z1, x2, y2, z2, x1, baseY, z1, x2, baseY, z2);
       const nx = orientation * (b[1] - a[1]) / length,

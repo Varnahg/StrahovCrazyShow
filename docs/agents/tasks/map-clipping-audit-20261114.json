@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "map-clipping-audit-20261114",
+  "title": "KEY-79: Prohledat statickou geometrii celé herní mapy",
+  "status": "done",
+  "dependsOn": ["building-overlaps-20261114"],
+  "writePaths": ["docs/verification-evidence/map-clipping-20261114/"],
+  "resources": ["heavy-validation"],
+  "acceptance": ["Inventář obsahuje souřadnice, rozsah, měřené mezery a omezení. Audit využije aktuální world factory a skutečné nativní CAD assety."],
+  "verification": ["Spustit repeatovatelný audit obou LOD, ověřit pozitivní kontroly B4 a menzy, porovnat pivoty a zaznamenat hranice geometrického pokrytí."],
+  "notes": ["Výchozí HEAD a6305f68 na main. Objemná mezidata patří na D: do vyhrazeného podadresáře map-clipping-20261114 pod existujícím geometry-release QA junctionem. Administrativní rezervaci po auditu přebírá původní vlastník svého katalogového souboru map-clipping-audit-01a1dad0.", "Výsledky a omezení jsou v docs/verification-evidence/map-clipping-20261114/README.md. Opravy geometrie zůstávají v KEY-79."]
+}

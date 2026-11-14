@@ -2,6 +2,7 @@ import source from "./data/outdoor-artifacts.json";
 import { groundHeight } from "./terrain";
 import landcover from "./data/landcover.json";
 import { STREET_FEATURES } from "./streets";
+import map from "./data/map.json";
 
 export type OutdoorArtifactMaterial =
   | "outdoor-wood"
@@ -280,6 +281,11 @@ export function buildOutdoorArtifactPlan(): OutdoorArtifactPlan {
   const gates = OUTDOOR_ARTIFACTS.filter(
     (artifact) => artifact.kind === "gate",
   );
+  const fenceWalls = new Map([
+    ["way/293949903", map.buildings.find((b) => b.id === "432351705")!.points],
+    ["way/159388523", map.buildings.find((b) => b.id === "1132256478")!.points],
+  ]);
+  const fencePosts = new Set<string>();
   const paths = STREET_FEATURES.filter((feature) => !feature.isArea).flatMap(
     (feature) =>
       feature.points
@@ -293,8 +299,10 @@ export function buildOutdoorArtifactPlan(): OutdoorArtifactPlan {
       0.9,
       12,
     );
-  const fenceBlocked = (x: number, z: number) => {
+  const fenceBlocked = (x: number, z: number, wall?: number[][]) => {
     if (!withinBounds(x, z, 0.3)) return "outside-walk-bounds";
+    if (wall?.some((p, i) => distanceToSegment(x, z, p, wall[(i + 1) % wall.length]) < 0.14))
+      return "building-wall-owns-shared-boundary";
     if (courtEdges.some(([a, b]) => distanceToSegment(x, z, a, b) < 1.3))
       return "existing-campus-court-fence-owner";
     if (
@@ -608,23 +616,29 @@ export function buildOutdoorArtifactPlan(): OutdoorArtifactPlan {
                 "outdoor-dark-metal",
                 false,
               );
-            for (const t of [lo, hi])
+            for (const t of [lo, hi]) {
+              const x = a[0] + t * dx, z = a[1] + t * dz;
+              const post = `${Math.round(x * 1000)}:${Math.round(z * 1000)}`;
+              if (fencePosts.has(post)) continue;
+              fencePosts.add(post);
+              const postBase = groundHeight(x, z);
               appendOutdoorArtifactBox(
                 parts,
                 colliders,
                 {
                   artifactId: artifact.id,
-                  x: a[0] + t * dx,
-                  y: y + h / 2,
-                  z: a[1] + t * dz,
+                  x,
+                  y: postBase + height / 2,
+                  z,
                   w: 0.075,
-                  h,
+                  h: height,
                   d: 0.075,
                   yaw,
                 },
                 "outdoor-dark-metal",
                 false,
               );
+            }
             // Thin rods provide a readable fence, while distant rendering keeps
             // the structural rails. Source does not establish a wire mesh weave.
             const bars = Math.max(1, Math.ceil(w / 0.32));
@@ -645,7 +659,7 @@ export function buildOutdoorArtifactPlan(): OutdoorArtifactPlan {
         };
         for (let sample = 0; sample < count; sample++) {
           const t = (sample + 0.5) * step,
-            reason = fenceBlocked(a[0] + t * dx, a[1] + t * dz);
+            reason = fenceBlocked(a[0] + t * dx, a[1] + t * dz, fenceWalls.get(artifact.id));
           if (reason) {
             if (start >= 0) emit(sample * step);
             start = -1;

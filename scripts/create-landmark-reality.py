@@ -7,15 +7,16 @@ Runtime uses the same shared numeric geometry batched by material for fewer draw
 import json, math, hashlib, argparse, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
-SOURCE=ROOT/'docs/reality-pack/landmarks/geometry-source.json'
-OUT=ROOT/'public/models/landmarks'
-BLEND=ROOT/'assets/blender/landmarks'
-data=json.loads(SOURCE.read_text(encoding='utf-8'))
 parser=argparse.ArgumentParser(description='Export the shared authored landmark geometry; --only preserves other archives.')
 parser.add_argument('--only',help='Comma-separated source module IDs')
 parser.add_argument('--dry-run',action='store_true',help='Read/validate selection without Blender or file writes')
+parser.add_argument('--source',type=Path,default=ROOT/'docs/reality-pack/landmarks/geometry-source.json')
+parser.add_argument('--glb-dir',type=Path,default=ROOT/'public/models/landmarks')
+parser.add_argument('--blend-dir',type=Path,default=ROOT/'assets/blender/landmarks')
 arguments=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else (sys.argv[1:] if Path(sys.argv[0]).resolve()==Path(__file__).resolve() else [])
 args=parser.parse_args(arguments)
+SOURCE,OUT,BLEND=(p.resolve() for p in (args.source,args.glb_dir,args.blend_dir))
+data=json.loads(SOURCE.read_text(encoding='utf-8'))
 known={module['id'] for module in data['modules']}
 selected=set(args.only.split(',')) if args.only else known
 if not selected or selected-known:parser.error('Unknown or empty module selection: '+','.join(sorted(selected-known)))

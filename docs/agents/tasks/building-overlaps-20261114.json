@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "building-overlaps-20261114",
+  "title": "KEY-79: Audit a opravy překryvů fasád, soklů a terénu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/architecture-reality.ts",
+    "client/terrain-renderer.ts",
+    "shared/landmark-reality.ts",
+    "shared/data/transit-navigation.json",
+    "tests/b4-facade-rendering.test.ts",
+    "docs/verification/building-overlaps.html",
+    "docs/verification/building-overlaps.ts",
+    "tests/building-foundation.test.ts",
+    "tests/building-overlaps.test.ts",
+    "docs/agents/handoffs/building-overlaps-20261114.md",
+    "docs/verification.md",
+    "docs/work-in-progress.md",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/building-overlaps-20261114/"
+  ],
+  "resources": ["heavy-validation", "gpu", "port:4189", "port:2568"],
+  "acceptance": [
+    "Audit současné hry rozlišuje sdílené hrany, záměrné detaily, překryvy s kladnou plochou a průnik terénu.",
+    "Opravené případy mají konkrétní reprodukci, srovnatelný obraz a cílenou regresi. Zbývající případy mají doložené omezení."
+  ],
+  "verification": [
+    "Cílené testy staveb a terénu, TypeScript, izolovaný build na D: a Edge WebGL2. Při změně společné kolize také izolovaná integrace."
+  ],
+  "notes": [
+    "Výchozí fae72002 v kanonickém main. Vlastní testovací výstupy fyzicky na D: pod existujícím geometry-release QA junctionem, běh building-overlaps-20261114.",
+    "Převzatý implementační checkpoint zahrnuje menzu, B3/B8, sokly, B4, schody a lemování. Další nálezy s odlišnými zdroji zůstávají v KEY-79 a předání.",
+    "https://linear.app/gigeconomy/issue/KEY-79/budovy-odstranit-cerne-prekryvy-soklu-fasad-a-terenu"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "map-clipping-ci-20261114",
+  "title": "KEY-79: Sjednotit odvozené archivy a přejímku PR #52",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/helpers/transit-route-audit.ts",
+    "docs/reality-pack/landmarks/export.ts",
+    "scripts/create-landmark-reality.py",
+    "docs/reality-pack/landmarks/geometry-source.json",
+    "public/models/landmarks/manifest.json",
+    "docs/agents/handoffs/map-clipping-ci-20261114.md",
+    "public/models/landmarks/great-strahov-stadium.glb",
+    "assets/blender/landmarks/great-strahov-stadium.blend",
+    "public/models/landmarks/great-strahov-stadium-far.glb",
+    "assets/blender/landmarks/great-strahov-stadium-far.blend",
+    "public/models/landmarks/common-covered-entrance.glb",
+    "assets/blender/landmarks/common-covered-entrance.blend"
+  ],
+  "resources": [
+    "heavy-validation",
+    "integration"
+  ],
+  "acceptance": [
+    "Aktuální sdílený stadion odpovídá oběma archivům. Fyzická trasa nezávisle ověřuje opravený nášlap. Povinné kontroly projdou pro aktuální head PR."
+  ],
+  "verification": [
+    "Selektivní Blender export na D:, cílené testy, opětovný běh CI a potvrzení merge."
+  ],
+  "notes": [
+    "Koordinátor key79-ci-01a1dad0 doplňuje pod vlastní administrativní rezervací katalog při prvním bootstrappingu. Výstupy generátorů fyzicky na D:; existující malé verzované archivy se synchronizují jednotlivě."
+  ]
+}

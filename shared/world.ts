@@ -267,6 +267,13 @@ export function measuredFootprint(building: Building) {
 export const STADIUM = BUILDING_CATALOG.landmarks.find(
   (landmark) => landmark.id === "great-strahov-stadium",
 )!;
+// Minimum game heights from the DMR triangle extrema inside these footprints
+// plus 2 cm of clearance. The catalogue retains the original OSM estimates.
+const roofClearanceHeights = new Map([
+  ["49379066", 10.58],
+  ["49379072", 3.08],
+  ["53920575", 3.56],
+]);
 // Consistent rendering/collision fallback. Explicit OSM heights and level counts
 // are preserved. Low-rise service/garage estimates are labelled in the catalogue.
 export const BUILDINGS = MAP.buildings
@@ -275,7 +282,7 @@ export const BUILDINGS = MAP.buildings
     ...b,
     height: landmarkBuildingHeight({
       ...b,
-      height: buildingArchitecture(b)?.renderHeight ?? b.height,
+      height: Math.max(buildingArchitecture(b)?.renderHeight ?? b.height, roofClearanceHeights.get(b.id) ?? 0),
     }),
   }));
 export const TREES = createMappedTrees(BOUNDS, BUILDINGS, MAP.paths);

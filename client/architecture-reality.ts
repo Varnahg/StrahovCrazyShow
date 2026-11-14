@@ -10,6 +10,8 @@ import { buildingRoofGeometry } from "../shared/building-roofs";
 import evidence from "../shared/data/facade-reality.json";
 import marketDetails from "../shared/data/market-detail-kit.json";
 import b4Panels from "../shared/data/b4-panel-kit.json";
+import { drapeTriangles, type GroundPoint } from "../shared/terrain";
+import { compileTerrainCutouts, subtractTerrainTriangle } from "../shared/terrain-cutouts";
 import { B4_FACADE_PLAN, b4FacadePlan } from "../shared/b4-facade-plan";
 import { BUILDINGS, buildingArchitecture } from "../shared/world";
 import type { Building, Vec3 } from "../shared/types";
@@ -297,11 +299,19 @@ class Batch {
     normal: Point,
     uv = [0, 0, 1, 1],
   ) {
+    this.face([a, b, c, d], normal, [uv[0], uv[1], uv[2], uv[1], uv[2], uv[3], uv[0], uv[3]]);
+  }
+  triangle(a: Point, b: Point, c: Point, normal: Point, uv: number[]) {
+    this.face([a, b, c], normal, uv);
+  }
+  private face(points: [Point, Point, Point, Point?], normal: Point, uv: number[]) {
+    const [a, b, c, d] = points;
     const offset = this.positions.length / 3;
-    this.positions.push(...a, ...b, ...c, ...d);
-    if (this.colors) for (let i = 0; i < 16; i++) this.colors.push(1);
-    for (let i = 0; i < 4; i++) this.normals.push(...normal);
-    this.uvs.push(uv[0], uv[1], uv[2], uv[1], uv[2], uv[3], uv[0], uv[3]);
+    this.positions.push(...a, ...b, ...c);
+    if (d) this.positions.push(...d);
+    if (this.colors) for (let i = 0; i < points.length * 4; i++) this.colors.push(1);
+    for (let i = 0; i < points.length; i++) this.normals.push(...normal);
+    this.uvs.push(...uv);
     const ab = b.map((x, i) => x - a[i]),
       ac = c.map((x, i) => x - a[i]);
     const dot =
@@ -313,9 +323,7 @@ class Batch {
       offset + (dot >= 0 ? 1 : 2),
       offset + (dot >= 0 ? 2 : 1),
     );
-    // Roof triangulation supplies c=d through the quad interface. Preserve the
-    // actual roof face without emitting a second, zero-area triangle.
-    if (!c.every((value, i) => value === d[i]))
+    if (d && !c.every((value, i) => value === d[i]))
       this.indices.push(
         offset,
         offset + (dot >= 0 ? 2 : 3),
@@ -408,6 +416,9 @@ function createMaterials(scene: Scene) {
     metal = solid("entrance galvanized frame", "#6c7a76"),
     cream = solid("menza tile", "#cfbf89", "tile", 0.13);
   const greyPanel = createB4PanelMaterial(scene);
+  // Continue the same concrete response as the vertical foundation skirt.
+  // A plain StandardMaterial made this band nearly black on shaded façades.
+  base.metadata = { surfaceKind: "concrete", uvMetresPerRepeat: 3 };
   const b4Frame = solid(
     "B4 dark window frames",
     B4_FACADE_PLAN.material.frameNeutralShadeHex,
@@ -774,6 +785,7 @@ export function buildArchitectureReality(context: {
     assetRoots.push(assetRoot);
     const buckets = new Map<Material, Batch>(),
       distant = new Map<Material, Batch>();
+    const panelFaces = new Set<string>();
     const batch = (material: Material, far = false) => {
       const map = far ? distant : buckets;
       let b = map.get(material);
@@ -802,6 +814,7 @@ export function buildArchitectureReality(context: {
       h: number,
       depth = 0,
       normalized = false,
+      textureBounds?: [number, number, number, number],
     ) => {
       if (w < 0.001 || h < 0.001) return;
       target.quad(
@@ -812,9 +825,21 @@ export function buildArchitectureReality(context: {
         [e.nx, 0, e.nz],
         // Polygon edge tangent runs screen-left when viewed from outside.
         // Flip normalized UVs so facade lettering is never mirrored.
-        normalized ? [1, 0, 0, 1] : [u / 3, v / 3, (u + w) / 3, (v + h) / 3],
+        textureBounds ?? (normalized ? [1, 0, 0, 1] : [u / 3, v / 3, (u + w) / 3, (v + h) / 3]),
       );
     };
+    const plinthHeight = 0.36;
+    const roofCapDepth = 0.03;
+    const roofCapCorners = edges.map((edge, i): GroundPoint => {
+      const previous = edges[(i + edges.length - 1) % edges.length];
+      const scale = roofCapDepth / (1 + edge.nx * previous.nx + edge.nz * previous.nz);
+      return scale <= roofCapDepth * 5
+        ? [edge.a[0] + (edge.nx + previous.nx) * scale, edge.a[1] + (edge.nz + previous.nz) * scale]
+        : [edge.a[0] + edge.nx * roofCapDepth, edge.a[1] + edge.nz * roofCapDepth];
+    });
+    const roofCaps = edges.map((edge, i) => [edge.a, edge.b,
+      roofCapCorners[(i + 1) % edges.length], roofCapCorners[i]]);
+    let roofCapCutouts: ReturnType<typeof compileTerrainCutouts> | undefined;
     for (let edgeIndex = 0; edgeIndex < edges.length; edgeIndex++) {
       const e = edges[edgeIndex],
         height = building.height;
@@ -847,31 +872,59 @@ export function buildArchitectureReality(context: {
       const lobbyFront = block === 6 && isB6EntranceEdge(e);
       if (lobbyFront) opening = opening.filter((w) => w.v > 3);
       const bottom = lobbyFront ? 3 : 0;
+      // These interpreted façades have low windows where the building meets a
+      // slope. Keep each window head and fill below its shortened sill with
+      // the same facing as the wall. The full sill footprint extends beyond
+      // the nominal aperture, in front of and behind the wall plane.
+      let fittedToGround = false;
+      if (context.baseElevation && (type === "canteen" || block === 3 || block === 8 || block === 9)) {
+        opening = opening.flatMap((w) => {
+          if (w.v > 1.1) return [w];
+          const corners = [
+            point(e, w.u - 0.045, 0, -0.21),
+            point(e, w.u + w.w + 0.045, 0, -0.21),
+            point(e, w.u + w.w + 0.045, 0, 0.08),
+            point(e, w.u - 0.045, 0, 0.08),
+          ];
+          const footprint: GroundPoint[] = corners.map(([x, , z]) => [x, z]);
+          const samples = drapeTriangles(footprint, [0, 1, 2, 0, 2, 3]).positions;
+          let highest = -Infinity;
+          for (let i = 1; i < samples.length; i += 3) highest = Math.max(highest, samples[i]);
+          // Stack the standard sill 7.2 cm above grade, with 2 cm clearance
+          // for draped paving. Decimetre heights retain reuse of window kits.
+          const sill = Math.ceil((highest - baseY + 0.092) * 10) / 10;
+          if (highest - baseY + 0.092 <= w.v) return [w];
+          fittedToGround = true;
+          const h = w.v + w.h - sill;
+          return h >= 0.32 ? [{ ...w, v: sill, h }] : [];
+        });
+      }
+      const menzaFront = type === "canteen" && e.nz < -0.8 && e.length > 12;
+      const metalBand = menzaFront ? { end: e.length * 0.74, bottom: height - 1.85, top: height - 0.11 } : undefined;
+      const explicitFarWindows = !!photoFacade || type === "commercial" || type === "canteen" || fittedToGround;
       const coreBand =
         !photoFacade && concrete && e.length >= 9 && e.length <= 19
           ? { from: e.length * 0.49 - 1.2, to: e.length * 0.49 + 1.2 }
           : undefined;
-      const wallRect = (u: number, v: number, w: number, h: number) => {
-        if (!coreBand) {
-          rect(batch(material), e, u, v, w, h);
-          return;
-        }
-        const cuts = [u, coreBand.from, coreBand.to, u + w]
-          .filter((x) => x >= u && x <= u + w)
-          .sort((a, b) => a - b);
+      const wallRect = (u: number, v: number, w: number, h: number, far = false) => {
+        if (w < 0.001) return;
+        const band = far ? undefined : coreBand;
+        const cuts = band
+          ? [u, band.from, band.to, u + w].filter((x) => x >= u && x <= u + w).sort((a, b) => a - b)
+          : [u, u + w];
+        const topOfPlinth = Math.min(v + h, Math.max(v, plinthHeight));
         for (let i = 0; i < cuts.length - 1; i++) {
           const a = cuts[i],
             b = cuts[i + 1],
-            mid = (a + b) / 2;
-          rect(
-            batch(material),
-            e,
-            a,
-            v,
-            b - a,
-            h,
-            mid > coreBand.from && mid < coreBand.to ? -0.23 : 0,
-          );
+            mid = (a + b) / 2,
+            depth = band && mid > band.from && mid < band.to ? -0.23 : 0;
+          if (topOfPlinth > v) rect(batch(palette.base, far), e, a, v, b - a, topOfPlinth - v, depth);
+          if (v + h <= topOfPlinth) continue;
+          const metalEnd = metalBand && topOfPlinth >= metalBand.bottom && v + h <= metalBand.top + 1e-9
+            ? Math.min(b, Math.max(a, metalBand.end))
+            : a;
+          rect(batch(palette.metal, far), e, a, topOfPlinth, metalEnd - a, v + h - topOfPlinth, depth);
+          rect(batch(material, far), e, metalEnd, topOfPlinth, b - metalEnd, v + h - topOfPlinth, depth);
         }
       };
       if (photoFacade) {
@@ -889,21 +942,52 @@ export function buildArchitectureReality(context: {
           nx: e.nx,
           nz: e.nz,
         };
-        for (const part of face.parts)
+        for (const part of face.parts) {
+          const { geometry } = part;
+          const indices: number[] = [];
+          for (let i = 0; i < geometry.indices.length; i += 3) {
+            const triangle = geometry.indices.slice(i, i + 3);
+            const offsets = triangle.map((index) => index * 3);
+            // The shared main roof already closes the top of the panel shell.
+            if (offsets.every((k) => geometry.normals[k + 1] > 0.999 &&
+              Math.abs(geometry.positions[k + 1] - height) < 1e-6)) continue;
+            const atSharedBevel = (photoFacade.id === "north-tower" && offsets.every((k) =>
+              geometry.positions[k] <= 0.001501) && geometry.normals[offsets[0]] < -0.1) ||
+              (photoFacade.id === "west-return" && offsets.every((k) =>
+                geometry.positions[k] >= photoFacade.width - 0.001501) && geometry.normals[offsets[0]] > 0.1);
+            if (!atSharedBevel || geometry.normals[offsets[0] + 2] <= 0.1) {
+              indices.push(...triangle);
+              continue;
+            }
+            const key = offsets.map((k) => {
+              const [u, y, d] = geometry.positions.slice(k, k + 3);
+              const x = placement.x + placement.tx * u + placement.nx * d;
+              const z = placement.z + placement.tz * u + placement.nz * d;
+              return [x, placement.y + y, z].map((value) => Math.round(value * 1e5)).join(",");
+            }).sort().join("|");
+            // The near panel exports contain coincident same-facing bevel
+            // triangles on the west-return / north-tower join.
+            if (panelFaces.has(key)) continue;
+            panelFaces.add(key);
+            indices.push(...triangle);
+          }
           appendBuildingDetailGeometry(
             batch(material),
-            part.geometry,
+            { ...geometry, indices },
             placement,
             undefined,
             FACADE_DEPTH.metresPerRepeat,
           );
-      } else {
+        }
+      }
+      if (!photoFacade || explicitFarWindows) {
         // Split planes around each hole; there is no opaque backing wall at the glass.
         const ys = [
           ...new Set(
             [
               bottom,
               height,
+              ...(metalBand ? [metalBand.bottom, metalBand.top] : []),
               ...opening.flatMap((w) => [w.v, w.v + w.h]),
             ].filter((y) => y >= bottom && y <= height),
           ),
@@ -916,14 +1000,18 @@ export function buildArchitectureReality(context: {
             .filter((w) => mid > w.v && mid < w.v + w.h)
             .sort((a, b) => a.u - b.u);
           let cursor = 0;
+          const strip = (u: number, w: number) => {
+            if (!photoFacade) wallRect(u, y0, w, y1 - y0);
+            if (explicitFarWindows) wallRect(u, y0, w, y1 - y0, true);
+          };
           for (const w of rowWindows) {
-            wallRect(cursor, y0, w.u - cursor, y1 - y0);
+            strip(cursor, w.u - cursor);
             cursor = w.u + w.w;
           }
-          wallRect(cursor, y0, e.length - cursor, y1 - y0);
+          strip(cursor, e.length - cursor);
         }
       }
-      if (!lobbyFront) {
+      if (!lobbyFront && !explicitFarWindows) {
         const farMaterial =
           !photoFacade &&
           !typicalEntranceFront &&
@@ -944,14 +1032,15 @@ export function buildArchitectureReality(context: {
                 4)
             : 1;
         f.quad(
-          point(e, 0, 0),
-          point(e, e.length, 0),
+          point(e, 0, plinthHeight),
+          point(e, e.length, plinthHeight),
           point(e, e.length, height),
           point(e, 0, height),
           [e.nx, 0, e.nz],
-          [0, 0, repeats, height / 12],
+          [0, plinthHeight / 12, repeats, height / 12],
         );
-      } else rect(batch(material, true), e, 0, 3, e.length, height - 3);
+        rect(batch(palette.base, true), e, 0, 0, e.length, plinthHeight);
+      } else if (lobbyFront) rect(batch(material, true), e, 0, 3, e.length, height - 3);
       if (coreBand)
         for (const [u, sign] of [
           [coreBand.from, 1],
@@ -1004,46 +1093,41 @@ export function buildArchitectureReality(context: {
             101,
           lit = w.style === "room" && seed < 30 ? 1 : 0,
           style = Math.floor(seed / 34);
-        rect(
-          batch(
-            (block === 6 && w.style === "room"
-              ? palette.b6Glass
-              : palette.glass)[Math.min(2, style) * 2 + lit],
-          ),
-          e,
-          w.u + frameWidth,
-          w.v + frameWidth,
-          w.w - frameWidth * 2,
-          w.h - frameWidth * 2,
-          glassBack,
-          true,
-        );
-        if (photoFacade) {
-          // The distant silhouette keeps this exact asymmetric source plan.
-          // Flat patches share the building's material batches; no generic grid.
-          rect(batch(frameMaterial, true), e, w.u, w.v, w.w, w.h, 0.006);
-          rect(
-            batch(palette.glass[Math.min(2, style) * 2 + lit], true),
-            e,
-            w.u + frameWidth,
-            w.v + frameWidth,
-            w.w - frameWidth * 2,
-            w.h - frameWidth * 2,
-            0.008,
-            true,
-          );
-          for (let pane = 1; pane < w.panes; pane++)
-            rect(
-              batch(frameMaterial, true),
-              e,
-              w.u + (w.w * pane) / w.panes - 0.018,
-              w.v,
-              0.036,
-              w.h,
-              0.009,
-            );
+        const glass = batch((block === 6 && w.style === "room" ? palette.b6Glass : palette.glass)[Math.min(2, style) * 2 + lit]);
+        const construction = (context.authoredWindowKit ?? BUILDING_WINDOW_KIT).construction;
+        const inset = BUILDING_WINDOW_KIT.construction.sashWidth + BUILDING_WINDOW_KIT.construction.gasketWidth - 0.001;
+        const paneRows = w.transom === undefined
+          ? [[frameWidth, w.h - frameWidth]]
+          : [[frameWidth, w.transom], [w.transom + construction.transomHeight, w.h - frameWidth]];
+        const innerWidth = w.w - frameWidth * 2, innerHeight = w.h - frameWidth * 2;
+        for (let pane = 0; pane < w.panes; pane++) {
+          const left = (pane === 0 ? frameWidth : w.w * pane / w.panes + construction.mullionWidth / 2) + inset;
+          const right = (pane === w.panes - 1 ? w.w - frameWidth : w.w * (pane + 1) / w.panes - construction.mullionWidth / 2) - inset;
+          for (const [low, high] of paneRows) {
+            const bottom = low + inset, top = high - inset;
+            rect(glass, e, w.u + left, w.v + bottom, right - left, top - bottom, glassBack, true,
+              [1 - (left - frameWidth) / innerWidth, (bottom - frameWidth) / innerHeight,
+                1 - (right - frameWidth) / innerWidth, (top - frameWidth) / innerHeight]);
+          }
         }
-        if (type === "commercial" || type === "canteen")
+        if (photoFacade) {
+          // Frame, mullions and panes fill disjoint regions of the opening.
+          const frame = batch(frameMaterial, true);
+          const glazing = batch(palette.glass[Math.min(2, style) * 2 + lit], true);
+          const paneBottom = w.v + frameWidth, paneHeight = w.h - 2 * frameWidth;
+          rect(frame, e, w.u, w.v, w.w, frameWidth);
+          rect(frame, e, w.u, w.v + w.h - frameWidth, w.w, frameWidth);
+          rect(frame, e, w.u, paneBottom, frameWidth, paneHeight);
+          rect(frame, e, w.u + w.w - frameWidth, paneBottom, frameWidth, paneHeight);
+          let from = w.u + frameWidth;
+          for (let pane = 1; pane < w.panes; pane++) {
+            const mullion = w.u + (w.w * pane) / w.panes - 0.018;
+            rect(glazing, e, from, paneBottom, mullion - from, paneHeight, 0, true);
+            rect(frame, e, mullion, paneBottom, 0.036, paneHeight);
+            from = mullion + 0.036;
+          }
+          rect(glazing, e, from, paneBottom, w.u + w.w - frameWidth - from, paneHeight, 0, true);
+        } else if (explicitFarWindows) {
           rect(
             batch(palette.glass[Math.min(2, style) * 2], true),
             e,
@@ -1051,9 +1135,10 @@ export function buildArchitectureReality(context: {
             w.v,
             w.w,
             w.h,
-            0.008,
+            0,
             true,
           );
+        }
         if (type === "commercial") {
           for (let i = 1; i < 4; i++)
             rect(
@@ -1148,23 +1233,30 @@ export function buildArchitectureReality(context: {
             point(e, x, height, 0.075),
             [-e.tx, 0, -e.tz],
           );
-          plaster.surface(
-            point(e, x, height),
-            point(e, x + width, height),
-            point(e, x + width, height, 0.075),
-            point(e, x, height, 0.075),
-            [0, 1, 0],
-          );
+          const corners = [point(e, x, height), point(e, x + width, height),
+            point(e, x + width, height, 0.075), point(e, x, height, 0.075)];
+          roofCapCutouts ??= compileTerrainCutouts(roofCaps.flatMap(([a, b, c, d]) =>
+            [[[a, b, c]], [[a, c, d]]].filter(([[p, q, r]]) =>
+              Math.abs((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])) > 1e-7)
+              .map((loops) => ({ loops }))));
+          for (const triangle of [[corners[0], corners[1], corners[2]], [corners[0], corners[2], corners[3]]]) {
+            for (const [a, b, c] of subtractTerrainTriangle(triangle, roofCapCutouts)) {
+              const area = (b[0] - a[0]) * (c[2] - a[2]) - (b[2] - a[2]) * (c[0] - a[0]);
+              // Below Float32 geometry precision at campus coordinates.
+              if (Math.abs(area) <= 1e-8) continue;
+              plaster.quad(a, b, c, c, [0, 1, 0],
+                [0, 0, Math.hypot(b[0] - a[0], b[2] - a[2]) / 3,
+                  Math.hypot(c[0] - b[0], c[2] - b[2]) / 3]);
+            }
+          }
         }
       }
-      // Foot/base and roof cap follow each original edge; no random balconies.
-      batch(palette.sill).surface(
-        point(e, 0, height),
-        point(e, e.length, height),
-        point(e, e.length, height, 0.03),
-        point(e, 0, height, 0.03),
-        [0, 1, 0],
-      );
+      // Both edges of every corner use the same outer point. Independent
+      // rectangles used to overlap at every reentrant corner.
+      const [, , [ex, ez], [sx, sz]] = roofCaps[edgeIndex];
+      const top = baseY + height;
+      batch(palette.sill).surface(point(e, 0, height), point(e, e.length, height),
+        [ex, top, ez], [sx, top, sz], [0, 1, 0]);
       for (const far of [false, true]) {
         if (lobbyFront) {
           const from = (B6_ENTRY_REFERENCE.passage.fromX - e.a[0]) / e.tx;
@@ -1187,7 +1279,7 @@ export function buildArchitectureReality(context: {
             0.36,
             0.004,
           );
-        } else rect(batch(palette.base, far), e, 0, 0, e.length, 0.36, 0.004);
+        }
         rect(
           batch(palette.sill, far),
           e,
@@ -1232,17 +1324,7 @@ export function buildArchitectureReality(context: {
             0.025,
             true,
           );
-      if (type === "canteen" && e.nz < -0.8 && e.length > 12) {
-        for (const far of [false, true])
-          rect(
-            batch(palette.metal, far),
-            e,
-            0,
-            height - 1.85,
-            e.length * 0.74,
-            1.74,
-            0.012,
-          );
+      if (menzaFront) {
         for (const far of [false, true])
           rect(
             batch(palette.sign("MENZA\nSTRAHOV", true), far),
@@ -1335,14 +1417,12 @@ export function buildArchitectureReality(context: {
           const a = p[triangles[i]],
             b = p[triangles[i + 1]],
             c = p[triangles[i + 2]];
-          // Degenerate fourth corner maintains the same batched format.
-          target.quad(
+          target.triangle(
             [a[0], sharedRoof.y, a[1]],
             [b[0], sharedRoof.y, b[1]],
             [c[0], sharedRoof.y, c[1]],
-            [c[0], sharedRoof.y, c[1]],
             [0, 1, 0],
-            [a[0] / 4, a[1] / 4, c[0] / 4, c[1] / 4],
+            [a[0] / 4, a[1] / 4, b[0] / 4, b[1] / 4, c[0] / 4, c[1] / 4],
           );
         }
       }

@@ -73,9 +73,10 @@ test("the canopy, door and twelve stair levels share one coherent landing elevat
     const steps = boxes.filter((b) => b.material === "concrete" && b.d < 0.4);
     assert.equal(steps.length, 12);
     const tops = steps.map((b) => b.y + b.h / 2).sort((a, b) => a - b);
-    tops.forEach((top, i) =>
-      assert.ok(Math.abs(top - entry.baseY - (i + 1) * 0.15) < 1e-8),
-    );
+    tops.forEach((top, i) => {
+      const gradeClearance = i === 0 && (entry.block === 3 || entry.block === 4) ? 0.02 : 0;
+      assert.ok(Math.abs(top - entry.baseY - (i + 1) * 0.15 - gradeClearance) < 1e-8);
+    });
     const door = boxes.find((b) => b.material === "glass")!;
     assert.ok(Math.abs(door.y - door.h / 2 - entry.baseY - entry.rise) < 1e-8);
     const roof = boxes.find((b) => b.material === "metal" && b.w > 3)!;
