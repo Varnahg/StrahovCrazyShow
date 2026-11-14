@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "map-clipping-repairs-20261114",
+  "title": "KEY-79: Opravy doložených překryvů a UV po celomapovém auditu",
+  "status": "ready",
+  "dependsOn": [
+    "map-clipping-audit-20261114"
+  ],
+  "writePaths": [
+    ".gitattributes",
+    "client/architecture-reality.ts",
+    "client/cad-buildings.ts",
+    "shared/landmark-reality.ts",
+    "shared/world.ts",
+    "shared/outdoor-artifacts.ts",
+    "shared/data/assets/cad-surface-repair-20261114.json",
+    "scripts/cad-buildings/repair_surface_overlaps.py",
+    "public/models/cad-buildings/",
+    "shared/data/transit-navigation.json",
+    "tests/b4-facade-rendering.test.ts",
+    "tests/building-overlaps.test.ts",
+    "tests/building-roofs.test.ts",
+    "tests/landmark-reality.test.ts",
+    "tests/cad-building-loader.test.ts",
+    "tests/outdoor-artifacts.test.ts",
+    "docs/verification/building-overlaps.ts",
+    "docs/verification/building-overlaps.html",
+    "docs/agents/handoffs/map-clipping-repairs-20261114.md",
+    "docs/verification.md",
+    "docs/work-in-progress.md",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/map-clipping-repairs-20261114/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "port:4189",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Opravené plochy mají jednoho vlastníka a přesné UV. Ověření probíhá v produkční herní scéně."
+  ],
+  "verification": [
+    "Geometrické regrese, TypeScript, neměnný build na D:, Edge WebGL2 a izolovaná integrace."
+  ],
+  "notes": [
+    "Checkpoint 8c5f6f3c v kanonickém main, testovací výstupy pod geometry-release QA junctionem na D:. Při obnově claimu přebírá key79-repair-01a1dad0 pouze vlastní změny této relace."
+  ]
+}

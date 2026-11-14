@@ -77,13 +77,22 @@ test("B4 source faces replace the wall geometry and retain the same openings in 
       0,
     );
     assert.equal(openingCount, 35);
-    assert.equal(
-      grey.getTotalIndices() / 3,
-      sourceTriangles +
-        (openingCount * BUILDING_WINDOW_KIT.primitives.reveal.indices.length) /
-          3,
-      "one Blender wall plus each window reveal; no procedural wall overlay",
-    );
+    const composedTriangles = sourceTriangles +
+      (openingCount * BUILDING_WINDOW_KIT.primitives.reveal.indices.length) / 3;
+    const positions = grey.getVerticesData("position")!;
+    const normals = grey.getVerticesData("normal")!;
+    const indices = grey.getIndices()!;
+    const faces = new Set<string>();
+    for (let i = 0; i < indices.length; i += 3) {
+      const offsets = Array.from(indices.slice(i, i + 3), (index) => index * 3);
+      assert.ok(!offsets.every((k) => normals[k + 1] > .999 && Math.abs(positions[k + 1] - building.height) < 1e-6),
+        "the roof, rather than the panel shell, covers the roof plane");
+      const key = offsets.map((k) => Array.from(positions.slice(k, k + 3), (n) => Math.round(n * 1e5)).join(",")).sort().join("|");
+      assert.ok(!faces.has(key), "composed B4 walls have only one owner for identical faces");
+      faces.add(key);
+    }
+    assert.ok(composedTriangles - 300 < faces.size && faces.size < composedTriangles - 186,
+      "the original wall and window reveals remain, minus covered caps and duplicate bevels");
     const nearWalls = scene.meshes.filter(
       (mesh) =>
         mesh.name.includes(" near ") &&
@@ -96,7 +105,11 @@ test("B4 source faces replace the wall geometry and retain the same openings in 
         mesh.name.includes(" far ") &&
         mesh.material?.name.startsWith("reality glass "),
     );
-    for (const mesh of [...nearWalls, ...farGlass])
+    const farFacade = scene.meshes.filter(
+      (mesh) => mesh.metadata?.lod === "far" &&
+        (mesh === farGrey || mesh.material === frameMaterial || farGlass.includes(mesh)),
+    );
+    for (const mesh of [...nearWalls, ...farFacade])
       mesh.computeWorldMatrix(true);
     let matched = 0;
     for (const edge of architectureEdges(building.points)) {
@@ -108,7 +121,7 @@ test("B4 source faces replace the wall geometry and retain the same openings in 
         face.openings,
       );
       for (const opening of face.openings) {
-        const u = opening.u + opening.w / 2;
+        const u = opening.u + opening.w / (2 * opening.panes);
         const ray = new Ray(
           new Vector3(
             edge.a[0] + edge.tx * u + edge.nx * 0.6,
@@ -122,10 +135,9 @@ test("B4 source faces replace the wall geometry and retain the same openings in 
           nearWalls.every((mesh) => !mesh.intersects(ray).hit),
           `${face.id} source opening is physically empty of wall geometry`,
         );
-        assert.ok(
-          farGlass.some((mesh) => mesh.intersects(ray).hit),
-          `${face.id} far glazing follows the source opening`,
-        );
+        const hits = farFacade.filter((mesh) => mesh.intersects(ray).hit);
+        assert.equal(hits.length, 1, `${face.id} has one far surface over a pane`);
+        assert.ok(farGlass.includes(hits[0]), `${face.id} far glazing follows the source opening`);
       }
       if (face.id === "north-recess") {
         const u = 4.17,

@@ -8,7 +8,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Simulation, initPhysics } from "../shared/simulation";
 import { buildingRoofGeometry } from "../shared/building-roofs";
 import { BUILDINGS, buildingArchitecture } from "../shared/world";
-import { buildingBaseHeight } from "../shared/terrain";
+import { buildingBaseHeight, drapeTriangles } from "../shared/terrain";
 import {
   LANDMARK_BUILDING_REPLACEMENTS,
   buildLandmarkPlan,
@@ -23,6 +23,29 @@ const building = BUILDINGS.find((b) => b.id === "53921692")!;
 const baseY = buildingBaseHeight(building.points);
 const roof = buildingRoofGeometry(building, baseY)!;
 const incident = { x: 154.1723175048828, z: -125.22493743896484 };
+
+test("three roofs on steep ground clear the full terrain footprint and use the same collider elevation", () => {
+  const sim = new Simulation();
+  try {
+    for (const id of ["49379066", "49379072", "53920575"]) {
+      const building = BUILDINGS.find((entry) => entry.id === id)!;
+      const roof = buildingRoofGeometry(building, buildingBaseHeight(building.points))!;
+      const terrain = drapeTriangles(roof.points, roof.triangles).positions;
+      let highest = -Infinity;
+      let point = { x: 0, z: 0 };
+      for (let i = 0; i < terrain.length; i += 3) {
+        if (terrain[i + 1] <= highest) continue;
+        highest = terrain[i + 1];
+        point = { x: terrain[i], z: terrain[i + 2] };
+      }
+      assert.ok(roof.y >= highest + 0.019, id);
+      const hit = sim.world.castRay(new RAPIER.Ray({ ...point, y: roof.y + 1 }, { x: 0, y: -1, z: 0 }), 2, true);
+      assert.ok(hit && Math.abs(hit.timeOfImpact - 1) < 1e-4, id);
+    }
+  } finally {
+    sim.dispose();
+  }
+});
 
 test("B1 and market roof collision streams exactly reuse their visible triangles", () => {
   const landmarks = buildLandmarkPlan(),
@@ -283,25 +306,15 @@ test("shared polygon keeps rendered triangles/UV order and rejects B6, market an
     )!;
     assert.ok(roofMesh);
     const expectedUvs: number[] = [];
-    for (let i = 0; i < roof.triangles.length; i += 3) {
-      const a = roof.points[roof.triangles[i]],
-        c = roof.points[roof.triangles[i + 2]];
-      expectedUvs.push(
-        a[0] / 4,
-        a[1] / 4,
-        c[0] / 4,
-        a[1] / 4,
-        c[0] / 4,
-        c[1] / 4,
-        a[0] / 4,
-        c[1] / 4,
-      );
+    for (const index of roof.triangles) {
+      const [x, z] = roof.points[index];
+      expectedUvs.push(x / 4, z / 4);
     }
     const uvs = roofMesh.getVerticesData(VertexBuffer.UVKind)!;
     assert.equal(uvs.length, expectedUvs.length);
     assert.ok(
       expectedUvs.every((v, i) => Math.abs(v - uvs[i]) < 1e-5),
-      "preserves the prior raw earcut UV corner order",
+      "ties each UV to the corresponding world-space roof vertex",
     );
     const positions = roofMesh.getVerticesData(VertexBuffer.PositionKind)!;
     const indices = Array.from(roofMesh.getIndices()!);

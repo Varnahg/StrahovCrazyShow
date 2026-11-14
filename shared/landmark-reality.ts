@@ -3,6 +3,7 @@ import catalogRaw from "./data/building-catalog.json";
 import { buildingBaseHeight, groundHeight } from "./terrain";
 import type { Building, Vec3 } from "./types";
 import earcut from "earcut";
+import { compileTerrainCutouts, subtractTerrainTriangle } from "./terrain-cutouts";
 import {
   stadiumClosurePanels,
   stadiumClosureBoundary,
@@ -218,9 +219,14 @@ export function commonEntranceHeight(x: number, z: number) {
       out < 0.48
         ? 12
         : Math.max(1, Math.min(12, Math.ceil((3.96 - out) / 0.29)));
-    return e.baseY + (step * e.rise) / e.steps;
+    return e.baseY + entranceTread(e, step);
   }
   return undefined;
+}
+
+function entranceTread(entry: MappedEntrance, step: number) {
+  const clearance = step === 1 && (entry.block === 3 || entry.block === 4) ? 0.02 : 0;
+  return step * entry.rise / entry.steps + clearance;
 }
 
 const emptyMeshData = (): LandmarkMeshData => ({
@@ -273,6 +279,7 @@ class Geometry {
     lod: LandmarkPart["lod"] = "both",
     collide: boolean | LandmarkMeshData = false,
     uv = [0, 0, 1, 1],
+    render = true,
   ) {
     const add = (data: LandmarkMeshData) => {
       const start = data.positions.length / 3;
@@ -307,10 +314,10 @@ class Geometry {
           );
       }
     };
-    add(this.part(group, material, lod));
+    if (render) add(this.part(group, material, lod));
     if (collide) add(collide === true ? this.collision : collide);
   }
-  box(box: LandmarkBox, lod: LandmarkPart["lod"] = "both") {
+  box(box: LandmarkBox, lod: LandmarkPart["lod"] = "both", render = true) {
     this.boxes.push(box);
     const { group, material, x, y, z, w, h, d, collision } = box,
       yaw = box.yaw ?? 0;
@@ -335,6 +342,7 @@ class Geometry {
         lod,
         collision,
         [0, 0, tw / 3, th / 3],
+        render,
       );
     face(
       [
@@ -627,21 +635,46 @@ function entrances(g: Geometry, rows: MappedEntrance[]) {
       d: number,
       collision = true,
       lod: LandmarkPart["lod"] = "both",
+      render = true,
     ) =>
       g.box(
         { group, material, ...at(u, v, out), w, h, d, yaw, collision },
-        lod,
+        lod, render,
       );
     const stepDepth = 0.29,
       landing = 0.48,
       depth = e.steps * stepDepth + landing,
       width = 3.45;
+    const p = (u: number, v: number, out: number): P => {
+      const { x, y, z } = at(u, v, out);
+      return [x, y, z];
+    };
+    const stairFace = (a: P, b: P, c: P, d: P, n: P, u: number, v: number) =>
+      g.quad(group, "concrete", a, b, c, d, n, "both", false, [0, 0, u / 3, v / 3]);
+    const half = width / 2;
+    const shellSection = (back: number, front: number, height: number, below: number) => {
+      stairFace(p(-half, height, back), p(half, height, back), p(half, height, front),
+        p(-half, height, front), [0, 1, 0], width, front - back);
+      stairFace(p(-half, 0, back), p(half, 0, back), p(half, 0, front),
+        p(-half, 0, front), [0, -1, 0], width, front - back);
+      // The pale screen covers the other side for the entire run and rise.
+      stairFace(p(half, 0, back), p(half, 0, front), p(half, height, front), p(half, height, back),
+        [tx, 0, tz], front - back, height);
+      if (height > below)
+        stairFace(p(-half, below, front), p(half, below, front), p(half, height, front),
+          p(-half, height, front), [e.nx, 0, e.nz], width, height - below);
+    };
     for (let i = 0; i < e.steps; i++) {
-      const h = ((i + 1) * e.rise) / e.steps,
+      const h = entranceTread(e, i + 1),
         outward = landing + (e.steps - i - 0.5) * stepDepth;
-      box("concrete", 0, h / 2, outward, width, h, stepDepth + 0.002);
+      box("concrete", 0, h / 2, outward, width, h, stepDepth + 0.002, true, "both", false);
+      shellSection(landing + (e.steps - i - 1) * stepDepth,
+        landing + (e.steps - i) * stepDepth, h, entranceTread(e, i));
     }
-    box("concrete", 0, e.rise / 2, landing / 2, width, e.rise, landing);
+    box("concrete", 0, e.rise / 2, landing / 2, width, e.rise, landing, true, "both", false);
+    shellSection(0, landing, e.rise, e.rise);
+    stairFace(p(-half, 0, 0), p(half, 0, 0), p(half, e.rise, 0), p(-half, e.rise, 0),
+      [-e.nx, 0, -e.nz], width, e.rise);
     box("metal", 0, e.rise + 2.58, depth / 2, width + 0.18, 0.12, depth + 0.13);
     for (const side of [-1, 1]) {
       box(
@@ -713,7 +746,7 @@ function entrances(g: Geometry, rows: MappedEntrance[]) {
       }
       for (let i = 0; i < e.steps; i++) {
         const out = landing + (e.steps - i - 0.5) * stepDepth,
-          y = ((i + 1) * e.rise) / e.steps + 0.85;
+          y = entranceTread(e, i + 1) + 0.85;
         if (i % 3 === 0)
           box(
             "metal",
@@ -924,6 +957,12 @@ function eastPavilion(g: Geometry, stadiumBaseY: number) {
       lod,
     );
   };
+  const slabCorners = (offset: number, y: number) => front.map(([x, z], i): P => {
+    const before = at(i ? spans[i - 1].b - 1e-6 : 0, y);
+    const after = at(i < spans.length ? spans[i].a + 1e-6 : total, y);
+    const scale = offset / (1 + before.nx * after.nx + before.nz * after.nz);
+    return [x + (before.nx + after.nx) * scale, baseY + y, z + (before.nz + after.nz) * scale];
+  });
   const face = (
     kind: LandmarkMaterial,
     a: number,
@@ -960,20 +999,32 @@ function eastPavilion(g: Geometry, stadiumBaseY: number) {
     a: lengths.slice(0, i).reduce((a, b) => a + b, 0),
     b: lengths.slice(0, i + 1).reduce((a, b) => a + b, 0),
   }));
+  const slab = (kind: LandmarkMaterial, y: number, out: number, height: number, depth: number) => {
+    const inner = slabCorners(out - depth / 2, y);
+    const outer = slabCorners(out + depth / 2, y);
+    const bottom = y - height / 2 + baseY, top = y + height / 2 + baseY;
+    const lift = ([x, , z]: P, y: number): P => [x, y, z];
+    for (const [i, span] of spans.entries()) {
+      const v = at((span.a + span.b) / 2, y, out);
+      const [a, b, c, d] = [outer[i], outer[i + 1], inner[i + 1], inner[i]];
+      const face = (a: P, b: P, c: P, d: P, n: P) => {
+        const distance = (p: P, q: P) => Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+        g.quad(group, kind, a, b, c, d, n, "both", true, [0, 0, distance(a, b) / 3, distance(a, d) / 3]);
+      };
+      face(lift(a, top), lift(b, top), lift(c, top), lift(d, top), [0, 1, 0]);
+      face(lift(a, bottom), lift(b, bottom), lift(c, bottom), lift(d, bottom), [0, -1, 0]);
+      face(lift(a, bottom), lift(b, bottom), lift(b, top), lift(a, top), [v.nx, 0, v.nz]);
+      face(lift(c, bottom), lift(d, bottom), lift(d, top), lift(c, top), [-v.nx, 0, -v.nz]);
+      if (i === 0) face(lift(d, bottom), lift(a, bottom), lift(a, top), lift(d, top), [-v.tx, 0, -v.tz]);
+      if (i === spans.length - 1) face(lift(b, bottom), lift(c, bottom), lift(c, top), lift(b, top), [v.tx, 0, v.tz]);
+    }
+  };
+  slab("concrete", source.concourseY - 0.18, -9.5, 0.36, 16.6);
+  slab("stadium-soffit", source.cantileverSoffitY + 0.12, -8.4, 0.24, 16.8);
+  slab("stadium-soffit", source.height + 0.12, -8.2, 0.24, 18.2);
   for (const span of spans) {
     const middle = (span.a + span.b) / 2,
       width = span.b - span.a;
-    // Horizontal opaque metal-faced lower concourse, not a ground-floor wall.
-    box(
-      "concrete",
-      middle,
-      source.concourseY - 0.18,
-      -9.5,
-      width,
-      0.36,
-      16.6,
-      true,
-    );
     face(
       "stadium-cladding",
       span.a,
@@ -982,16 +1033,6 @@ function eastPavilion(g: Geometry, stadiumBaseY: number) {
       source.concourseY + 1.13,
       -1.15,
       "both",
-      true,
-    );
-    box(
-      "stadium-soffit",
-      middle,
-      source.cantileverSoffitY + 0.12,
-      -8.4,
-      width,
-      0.24,
-      16.8,
       true,
     );
     face(
@@ -1032,17 +1073,6 @@ function eastPavilion(g: Geometry, stadiumBaseY: number) {
       source.upperGlassTopY,
       0.025,
       "far",
-      true,
-    );
-    // The projecting roof and ribbed underside carry the recognizable profile.
-    box(
-      "stadium-soffit",
-      middle,
-      source.height + 0.12,
-      -8.2,
-      width + 0.02,
-      0.24,
-      18.2,
       true,
     );
     box(
@@ -1369,6 +1399,9 @@ function eastPavilion(g: Geometry, stadiumBaseY: number) {
 
 function stadium(g: Geometry, baseY: number) {
   const { outer, inner, upperHeight, lowerHeight } = STADIUM_PLAN;
+  // The parapet owns the rim. Seat triangles with three outer vertices used
+  // to lie in its top plane; the seating meets the inside of the wall below it.
+  const seatUpperHeight = upperHeight - 0.05;
   const outside = ring(outer),
     inside = ring(inner),
     points = [...outside, ...inside],
@@ -1383,7 +1416,7 @@ function stadium(g: Geometry, baseY: number) {
         (index) =>
           [
             points[index][0],
-            baseY + (index < outside.length ? upperHeight : lowerHeight),
+            baseY + (index < outside.length ? seatUpperHeight : lowerHeight),
             points[index][1],
           ] as P,
       );
@@ -1408,6 +1441,13 @@ function stadium(g: Geometry, baseY: number) {
       false,
     );
   }
+  const westStand = (mapRaw.buildings as unknown as Building[]).find((building) => building.id === "106220817")!;
+  const westBase = buildingBaseHeight(westStand.points);
+  const westEdges = landmarkEdges(westStand.points).map((edge) => ({
+    edge,
+    cut: compileTerrainCutouts([{ loops: [[[0, westBase - 6], [edge.length, westBase - 6],
+      [edge.length, westBase + westStand.height], [0, westBase + westStand.height]]] }]),
+  }));
   for (const e of landmarkEdges(outer)) {
     if (e.length < 0.5) continue;
     // The main east pavilion has its own photo-correct structure. A generic
@@ -1420,6 +1460,7 @@ function stadium(g: Geometry, baseY: number) {
     )
       continue;
     const yaw = Math.atan2(-e.tz, e.tx);
+    const westEnd = Math.max(e.a[0], e.b[0]) < -424;
     const box = (
       material: LandmarkMaterial,
       u: number,
@@ -1430,9 +1471,8 @@ function stadium(g: Geometry, baseY: number) {
       d: number,
       lod: LandmarkPart["lod"] = "both",
       collision = true,
-    ) =>
-      g.box(
-        {
+    ) => {
+      const shape = {
           group: "stadium",
           material,
           x: e.a[0] + e.tx * u + e.nx * out,
@@ -1443,9 +1483,46 @@ function stadium(g: Geometry, baseY: number) {
           d,
           yaw,
           collision,
-        },
-        lod,
-      );
+        };
+      if (!westEnd) return g.box(shape, lod);
+      // The west stand already closes the outside wall. The procedural
+      // structure remains solid for physics, but omit the surface inside it.
+      const rendered = new Geometry();
+      rendered.box({ ...shape, collision: false }, lod);
+      g.box(shape, lod, false);
+      const part = rendered.part("stadium", material, lod);
+      const target = g.part("stadium", material, lod);
+      for (let i = 0; i < part.indices.length; i += 3) {
+        const source = part.indices.slice(i, i + 3);
+        const points = source.map((index) => part.positions.slice(index * 3, index * 3 + 3) as P);
+        const normal = part.normals.slice(source[0] * 3, source[0] * 3 + 3) as P;
+        const append = (corners: P[], uv: number[]) => {
+          const first = target.positions.length / 3;
+          target.positions.push(...corners.flat());
+          target.normals.push(...normal, ...normal, ...normal);
+          target.uvs.push(...uv);
+          target.indices.push(first, first + 1, first + 2);
+        };
+        const match = Math.abs(normal[1]) < 0.01 && westEdges.find(({ edge }) =>
+          normal[0] * edge.nx + normal[2] * edge.nz > 0.9999 && points.every(([x, , z]) =>
+            Math.abs((x - edge.a[0]) * edge.nx + (z - edge.a[1]) * edge.nz) < 0.015));
+        if (!match) {
+          append(points, source.flatMap((index) => part.uvs.slice(index * 2, index * 2 + 2)));
+          continue;
+        }
+        const { edge, cut } = match;
+        const projected = points.map(([x, y, z]): P => {
+          const dx = x - edge.a[0], dz = z - edge.a[1];
+          return [dx * edge.tx + dz * edge.tz, dx * edge.nx + dz * edge.nz, y];
+        });
+        for (const triangles of subtractTerrainTriangle(projected, cut)) {
+          append(triangles.map(([u, depth, y]): P => [
+            edge.a[0] + edge.tx * u + edge.nx * depth, y,
+            edge.a[1] + edge.tz * u + edge.nz * depth,
+          ]), triangles.flatMap(([u, , y]) => [u / 3, y / 3]));
+        }
+      }
+    };
     // Continuous upper concrete parapet and projecting lower concourse.
     box("concrete", e.length / 2, upperHeight - 0.8, 0, e.length, 1.6, 0.45);
     box("concrete", e.length / 2, upperHeight - 2.2, 0.22, e.length, 0.32, 1.9);

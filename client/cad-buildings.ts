@@ -6,6 +6,8 @@ import type { CadDoorDefinition, CadDoorState } from "../shared/cad-doors";
 import { createCadDoorRenderer } from "./cad-doors";
 import "@babylonjs/loaders/glTF";
 import type { CadPlacement } from "../shared/cad-building-geometry";
+import surfaceRepair from "../shared/data/assets/cad-surface-repair-20261114.json";
+import { assetSha256 } from "./asset-sha256";
 import type { WorldAssetIdentity } from "../shared/world-asset-identity";
 import {
   attachWorldAssetNode,
@@ -24,6 +26,14 @@ export type CadBuildingAsset = {
 };
 
 type ContainerLoader = (url: string, scene: Scene) => Promise<AssetContainer>;
+async function loadPinnedRender(scene: Scene, url: string, pin: { bytes: number; sha256: string }, signal?: AbortSignal) {
+  const response = await fetch(url, { signal });
+  if (!response.ok) throw new Error(`Načtení renderu budovy selhalo (${response.status}).`);
+  const buffer = await response.arrayBuffer();
+  if (buffer.byteLength !== pin.bytes || await assetSha256(buffer, signal) !== pin.sha256)
+    throw new Error("Render budovy neodpovídá vydané geometrii.");
+  return LoadAssetContainerAsync(new Uint8Array(buffer), scene, { pluginExtension: ".glb", name: url.split("?")[0].split("/").at(-1) });
+}
 export type CadBuildingsController = {
   readonly stats: { buildings: number; meshes: number; materials: number };
   setDoorStates(states: readonly Pick<CadDoorState, "id" | "open">[]): void;
@@ -68,7 +78,12 @@ export async function loadCadBuildings(
   try {
     assertActive();
     for (const asset of assets) {
-      const container = await load(asset.url, scene);
+      const repair = surfaceRepair[asset.id as keyof typeof surfaceRepair];
+      const render = repair?.nativeSha256 === asset.glbSha256 ? repair : undefined;
+      const renderUrl = render ? `${render.url}?v=${render.sha256}` : asset.url;
+      const container = render && !options.loadContainer
+        ? await loadPinnedRender(scene, renderUrl, render, options.signal)
+        : await load(renderUrl, scene);
       if (disposed || scene.isDisposed || options.signal?.aborted) {
         container.dispose();
         assertActive();
@@ -107,6 +122,7 @@ export async function loadCadBuildings(
           assetKey: asset.identity.key,
           sourceId: asset.identity.sourceId,
           sourceGlbSha256: asset.glbSha256,
+          renderGlbSha256: render?.sha256 ?? asset.glbSha256,
           shadowCaster: true,
         };
         mesh.computeWorldMatrix(true);
@@ -117,6 +133,7 @@ export async function loadCadBuildings(
           sourcePack: "cad-buildings",
           buildingId: asset.id,
           sourceGlbSha256: asset.glbSha256,
+          renderGlbSha256: render?.sha256 ?? asset.glbSha256,
         };
       if (asset.model?.interactiveDoors?.length)
         doors.push(createCadDoorRenderer(scene, pivot, meshes, asset.model.interactiveDoors));

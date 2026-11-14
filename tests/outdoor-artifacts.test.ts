@@ -14,6 +14,23 @@ import { groundHeight } from "../shared/terrain";
 import { STREET_FEATURES } from "../shared/streets";
 const plan = buildOutdoorArtifactPlan();
 
+test("source-connected fence posts and the two mapped building walls have one geometry owner", () => {
+  for (const id of ["way/293949903", "way/159388523"])
+    assert.ok(plan.audit.some((entry) => entry.artifactId === id && entry.reason === "building-wall-owns-shared-boundary" && (entry.omittedMetres ?? 0) > 0));
+  const between = plan.parts.filter((p) => ["way/269652203", "way/1532983905"].includes(p.artifactId) && p.lod === "both");
+  let topFaces = 0;
+  for (const part of between) {
+    for (let i = 0; i < part.positions.length; i += 12) {
+      if (part.normals[i + 1] < 0.99) continue;
+      const points = Array.from({ length: 4 }, (_, j) => part.positions.slice(i + 3 * j, i + 3 * j + 3));
+      const x = points.reduce((sum, p) => sum + p[0], 0) / 4;
+      const z = points.reduce((sum, p) => sum + p[2], 0) / 4;
+      if (Math.hypot(x - 350.44, z - 290.37) < 0.001) topFaces++;
+    }
+  }
+  assert.equal(topFaces, 1);
+});
+
 test("outdoor inventory keeps exact primary OSM identity, map coordinates and evidence distinction", () => {
   assert.match(
     raw.source.url,
