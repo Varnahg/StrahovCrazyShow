@@ -331,7 +331,11 @@ export async function walkNorthEntranceApproaches(nav: NavigationAuditInput) {
               entry.block === 6
                 ? CAD_B6_ENTRY.treads[i].z
                 : entry.z + entry.nz * out!;
-          const expected = entry.block === 6 ? CAD_B6_ENTRY.treads[i].y : entry.baseY + ((i + 1) * entry.rise) / entry.steps,
+          // B3 and B4 clear the sloping terrain at the lowest tread.
+          const firstTreadClearance = i === 0 && (entry.block === 3 || entry.block === 4) ? 0.02 : 0;
+          const expected = entry.block === 6
+            ? CAD_B6_ENTRY.treads[i].y
+            : entry.baseY + ((i + 1) * entry.rise) / entry.steps + firstTreadClearance,
             analytic =
               entry.block === 6
                 ? cadB6EntranceHeight(x, z)
