@@ -58,6 +58,7 @@ Server drží originály deset minut, nejvýše 512 zpráv a 8 192 vazeb na př�
 
 - Server: nový klient po rollbacku nesmí odeslat potvrzovanou zprávu starému serveru. Opraveno vyjednáním `playerChatVersion` ve welcome. Při připojování klienta se běžná zpráva nadále řadí do fronty, bez přidělení oprávnění na původní citaci.
 - Klient: obecné CSS přebíjelo barvy chatu, do odpojené konverzace zkratka zkoušela zaostřit zakázaný vstup a akce AI potřebovala vlastní kotvu. Opraveno a určeno k browser přejímce.
+- Při živém testu prohlížeč krátce zobrazil tmavý text Odeslat na ještě tmavém pozadí během animace. Ovládací prvky chatu nyní přepínají barvy společně.
 
 ## Verification
 

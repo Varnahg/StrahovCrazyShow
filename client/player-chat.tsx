@@ -155,7 +155,7 @@ export const ChatPreview = memo(function ChatPreview({
     return () => clearTimeout(timeout);
   }, [expiresAt]);
   return (
-    <section className="player-chat-preview">
+    <section className="player-chat-preview" data-recent={recent.length || undefined}>
       <button type="button" onClick={event => open(event.currentTarget)}
         aria-haspopup="dialog" aria-keyshortcuts={shortcut ? "T" : undefined}
         aria-label={count ? t("Otevřít chat · neveřejné nepřečtené: {count}", { count }) : t("Otevřít chat")}>
