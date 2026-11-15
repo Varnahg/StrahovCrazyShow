@@ -123,7 +123,7 @@ test("Game feedback reuses one copy owner and projects the actual render camera 
   assert.equal(m.frame(), null);
 });
 
-test("ordinary Game render phase advances the real capture, while a thrown render never advances its identity", async () => {
+async function verifyFeedbackAfterRender(profiled: boolean) {
   const source = ts.createSourceFile(
     "game.ts",
     readFileSync(new URL("../client/game.ts", import.meta.url), "utf8"),
@@ -140,7 +140,7 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
   assert.ok(frame?.body);
   const statements = [...frame.body.statements];
   const begin = statements.findIndex(
-    (statement) => statement.getText(source) === "this.scene.render();",
+    (statement) => statement.getText(source) === "this.benchmark?.profile.beginFrame();",
   );
   const end = statements.findIndex(
     (statement, index) =>
@@ -152,7 +152,7 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
   );
   assert.ok(
     begin >= 0 && end > begin,
-    "actual ordinary render phase must be identifiable",
+    "actual gameplay render phase must be identifiable",
   );
   let now = 100,
     draws = 0,
@@ -162,7 +162,8 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
       statements
         .slice(begin, end)
         .map((statement) => statement.getText(source))
-        .join("\n") +
+        .join("\n")
+        .replaceAll("import.meta.env.", "localDriveFlags.") +
       "})",
     {
       compilerOptions: {
@@ -173,6 +174,11 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
   ).outputText;
   const renderPhase = new Script(js).runInNewContext({
     performance: { now: () => now },
+    localDriveFlags: {},
+    frameStarted: 100,
+    rawFrameMs: 16,
+    visible: true,
+    pos: { x: 1, y: 2, z: 3 },
   });
   const observable = new Observable<any>();
   const sourceCanvas = { width: 32, height: 24 } as HTMLCanvasElement;
@@ -201,6 +207,8 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
     rendererFailed: false,
     feedbackFrameId: 0,
     feedbackRenderCompletedAtMs: 0,
+    gltfLightBudget: { prepareFrame() {} },
+    stableLights: { update() {} },
     engine: {
       isWebGPU: false,
       onEndFrameObservable: observable,
@@ -225,6 +233,18 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
     },
     feedbackCapture: undefined as RenderedFrameCapture | undefined,
   };
+  let profileCalls = 0;
+  const context = Object.assign(state, {
+    productionMeshTrace: profiled ? {
+      render(frameStarted: number, rawFrameMs: number, position: unknown) {
+        assert.equal(frameStarted, 100);
+        assert.equal(rawFrameMs, 16);
+        assert.deepEqual(position, state.actor.position);
+        profileCalls++;
+        state.scene.render();
+      },
+    } : undefined,
+  });
   try {
     const pending = method.call(state);
     observable.notifyObservers(state.engine);
@@ -233,7 +253,7 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
       0,
       "an endFrame without an ordinary render is not a fresh image",
     );
-    renderPhase.call(state);
+    renderPhase.call(context);
     observable.notifyObservers(state.engine);
     const captured = await pending;
     assert.equal(captured.capture.state, "ready");
@@ -242,20 +262,25 @@ test("ordinary Game render phase advances the real capture, while a thrown rende
     assert.equal(captured.capture.frame.camera.x, 4);
     assert.equal(await captured.image.text(), "frame bytes");
     assert.equal(renders, 1);
+    assert.equal(profileCalls, Number(profiled));
     assert.equal(draws, 1);
     const controller = new AbortController();
     const failed = method.call(state, controller.signal);
     state.scene.render = () => {
       throw new Error("render failed");
     };
-    assert.throws(() => renderPhase.call(state), /render failed/);
+    assert.throws(() => renderPhase.call(context), /render failed/);
     observable.notifyObservers(state.engine);
     assert.equal(state.feedbackFrameId, 1);
     assert.equal(state.feedbackRenderCompletedAtMs, 101);
     assert.equal(draws, 1);
+    assert.equal(profileCalls, profiled ? 2 : 0);
     controller.abort();
     assert.equal((await failed).capture.state, "unavailable");
   } finally {
     state.feedbackCapture?.dispose();
   }
-});
+}
+
+test("ordinary Game render advances the real capture only on successful rendering", () => verifyFeedbackAfterRender(false));
+test("profiled Game render advances the real capture only on successful rendering", () => verifyFeedbackAfterRender(true));
