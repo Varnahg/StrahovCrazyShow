@@ -183,9 +183,11 @@ test("actual replay frame freezes adaptation and renders recorded scales without
   const methods = gameClass.members.filter(ts.isMethodDeclaration);
   const method = (name: string) => { const found = methods.find(node => node.name.getText(gameSource) === name); assert.ok(found?.body); return found; };
   const frame = method("frame");
+  const frameVisibility = frame.body!.statements.find(node => ts.isVariableStatement(node) &&
+    node.declarationList.declarations.some(({ name }) => ts.isIdentifier(name) && name.text === "visible"));
   const adaptiveStep = frame.body!.statements.find(node => ts.isExpressionStatement(node) && ts.isCallExpression(node.expression) && node.expression.expression.getText(gameSource) === "this.applyAdaptiveQuality");
   const graphicsGate = frame.body!.statements.find(node => ts.isIfStatement(node) && node.expression.getText(gameSource) === "this.graphicsApplying");
-  assert.ok(adaptiveStep); assert.ok(graphicsGate);
+  assert.ok(frameVisibility); assert.ok(adaptiveStep); assert.ok(graphicsGate);
   const compile = (text: string) => new Script(ts.transpileModule(text, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText);
   const QualityMethods = compile("class ReplayQualityFixture {" + ["setQuality", "applyAdaptiveQuality", "applyRenderQuality"].map(name => method(name).getText(gameSource)).join("\n") + "} ReplayQualityFixture;")
     .runInNewContext(quality);
@@ -203,8 +205,13 @@ test("actual replay frame freezes adaptation and renders recorded scales without
   };
   // Execute the real per-frame adaptive application and early-return gate. GPU,
   // physics and scene rendering stay fixture-owned; this proves control flow only.
-  env.originalFrame = compile("(function () { const frameStarted = performance.now(), rawFrameMs = 100, simulationEnded = frameStarted; " + adaptiveStep.getText(gameSource) + graphicsGate.getText(gameSource) + " this.scene.render(); })")
-    .runInNewContext(env);
+  env.originalFrame = compile([
+    "(function () { const frameStarted = performance.now(), rawFrameMs = 100, simulationEnded = frameStarted;",
+    frameVisibility.getText(gameSource),
+    adaptiveStep.getText(gameSource),
+    graphicsGate.getText(gameSource),
+    "this.scene.render(); })",
+  ].join("\n")).runInNewContext(env);
   const game = Object.assign(new QualityMethods(), {
     ready: true, disposed: false, rendererFailed: false, graphicsApplying: false, network: false,
     adaptive: new AdaptiveQualityController({ mode: "auto" }),

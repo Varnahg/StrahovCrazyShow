@@ -23,23 +23,34 @@ const method = (name: string) => {
 const registrations = method("onCreate").body!.statements.filter(n => {
   if (ts.isVariableStatement(n)) return n.declarationList.declarations.some(d => d.name.getText(source) === "recoverInputEpoch");
   if (!ts.isExpressionStatement(n) || !ts.isCallExpression(n.expression)) return false;
-  const call = n.expression;
-  return call.expression.getText(source) === "this.onMessage" &&
-    ["resync", "doorResync"].includes((call.arguments[0] as ts.StringLiteral).text);
+  const { expression, arguments: [message] } = n.expression;
+  return ["this.onMessage", "this.onGameMessage"].includes(expression.getText(source)) &&
+    message && ts.isStringLiteral(message) && ["resync", "doorResync"].includes(message.text);
 });
+const wrapped = registrations.filter(n => ts.isExpressionStatement(n) &&
+  ts.isCallExpression(n.expression) && n.expression.expression.getText(source) === "this.onGameMessage");
+const fixtureMethods = ["resetInputEpoch", "sendAuthority", "sendDoorSnapshot"];
+if (wrapped.length) fixtureMethods.push("onGameMessage");
 const compiled = new Script(ts.transpileModule(`class RecoveryRoom {
   onCreate() { ${registrations.map(n => n.getText(source)).join("\n")} }
-  ${["resetInputEpoch", "sendAuthority", "sendDoorSnapshot"].map(n => method(n).getText(source)).join("\n")}
+  ${fixtureMethods.map(n => method(n).getText(source)).join("\n")}
 }; RecoveryRoom;`, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText);
 
-function fixture() {
+function fixture(logProduction = false) {
   let now = 1000;
   const rates = new Map<string, number[]>(), rateCalls: string[] = [];
   const store = { players: new Map([["self", { ack: 4 }]]), rate(id: string, key: string, count: number, ms: number) {
     rateCalls.push(key);
     return consumeRate(rates, `${id}:${key}`, count, ms, now);
   } };
-  const Room = compiled.runInNewContext({ store, resyncRequestMatchesEpoch });
+  const received: string[] = [], authority: (string | undefined)[] = [];
+  const production = logProduction ? {
+    received: (channel: string) => received.push(channel),
+    authority: (reason?: string) => authority.push(reason),
+  } : undefined;
+  const Room = compiled.runInNewContext({
+    store, resyncRequestMatchesEpoch, production, wireTrace: undefined, authorityTraceRun: undefined,
+  });
   const room = new Room(), queue = new TimelineInputQueue(7, 100);
   const messages: { type: string; data: any }[] = [], client = {
     auth: { id: "self" }, send(type: string, data: unknown) { messages.push({ type, data }); },
@@ -55,12 +66,25 @@ function fixture() {
   });
   room.onCreate();
   assert.equal(handlers.size, 2);
-  return { room, queue, client, messages, store, rates, rateCalls,
+  return { room, queue, client, messages, store, rates, rateCalls, received, authority,
     send: (channel: string, data: unknown, sender = client) => handlers.get(channel)!(sender, data),
     setNow: (value: number) => { now = value; },
   };
 }
 const command = (inputEpoch: number) => ({ inputEpoch, seq: 1, x: 1, z: 0, yaw: 0, jump: true, vehicle: false });
+
+test("logged recovery counts incoming requests without letting a stale epoch mutate the room", () => {
+  const historicalWithoutLogging = process.env.RESYNC_SERVER_SOURCE !== undefined && wrapped.length === 0;
+  assert.equal(wrapped.length, historicalWithoutLogging ? 0 : 2);
+  const f = fixture(true);
+  f.send("resync", { inputEpoch: 7 });
+  f.send("doorResync", { inputEpoch: 7 });
+  assert.equal(f.queue.frontier().inputEpoch, 8);
+  assert.equal(f.rateCalls.length, 1);
+  assert.deepEqual(f.messages.map(m => m.type), ["doorSnapshot", "authoritative"]);
+  assert.deepEqual(f.received, historicalWithoutLogging ? [] : ["resync", "doorResync"]);
+  assert.deepEqual(f.authority, historicalWithoutLogging ? [] : ["client-request"]);
+});
 
 for (const [first, second] of [["resync", "resync"], ["doorResync", "doorResync"], ["resync", "doorResync"], ["doorResync", "resync"]])
   test(`actual handlers reset once and retain new inputs: ${first}/${second}`, (t) => {

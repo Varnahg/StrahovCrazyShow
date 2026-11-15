@@ -18,6 +18,8 @@ import {
 } from "../client/authority-buffer";
 import { NetworkProbe } from "../client/network-probe";
 import { NetworkTimeline } from "../client/network-timeline";
+import { ProductionPlayback } from "../client/production-playback";
+import { PLAYBACK_INTERVAL_MS } from "../shared/production-playback";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
 import { snapshotAcceptedAuthorityDiagnostics } from "../client/game-diagnostics";
 import { selectSeasonPreview } from "../client/season-preview";
@@ -48,6 +50,7 @@ const declarations = app.body!.statements.flatMap((node) =>
   ts.isVariableStatement(node) ? [...node.declarationList.declarations] : [],
 );
 const callbackNames = [
+  "playbackInView",
   "resetConnectionDiagnostics",
   "disconnectRoom",
   "applyReceivedAuthority",
@@ -503,7 +506,7 @@ function fixture() {
     chatOpener: { current: null },
     chatKeyboardOpen: { current: false },
     useCallback: (callback: unknown) => callback,
-    document: { activeElement: null },
+    document: { activeElement: null, hidden: false },
     HTMLElement: class {},
     currentRoomCallbacks,
     requestWebGlFallback,
@@ -1285,6 +1288,10 @@ test("the actual probe callback logs main-thread contamination without feeding i
   const ui = fixture(),
     room = new FakeRoom();
   ui.bind(room);
+  const playback = new ProductionPlayback("fixture", () => true);
+  ui.game.productionPlayback = playback;
+  const frameStart = 1900;
+  playback.frame(frameStart, true);
   let now = 1970;
   const tasks: { startTime: number; duration: number }[] = [];
   ui.networkProbeRef.current = new NetworkProbe({
@@ -1310,6 +1317,22 @@ test("the actual probe callback logs main-thread contamination without feeding i
   assert.equal(event.roundTripMs, 1000);
   assert.equal(event.blockedOverlapMs, 990);
   assert.equal(event.acceptedForPrediction, false);
+
+  // A probe can arrive before Game has processed the visibility change event.
+  ui.environment.document.hidden = true;
+  now = 6200;
+  ui.networkProbeRef.current.poll({ enabled: true, ready: true });
+  now = 7600;
+  room.message("networkProbe", { ...payloads().networkProbe, nonce: 3 });
+  assert.equal(ui.state.rttMeasuredAt, 7600, "the ordinary callback still consumes the hidden reply");
+  ui.environment.document.hidden = false;
+  const windowEnd = frameStart + PLAYBACK_INTERVAL_MS;
+  playback.frame(windowEnd, true);
+  const summary = playback.take(windowEnd);
+  assert.ok(summary);
+  assert.equal(summary.rttSamples, 2, "production coverage counts only visible replies");
+  assert.equal(summary.maxRttMs, 1000);
+  assert.equal(summary.overlapSamples, 1);
 });
 
 for (const transition of ["rebind", "close", "leave"] as const) {
