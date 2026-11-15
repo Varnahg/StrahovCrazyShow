@@ -296,6 +296,7 @@ export type Benchmark = {
     outdoorArtifacts: unknown;
     b6: unknown;
     cadBuildings: unknown;
+    cadInteriorVisibility: unknown;
     parkedCars: number;
   };
   modelReview: ReturnType<typeof captureModelReview>;
@@ -3540,6 +3541,7 @@ export class Game {
       m.position.y =
         (m.metadata?.groundY ?? 0) + 1.3 + Math.sin(time * 2 + i) * 0.12;
     });
+    this.cadBuildings?.updateVisibility(this.camera.position);
     const avatarsEnded = performance.now();
     return { pos, self, time, cameraLight: localView.cameraLight, worldEnded, avatarsEnded };
   }
@@ -3693,6 +3695,7 @@ export class Game {
             landmarks: this.worldControllers?.landmarks?.metrics ?? null,
             b6: this.b6Reality?.stats ?? null,
             cadBuildings: this.cadBuildings?.stats ?? null,
+            cadInteriorVisibility: this.cadBuildings?.visibility ?? null,
             parkedCars: PARKING_SLOTS.length,
           },
           renderCost: {
