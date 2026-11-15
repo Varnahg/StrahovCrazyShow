@@ -32,6 +32,7 @@ export type CadDoorRenderer = {
   setStates(states: readonly Pick<CadDoorState, "id" | "open">[]): void;
   dispose(): void;
   readonly stats: CadDoorRendererStats;
+  readonly meshes: readonly Mesh[];
 };
 type Attribute = { size: number; data: Float32Array };
 type Attributes = Map<string, Attribute>;
@@ -44,6 +45,7 @@ type Piece = {
 type Policy = ReturnType<typeof renderPolicy>;
 type Group = {
   floor: string;
+  visibilityGroup: string;
   material: Material;
   source: Mesh;
   policy: Policy;
@@ -221,6 +223,7 @@ function sourceGroups(
   pivot: TransformNode,
   meshes: readonly AbstractMesh[],
   definitions: readonly CadDoorDefinition[],
+  visibilityGroup: (door: CadDoorDefinition) => string,
 ) {
   const identity = { translation: { x: 0, y: 0, z: 0 }, yaw: 0 };
   const doors = cadDoorDefinitionsById(
@@ -321,12 +324,15 @@ function sourceGroups(
         fail("invalid material/submesh on " + part);
       for (let i = sub.indexStart; i < sub.indexStart + sub.indexCount; i++)
         if (coverage[i]++) fail("overlapping submeshes on " + part);
-      let floor = grouped.get(door.floor);
-      if (!floor) grouped.set(door.floor, (floor = new Map()));
+      const visibility = visibilityGroup(door);
+      const groupKey = door.floor + ":" + visibility;
+      let floor = grouped.get(groupKey);
+      if (!floor) grouped.set(groupKey, (floor = new Map()));
       let group = floor.get(material);
       if (!group) {
         group = {
           floor: door.floor,
+          visibilityGroup: visibility,
           material,
           source: candidate,
           policy,
@@ -455,6 +461,7 @@ function makeBatch(
       gltf: { ...group.source.metadata?.gltf, extras },
       shadowCaster: group.policy.shadowCaster,
       cadDoorBatch: true,
+      cadVisibilityGroup: group.visibilityGroup,
       floorId: group.floor,
       cadDoorIds: ranges.map((range) => range.id),
       cadDoorSourcePartIds: [...new Set(pieces.map((piece) => piece.part))],
@@ -492,6 +499,7 @@ export function createCadDoorRenderer(
   pivot: TransformNode,
   meshes: readonly AbstractMesh[],
   definitions: readonly CadDoorDefinition[],
+  visibilityGroup: (door: CadDoorDefinition) => string = () => "exterior",
 ): CadDoorRenderer {
   if (
     !scene.useRightHandedSystem ||
@@ -504,6 +512,7 @@ export function createCadDoorRenderer(
       pivot,
       meshes,
       definitions,
+      visibilityGroup,
     ),
     batches: Batch[] = [];
   try {
@@ -560,6 +569,7 @@ export function createCadDoorRenderer(
   const observer = scene.onDisposeObservable.add(dispose);
   return {
     stats,
+    meshes: batches.map(batch => batch.mesh),
     dispose,
     setStates(next) {
       if (disposed) fail("renderer disposed");
