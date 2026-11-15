@@ -4,7 +4,15 @@ services:
     image: ${STRAHOV_GAME_IMAGE:?}
     pull_policy: never
     restart: on-failure
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: non-blocking
+        max-buffer-size: "256k"
     environment:
+      STRAHOV_COMMUNICATION_LOG: "1"
       STRAHOV_AUTH_MODE: ${STRAHOV_PI_AUTH_MODE:-google}
       STRAHOV_LOCAL_TEST_ONLY: "0"
       STRAHOV_AUTH_ORIGIN: https://strahov.reomnik.com

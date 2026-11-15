@@ -19,6 +19,7 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { FrameInputBuffer } from "./network-input-buffer";
 import { AuthorityBuffer, type ReceivedAuthority } from "./authority-buffer";
 import { NetworkProbe } from "./network-probe";
+import { ProductionPlayback } from "./production-playback";
 import type { NetworkProbeReply } from "../shared/network-diagnostics";
 
 import {
@@ -494,9 +495,20 @@ export function App() {
         }),
     });
   authorityBufferRef.current ??= new AuthorityBuffer();
+  const playbackInView = () => {
+    const current = game.current;
+    if (
+      current?.productionPlayback && current.ready && !current.graphicsApplying &&
+      connectedRef.current && room.current && modeRef.current === "multi" && !document.hidden
+    )
+      return current.productionPlayback;
+  };
   networkProbeRef.current ??= new NetworkProbe({
     now: () => performance.now(),
-    send: (request) => room.current!.send("networkProbe", request),
+    send: (request) => {
+      const playback = playbackInView()?.take(performance.now());
+      room.current!.send("networkProbe", playback ? { ...request, playback } : request);
+    },
   });
   useDialogFocus(
     panel === "map" && !journalOpen && !emotesOpen && !showForm,
@@ -641,9 +653,10 @@ export function App() {
           !!room.current && connectedRef.current && modeRef.current === "multi",
         ready: !!game.current?.ready,
       });
-      if (result?.kind === "timeout")
+      if (result?.kind === "timeout") {
+        playbackInView()?.recordTimeout(performance.now(), result.pendingMs);
         sessionDiagnostics.event("network-probe-timeout", result);
-      else if (result?.kind === "send-error")
+      } else if (result?.kind === "send-error")
         sessionDiagnostics.event("network-send-error", result);
     }, 1000);
     return () => {
@@ -808,6 +821,10 @@ export function App() {
           inputBuffer.current?.reset("renderer-failure");
         };
         g.network = mode === "multi";
+        if (import.meta.env.PROD && g.network)
+          g.productionPlayback = new ProductionPlayback(CLIENT_BUILD_ID, () =>
+            game.current === g && connectedRef.current && !!room.current && modeRef.current === "multi",
+          );
         if (g.network) g.attachDoorTimeline(doorConnectionRef.current?.timeline ?? null);
         syncNetworkStage(g);
         g.timeOverride = seasonPreviewRef.current.instant;
@@ -976,6 +993,7 @@ export function App() {
     callbacks.onMessage("networkProbe", (data: NetworkProbeReply) => {
       const measurement = networkProbeRef.current?.receive(data);
       if (!measurement) return;
+      playbackInView()?.recordRoundTrip(measurement);
       if (
         measurement.acceptedForPrediction &&
         measurement.predictionRoundTripMs !== null

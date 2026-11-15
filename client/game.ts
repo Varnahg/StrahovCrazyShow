@@ -1,6 +1,7 @@
 import { AuthoredLightPreparation } from "./authored-light-preparation";
 import "./render-shaders";
 import { sessionDiagnostics } from "./session-diagnostics";
+import type { ProductionPlayback } from "./production-playback";
 import { RenderedFrameCapture } from "./rendered-frame-capture";
 import type { FeedbackFrame } from "../shared/feedback";
 import { createEnvironmentProfile } from "./environment-profile";
@@ -467,6 +468,7 @@ export class Game {
   seq = 0;
   onInputFrame?: () => void;
   onBeforeInputFrame?: () => void;
+  productionPlayback?: ProductionPlayback;
   onNetworkDiagnostics?: () => unknown;
   networkTimeline = new NetworkTimeline();
   private networkPresentation?: TimelinePresentation & {
@@ -2004,6 +2006,7 @@ export class Game {
       publish: state => {
         if (this.rendererFailed && !state.applying && !this.disposed)
           state = { ...state, restartRequired: true, error: state.error ?? "Renderer vyžaduje nové spuštění." };
+        if (this.graphicsApplying !== state.applying) this.productionPlayback?.reset();
         this.graphicsApplying = state.applying;
         this.graphicsState = state;
         this.onGraphicsState?.(state);
@@ -2287,6 +2290,7 @@ export class Game {
   blur = () => this.clearHeldInput();
   visibility = () => {
     this.blur();
+    this.productionPlayback?.reset();
     if (!document.hidden && this.network) {
       const inputEpoch = this.networkTimeline.snapshot().inputEpoch;
       if (inputEpoch !== null) this.onAction?.("resync", { inputEpoch });
@@ -2820,6 +2824,7 @@ export class Game {
 
   /** Diagnostic lifetime is a connection, independently of prediction identity. */
   resetDiagnosticContext(): void {
+    this.productionPlayback?.reset();
     this.completedDiagnosticCallback = undefined;
     this.lastAuthorityNetwork = null;
     this.lastAuthorityAtMs = null;
@@ -3537,6 +3542,8 @@ export class Game {
   frame() {
     if (!this.ready || this.disposed) return;
     const frameStarted = performance.now();
+    const visible = !document.hidden;
+    this.productionPlayback?.frame(frameStarted, visible && !this.graphicsApplying);
     this.onBeforeInputFrame?.();
     const rawFrameMs = this.engine.getDeltaTime(),
       dt = Math.min(0.1, rawFrameMs / 1000);
@@ -3560,7 +3567,7 @@ export class Game {
       this.adaptive.update({
         nowMs: frameStarted,
         frameMs: rawFrameMs,
-        visible: !document.hidden,
+        visible,
         suspended: !!this.benchmark || this.graphicsApplying,
         cpuFrameMs: this.lastCpuFrameMs,
         gpuFrameMs: this.lastGpuFrameMs,
