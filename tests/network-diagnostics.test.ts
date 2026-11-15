@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import ts from "typescript";
 import {
   InputQueue,
   FixedStepClock,
@@ -140,15 +141,29 @@ test("V15 probe wiring is an authenticated own-room reply, never an HTTP/presenc
     new URL("../server/index.ts", import.meta.url),
     "utf8",
   );
-  const start = server.indexOf('this.onMessage("networkProbe"');
-  const end = server.indexOf('this.onMessage("motionResync"', start);
-  assert.ok(start >= 0 && end > start);
-  const handler = server.slice(start, end);
+  const source = ts.createSourceFile("server.ts", server, ts.ScriptTarget.Latest, true);
+  const room = source.statements.find((node): node is ts.ClassDeclaration =>
+    ts.isClassDeclaration(node) && node.name?.text === "StrahovRoom",
+  );
+  const onCreate = room?.members.find((node): node is ts.MethodDeclaration =>
+    ts.isMethodDeclaration(node) && node.name.getText(source) === "onCreate",
+  );
+  assert.ok(onCreate?.body, "the actual room owns the probe registration");
+  const registrations = onCreate.body.statements.filter((node) => {
+    if (!ts.isExpressionStatement(node) || !ts.isCallExpression(node.expression)) return false;
+    const { expression, arguments: [message] } = node.expression;
+    return expression.getText(source) === "this.onGameMessage" &&
+      message && ts.isStringLiteral(message) && message.text === "networkProbe";
+  });
+  assert.equal(registrations.length, 1, "the room registers one instrumented probe handler");
+  const handler = registrations[0].getText(source);
   assert.match(handler, /this\.connections\.get\(c\.auth\.id\) !== c/);
   assert.match(handler, /!this\.inputQueues\.has\(c\.auth\.id\)/);
   assert.match(handler, /store\.rate\(c\.auth\.id, "network-probe", 1, 1000\)/);
   assert.match(handler, /c\.send\("networkProbe", reply\)/);
   assert.doesNotMatch(handler, /broadcast|players|token/);
-  const http = server.slice(server.indexOf("createServer("));
+  const httpStart = server.indexOf("createServer(");
+  assert.ok(httpStart >= 0, "check the actual HTTP handling section");
+  const http = server.slice(httpStart);
   assert.doesNotMatch(http, /networkProbe|captureNetworkDiagnostics/);
 });
