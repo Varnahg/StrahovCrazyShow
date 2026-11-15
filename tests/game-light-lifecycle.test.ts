@@ -17,6 +17,7 @@ import {
 import { PrepareDefinesForLights } from "@babylonjs/core/Materials/materialHelper.functions";
 import { StableLightState } from "../client/stable-light-state";
 import { GltfLightBudget } from "../client/gltf-light-budget";
+import { ProductionMeshTrace } from "../client/production-mesh-trace";
 
 // Extract the production lifecycle code instead of restating its hook calls.
 // Only browser/render IO is replaced: real Babylon scene, materials, lights and
@@ -39,13 +40,14 @@ function compile(body: string, environment: Record<string, unknown> = {}) {
     compilerOptions: { target: ts.ScriptTarget.ES2022 },
   }).outputText;
   return new Script(`(function(environment) {
-    const { Scene, StableLightState, GltfLightBudget, window, document, sessionDiagnostics } = environment;
+    const { Scene, StableLightState, GltfLightBudget, ProductionMeshTrace, window, document, sessionDiagnostics } = environment;
     ${compiled}
     return run;
   })`).runInThisContext()({
     Scene,
     StableLightState,
     GltfLightBudget,
+    ProductionMeshTrace,
     ...environment,
   });
 }
@@ -79,10 +81,12 @@ function fixture(t: import("node:test").TestContext) {
       .getText(source)
       .startsWith("this.gltfLightBudget = new GltfLightBudget("),
   );
-  assert.equal(
-    budgetAt,
-    sceneAt + 1,
-    "capture budgets before world/loaders/materials",
+  assert.ok(sceneAt >= 0 && budgetAt > sceneAt);
+  assert.ok(
+    statements.slice(sceneAt + 1, budgetAt).every((node) =>
+      node.getText(source) === "this.productionMeshTrace = ProductionMeshTrace.create(this.scene);"
+    ) && budgetAt - sceneAt <= 2,
+    "capture budgets before world/loaders/materials, allowing the opt-in trace owner",
   );
   assert.equal(
     stableAt,
@@ -123,29 +127,21 @@ test("all production render callsites canonicalize actual light slots before dra
   game.stableLights.update();
   const canonical = defines();
   const contributors = mesh.lightSources.map((light) => light.uniqueId).sort();
+  const loopback = gameClass.members.find((node) => node.name?.getText(source) === "renderWithMeshDrawSample");
   const calls = findNodes(
     gameClass,
     (node): node is ts.CallExpression =>
       ts.isCallExpression(node) &&
       node.expression.getText(source) === "this.scene.render",
   );
+  const callers = calls.filter((call) => !loopback || call.pos < loopback.pos || call.end > loopback.end);
   assert.equal(
-    calls.length,
-    3,
+    callers.length,
+    loopback ? 4 : 3,
     "cover preload, live graphics preparation and gameplay; new render sites need explicit review",
   );
-  for (const call of calls) {
-    const statement = call.parent;
-    assert.ok(ts.isExpressionStatement(statement));
-    assert.ok(ts.isBlock(statement.parent));
-    const siblings = [...statement.parent.statements];
-    const before = siblings[siblings.indexOf(statement) - 1];
-    const budget = siblings[siblings.indexOf(statement) - 2];
-    assert.equal(before?.getText(source), "this.stableLights.update();");
-    assert.equal(
-      budget?.getText(source),
-      "this.gltfLightBudget.prepareFrame();",
-    );
+  assert.equal(calls.length - callers.length, loopback ? 2 : 0);
+  const checkDraw = (draw: () => void) => {
     // Toggle the first canonical light off/on: Babylon appends it to the end.
     const first = mesh.lightSources[0];
     first.setEnabled(false);
@@ -164,10 +160,53 @@ test("all production render callsites canonicalize actual light slots before dra
         contributors,
       );
     };
-    compile(
-      `${budget.getText(source)}\n${before.getText(source)}\n${statement.getText(source)}`,
-    ).call(game);
+    draw();
     assert.equal(draws, 1);
+  };
+  for (const call of callers) {
+    if (ts.isArrowFunction(call.parent)) {
+      const wrapper = call.parent.parent;
+      assert.ok(ts.isCallExpression(wrapper));
+      assert.equal(wrapper.expression.getText(source), "profile.run");
+      assert.deepEqual(wrapper.arguments.map((arg) => arg.getText(source)), [
+        "() => this.gltfLightBudget.prepareFrame()",
+        "() => this.stableLights.update()",
+        "() => this.scene.render()",
+      ]);
+      const run = compile(`const profile = arguments[0]; ${wrapper.getText(source)};`);
+      checkDraw(() => run.call(game, {
+        run: (prepare: () => void, stabilize: () => void, draw: () => void) => {
+          prepare();
+          stabilize();
+          draw();
+        },
+      }));
+      continue;
+    }
+    let statement: ts.Statement = call.parent as ts.ExpressionStatement;
+    assert.ok(ts.isExpressionStatement(statement));
+    while (ts.isIfStatement(statement.parent)) statement = statement.parent;
+    assert.ok(ts.isBlock(statement.parent));
+    const siblings = [...statement.parent.statements];
+    const before = siblings[siblings.indexOf(statement) - 1];
+    const budget = siblings[siblings.indexOf(statement) - 2];
+    assert.equal(before?.getText(source), "this.stableLights.update();");
+    assert.equal(budget?.getText(source), "this.gltfLightBudget.prepareFrame();");
+    const run = compile(`const frameStarted = 10, rawFrameMs = 20, pos = null, visible = true;
+      ${budget.getText(source)}\n${before.getText(source)}\n${statement.getText(source)}`);
+    checkDraw(() => run.call(game));
+    if (ts.isIfStatement(statement)) {
+      const routes = ["production", ...(loopback ? ["loopback"] : [])];
+      for (const route of routes) {
+        let delegateCalls = 0;
+        const draw = () => { delegateCalls++; game.scene.render(); };
+        const profiledGame = Object.create(game);
+        Object.assign(profiledGame, route === "production" ? { productionMeshTrace: { render: draw } }
+          : { meshDrawMode: "stationary", renderWithMeshDrawSample: draw });
+        checkDraw(() => run.call(profiledGame));
+        assert.equal(delegateCalls, 1);
+      }
+    }
   }
   assert.equal(ambient.intensity, 1);
   assert.equal(lamp.intensity, 1);

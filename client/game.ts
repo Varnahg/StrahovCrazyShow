@@ -38,6 +38,7 @@ import { buildWorld } from "./world-renderer";
 import { captureModelReview } from "./model-review";
 import { resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity, type TerrainReviewPreset } from "./terrain-review";
 import { captureRenderCostInventory } from "./render-cost";
+import { ProductionMeshTrace } from "./production-mesh-trace";
 import { snapshotBenchmarkDiagnostics } from "./benchmark-snapshot";
 import { EnabledMeshCandidates } from "./active-mesh-candidates";
 import { writeQuaternion, writeVector3 } from "./transform-updates";
@@ -537,6 +538,7 @@ export class Game {
   private readonly compilationProfile: WebGpuCompilationProfile;
   private readonly environmentProfile: ReturnType<typeof createEnvironmentProfile>;
   private readonly frameLifecycleProfile?: WebGpuFrameLifecycleProfile;
+  private readonly productionMeshTrace?: ProductionMeshTrace;
   private readonly startupCpuProfile?: WebGpuStartupCpuProfile;
   private readonly syntaxCache?: ShaderSyntaxCache;
   private profiledLightingInstant = 0;
@@ -750,6 +752,7 @@ export class Game {
       }
     }
     this.scene = new Scene(this.engine);
+    this.productionMeshTrace = ProductionMeshTrace.create(this.scene);
     // Capture material budgets before any world/asset loader can inflate them.
     this.gltfLightBudget = new GltfLightBudget(this.scene);
     this.stableLights = new StableLightState(this.scene);
@@ -871,6 +874,7 @@ export class Game {
     attempt("light-preparation", () => this.cancelLightPreparation?.());
     attempt("graphics-application", () => this.graphicsTransition?.dispose());
     attempt("render-loop", () => this.engine.stopRenderLoop());
+    attempt("production-mesh-trace", () => this.productionMeshTrace?.dispose());
     attempt("benchmark", () => benchmark?.profile.dispose());
     attempt("held-input", () => this.blur());
     attempt("ui", () => this.onRendererFailure?.(message));
@@ -3602,7 +3606,8 @@ export class Game {
     // All beam, street, interior and celestial shadow states are final here.
     this.gltfLightBudget.prepareFrame();
     this.stableLights.update();
-    this.scene.render();
+    if (this.productionMeshTrace) this.productionMeshTrace.render(frameStarted, rawFrameMs, pos);
+    else this.scene.render();
     this.feedbackFrameId++;
     this.feedbackRenderCompletedAtMs = performance.now();
     const engineWork = this.benchmark?.profile.endFrame();
@@ -3877,6 +3882,7 @@ export class Game {
     window.removeEventListener("resize", this.resize);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
+    this.productionMeshTrace?.dispose();
     this.startupCpuProfile?.dispose();
     this.syntaxCache?.dispose();
     this.stableLights.dispose();

@@ -1,6 +1,48 @@
 import type { Scene } from "@babylonjs/core/scene";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import type { Material } from "@babylonjs/core/Materials/material";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+
+const technicalName = (value: string) => value.slice(0, 96);
+const avatarNode = (name: string) =>
+  name === "avatar" || name.startsWith("avatar ");
+
+export function renderMaterialName(material: Material) {
+  const name = material.name;
+  return avatarNode(name) ||
+    name.startsWith("character ") ||
+    name.startsWith("CC0 student garment ")
+    ? "avatar material"
+    : technicalName(name);
+}
+
+/** Technical source identity only; no matrix, bounds, readiness or shader work. */
+export function renderMeshIdentity(mesh: AbstractMesh) {
+  let source: string | undefined;
+  let avatar = false;
+  let node: typeof mesh.parent = mesh;
+  for (let depth = 0; node && depth < 8; depth++, node = node.parent) {
+    if (avatarNode(node.name)) {
+      avatar = true;
+      break;
+    }
+    const tag = node.metadata?.sourcePack ?? node.metadata?.vegetation;
+    if (!source && typeof tag === "string" && tag) source = technicalName(tag);
+  }
+  return {
+    meshId: mesh.uniqueId,
+    name: avatar ? "avatar" : technicalName(mesh.name),
+    source: avatar ? "avatar" : (source ?? "unclassified"),
+    kind: mesh.getClassName(),
+    sourceMesh:
+      mesh instanceof InstancedMesh
+        ? avatar || avatarNode(mesh.sourceMesh.name)
+          ? "avatar"
+          : technicalName(mesh.sourceMesh.name)
+        : null,
+  };
+}
 
 /** On-demand structural inventory, never FPS/GPU timing or a shader-count claim.
  * Registered totals deliberately include disabled LODs; enabled totals do not. */
