@@ -67,7 +67,7 @@ export const WorldDock = memo(function WorldDock({
             <HudIcon name={item.id} />
             <span className="dock-label" aria-hidden="true">
               {label}
-              {shortcut && <kbd>{shortcut}</kbd>}
+              {shortcut && !chat && <kbd>{shortcut}</kbd>}
             </span>
             {requests && <b aria-hidden="true">{requestCount}</b>}
             {chat && chatCount > 0 && <b className="dock-chat-count" aria-hidden="true">{chatCount}</b>}

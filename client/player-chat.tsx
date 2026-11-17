@@ -1,67 +1,126 @@
 import {
-  memo, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState,
-  type KeyboardEvent, type ReactNode, type RefObject,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import type { ChatMessage, ChatSendResult } from "../shared/types";
-import { HudIcon } from "./hud-icons";
 import { formatDate, localizeNotice, t, useLocale } from "./i18n";
-import "./player-chat.css";
+import {
+  chatConversation,
+  chatEntries,
+  parseChatPreferences,
+  revealChatText,
+  type ChatEntry,
+  type ChatMode,
+  type ChatPreferences,
+} from "./player-chat-model";
+export type { ChatMode, ChatPreviewMode } from "./player-chat-model";
 
-const previewMs = 8_000;
 const sendTimeoutMs = 10_000;
 const emptyDraft: Draft = { text: "" };
 type Draft = { text: string; reply?: ChatMessage };
-type Entry = { message: ChatMessage; receivedAt: number };
-type Pending = { id: string; channel: string; draft: Draft; timer: ReturnType<typeof setTimeout> };
-export type ChatPreviewMode = "recent" | "badge" | "hidden";
-export type ChatDestination = { key: string; label: string; available?: boolean };
-type ChatPayload = { channel: string; text: string; requestId: string; replyTo?: string };
+type Entry = ChatEntry;
+type Pending = {
+  id: string;
+  channel: string;
+  draft: Draft;
+  timer: ReturnType<typeof setTimeout>;
+};
+export type ChatDestination = {
+  key: string;
+  label: string;
+  available?: boolean;
+};
+type ChatPayload = {
+  channel: string;
+  text: string;
+  requestId: string;
+  replyTo?: string;
+};
 
-export function readChatPreferences(): { preview: ChatPreviewMode; shortcut: boolean } {
+export function readChatPreferences(): ChatPreferences {
   try {
-    const value = JSON.parse(localStorage.getItem("strahov.chat") ?? "{}");
-    return {
-      preview: value?.preview === "badge" || value?.preview === "hidden" ? value.preview : "recent",
-      shortcut: value?.shortcut !== false,
-    };
+    return parseChatPreferences(
+      JSON.parse(localStorage.getItem("strahov.chat") ?? "{}"),
+    );
   } catch {
-    return { preview: "recent", shortcut: true };
+    return parseChatPreferences(undefined);
   }
 }
 
-function conversation(message: ChatMessage, self: string) {
-  return message.sender !== self && message.channel === "dm:" + self ? "dm:" + message.sender : message.channel;
-}
-
-export function usePlayerChat(self: string, muted: readonly string[], blocked: readonly string[]) {
+export function usePlayerChat(
+  self: string,
+  muted: readonly string[],
+  blocked: readonly string[],
+) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [read, setRead] = useState<ReadonlySet<string>>(() => new Set());
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
-  const [failure, setFailure] = useState<{ channel: string; reason: string } | null>(null);
+  const [failure, setFailure] = useState<{
+    channel: string;
+    reason: string;
+  } | null>(null);
   const [sending, setSending] = useState(false);
   const pending = useRef<Pending | null>(null);
-  const hidden = useMemo(() => new Set([...muted, ...blocked]), [muted, blocked]);
-  const visible = useMemo(() => entries.filter(({ message }) => !hidden.has(message.sender)), [entries, hidden]);
-  const unread = useMemo(() => visible.filter(({ message }) => message.sender !== self && !read.has(message.id)),
-    [visible, read, self]);
-  const privateCount = useMemo(() => unread.filter(({ message }) =>
-    message.channel.startsWith("dm:") || message.channel.startsWith("event:")).length, [unread]);
+  const hidden = useMemo(
+    () => new Set([...muted, ...blocked]),
+    [muted, blocked],
+  );
+  const visible = useMemo(
+    () => entries.filter(({ message }) => !hidden.has(message.sender)),
+    [entries, hidden],
+  );
+  const unread = useMemo(
+    () =>
+      visible.filter(
+        ({ message }) => message.sender !== self && !read.has(message.id),
+      ),
+    [visible, read, self],
+  );
+  const privateCount = useMemo(
+    () =>
+      unread.filter(
+        ({ message }) =>
+          message.channel.startsWith("dm:") ||
+          message.channel.startsWith("event:"),
+      ).length,
+    [unread],
+  );
 
   const markRead = useCallback((seen: readonly Entry[]) => {
     if (!seen.length) return;
-    setRead(previous => {
-      if (seen.every(({ message }) => previous.has(message.id))) return previous;
-      return new Set([...previous, ...seen.map(({ message }) => message.id)].slice(-400));
+    setRead((previous) => {
+      if (seen.every(({ message }) => previous.has(message.id)))
+        return previous;
+      return new Set(
+        [...previous, ...seen.map(({ message }) => message.id)].slice(-400),
+      );
     });
   }, []);
   const receive = useCallback((message: ChatMessage) => {
     const receivedAt = performance.now();
-    setEntries(previous => [...previous, { message, receivedAt }].slice(-200));
+    setEntries((previous) =>
+      [...previous, { message, receivedAt }].slice(-200),
+    );
   }, []);
   const forget = useCallback((channels: ReadonlySet<string>) => {
-    setEntries(previous => previous.filter(({ message }) => !channels.has(message.channel)));
-    setDrafts(previous => Object.fromEntries(Object.entries(previous).filter(([key]) => !channels.has(key))));
-    setFailure(previous => previous && channels.has(previous.channel) ? null : previous);
+    setEntries((previous) =>
+      previous.filter(({ message }) => !channels.has(message.channel)),
+    );
+    setDrafts((previous) =>
+      Object.fromEntries(
+        Object.entries(previous).filter(([key]) => !channels.has(key)),
+      ),
+    );
+    setFailure((previous) =>
+      previous && channels.has(previous.channel) ? null : previous,
+    );
   }, []);
   const takePending = useCallback(() => {
     const job = pending.current;
@@ -70,12 +129,15 @@ export function usePlayerChat(self: string, muted: readonly string[], blocked: r
     pending.current = null;
     return job;
   }, []);
-  const fail = useCallback((reason: string) => {
-    const job = takePending();
-    if (!job) return;
-    setSending(false);
-    setFailure({ channel: job.channel, reason });
-  }, [takePending]);
+  const fail = useCallback(
+    (reason: string) => {
+      const job = takePending();
+      if (!job) return;
+      setSending(false);
+      setFailure({ channel: job.channel, reason });
+    },
+    [takePending],
+  );
   const reset = useCallback(() => {
     takePending();
     setEntries([]);
@@ -84,99 +146,122 @@ export function usePlayerChat(self: string, muted: readonly string[], blocked: r
     setFailure(null);
     setSending(false);
   }, [takePending]);
-  useEffect(() => () => { takePending(); }, [takePending]);
+  useEffect(
+    () => () => {
+      takePending();
+    },
+    [takePending],
+  );
 
-  const result = useCallback((response: ChatSendResult) => {
-    if (pending.current?.id !== response.requestId) return;
-    if (!response.ok) {
-      fail(response.reason);
-      return;
-    }
-    const job = takePending()!;
-    setSending(false);
-    setDrafts(previous => {
-      if (previous[job.channel] !== job.draft) return previous;
-      const next = { ...previous };
-      delete next[job.channel];
-      return next;
-    });
-  }, [fail, takePending]);
+  const result = useCallback(
+    (response: ChatSendResult) => {
+      if (pending.current?.id !== response.requestId) return;
+      if (!response.ok) {
+        fail(response.reason);
+        return;
+      }
+      const job = takePending()!;
+      setSending(false);
+      setDrafts((previous) => {
+        if (previous[job.channel] !== job.draft) return previous;
+        const next = { ...previous };
+        delete next[job.channel];
+        return next;
+      });
+    },
+    [fail, takePending],
+  );
 
   const edit = useCallback((channel: string, draft: Draft) => {
-    setDrafts(previous => {
+    setDrafts((previous) => {
       const next = { ...previous };
       delete next[channel];
       if (draft.text || draft.reply) next[channel] = draft;
       return Object.fromEntries(Object.entries(next).slice(-32));
     });
-    setFailure(previous => previous?.channel === channel ? null : previous);
+    setFailure((previous) => (previous?.channel === channel ? null : previous));
   }, []);
 
   const submit = (channel: string, send: (payload: ChatPayload) => boolean) => {
     const draft = drafts[channel] ?? emptyDraft;
-    if (!draft.text.trim() || pending.current || (draft.reply && hidden.has(draft.reply.sender))) return;
-    const id = Array.from(crypto.getRandomValues(new Uint8Array(16)), byte =>
-      byte.toString(16).padStart(2, "0")).join("");
+    if (
+      !draft.text.trim() ||
+      pending.current ||
+      (draft.reply && hidden.has(draft.reply.sender))
+    )
+      return;
+    const id = Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
     pending.current = {
-      id, channel, draft,
-      timer: setTimeout(() => fail("Potvrzení nepřišlo. Text zůstal v poli."), sendTimeoutMs),
+      id,
+      channel,
+      draft,
+      timer: setTimeout(
+        () => fail("Potvrzení nepřišlo. Text zůstal v poli."),
+        sendTimeoutMs,
+      ),
     };
     setFailure(null);
     setSending(true);
     try {
-      if (send({ channel, text: draft.text, requestId: id, ...(draft.reply && { replyTo: draft.reply.id }) }))
+      if (
+        send({
+          channel,
+          text: draft.text,
+          requestId: id,
+          ...(draft.reply && { replyTo: draft.reply.id }),
+        })
+      )
         return;
-    } catch { /* The draft is retained if the socket closes during send. */ }
+    } catch {
+      /* The draft is retained if the socket closes during send. */
+    }
     fail("Zprávu se nepodařilo odeslat.");
   };
 
-  return { visible, unread, privateCount, hidden, drafts, failure, sending, markRead, receive, forget, reset, fail, result, edit, submit };
+  return {
+    visible,
+    unread,
+    privateCount,
+    hidden,
+    drafts,
+    failure,
+    sending,
+    markRead,
+    receive,
+    forget,
+    reset,
+    fail,
+    result,
+    edit,
+    submit,
+  };
 }
 
-export const ChatPreview = memo(function ChatPreview({
-  entries, count, shortcut, open,
-}: {
-  entries: readonly Entry[];
-  count: number;
-  shortcut: boolean;
-  open: (opener: HTMLButtonElement) => void;
-}) {
-  useLocale();
-  const [cutoffAt, setCutoffAt] = useState(() => performance.now());
-  const recent = entries.filter(({ message, receivedAt }) =>
-    receivedAt + previewMs > cutoffAt && (message.channel === "global" || message.channel === "local")).slice(-3);
-  const expiresAt = recent[0] ? recent[0].receivedAt + previewMs : 0;
-  useEffect(() => {
-    if (!expiresAt) return;
-    const timeout = setTimeout(
-      () => setCutoffAt(Math.max(expiresAt, performance.now())),
-      Math.max(0, expiresAt - performance.now()),
-    );
-    return () => clearTimeout(timeout);
-  }, [expiresAt]);
-  return (
-    <section className="player-chat-preview" data-recent={recent.length || undefined}>
-      <button type="button" onClick={event => open(event.currentTarget)}
-        aria-haspopup="dialog" aria-keyshortcuts={shortcut ? "T" : undefined}
-        aria-label={count ? t("Otevřít chat · neveřejné nepřečtené: {count}", { count }) : t("Otevřít chat")}>
-        <HudIcon name="chat" />{t("Chat")}{shortcut && <kbd aria-hidden="true">T</kbd>}
-        {count > 0 && <span className="player-chat-count" aria-hidden="true">{count}</span>}
-      </button>
-      {!!recent.length && <ul aria-label={t("Poslední zprávy")}>
-        {recent.map(({ message }) => <li key={message.id}>
-          <span>{message.channel === "local" ? t("V okolí") : t("Celý Strahov")}</span>
-          {" "}<strong>{message.nickname}:</strong> {message.text}
-        </li>)}
-      </ul>}
-    </section>
-  );
-});
-
 type ChatState = ReturnType<typeof usePlayerChat>;
+type ScrollPosition = { top: number; atEnd: boolean; anchor?: string; offset?: number };
 
-export function PlayerChatDialog({
-  chat, self, channel, changeChannel, destinations, connected, supported, guest, aiActive, showAi,
-  aiActions, aiContent, opener, fallback, keyboardOpen, close, send,
+export function PlayerChat({
+  chat,
+  self,
+  channel,
+  changeChannel,
+  destinations,
+  connected,
+  supported,
+  guest,
+  aiActive,
+  showAi,
+  aiActions,
+  aiContent,
+  send,
+  mode,
+  onModeChange,
+  focusRequest,
+  showPrivateText,
+  shortcut,
+  visible,
 }: {
   chat: ChatState;
   self: string;
@@ -190,44 +275,192 @@ export function PlayerChatDialog({
   showAi: (value: boolean) => void;
   aiActions: ReactNode;
   aiContent: ReactNode;
-  opener: HTMLElement | null;
-  fallback: RefObject<HTMLCanvasElement | null>;
-  keyboardOpen: boolean;
-  close: () => void;
   send: (payload: ChatPayload) => boolean;
+  mode: ChatMode;
+  onModeChange: (mode: ChatMode) => void;
+  focusRequest: number;
+  showPrivateText: boolean;
+  shortcut: boolean;
+  visible: boolean;
 }) {
   useLocale();
   const name = useId();
-  const dialog = useRef<HTMLDialogElement>(null);
-  const title = useRef<HTMLHeadingElement>(null);
+  const root = useRef<HTMLElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const log = useRef<HTMLDivElement>(null);
-  const atBottom = useRef(true);
-  const [showBottom, setShowBottom] = useState(false);
   const composing = useRef(false);
-  const group = channel.split(":")[0];
-  const options = destinations.filter(({ key }) => key.startsWith(group + ":"));
-  const destination = options.find(({ key }) => key === channel);
-  const canCompose = channel === "global" || channel === "local" || (!!destination && destination.available !== false);
-  const canReply = connected && supported && canCompose;
-  const human = !aiActive && !guest;
-  const draft = chat.drafts[channel] ?? emptyDraft;
-  const visible = useMemo(() => human ? chat.visible.filter(({ message }) => conversation(message, self) === channel) : [],
-    [chat.visible, channel, self, human]);
-  const visibleIds = useMemo(() => new Set(visible.map(({ message }) => message.id)), [visible]);
+  const expandedFrom = useRef<ChatMode>("idle");
+  const positions = useRef(new Map<string, ScrollPosition>());
   const currentView = useRef("");
-  const { markRead } = chat;
+  const focusSeen = useRef(-1);
+  const [showBottom, setShowBottom] = useState(false);
+  const destination = destinations.find(({ key }) => key === channel);
+  const canCompose =
+    !guest && (channel === "global" || channel === "local" || !!destination);
+  const canSend =
+    canCompose && connected && supported && destination?.available !== false;
+  const draft = chat.drafts[channel] ?? emptyDraft;
+  const entries = useMemo(
+    () =>
+      guest || aiActive ? [] : chatEntries(chat.visible, mode),
+    [guest, aiActive, chat.visible, mode],
+  );
+  const viewKey = aiActive
+    ? "ai"
+    : mode === "idle"
+        ? "idle"
+        : "feed";
+  const entriesRef = useRef(entries);
+  entriesRef.current = entries;
+  const markRead = chat.markRead;
+  const interacting = useRef(mode !== "idle");
+  interacting.current = mode !== "idle" && visible;
+  const revealedIds = useMemo(
+    () =>
+      new Set(
+        entries
+          .filter(({ message }) =>
+            revealChatText(message, self, channel, mode, showPrivateText),
+          )
+          .map(({ message }) => message.id),
+      ),
+    [entries, self, channel, mode, showPrivateText],
+  );
+
+  const activate = () => {
+    if (mode === "idle") onModeChange("composing");
+  };
+  const focusEditor = () => {
+    const editor = aiActive
+      ? root.current?.querySelector<HTMLTextAreaElement>(
+          ".player-chat-ai textarea:not(:disabled)",
+        )
+      : input.current;
+    if (editor && !editor.disabled) editor.focus({ preventScroll: true });
+    else
+      root.current
+        ?.querySelector<HTMLSelectElement>(".player-chat-destination")
+        ?.focus();
+  };
+  const labelFor = (message: ChatMessage) => {
+    const target = chatConversation(message, self);
+    if (target === "global") return t("Celý Strahov");
+    if (target === "local") return t("V okolí");
+    const dest = destinations.find(({ key }) => key === target);
+    if (target.startsWith("dm:")) {
+      const person =
+        message.sender === self
+          ? (dest?.label ?? t("Odpojený kontakt"))
+          : message.nickname;
+      return message.sender === self
+        ? t("Ty → {name}", { name: person })
+        : t("{name} → ty", { name: person });
+    }
+    return t("Akce:") + " " + (dest?.label ?? t("Akce"));
+  };
+  const isAllowedTarget = (target: string) =>
+    target === "global" ||
+    target === "local" ||
+    destinations.some(
+      (item) => item.key === target && item.available !== false,
+    );
+
+  const markVisible = useCallback(() => {
+    if (!interacting.current || !log.current) return;
+    const bounds = log.current.getBoundingClientRect();
+    const shown = new Set(
+      [
+        ...log.current.querySelectorAll<HTMLElement>(
+          "[data-message-id][data-revealed]",
+        ),
+      ]
+        .filter((element) => {
+          const rect = element.getBoundingClientRect();
+          return (
+            rect.height > 0 &&
+            rect.bottom > bounds.top &&
+            rect.top < bounds.bottom
+          );
+        })
+        .map((element) => element.dataset.messageId),
+    );
+    markRead(entriesRef.current.filter(({ message }) => shown.has(message.id)));
+  }, [markRead]);
+
+  const rememberScroll = () => {
+    if (!log.current || !currentView.current) return;
+    const bounds = log.current.getBoundingClientRect();
+    const anchor = [...log.current.querySelectorAll<HTMLElement>("[data-message-id]")]
+      .find(element => element.getBoundingClientRect().bottom > bounds.top);
+    positions.current.set(currentView.current, {
+      top: log.current.scrollTop,
+      atEnd:
+        log.current.scrollHeight -
+          log.current.scrollTop -
+          log.current.clientHeight <
+        12,
+      anchor: anchor?.dataset.messageId,
+      offset: anchor ? anchor.getBoundingClientRect().top - bounds.top : undefined,
+    });
+  };
+  const onScroll = () => {
+    rememberScroll();
+    const atEnd = positions.current.get(currentView.current)?.atEnd ?? true;
+    setShowBottom(!atEnd);
+    markVisible();
+  };
+  const goToEnd = () => {
+    if (log.current) log.current.scrollTop = log.current.scrollHeight;
+    positions.current.set(viewKey, {
+      top: log.current?.scrollTop ?? 0,
+      atEnd: true,
+    });
+    setShowBottom(false);
+    markVisible();
+  };
 
   useLayoutEffect(() => {
-    const element = dialog.current!;
-    element.showModal();
-    (keyboardOpen && input.current && !input.current.disabled ? input.current : title.current)?.focus();
+    if (!visible || aiActive || !log.current) return;
+    const element = log.current;
+    const saved = positions.current.get(viewKey);
+    if (saved?.atEnd === false) {
+      const anchor = [...element.querySelectorAll<HTMLElement>("[data-message-id]")]
+        .find(row => row.dataset.messageId === saved.anchor);
+      element.scrollTop = anchor
+        ? element.scrollTop + anchor.getBoundingClientRect().top - element.getBoundingClientRect().top - (saved.offset ?? 0)
+        : saved.top;
+    } else element.scrollTop = element.scrollHeight;
+    currentView.current = viewKey;
+    const atEnd =
+      element.scrollHeight - element.scrollTop - element.clientHeight < 12;
+    rememberScroll();
+    setShowBottom(!atEnd);
+    markVisible();
+  }, [entries, viewKey, mode, aiActive, visible, markVisible]);
+  useLayoutEffect(() => {
+    markVisible();
+  }, [channel, showPrivateText, markVisible]);
+
+  useLayoutEffect(() => {
+    if (!visible || mode === "idle" || focusSeen.current === focusRequest)
+      return;
+    focusSeen.current = focusRequest;
+    focusEditor();
+  }, [focusRequest, visible, mode, aiActive, channel]);
+
+  useEffect(() => {
+    if (!visible) return;
     const viewport = window.visualViewport;
     const fit = () => {
-      if (!viewport) return;
-      element.style.setProperty("--player-chat-height", `${viewport.height}px`);
-      element.style.setProperty("--player-chat-y", `${viewport.offsetTop}px`);
-      element.style.setProperty("--player-chat-bottom", `${Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)}px`);
+      const element = root.current;
+      if (!element || !viewport) return;
+      element.style.setProperty("--player-chat-height", viewport.height + "px");
+      element.style.setProperty("--player-chat-y", viewport.offsetTop + "px");
+      element.style.setProperty(
+        "--player-chat-bottom",
+        Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop) +
+          "px",
+      );
     };
     fit();
     viewport?.addEventListener("resize", fit);
@@ -235,152 +468,368 @@ export function PlayerChatDialog({
     return () => {
       viewport?.removeEventListener("resize", fit);
       viewport?.removeEventListener("scroll", fit);
-      element.close();
-      const dock = opener && fallback.current?.parentElement?.querySelector<HTMLElement>("[data-world-chat]");
-      (opener?.isConnected && opener.getClientRects().length ? opener : dock || fallback.current)?.focus({ preventScroll: true });
     };
-  }, [fallback, keyboardOpen, opener]);
+  }, [visible]);
 
-  function wrapTab(event: KeyboardEvent<HTMLDialogElement>) {
-    if (event.key !== "Tab") return;
-    const items = [...event.currentTarget.querySelectorAll<HTMLElement>(
-      'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex="0"]',
-    )].filter(element => element.getClientRects().length > 0);
-    const index = items.indexOf(document.activeElement as HTMLElement);
-    if (index === -1 || (event.shiftKey ? index === 0 : index === items.length - 1)) {
+  const toggleExpanded = () => {
+    rememberScroll();
+    focusSeen.current = -1;
+    if (mode === "expanded")
+      onModeChange(
+        expandedFrom.current === "expanded"
+          ? "composing"
+          : expandedFrom.current,
+      );
+    else {
+      expandedFrom.current = mode;
+      onModeChange("expanded");
+    }
+  };
+  const wrapTab = (event: KeyboardEvent<HTMLElement>) => {
+    if (mode !== "expanded" || event.key !== "Tab") return;
+    const items = [
+      ...event.currentTarget.querySelectorAll<HTMLElement>(
+        'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex="0"]',
+      ),
+    ].filter((element) => element.getClientRects().length > 0);
+    const at = items.indexOf(document.activeElement as HTMLElement);
+    if (at === -1 || (event.shiftKey ? at === 0 : at === items.length - 1)) {
       event.preventDefault();
       (event.shiftKey ? items.at(-1) : items[0])?.focus();
     }
-  }
-
-  function goToEnd() {
-    if (log.current) log.current.scrollTop = log.current.scrollHeight;
-    atBottom.current = true;
-    setShowBottom(false);
-    markRead(visible);
-  }
-
-  useLayoutEffect(() => {
-    const nextView = human ? channel : "";
-    if (nextView !== currentView.current || atBottom.current) goToEnd();
-    currentView.current = nextView;
-  }, [channel, human, visible, markRead]);
-
-  const onScroll = () => {
-    const element = log.current;
-    if (!element) return;
-    const bottom = element.scrollHeight - element.scrollTop - element.clientHeight < 12;
-    atBottom.current = bottom;
-    setShowBottom(!bottom);
-    if (bottom) markRead(visible);
+  };
+  const choose = (value: string) => {
+    rememberScroll();
+    composing.current = false;
+    if (value === "ai") showAi(true);
+    else {
+      showAi(false);
+      changeChannel(value);
+    }
+    activate();
+    focusSeen.current = -1;
+  };
+  const replyTo = (message: ChatMessage) => {
+    const target = chatConversation(message, self);
+    if (!isAllowedTarget(target)) return;
+    const targetDraft = chat.drafts[target] ?? emptyDraft;
+    focusSeen.current = -1;
+    showAi(false);
+    changeChannel(target);
+    chat.edit(target, { ...targetDraft, reply: message });
+    activate();
+    input.current?.focus({ preventScroll: true });
   };
   const jump = (id: string) => {
-    const original = document.getElementById(name + "-" + id);
-    if (!original || !log.current?.contains(original)) return;
-    original.scrollIntoView({ block: "nearest" });
-    original.focus({ preventScroll: true });
+    const target = [
+      ...root.current!.querySelectorAll<HTMLElement>("[data-message-id]"),
+    ].find((element) => element.dataset.messageId === id);
+    if (!target) return;
+    activate();
+    target.scrollIntoView({ block: "nearest" });
+    target.focus({ preventScroll: true });
     onScroll();
   };
-  const selectGroup = (kind: string) => {
-    composing.current = false;
-    showAi(false);
-    if (group !== kind || !destination) changeChannel(destinations.find(({ key }) => key.startsWith(kind + ":"))?.key ?? kind);
-  };
-  const selectChannel = (value: string) => {
-    composing.current = false;
-    showAi(false);
-    changeChannel(value);
-  };
   const availableReply = draft.reply && !chat.hidden.has(draft.reply.sender);
+  const maskDraft = !showPrivateText && mode === "idle" && channel.startsWith("dm:");
+  const selectedValue = aiActive ? "ai" : channel;
+  const missingTarget =
+    !aiActive && !["global", "local"].includes(channel) && !destination;
+  const collapsed = mode === "idle";
+
   return (
-    <dialog ref={dialog} id="world-player-chat" className="player-chat-dialog"
-      aria-labelledby={name} onCancel={event => { event.preventDefault(); if (!composing.current) close(); }} onKeyDown={wrapTab}>
-      <header className="player-chat-header">
-        <h2 ref={title} id={name} tabIndex={-1}>{t("Chat na Strahově")}</h2>
-        {aiActive && <div className="crazy-panel-actions">{aiActions}</div>}
-        <button className="player-chat-close" type="button" onClick={close} aria-label={t("Zavřít chat")}>×</button>
-      </header>
-      <div className="player-chat-channels" role="group" aria-label={t("Chatový kanál")}>
-        {guest ? <button type="button" aria-pressed={!aiActive} onClick={() => showAi(false)}>{t("Hráči")}</button> : <>
-          <button type="button" aria-pressed={human && group === "global"} onClick={() => selectChannel("global")}>{t("Celý Strahov")}</button>
-          <button type="button" aria-pressed={human && group === "local"} onClick={() => selectChannel("local")}>{t("V okolí")}</button>
-          <button type="button" aria-pressed={human && group === "dm"} onClick={() => selectGroup("dm")}>{t("Soukromé")}</button>
-          <button type="button" aria-pressed={human && group === "event"} onClick={() => selectGroup("event")}>{t("Akce")}</button>
-        </>}
-        <button type="button" className="player-chat-ai-tab" aria-pressed={aiActive}
-          onClick={() => { composing.current = false; showAi(true); }}>Crazy Typka · AI</button>
-      </div>
-      {aiActive ? <div className="player-chat-content game-ai-chat">{aiContent}</div> : guest ? (
-        <p className="player-chat-content">{t("Samostatná prohlídka není připojená k žádnému multiplayerovému chatu.")}</p>
-      ) : <>
-        <div className="player-chat-audience">
-          <strong>{t("Píšeš do:")}</strong>{" "}
-          {group === "global" ? t("Celý Strahov · všichni připojení hráči")
-            : group === "local" ? t("V okolí · stejná zóna, méně než 40 m")
-              : group === "dm" ? t("Soukromě · ty a vybraný kontakt") : t("Akce · přihlášení účastníci")}
-          {options.length > 0 && <select aria-label={t("Konverzace")} value={destination?.key ?? ""} onChange={event => changeChannel(event.target.value)}>
-            {!destination && <option value="" disabled>{t("Vyber konverzaci")}</option>}
-            {options.map(({ key, label }) => <option key={key} value={key}>{label}</option>)}
-          </select>}
+    <>
+      {visible && mode === "expanded" && (
+        <div
+          className="player-chat-backdrop"
+          aria-hidden="true"
+          onPointerDown={toggleExpanded}
+        />
+      )}
+      <section
+        ref={root}
+        className={"player-chat player-chat-" + mode}
+        data-player-chat=""
+        data-chat-mode={mode}
+        hidden={!visible}
+        role={mode === "expanded" ? "dialog" : "region"}
+        aria-modal={mode === "expanded" ? true : undefined}
+        aria-label={t("Chat")}
+        onKeyDown={wrapTab}
+        onFocusCapture={(event) => {
+          if (event.target !== root.current) activate();
+        }}
+      >
+        <header className="player-chat-header">
+          <label className="player-chat-recipient">
+            <span>{t("Píšeš do:")}</span>
+            <select
+              className="player-chat-destination"
+              value={selectedValue}
+              aria-label={t("Vybrat příjemce")}
+              onChange={(event) => choose(event.target.value)}
+            >
+              {!guest && (
+                <>
+                  <option value="global">{t("Celý Strahov")}</option>
+                  <option value="local">{t("V okolí")}</option>
+                  {destinations.map(({ key, label: text, available }) => (
+                    <option
+                      key={key}
+                      value={key}
+                      disabled={available === false}
+                    >
+                      {key.startsWith("dm:") ? t("Soukromě:") : t("Akce:")}{" "}
+                      {text}
+                    </option>
+                  ))}
+                  {missingTarget && (
+                    <option value={channel} disabled>
+                      {t("Vyber dostupnou konverzaci.")}
+                    </option>
+                  )}
+                </>
+              )}
+              <option value="ai">Crazy Typka · AI</option>
+            </select>
+          </label>
+          {aiActive && visible && (
+            <div className="crazy-panel-actions">{aiActions}</div>
+          )}
+          <button
+            type="button"
+            className="player-chat-expand"
+            onClick={toggleExpanded}
+            onPointerDown={(event) => event.preventDefault()}
+            aria-label={
+              mode === "expanded" ? t("Zmenšit chat") : t("Zvětšit chat")
+            }
+            title={mode === "expanded" ? t("Zmenšit chat") : t("Zvětšit chat")}
+            aria-expanded={mode === "expanded"}
+          >
+            <span aria-hidden="true">{mode === "expanded" ? "↙" : "↗"}</span>
+          </button>
+        </header>
+        <div className="player-chat-ai" hidden={!aiActive}>
+          {aiContent}
         </div>
-        <div className="player-chat-history">
-          <div className="player-chat-log" ref={log} onScroll={onScroll} role="log" aria-label={t("Zprávy")} tabIndex={0}>
-            {!visible.length && <p>{canCompose ? t("V této konverzaci zatím nejsou žádné zprávy.") : t("Vyber dostupnou konverzaci.")}</p>}
-            {visible.map(({ message }) => {
-              const reply = message.reply;
-              const revealed = reply && "id" in reply && !chat.hidden.has(reply.sender) ? reply : undefined;
-              const originalVisible = revealed && visibleIds.has(revealed.id);
-              const textId = name + "-text-" + message.id;
-              return (
-                <article key={message.id} id={name + "-" + message.id} tabIndex={-1}>
-                  <div className="player-chat-byline">
-                    <strong>{message.nickname}</strong>
-                    <time>{formatDate(message.at, { timeZone: "Europe/Prague", hour: "2-digit", minute: "2-digit" })}</time>
-                    {message.sender === self && <span>{t("Ty")}</span>}
-                    {canReply && <button type="button" aria-describedby={textId}
-                      onClick={() => { chat.edit(channel, { ...draft, reply: message }); input.current?.focus(); }}>
-                      <span aria-hidden="true">↪ </span>{t("Odpovědět")}
-                    </button>}
-                  </div>
-                  {reply && (originalVisible ? (
-                    <button type="button" className="player-chat-quote" onClick={() => jump(revealed.id)}>
-                      ↪ {revealed.nickname}: {revealed.text}
+        <div className="player-chat-human" hidden={aiActive}>
+          {guest ? (
+            <p className="player-chat-empty">
+              {t(
+                "Samostatná prohlídka není připojená k žádnému multiplayerovému chatu.",
+              )}
+            </p>
+          ) : (
+            <>
+              <div className="player-chat-history">
+                <div
+                  ref={log}
+                  className="player-chat-log"
+                  role="log"
+                  aria-label={t("Zprávy")}
+                  aria-live={collapsed ? "off" : "polite"}
+                  tabIndex={collapsed ? -1 : 0}
+                  onScroll={onScroll}
+                >
+                  {!entries.length && (
+                    <p className="player-chat-empty">
+                      {t("V této konverzaci zatím nejsou žádné zprávy.")}
+                    </p>
+                  )}
+                  {entries.map(({ message }) => {
+                    const target = chatConversation(message, self);
+                    const revealed = revealChatText(
+                      message,
+                      self,
+                      channel,
+                      mode,
+                      showPrivateText,
+                    );
+                    const reference =
+                      message.reply &&
+                      "id" in message.reply &&
+                      !chat.hidden.has(message.reply.sender)
+                        ? message.reply
+                        : undefined;
+                    const referencedHere =
+                      reference && revealedIds.has(reference.id);
+                    const textId = name + "-text-" + message.id;
+                    return (
+                      <article
+                        key={message.id}
+                        id={name + "-" + message.id}
+                        data-message-id={message.id}
+                        data-revealed={revealed ? "" : undefined}
+                        tabIndex={-1}
+                      >
+                        <div className="player-chat-byline">
+                          <strong>{message.nickname}</strong>
+                          <span
+                            className="player-chat-channel"
+                            title={labelFor(message)}
+                          >
+                            {labelFor(message)}
+                          </span>
+                          <time>
+                            {formatDate(message.at, {
+                              timeZone: "Europe/Prague",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </time>
+                          {revealed &&
+                            connected &&
+                            supported &&
+                            isAllowedTarget(target) && (
+                              <button
+                                type="button"
+                                className="player-chat-reply"
+                                aria-label={t("Odpovědět")}
+                                aria-describedby={textId}
+                                title={t("Odpovědět")}
+                                onPointerDown={(event) =>
+                                  event.preventDefault()
+                                }
+                                onClick={() => replyTo(message)}
+                              >
+                                <span aria-hidden="true">↪</span>
+                              </button>
+                            )}
+                        </div>
+                        {!revealed ? (
+                          <p>{t("Soukromá zpráva")}</p>
+                        ) : (
+                          <>
+                            {message.reply &&
+                              (referencedHere ? (
+                                <button
+                                  type="button"
+                                  className="player-chat-quote"
+                                  onClick={() => jump(reference.id)}
+                                >
+                                  ↪ {reference.nickname}: {reference.text}
+                                </button>
+                              ) : (
+                                <div className="player-chat-quote">
+                                  {reference
+                                    ? "↪ " +
+                                      reference.nickname +
+                                      ": " +
+                                      reference.text
+                                    : t("Původní zpráva není dostupná.")}
+                                </div>
+                              ))}
+                            <p id={textId}>{message.text}</p>
+                          </>
+                        )}
+                      </article>
+                    );
+                  })}
+                </div>
+                {showBottom && (
+                  <button
+                    className="player-chat-bottom"
+                    type="button"
+                    onClick={goToEnd}
+                  >
+                    {t("Nové zprávy")} ↓
+                  </button>
+                )}
+              </div>
+              <form
+                className="player-chat-composer"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (canSend && !maskDraft && !composing.current) chat.submit(channel, send);
+                }}
+              >
+                {draft.reply && !maskDraft && (
+                  <div className="player-chat-reference">
+                    <span>
+                      {availableReply
+                        ? t("Odpovídáš: {name} · {text}", {
+                            name: draft.reply.nickname,
+                            text: draft.reply.text,
+                          })
+                        : t("Původní zpráva není dostupná.")}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t("Zrušit odpověď")}
+                      onClick={() => {
+                        chat.edit(channel, { text: draft.text });
+                        input.current?.focus();
+                      }}
+                    >
+                      ×
                     </button>
-                  ) : <div className="player-chat-quote">{revealed
-                    ? `↪ ${revealed.nickname}: ${revealed.text}`
-                    : t("Původní zpráva není dostupná.")}</div>)}
-                  <p id={textId}>{message.text}</p>
-                </article>
-              );
-            })}
-          </div>
-          {showBottom && <button className="player-chat-bottom" type="button" onClick={() => { goToEnd(); log.current?.focus(); }}>
-            {t("Na konec konverzace")} ↓
-          </button>}
+                  </div>
+                )}
+                {chat.failure?.channel === channel && (
+                  <div role="alert">{localizeNotice(chat.failure.reason)}</div>
+                )}
+                {!connected && (
+                  <div role="status">
+                    {t("Chat je odpojený. Rozepsaný text zůstává v poli.")}
+                  </div>
+                )}
+                {connected && !supported && (
+                  <div role="status">
+                    {t("Tato verze serveru zatím nepodporuje nový chat.")}
+                  </div>
+                )}
+                {canCompose && destination?.available === false && (
+                  <div role="status">{t("Odpojený kontakt")}</div>
+                )}
+                <div className="player-chat-send">
+                  <input
+                    ref={input}
+                    aria-label={t("Zpráva")}
+                    aria-keyshortcuts={shortcut ? "T" : undefined}
+                    title={shortcut ? t("Chat (T)") : t("Chat")}
+                    placeholder={t("Napsat zprávu…")}
+                    maxLength={500}
+                    disabled={!canCompose}
+                    value={maskDraft ? "" : draft.text}
+                    onChange={(event) =>
+                      chat.edit(channel, { ...draft, text: event.target.value })
+                    }
+                    onCompositionStart={() => {
+                      composing.current = true;
+                    }}
+                    onCompositionEnd={() => {
+                      composing.current = false;
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        event.key === "Enter" &&
+                        (event.nativeEvent.isComposing ||
+                          event.nativeEvent.keyCode === 229 ||
+                          event.repeat)
+                      )
+                        event.preventDefault();
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    aria-label={t("Odeslat")}
+                    title={t("Odeslat")}
+                    disabled={maskDraft ||
+                      !canSend ||
+                      chat.sending ||
+                      !draft.text.trim() ||
+                      (!!draft.reply && !availableReply)
+                    }
+                  >
+                    <span aria-hidden="true">↑</span>
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
         </div>
-        <form className="player-chat-composer" onSubmit={event => {
-          event.preventDefault();
-          if (canReply && !composing.current) chat.submit(channel, send);
-        }}>
-          {draft.reply && <div className="player-chat-reference">
-            <span>{availableReply ? t("Odpovídáš: {name} · {text}", { name: draft.reply.nickname, text: draft.reply.text })
-              : t("Původní zpráva není dostupná.")}</span>
-            <button type="button" aria-label={t("Zrušit odpověď")} onClick={() => {
-              chat.edit(channel, { text: draft.text }); input.current?.focus();
-            }}>{t("Zrušit")}</button>
-          </div>}
-          {chat.failure?.channel === channel && <div role="alert">{localizeNotice(chat.failure.reason)}</div>}
-          {!connected && <div role="status">{t("Chat je odpojený. Rozepsaný text zůstává v poli.")}</div>}
-          {connected && !supported && <div role="status">{t("Tato verze serveru zatím nepodporuje nový chat.")}</div>}
-          <div className="player-chat-send">
-            <input ref={input} aria-label={t("Zpráva")} placeholder={t("Napiš něco…")} maxLength={500}
-              disabled={!canCompose} value={draft.text} onChange={event => chat.edit(channel, { ...draft, text: event.target.value })}
-              onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; }}
-              onKeyDown={event => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.preventDefault(); }} />
-            <button type="submit" disabled={!canReply || chat.sending || !draft.text.trim() || !!draft.reply && !availableReply}>{t("Odeslat")}</button>
-          </div>
-        </form>
-      </>}
-    </dialog>
+      </section>
+    </>
   );
 }

@@ -28,7 +28,8 @@ import {
   createBenchmarkDownloads,
 } from "./benchmark-presentation";
 import { WorldDock } from "./world-dock";
-import { ChatPreview, PlayerChatDialog, readChatPreferences, usePlayerChat } from "./player-chat";
+import { PlayerChat, readChatPreferences, usePlayerChat, type ChatMode } from "./player-chat";
+import "./player-chat.css";
 import { HudWeather } from "./hud-status";
 import {
   LIGHTING_PREVIEWS,
@@ -331,8 +332,13 @@ export function App() {
   }, [events, forgetChatChannels]);
   const [playerChatSupported, setPlayerChatSupported] = useState(false);
   const [chatPreferences, setChatPreferences] = useState(readChatPreferences);
-  const chatOpener = useRef<HTMLElement | null>(null);
-  const chatKeyboardOpen = useRef(false);
+  const [chatMode, setChatMode] = useState<ChatMode>("idle");
+  const [chatFocusRequest, setChatFocusRequest] = useState(0);
+  const chatModeRef = useRef<ChatMode>("idle");
+  const chatBeforeExpand = useRef<ChatMode>("idle");
+  const chatOtherUiOpen = useRef(false);
+  const chatReturnPointer = useRef<number | null>(null);
+  const chatReturnClick = useRef(false);
   useEffect(() => {
     try { localStorage.setItem("strahov.chat", JSON.stringify(chatPreferences)); }
     catch { /* Chat preferences still apply in the current tab. */ }
@@ -451,7 +457,7 @@ export function App() {
     const rejected = () => record("unhandled-rejection", "Asynchronous operation failed");
     const key = (event: KeyboardEvent) => {
       if (event.code !== "F8" || event.repeat || event.defaultPrevented ||
-          (event.target as Element | null)?.closest("input,textarea,select,[contenteditable],.player-chat-dialog")) return;
+          (event.target as Element | null)?.closest("input,textarea,select,[contenteditable],[data-player-chat]")) return;
       event.preventDefault();
       openFeedback();
     };
@@ -548,6 +554,8 @@ export function App() {
     setConnected(false);
     setPlayers([]);
     chat.reset();
+    chatModeRef.current = "idle";
+    setChatMode("idle");
     setSocial({ attendance: [], contacts: [], requests: [], blocked: [] });
     setWorldSelection(null);
     try { void previousRoom?.leave().catch(() => {}); }
@@ -710,9 +718,35 @@ export function App() {
       window.removeEventListener("close-world-ui", close);
     };
   }, []);
+  chatOtherUiOpen.current = graphicsState.applying || feedbackOpen || journalOpen || emotesOpen || showForm || !!panel;
+  const changeChatMode = useCallback((next: ChatMode) => {
+    if (next === "expanded" && chatModeRef.current !== "expanded")
+      chatBeforeExpand.current = chatModeRef.current;
+    chatModeRef.current = next;
+    game.current?.setUiModal(chatOtherUiOpen.current || next !== "idle");
+    setChatMode(next);
+    if (next === "idle" && !chatOtherUiOpen.current) canvas.current?.focus({ preventScroll: true });
+  }, []);
   useEffect(() => {
-    game.current?.setUiModal(graphicsState.applying || feedbackOpen || journalOpen || emotesOpen || showForm || !!panel);
-  }, [feedbackOpen, journalOpen, emotesOpen, showForm, panel, ready, graphicsState.applying]);
+    if (chatOtherUiOpen.current && chatModeRef.current !== "idle") {
+      chatModeRef.current = "idle";
+      setChatMode("idle");
+    }
+    game.current?.setUiModal(chatOtherUiOpen.current || chatModeRef.current !== "idle");
+  }, [feedbackOpen, journalOpen, emotesOpen, showForm, panel, ready, graphicsState.applying, chatMode]);
+  useEffect(() => {
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.isComposing || event.keyCode === 229 ||
+          chatModeRef.current === "idle" || chatOtherUiOpen.current) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const next = chatModeRef.current === "expanded" ? chatBeforeExpand.current : "idle";
+      changeChatMode(next);
+      if (next === "composing") setChatFocusRequest(value => value + 1);
+    };
+    document.addEventListener("keydown", keyboard, true);
+    return () => document.removeEventListener("keydown", keyboard, true);
+  }, [changeChatMode]);
   useEffect(() => {
     let cancelled = false;
     let active: AbortController | undefined;
@@ -1176,6 +1210,8 @@ export function App() {
       setSelfId(data.id);
       if (identityChanged) {
         chat.reset();
+        chatModeRef.current = "idle";
+        setChatMode("idle");
         setChannel("global");
         setAiChatActive(false);
         bootstrapAuthorityRef.current = null;
@@ -1318,34 +1354,29 @@ export function App() {
     }
     room.current?.send(action, data);
   };
-  const openChat = useCallback((opener: HTMLElement | null, keyboard = false) => {
-    chatOpener.current = opener;
-    chatKeyboardOpen.current = keyboard;
+  const openChat = useCallback(() => {
     game.current?.setUiModal(true);
     setJournalOpen(false);
     setEmotesOpen(false);
-    setPanel("chat");
-  }, []);
-  const closeChat = useCallback(() => setPanel(""), []);
+    setPanel("");
+    changeChatMode("composing");
+    setChatFocusRequest(value => value + 1);
+  }, [changeChatMode]);
   const openHumanChat = (nextChannel: string) => {
     setAiChatActive(false);
     setChannel(nextChannel);
-    openChat(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    openChat();
   };
-  const openChatPreview = useCallback((opener: HTMLButtonElement) => {
-    setAiChatActive(false);
-    openChat(opener);
-  }, [openChat]);
   useEffect(() => {
-    if (mode !== "multi" || !ready || !chatPreferences.shortcut || panel || journalOpen ||
+    if (mode === "menu" || !ready || !chatPreferences.shortcut || panel || journalOpen ||
         emotesOpen || feedbackOpen || showForm || graphicsState.applying) return;
     const keyboard = (event: KeyboardEvent) => {
       if (event.code !== "KeyT" || event.defaultPrevented || event.repeat || event.isComposing ||
           event.ctrlKey || event.metaKey || event.altKey ||
           (event.target as Element | null)?.closest?.("input,textarea,select,button,a,[contenteditable]")) return;
       event.preventDefault();
-      setAiChatActive(false);
-      openChat(null, true);
+      if (mode === "guest") setAiChatActive(true);
+      openChat();
     };
     document.addEventListener("keydown", keyboard);
     return () => document.removeEventListener("keydown", keyboard);
@@ -1356,7 +1387,8 @@ export function App() {
       return;
     }
     if (value === "chat") {
-      openChat(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+      if (modeRef.current === "guest") setAiChatActive(true);
+      openChat();
       return;
     }
     game.current?.blur();
@@ -1440,6 +1472,8 @@ export function App() {
   );
   const feedbackDialog = <FeedbackDialog open={feedbackOpen} onClose={closeFeedback}
     getContext={feedbackContext} capture={captureFeedback} />;
+  const chatSurfaceVisible = ready && !chatOtherUiOpen.current &&
+    (chatMode !== "idle" || mode === "multi" && chatPreferences.preview === "recent");
   if (mode === "menu")
     return (
       <>
@@ -1464,13 +1498,38 @@ export function App() {
       </>
     );
   return (
-    <main className="game-shell">
+    <main className="game-shell" data-chat-mode={chatMode}>
       <canvas
         key={rendererGeneration}
         ref={canvas}
         tabIndex={0}
         aria-label={t("3D hra Strahov")}
         style={{ touchAction: "none" }}
+        onPointerDownCapture={event => {
+          chatReturnClick.current = false;
+          if (chatModeRef.current === "idle" || chatOtherUiOpen.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+          chatReturnPointer.current = event.pointerId;
+          chatReturnClick.current = true;
+          changeChatMode("idle");
+        }}
+        onPointerUpCapture={event => {
+          if (chatReturnPointer.current !== event.pointerId) return;
+          event.preventDefault();
+          event.stopPropagation();
+          chatReturnPointer.current = null;
+        }}
+        onPointerCancelCapture={() => {
+          chatReturnPointer.current = null;
+          chatReturnClick.current = false;
+        }}
+        onClickCapture={event => {
+          if (!chatReturnClick.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+          chatReturnClick.current = false;
+        }}
       />
       {!ready && (
         <LoadingScreen key={rendererGeneration} stage={startupStage} locale={feedbackLocale}
@@ -1613,7 +1672,7 @@ export function App() {
         </button>
       )}
       <WorldDock
-        panel={panel}
+        panel={chatMode !== "idle" ? "chat" : panel}
         journalOpen={journalOpen}
         requestCount={social.requests.length}
         chatCount={mode === "multi" && chatPreferences.preview !== "hidden"
@@ -1623,9 +1682,31 @@ export function App() {
         onToggle={togglePanel}
       />
       <div className="minimap">
-        {mode === "multi" && ready && connected && chatPreferences.preview === "recent" &&
-          (!panel || panel === "chat") && !journalOpen && !emotesOpen && !feedbackOpen && !showForm && !graphicsState.applying &&
-          <ChatPreview entries={chat.visible} count={chat.privateCount} shortcut={chatPreferences.shortcut} open={openChatPreview} />}
+        <PlayerChat chat={chat} self={selfId} channel={channel} changeChannel={setChannel}
+          destinations={mode === "multi" ? [
+            ...social.contacts.filter(id => !social.blocked.includes(id)).map(id => {
+              const player = players.find(item => item.id === id);
+              return { key: "dm:" + id, label: player?.nickname || social.names?.[id] || t("Odpojený kontakt"), available: !!player };
+            }),
+            ...events.filter(event => attendance(event.id)).map(event => ({ key: "event:" + event.id, label: demoEventText(event, "title") })),
+          ] : []}
+          connected={connected} supported={playerChatSupported} guest={mode === "guest"}
+          aiActive={aiChatActive} showAi={setAiChatActive}
+          aiActions={aiChatActive && chatSurfaceVisible ? <CrazyTypkaChatActions state={ai} locale={feedbackLocale} /> : null}
+          aiContent={<CrazyTypkaChat state={ai} locale={feedbackLocale} variant="embedded"
+            interactionActive={chatMode !== "idle" && aiChatActive && chatSurfaceVisible}
+            visible={aiChatActive && chatSurfaceVisible} expanded={chatMode === "expanded"} />}
+          mode={chatMode} onModeChange={changeChatMode} focusRequest={chatFocusRequest}
+          showPrivateText={chatPreferences.showPrivateText} shortcut={chatPreferences.shortcut}
+          visible={chatSurfaceVisible}
+          send={payload => {
+            if (!playerChatSupported || !connectedRef.current || !room.current || modeRef.current !== "multi") return false;
+            room.current.send("chat", payload);
+            return true;
+          }} />
+        <button type="button" className="chat-map-toggle" onClick={() => togglePanel("map")} aria-label={t("Mapa")}>
+          <HudIcon name="map" />{t("Mapa")}
+        </button>
         <div className="minimap-frame">
         <MapView
           self={stats || undefined}
@@ -1825,26 +1906,7 @@ export function App() {
           )}
         </section>
       )}
-      {panel === "chat" && (
-        <PlayerChatDialog chat={chat} self={selfId} channel={channel} changeChannel={setChannel}
-          destinations={mode === "multi" ? [
-            ...social.contacts.filter(id => !social.blocked.includes(id)).map(id => {
-              const player = players.find(item => item.id === id);
-              return { key: "dm:" + id, label: player?.nickname || social.names?.[id] || t("Odpojený kontakt"), available: !!player };
-            }),
-            ...events.filter(event => attendance(event.id)).map(event => ({ key: "event:" + event.id, label: demoEventText(event, "title") })),
-          ] : []}
-          connected={connected} supported={playerChatSupported} guest={mode === "guest"} aiActive={aiChatActive} showAi={setAiChatActive}
-          aiActions={<CrazyTypkaChatActions state={ai} locale={feedbackLocale} />}
-          aiContent={<CrazyTypkaChat state={ai} locale={feedbackLocale} />}
-          opener={chatOpener.current} fallback={canvas} keyboardOpen={chatKeyboardOpen.current} close={closeChat}
-          send={payload => {
-            if (!playerChatSupported || !connectedRef.current || !room.current || modeRef.current !== "multi") return false;
-            room.current.send("chat", payload);
-            return true;
-          }} />
-      )}
-      {panel && panel !== "chat" && (
+      {panel && (
         <div
           className={panel === "map" ? "map-overlay" : "panel-container"}
           onPointerDown={(e) => {
@@ -2576,13 +2638,15 @@ export function App() {
                       if (preview === "recent" || preview === "badge" || preview === "hidden")
                         setChatPreferences(previous => ({ ...previous, preview }));
                     }}>
-                      <option value="recent">{t("Poslední zprávy")}</option>
+                      <option value="recent">{t("Trvalý chat")}</option>
                       <option value="badge">{t("Jen odznak")}</option>
                       <option value="hidden">{t("Skrýt náhled")}</option>
                     </select>
                   </label>
                   <label><input type="checkbox" checked={chatPreferences.shortcut}
                     onChange={event => setChatPreferences(previous => ({ ...previous, shortcut: event.target.checked }))} /> {t("Zkratka T pro chat")}</label>
+                  <label><input type="checkbox" checked={chatPreferences.showPrivateText}
+                    onChange={event => setChatPreferences(previous => ({ ...previous, showPrivateText: event.target.checked }))} /> {t("Zobrazovat text soukromých zpráv")}</label>
                 </fieldset>}
                 <GraphicsSettingsPanel preferences={renderPreferences}
                   effective={game.current?.getEffectiveVisualSettings() ?? resolveVisualSettings(renderPreferences)}

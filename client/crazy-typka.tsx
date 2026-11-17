@@ -897,19 +897,35 @@ export function CrazyTypkaChat({
   state,
   locale,
   variant = "default",
+  interactionActive = true,
+  visible = true,
+  expanded = false,
 }: {
   state: CrazyTypkaState;
   locale: Locale;
-  variant?: "default" | "compact";
+  variant?: "default" | "compact" | "embedded";
+  interactionActive?: boolean;
+  visible?: boolean;
+  expanded?: boolean;
 }) {
   const id = useId();
   const log = useRef<HTMLDivElement>(null);
   const composer = useRef<HTMLTextAreaElement>(null);
   const followLatest = useRef(true);
-  useEffect(() => {
-    if (log.current && followLatest.current)
-      log.current.scrollTop = log.current.scrollHeight;
-  }, [state.messages]);
+  const scrollAnchor = useRef<{ id: string; offset: number; top: number } | null>(null);
+  useLayoutEffect(() => {
+    const element = log.current;
+    if (!element || !visible) return;
+    if (followLatest.current) element.scrollTop = element.scrollHeight;
+    else if (scrollAnchor.current) {
+      const saved = scrollAnchor.current;
+      const row = [...element.querySelectorAll<HTMLElement>("[data-ai-message]")]
+        .find(item => item.dataset.aiMessage === saved.id);
+      element.scrollTop = row
+        ? element.scrollTop + row.getBoundingClientRect().top - element.getBoundingClientRect().top - saved.offset
+        : saved.top;
+    }
+  }, [state.messages, visible, expanded]);
   useEffect(() => {
     if (composer.current) fitCrazyTypkaComposer(composer.current);
   }, [state.draft, variant]);
@@ -933,12 +949,13 @@ export function CrazyTypkaChat({
   }, []);
   const cs = locale === "cs";
   const enabled = state.availability === "enabled";
-  const compact = variant === "compact";
+  const compact = variant !== "default";
+  const embedded = variant === "embedded";
   const canSend =
     enabled && !state.busy && state.recovery === "none" && !!state.draft.trim();
   return (
     <section
-      className={compact ? "crazy-chat crazy-compact" : "crazy-chat"}
+      className={embedded ? "crazy-chat crazy-compact crazy-embedded" : compact ? "crazy-chat crazy-compact" : "crazy-chat"}
       aria-labelledby={`${id}-title`}
     >
       <header className="crazy-heading">
@@ -1007,17 +1024,25 @@ export function CrazyTypkaChat({
           ref={log}
           className="crazy-log"
           role="log"
-          aria-live="polite"
+          aria-live={embedded && !interactionActive ? "off" : "polite"}
           aria-label={cs ? "Konverzace s AI" : "AI conversation"}
           onScroll={(event) => {
+            if (!visible) return;
             const target = event.currentTarget;
             followLatest.current =
               target.scrollHeight - target.scrollTop - target.clientHeight < 32;
+            const top = target.getBoundingClientRect().top;
+            const anchor = [...target.querySelectorAll<HTMLElement>("[data-ai-message]")]
+              .find(row => row.getBoundingClientRect().bottom > top);
+            if (anchor?.dataset.aiMessage) scrollAnchor.current = {
+              id: anchor.dataset.aiMessage, offset: anchor.getBoundingClientRect().top - top, top: target.scrollTop,
+            };
           }}
         >
           {state.messages.map((message) => (
             <article
               key={message.id}
+              data-ai-message={message.id}
               className={`crazy-message ${message.role}`}
             >
               <strong>
@@ -1269,7 +1294,7 @@ export function CrazyTypkaChat({
           disabled={!enabled}
           onChange={(event) => state.setDraft(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Escape" && state.draftReply) {
+            if (!embedded && event.key === "Escape" && state.draftReply) {
               event.preventDefault();
               event.stopPropagation();
               state.clearReply();
