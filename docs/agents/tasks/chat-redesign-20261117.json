@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "chat-redesign-20261117",
+  "title": "KEY-78: Trvalý rohový chat a sjednocení HUD",
+  "writePaths": [
+    "client/ui.tsx",
+    "client/game.ts",
+    "client/world-dock.tsx",
+    "client/i18n-messages.ts",
+    "client/crazy-typka.tsx",
+    "tests/room-callbacks.test.ts",
+    "tests/interaction.test.ts",
+    "tests/hud-status.test.ts",
+    "tests/fixtures/chat-browser/",
+    "scripts/chat-browser.ts",
+    "_bmad-output/implementation-artifacts/chat-redesign-20261117/",
+    "_bmad/render/bmad-build/",
+    "docs/agents/handoffs/chat-redesign-20261117.md",
+    "docs/verification.md",
+    ".cache/chat-redesign-20261117/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "port:2568",
+    "port:4291",
+    "port:18082",
+    "external:raspberrypi-strahov"
+  ],
+  "status": "ready",
+  "dependsOn": [],
+  "acceptance": [
+    "Implementovat schválený plán přepracování chatu a související jednotný vzhled v přiděleném rozsahu."
+  ],
+  "verification": [
+    "Cílené testy, společná browserová přejímka a build koordinátorem."
+  ],
+  "notes": [
+    "Uživatel schválil plán 17.11.2026, trvalý chat, nenápadná T, zůstat v psaní, viditelné DM a Crazy Typka ve stejném chatu.",
+    "https://linear.app/gigeconomy/issue/KEY-78"
+  ]
+}

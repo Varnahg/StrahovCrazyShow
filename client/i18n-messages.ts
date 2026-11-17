@@ -1,5 +1,16 @@
 /** Czech source strings are stable typed keys; English never changes content identifiers. */
 export const messages = {
+  "Zvětšit chat": "Expand chat",
+  "Zmenšit chat": "Collapse chat",
+  "Napsat zprávu…": "Write a message…",
+  "Nové zprávy": "New messages",
+  "Soukromě: {name}": "Direct: {name}",
+  "Ty → {name}": "You → {name}",
+  "{name} → ty": "{name} → you",
+  "Vybrat příjemce": "Choose recipient",
+  "Chat (T)": "Chat (T)",
+  "Trvalý chat": "Persistent chat",
+  "Zobrazovat text soukromých zpráv": "Show private message text",
   "Chat na Strahově": "Strahov chat",
   "Zavřít chat": "Close chat",
   "Otevřít chat": "Open chat",

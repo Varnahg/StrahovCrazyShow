@@ -1,3 +1,5 @@
+@import "./jantar-theme.css";
+
 .feedback-dialog {
   color-scheme: dark;
   box-sizing: border-box;
@@ -6,18 +8,16 @@
   margin: auto;
   padding: 22px;
   overflow: auto;
-  border: 1px solid #bba879;
-  border-radius: 8px;
-  background: #14242e;
-  color: #eef2ed;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-panel-radius);
+  background: var(--ui-surface);
+  color: var(--jantar-ink);
   box-shadow: 0 24px 90px #0009;
-  font:
-    14px/1.5 system-ui,
-    sans-serif;
+  font: 400 var(--ui-text)/1.5 var(--jantar-font);
   overscroll-behavior: contain;
 }
 .feedback-dialog::backdrop {
-  background: #061019bd;
+  background: var(--ui-backdrop);
 }
 .feedback-dialog .feedback-heading {
   display: flex;
@@ -26,22 +26,20 @@
 }
 .feedback-dialog h2 {
   margin: 0;
-  color: #f2dda7;
-  font:
-    28px Georgia,
-    serif;
+  color: var(--jantar-ink);
+  font: 700 var(--ui-title)/1.25 var(--jantar-font);
 }
 .feedback-dialog h3 {
   margin: 0 0 8px;
-  font-size: 16px;
+  font-size: var(--ui-text);
 }
 .feedback-dialog button {
   min-height: 40px;
   padding: 8px 13px;
-  border: 1px solid #829398;
-  border-radius: 4px;
-  background: #213945;
-  color: #f3f5f0;
+  border: 1px solid var(--jantar-control-line);
+  border-radius: var(--ui-radius);
+  background: var(--ui-surface);
+  color: var(--jantar-ink);
   font: inherit;
   cursor: pointer;
 }
@@ -50,7 +48,7 @@
   cursor: default;
 }
 .feedback-dialog button:hover:not(:disabled) {
-  background: #31505e;
+  background: var(--ui-hover);
 }
 .feedback-dialog .feedback-close {
   margin-left: auto;
@@ -59,12 +57,12 @@
   padding: 0 8px;
 }
 .feedback-dialog :is(button, input, textarea, summary):focus-visible {
-  outline: 3px solid #f2d494;
+  outline: 3px solid var(--jantar-accent);
   outline-offset: 3px;
 }
 .feedback-dialog .feedback-muted {
-  color: #b9c9ce;
-  font-size: 12px;
+  color: var(--jantar-muted);
+  font-size: var(--ui-meta);
 }
 .feedback-dialog .feedback-fields {
   margin: 0;
@@ -89,11 +87,11 @@
   gap: 7px;
   min-height: 38px;
   padding: 0 10px;
-  border: 1px solid #617c88;
-  border-radius: 4px;
+  border: 1px solid var(--jantar-control-line);
+  border-radius: var(--ui-radius);
 }
 .feedback-dialog input[type="radio"] {
-  accent-color: #ead39e;
+  accent-color: var(--jantar-accent);
   width: 17px;
   height: 17px;
   margin: 0;
@@ -102,10 +100,10 @@
   box-sizing: border-box;
   width: 100%;
   min-height: 40px;
-  background: #0b1c26;
-  border: 1px solid #82959d;
-  border-radius: 4px;
-  color: #f3f6f1;
+  background: var(--jantar-recess);
+  border: 1px solid var(--jantar-control-line);
+  border-radius: var(--ui-radius);
+  color: var(--jantar-ink);
   padding: 9px;
   font: inherit;
 }
@@ -113,13 +111,13 @@
   resize: vertical;
 }
 .feedback-dialog textarea::placeholder {
-  color: #a8bac3;
+  color: var(--jantar-ink);
 }
 .feedback-dialog summary {
   min-height: 34px;
   padding-top: 5px;
   cursor: pointer;
-  color: #e9d8af;
+  color: var(--jantar-ink);
 }
 .feedback-dialog .feedback-details {
   display: grid;
@@ -129,9 +127,9 @@
 .feedback-dialog .feedback-photo {
   margin: 5px 0;
   padding: 12px;
-  background: #0d1f29;
-  border: 1px solid #496470;
-  border-radius: 4px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
   display: grid;
   gap: 9px;
 }
@@ -139,8 +137,8 @@
   width: 100%;
   max-height: 230px;
   object-fit: contain;
-  border-radius: 3px;
-  background: #06121a;
+  border-radius: var(--ui-radius);
+  background: var(--ui-surface);
 }
 .feedback-dialog .feedback-photo button {
   justify-self: start;
@@ -152,16 +150,16 @@
   margin-top: 18px;
 }
 .feedback-dialog .feedback-send {
-  background: #dfc68f;
-  color: #14212a;
-  border-color: #dfc68f;
+  background: var(--jantar-accent);
+  color: var(--jantar-accent-ink);
+  border-color: var(--ui-border);
   font-weight: 700;
 }
 .feedback-dialog .feedback-send:hover:not(:disabled) {
-  background: #f2dcae;
+  background: var(--jantar-accent);
 }
 .feedback-dialog .feedback-error {
-  color: #ffd0b9;
+  color: var(--ui-danger);
   padding: 8px 0;
 }
 .feedback-dialog .feedback-result {
@@ -169,7 +167,7 @@
 }
 .feedback-dialog .feedback-pending {
   margin-top: 20px;
-  border-top: 1px solid #627b87;
+  border-top: 1px solid var(--ui-border);
   padding-top: 16px;
 }
 .feedback-dialog .feedback-pending ul {
@@ -178,8 +176,8 @@
   margin: 0;
 }
 .feedback-dialog .feedback-pending li {
-  border: 1px solid #58727f;
-  border-radius: 4px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
   padding: 10px;
   margin-top: 10px;
 }
@@ -202,7 +200,7 @@
     padding: 16px;
   }
   .feedback-dialog h2 {
-    font-size: 25px;
+    font-size: var(--ui-title);
   }
   .feedback-dialog .feedback-actions > button {
     flex: 1;

@@ -133,7 +133,7 @@ html:has(.welcome-screen) {
   );
   border: 1px solid rgba(var(--home-tint), 0.22);
   border-top-color: rgba(var(--home-tint), 0.36);
-  border-radius: 24px;
+  border-radius: var(--ui-panel-radius);
   box-shadow:
     0 18px 50px rgba(8, 5, 8, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.09);
@@ -155,8 +155,8 @@ html:has(.welcome-screen) {
   margin-left: auto;
 }
 .welcome-screen .home-nav-actions :is(button, select) {
-  font-size: 12px;
-  border-radius: 12px;
+  font-size: var(--ui-control);
+  border-radius: var(--ui-radius);
   min-height: 40px;
 }
 .welcome-screen .home-nav-actions .language-picker {
@@ -234,7 +234,7 @@ html:has(.welcome-screen) {
   min-height: 52px;
   padding: 13px 28px;
   border: 1px solid rgba(var(--home-tint), 0.75);
-  border-radius: 15px;
+  border-radius: var(--ui-radius);
   background: linear-gradient(120deg, #ffcf92, #edb77d);
   color: var(--home-button-ink);
   box-shadow:
@@ -258,15 +258,15 @@ html:has(.welcome-screen) {
   max-width: 100%;
   margin: 14px 0 0;
   padding: 6px 12px;
-  border-radius: 99px;
+  border-radius: var(--ui-radius);
   box-shadow: 0 5px 18px #08050824;
   color: var(--home-muted);
-  font-size: 11px;
+  font-size: var(--ui-meta);
   line-height: 1.6;
 }
 .home-presence strong {
   color: var(--home-text);
-  font-weight: 500;
+  font-weight: 600;
 }
 .home-presence-dot {
   width: 6px;
@@ -291,10 +291,10 @@ html:has(.welcome-screen) {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 12px;
+  border-radius: var(--ui-radius);
   padding: 9px 12px;
   min-height: 40px;
-  font-size: 11px;
+  font-size: var(--ui-control);
 }
 .home-quiet svg {
   width: 17px;
@@ -341,14 +341,14 @@ html:has(.welcome-screen) {
   margin-bottom: 18px;
 }
 .home-setup-heading h1 {
-  font-size: 24px;
+  font-size: var(--ui-title);
   font-weight: 600;
   margin: 0;
   letter-spacing: -0.03em;
 }
 .home-setup-heading > span {
   color: var(--home-muted);
-  font-size: 11px;
+  font-size: var(--ui-meta);
 }
 .home-setup-actions {
   display: flex;
@@ -383,7 +383,7 @@ html:has(.welcome-screen) {
 }
 .home-editor .ae-nickname input,
 .welcome-screen .home-chat-popup textarea {
-  font-size: 16px;
+  font-size: var(--ui-text);
 }
 .home-editor .ae-preview {
   grid-area: 1 / 1 / 4;
@@ -396,7 +396,7 @@ html:has(.welcome-screen) {
 }
 .home-editor .ae-preview-label {
   color: var(--home-muted);
-  font-size: 8px;
+  font-size: var(--ui-meta);
 }
 .home-editor .ae-view-controls {
   background: #241c1be6;
@@ -462,7 +462,7 @@ html:has(.welcome-screen) {
 .home-error {
   margin: 16px 0 0;
   color: #ffb9a7;
-  font-size: 12px;
+  font-size: var(--ui-meta);
   overflow-wrap: anywhere;
 }
 .home-chat-launcher {
@@ -474,11 +474,11 @@ html:has(.welcome-screen) {
   align-items: center;
   gap: 10px;
   padding: 8px 14px 8px 8px;
-  font-size: 12px;
+  font-size: var(--ui-control);
 }
 .welcome-screen .home-chat-launcher {
   background: linear-gradient(142deg, #f3c89c21, #f3c89c09);
-  border-radius: 99px;
+  border-radius: var(--ui-radius);
 }
 .home-chat-launcher.is-open {
   visibility: hidden;
@@ -496,10 +496,10 @@ html:has(.welcome-screen) {
   margin-left: 5px;
   padding: 1px 5px;
   border: 1px solid rgba(var(--home-tint), 0.24);
-  border-radius: 5px;
+  border-radius: var(--ui-radius);
   background: rgba(var(--home-tint), 0.1);
   color: var(--home-accent);
-  font-size: 9px;
+  font-size: var(--ui-meta);
   font-weight: 600;
   vertical-align: middle;
 }
@@ -515,7 +515,7 @@ html:has(.welcome-screen) {
   overscroll-behavior: contain;
   scroll-padding-block: 12px;
   background: transparent;
-  border-radius: 22px;
+  border-radius: var(--ui-panel-radius);
   animation: home-chat-enter 0.22s ease-out;
 }
 .home-chat-popup .crazy-form {
@@ -554,7 +554,7 @@ html:has(.welcome-screen) {
 }
 .home-dialog h2 {
   margin: 0 36px 24px 0;
-  font-size: 23px;
+  font-size: var(--ui-title);
   font-weight: 600;
 }
 .welcome-screen .home-dialog-close {
@@ -569,7 +569,7 @@ html:has(.welcome-screen) {
 }
 .home-about p {
   color: var(--home-muted);
-  font-size: 12px;
+  font-size: var(--ui-text);
 }
 .home-about a {
   color: var(--home-accent);
@@ -585,7 +585,7 @@ html:has(.welcome-screen) {
   align-items: center;
   gap: 18px;
   margin: 14px 0;
-  font-size: 13px;
+  font-size: var(--ui-meta);
 }
 .home-controls dd {
   margin: 0;
@@ -593,10 +593,10 @@ html:has(.welcome-screen) {
 }
 .home-controls kbd {
   font: inherit;
-  font-size: 11px;
+  font-size: var(--ui-meta);
   border: 1px solid rgba(var(--home-tint), 0.25);
   padding: 5px 8px;
-  border-radius: 6px;
+  border-radius: var(--ui-radius);
   white-space: nowrap;
 }
 @keyframes home-map-drift {
@@ -683,7 +683,7 @@ html:has(.welcome-screen) {
   }
   .welcome-screen .home-nav-actions :is(button, select) {
     padding: 8px;
-    font-size: 10px;
+    font-size: var(--ui-control);
   }
   .home-hero h1 {
     font-size: 55px;
@@ -806,29 +806,29 @@ html:has(.welcome-screen) {
 .startup-monogram {
   color: var(--home-text);
   font-size: 37px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.07em;
   text-shadow: 0 0 24px #ffcf9238;
 }
 .startup-card p.startup-brand {
   margin: 0;
   color: var(--home-text);
-  font-size: 13px;
+  font-size: var(--ui-meta);
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .startup-eyebrow {
   display: block;
   margin-bottom: 10px;
-  font-size: 10px;
+  font-size: var(--ui-meta);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0;
   color: var(--home-accent);
 }
 .startup-card h1 {
   font-family: inherit;
-  font-size: clamp(26px, 4vw, 35px);
+  font-size: var(--ui-title);
   font-weight: 600;
   line-height: 1.18;
   margin: 0 0 24px;
@@ -840,10 +840,10 @@ html:has(.welcome-screen) {
   min-height: 60px;
   padding: 15px 16px;
   border: 1px solid rgba(var(--home-tint), 0.24);
-  border-radius: 12px;
+  border-radius: var(--ui-radius);
   background: #ffcf920b;
   color: var(--home-text);
-  font-size: 16px;
+  font-size: var(--ui-text);
   line-height: 1.5;
 }
 .startup-current strong {
@@ -872,14 +872,14 @@ html:has(.welcome-screen) {
   animation: startup-turn 1s linear infinite;
 }
 .startup-card p.startup-time {
-  font-size: 12px;
+  font-size: var(--ui-meta);
   color: var(--home-muted);
   margin-top: 12px;
 }
 .startup-card > p {
   margin: 16px 0;
   color: var(--home-muted);
-  font-size: 12px;
+  font-size: var(--ui-meta);
 }
 .startup-card p.error {
   color: #ffb9a7;
@@ -896,7 +896,7 @@ html:has(.welcome-screen) {
   border-bottom: 1px solid rgba(var(--home-tint), 0.18);
   margin-top: 24px;
   padding: 16px 0;
-  font-size: 12px;
+  font-size: var(--ui-meta);
 }
 .startup-details summary {
   cursor: pointer;
@@ -925,7 +925,7 @@ html:has(.welcome-screen) {
 }
 .startup-step-state {
   margin-left: auto;
-  font-size: 10px;
+  font-size: var(--ui-meta);
   white-space: nowrap;
 }
 .startup-actions {
@@ -940,11 +940,11 @@ html:has(.welcome-screen) {
   max-width: 100%;
   padding: 10px 16px;
   border: 1px solid rgba(var(--home-tint), 0.25);
-  border-radius: 12px;
+  border-radius: var(--ui-radius);
   background: rgba(var(--home-tint), 0.08);
   color: var(--home-text);
   font-family: inherit;
-  font-size: 12px;
+  font-size: var(--ui-control);
   overflow-wrap: anywhere;
 }
 .loading.startup-screen button:hover {

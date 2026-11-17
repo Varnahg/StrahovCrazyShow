@@ -6,7 +6,7 @@
   font-display: swap;
 }
 
-:is(.welcome-screen, .startup-screen, .game-shell) {
+#root {
   --jantar-font: Manrope, system-ui, sans-serif;
   --jantar-ink: #fff3e4;
   --jantar-muted: #cfbfb2;
@@ -16,4 +16,27 @@
   --jantar-panel: 37, 27, 26;
   --jantar-recess: #1a1414;
   --jantar-control-line: #a18370;
+  --ui-text: 1rem;
+  --ui-control: .875rem;
+  --ui-meta: .75rem;
+  --ui-title: 1.375rem;
+  --ui-radius: 8px;
+  --ui-panel-radius: 12px;
+  --ui-surface: rgb(var(--jantar-panel));
+  --ui-surface-raised: #302522;
+  --ui-border: rgba(var(--jantar-tint), .24);
+  --ui-backdrop: rgba(14, 10, 10, .64);
+  --ui-hover: rgba(var(--jantar-tint), .1);
+  --ui-selected: rgba(var(--jantar-tint), .16);
+  --ui-danger: #ffb9a7;
+  --ui-danger-surface: #542e29;
+  --ui-shadow: 0 12px 36px #100b0b40;
+  --ink: var(--jantar-ink);
+  --muted: var(--jantar-muted);
+  --paper: var(--ui-surface);
+  --line: var(--ui-border);
+  --lime: var(--jantar-accent);
+  color-scheme: dark;
+  color: var(--jantar-ink);
+  font: 400 var(--ui-text)/1.5 var(--jantar-font);
 }

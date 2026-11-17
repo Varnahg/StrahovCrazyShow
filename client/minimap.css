@@ -1,9 +1,9 @@
 .map-widget {
-  color: #dce7e5;
+  color: var(--jantar-ink);
   overflow: hidden;
-  background: #10202bdd;
-  border: 1px solid #af9f7066;
-  border-radius: 4px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
 }
 .map-widget-heading {
   min-height: 27px;
@@ -12,11 +12,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 5px;
-  background: #11212bcc;
-  border-bottom: 1px solid #9eaa8b24;
+  background: var(--ui-surface);
+  border-bottom: 1px solid var(--ui-border);
 }
 .map-widget-heading > span {
-  font-size: 9px;
+  font-size: var(--ui-meta);
   font-weight: 600;
   letter-spacing: 0.07em;
   overflow: hidden;
@@ -27,10 +27,10 @@
   display: flex;
   gap: 3px;
   padding: 2px 5px;
-  background: transparent !important;
-  color: #d8c596;
-  border: 0 !important;
-  font-size: 9px;
+  background: transparent;
+  color: var(--jantar-ink);
+  border: 0;
+  font-size: var(--ui-meta);
 }
 .map-north > span {
   display: inline-block;
@@ -53,7 +53,7 @@
   cursor: grabbing;
 }
 .map-widget svg.map:focus-visible {
-  outline: 2px solid #d9bc74;
+  outline: 2px solid var(--jantar-accent);
   outline-offset: -2px;
 }
 .map-widget-big svg.map {
@@ -82,19 +82,19 @@
   padding: 0;
   width: 25px;
   height: 25px;
-  border-radius: 2px;
-  font-size: 16px;
-  color: #d2c7a2;
-  border: 1px solid #8a9a8d66;
-  background: #142731ee !important;
+  border-radius: var(--ui-radius);
+  font-size: var(--ui-control);
+  color: var(--jantar-ink);
+  border: 1px solid var(--jantar-control-line);
+  background: var(--ui-surface);
 }
 .map-widget .map-tools button:hover,
 .map-widget .map-tools button[aria-pressed="true"] {
-  background: #3b515acc !important;
-  color: #f4dd9b;
+  background: var(--ui-hover);
+  color: var(--jantar-accent);
 }
 .map-widget button:focus-visible {
-  outline: 2px solid #e0bc6e;
+  outline: 2px solid var(--jantar-accent);
   outline-offset: 2px;
 }
 .map-land {
@@ -142,7 +142,7 @@
 .map-building text {
   fill: #95b1b4;
   font-size: 7px;
-  font-weight: 500;
+  font-weight: 600;
   paint-order: stroke;
   stroke: #142733;
   stroke-width: 1px;
@@ -203,16 +203,12 @@
   opacity: 0.12;
 }
 .map-cluster-count {
-  font:
-    600 9px "DM Sans",
-    sans-serif;
+  font: 600 9px var(--jantar-font);
   fill: #132b37;
   pointer-events: none;
 }
 .map-poi-name {
-  font:
-    500 10px "DM Sans",
-    sans-serif;
+  font: 600 10px var(--jantar-font);
   fill: #dce5df;
   paint-order: stroke;
   stroke: #10212bed;
@@ -237,8 +233,8 @@
   max-height: 210px;
   overflow: auto;
   padding: 7px;
-  border: 1px solid #c0aa6a55;
-  background: #11242ef5;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface);
   box-shadow: 0 8px 25px #0006;
 }
 .map-widget {
@@ -248,34 +244,34 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
+  font-size: var(--ui-meta);
   padding-left: 6px;
 }
 .map-cluster-list header button {
-  background: transparent !important;
-  color: #ded2ad;
-  border: 0 !important;
+  background: transparent;
+  color: var(--jantar-ink);
+  border: 0;
   padding: 2px 7px;
-  font-size: 20px;
+  font-size: var(--ui-control);
 }
 .map-cluster-list > button {
   display: flex;
   width: 100%;
   gap: 7px;
   align-items: center;
-  background: transparent !important;
-  color: #d5dfd9;
-  border: 0 !important;
+  background: transparent;
+  color: var(--jantar-ink);
+  border: 0;
   text-align: left;
   padding: 8px;
-  font-size: 11px;
+  font-size: var(--ui-control);
 }
 .map-cluster-list > button span:last-child {
   margin-left: auto;
 }
 .map-cluster-list > button:hover,
 .map-cluster-list > button[aria-pressed="true"] {
-  background: #c7ad711d !important;
+  background: var(--ui-hover);
 }
 .map-scale {
   pointer-events: none;
@@ -302,9 +298,9 @@
   gap: 7px;
   min-height: 31px;
   padding: 6px 9px;
-  background: #102430;
-  border-top: 1px solid #b39c6544;
-  font-size: 10px;
+  background: var(--ui-surface);
+  border-top: 1px solid var(--ui-border);
+  font-size: var(--ui-meta);
   flex: none;
 }
 .map-destination > span {
@@ -312,14 +308,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #e4ce98;
+  color: var(--jantar-ink);
 }
 .map-destination strong {
-  font-size: 9px;
-  font-weight: 500;
+  font-size: var(--ui-meta);
+  font-weight: 600;
   margin-left: auto;
   white-space: nowrap;
-  color: #b6c8c6;
+  color: var(--jantar-ink);
 }
 .map-widget-mini .map-destination {
   flex-wrap: wrap;
@@ -329,22 +325,22 @@
   max-width: 145px;
 }
 .map-destination[data-navigation-status="unavailable"] strong {
-  color: #d7ad91;
+  color: var(--jantar-ink);
 }
 .map-clear-target {
-  padding: 0 !important;
+  padding: 0;
   width: 20px;
   height: 20px;
   min-width: 20px;
-  background: transparent !important;
-  border: 0 !important;
-  color: #aebdbb;
+  background: transparent;
+  border: 0;
+  color: var(--jantar-ink);
   font-size: 15px;
 }
 .map-route-note {
-  font-size: 9px;
-  color: #a7b8b9;
-  background: #112430;
+  font-size: var(--ui-meta);
+  color: var(--jantar-muted);
+  background: var(--ui-surface);
   margin: 0;
   padding: 0 10px 7px;
   flex: none;
@@ -389,19 +385,19 @@
 }
 .map-artifact-tools {
   padding: 6px 10px;
-  background: #112430;
-  font-size: 11px;
+  background: var(--ui-surface);
+  font-size: var(--ui-meta);
 }
 .map-artifact-tools > button {
   padding: 5px 8px;
-  border: 1px solid #536b70;
-  border-radius: 4px;
-  color: #e4e8da;
-  background: #203b45;
+  border: 1px solid var(--jantar-control-line);
+  border-radius: var(--ui-radius);
+  color: var(--jantar-ink);
+  background: var(--ui-surface);
   cursor: pointer;
 }
 .map-artifact-tools > button[aria-pressed="true"] {
-  border-color: #e3c78d;
+  border-color: var(--jantar-accent);
 }
 .map-artifact-detail {
   display: flex;
@@ -411,23 +407,23 @@
 }
 .map-artifact-detail strong {
   width: 100%;
-  color: #ede0b7;
+  color: var(--jantar-ink);
 }
 .map-artifact-detail span {
-  color: #b6c8c6;
+  color: var(--jantar-ink);
 }
 .map-artifact-detail a {
-  color: #d5cfb2;
+  color: var(--jantar-ink);
 }
 @media (max-width: 620px) {
   .map-widget-mini svg.map {
     height: 125px;
   }
   .map-widget-heading > span {
-    font-size: 8px;
+    font-size: var(--ui-meta);
   }
   .map-widget-mini .map-destination {
-    font-size: 9px;
+    font-size: var(--ui-meta);
   }
   .map-widget-mini .map-tools {
     display: none;

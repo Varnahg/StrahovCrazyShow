@@ -10,6 +10,7 @@ import { placeCadDoorDefinition } from "../shared/cad-doors";
 import { MotionDecoder, MotionEncoder } from "../shared/motion-codec";
 import { PROTOCOL_VERSION, FIXED_DT, canonicalInput } from "../shared/netcode";
 import { movementFromKeys } from "../shared/controls";
+import { textEntryTarget, worldKeyboardAllowed } from "../client/interaction";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FrameInputBuffer } from "../client/network-input-buffer";
 import {
@@ -61,6 +62,7 @@ const callbackNames = [
   "reconnect",
   "enter",
   "leave",
+  "changeChatMode",
   "openChat",
   "openHumanChat",
     "expireAccount",
@@ -503,8 +505,12 @@ function fixture() {
       result: (result: unknown) => { state.chatResult = result; effects.push("chat.result"); },
       fail: (reason: string) => { state.chatFailure = reason; effects.push("chat.fail"); },
     },
-    chatOpener: { current: null },
-    chatKeyboardOpen: { current: false },
+    chatModeRef: { current: "idle" },
+    chatBeforeExpand: { current: "idle" },
+    chatOtherUiOpen: { current: false },
+    chatReturnPointer: { current: null },
+    chatReturnClick: { current: false },
+    canvas: { current: { focus() {} } },
     useCallback: (callback: unknown) => callback,
     document: { activeElement: null, hidden: false },
     HTMLElement: class {},
@@ -564,6 +570,8 @@ function fixture() {
   for (const name of [
     "Connected",
     "PlayerChatSupported",
+    "ChatMode",
+    "ChatFocusRequest",
     "SelfId",
     "Players",
     "Events",
@@ -652,9 +660,66 @@ test("explicit human chat navigation selects the requested conversation after us
     f.openHumanChat(channel);
     assert.equal(f.state.aiChatActive, false);
     assert.equal(f.state.channel, channel);
-    assert.equal(f.state.panel, "chat");
+    assert.equal(f.state.panel, "");
+    assert.equal(f.state.chatMode, "composing");
+    assert.deepEqual(f.state["game.setUiModal"], [true]);
     assert.equal(f.fetches.length, 0, "changing chat view must not contact AI or create a session");
   }
+});
+
+test("actual canvas return gesture is consumed once and clears typing before the next gesture", () => {
+  const f = fixture();
+  const handlers = new Map<string, string>();
+  const visit = (node: ts.Node) => {
+    if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(ui) === "canvas") {
+      for (const attribute of node.attributes.properties) {
+        if (ts.isJsxAttribute(attribute) && attribute.initializer && ts.isJsxExpression(attribute.initializer) &&
+            attribute.initializer.expression && /^on(?:Pointer|Click)/.test(attribute.name.getText(ui)))
+          handlers.set(attribute.name.getText(ui), attribute.initializer.expression.getText(ui));
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(app);
+  const functions = compileScript("({" + [...handlers].map(([name, body]) => name + ": " + body).join(",") + "})")
+    .runInContext(f.context) as Record<string, (event: unknown) => void>;
+  f.openHumanChat("global");
+  let prevented = 0, stopped = 0;
+  const event = { pointerId: 4, preventDefault() { prevented++; }, stopPropagation() { stopped++; } };
+  functions.onPointerDownCapture(event);
+  assert.equal(f.state.chatMode, "idle");
+  assert.equal(f.environment.chatReturnPointer.current, 4);
+  functions.onPointerUpCapture(event);
+  functions.onClickCapture(event);
+  assert.equal(prevented, 3);
+  assert.equal(stopped, 3);
+  functions.onPointerDownCapture(event);
+  functions.onPointerUpCapture(event);
+  functions.onClickCapture(event);
+  assert.equal(stopped, 3, "the next world gesture remains usable");
+});
+
+test("actual Game key handler blocks shortcuts on active chat buttons and accepts W after returning", () => {
+  const f = fixture();
+  const keyDown = gameClass.members.find(node => ts.isPropertyDeclaration(node) && node.name.getText(gameSource) === "keyDown");
+  assert.ok(keyDown && ts.isPropertyDeclaration(keyDown) && keyDown.initializer);
+  const events: string[] = [];
+  Object.assign(f.environment, {
+    textEntryTarget, worldKeyboardAllowed,
+    CustomEvent: class { constructor(public type: string) {} },
+    window: { dispatchEvent: (event: { type: string }) => events.push(event.type) },
+  });
+  const game = { ready: true, uiModal: true, keys: new Set<string>(), blur() { this.keys.clear(); } };
+  const run = compileScript("(function(){return " + keyDown.initializer.getText(gameSource) + ";})").runInContext(f.context).call(game);
+  const target = { closest: (selector: string) => selector === "[data-player-chat]" ? {} : null };
+  for (const code of ["KeyM", "KeyJ", "KeyG", "KeyW", "Escape"]) {
+    run({ code, target, repeat: false, preventDefault() {} });
+  }
+  assert.deepEqual(events, []);
+  assert.equal(game.keys.size, 0);
+  game.uiModal = false;
+  run({ code: "KeyW", target: null, repeat: false, preventDefault() {} });
+  assert.ok(game.keys.has("KeyW"));
 });
 
 function payloads(id = "self") {

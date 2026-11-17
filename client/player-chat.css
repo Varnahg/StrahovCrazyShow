@@ -6,70 +6,24 @@
 }
 .game-shell .minimap-frame {
   overflow: hidden;
-  border: 1px solid rgba(var(--jantar-tint), .4);
-  border-radius: 14px;
+  border: 1px solid rgba(var(--jantar-tint), 0.22);
+  border-radius: 12px;
   background: rgb(var(--jantar-panel));
-  box-shadow: 0 5px 24px #0005;
 }
 .game-shell .minimap-frame > .minimap-attribution {
   display: block;
-  padding: 2px 7px;
+  padding: 4px 8px;
   color: var(--jantar-muted);
-  font: 600 .75rem var(--jantar-font);
+  font: 400 var(--ui-meta)/1.4 var(--jantar-font);
   text-align: right;
 }
-.game-shell .player-chat-preview {
-  position: absolute;
-  inset: auto auto calc(100% + 10px) 0;
-  width: min(350px, 36vw);
-  overflow: hidden;
-  color: var(--jantar-ink);
-  background: rgba(var(--jantar-panel), .88);
-  border: 1px solid rgba(var(--jantar-tint), .4);
-  border-radius: 14px;
-  box-shadow: 0 10px 32px #160e0e60;
-  font-family: var(--jantar-font);
+.game-shell .chat-map-toggle {
+  display: none;
 }
-.game-shell .player-chat-preview > button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  width: 100%;
-  padding: 6px 10px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font-weight: 800;
-  text-align: left;
+.game-shell .minimap:has([data-chat-mode="expanded"]) {
+  z-index: 100;
 }
-.player-chat-preview > button::after { content: ""; position: absolute; inset: 0; }
-.game-shell .player-chat-preview > button:focus-visible { outline-offset: -4px; }
-.game-shell .player-chat-preview svg { width: 18px; height: 18px; color: var(--jantar-accent); }
-.player-chat-preview kbd { color: var(--jantar-ink); background: var(--jantar-recess); }
-.player-chat-count {
-  margin-left: auto;
-  padding: 1px 7px;
-  border-radius: 99px;
-  color: var(--jantar-accent);
-  background: #ffcf9224;
-  font-size: .75rem;
-}
-.player-chat-preview ul {
-  display: grid;
-  gap: 4px;
-  margin: 0;
-  padding: 0 10px 8px;
-  list-style: none;
-  font-size: .875rem;
-}
-.player-chat-preview li { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.player-chat-preview li span { color: var(--jantar-muted); font-size: .75rem; font-weight: 800; }
-.game-shell .world-dock .dock-chat-count-narrow { display: none; }
-.game-shell .world-dock :is(.dock-chat-count, .dock-chat-count-narrow) {
-  color: var(--jantar-accent-ink);
-  background: var(--jantar-accent);
-}
+
 .player-chat-sr-only {
   position: absolute;
   width: 1px;
@@ -78,156 +32,400 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
-.game-shell .player-chat-dialog {
-  width: min(720px, calc(100vw - 32px));
-  height: min(620px, calc(100dvh - 32px), calc(var(--player-chat-height, 100dvh) - 32px));
-  inset-block: var(--player-chat-y, 0) var(--player-chat-bottom, 0);
-  max-width: none;
-  max-height: none;
-  margin: auto;
-  padding: 0;
-  overflow: auto;
-  overscroll-behavior: contain;
+.game-shell .world-dock .dock-chat-count-narrow {
+  display: none;
+}
+.game-shell .world-dock :is(.dock-chat-count, .dock-chat-count-narrow) {
+  color: var(--jantar-accent-ink);
+  background: var(--jantar-accent);
+}
+
+.game-shell .player-chat {
+  position: absolute;
+  inset: auto auto calc(100% + 10px) 0;
+  z-index: 2;
+  width: min(360px, calc(100vw - 48px));
   color: var(--jantar-ink);
-  background: rgba(var(--jantar-panel), .96);
-  border: 1px solid rgba(var(--jantar-tint), .5);
-  border-radius: 20px;
-  box-shadow: 0 30px 90px #0a0708a3;
-  font-family: var(--jantar-font);
+  background: rgba(var(--jantar-panel), 0.94);
+  border: 1px solid rgba(var(--jantar-tint), 0.22);
+  border-radius: 12px;
+  font: 400 var(--ui-text)/1.45 var(--jantar-font);
+  box-shadow: 0 6px 20px #120d0d38;
+  overflow: visible;
 }
-.player-chat-dialog[open] {
-  display: grid;
-  grid-template-rows: auto auto auto minmax(7rem, 1fr) auto;
+.game-shell .player-chat [hidden],
+.game-shell .player-chat[hidden] {
+  display: none !important;
 }
-.player-chat-dialog::backdrop { background: #140d0d65; }
-.player-chat-dialog:has(.player-chat-content) { grid-template-rows: auto auto minmax(7rem, 1fr); }
-.player-chat-header, .player-chat-channels, .player-chat-audience, .player-chat-log, .player-chat-composer, .player-chat-content {
-  min-width: 0;
-  padding-inline: 22px;
-}
+
 .player-chat-header {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-block: 16px 10px;
+  min-width: 0;
+  padding: 8px 10px;
 }
-.player-chat-header h2 {
-  margin: 0 auto 0 0;
-  font: 800 1.5rem/1.25 var(--jantar-font);
-  letter-spacing: -.02em;
+.player-chat-recipient {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
+  color: var(--jantar-muted);
+  font-size: var(--ui-meta);
 }
-.player-chat-dialog .crazy-chat-info-content {
-  max-width: min(310px, calc(100vw - 86px));
+.player-chat-recipient > span {
+  flex: none;
 }
-.game-shell .player-chat-dialog :is(button, select, input) {
-  border: 1px solid var(--jantar-control-line);
-  border-radius: 8px;
-  background: var(--jantar-recess);
+.game-shell .player-chat .player-chat-destination {
+  width: auto;
+  min-width: 0;
+  flex: 1;
+  max-width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 4px 20px 4px 2px;
   color: var(--jantar-ink);
-  font-family: inherit;
+  font-size: var(--ui-control);
+  font-weight: 600;
+}
+.game-shell .player-chat option {
+  background: rgb(var(--jantar-panel));
+  color: var(--jantar-ink);
+}
+.game-shell .player-chat :is(button, input, select, textarea) {
+  font-family: var(--jantar-font);
+  border-radius: 8px;
   transition: none;
 }
-.game-shell .player-chat-dialog :is(button, select, input):focus-visible {
+.game-shell .player-chat button:not(:where(.crazy-chat *)) {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--jantar-muted);
+  font-size: var(--ui-control);
+  font-weight: 600;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.game-shell .player-chat button:not(:where(.crazy-chat *)):hover:not(:disabled) {
+  color: var(--jantar-ink);
+  background: rgba(var(--jantar-tint), 0.1);
+}
+.game-shell
+  .player-chat
+  :is(button, input, select, textarea, article):focus-visible {
   outline: 2px solid var(--jantar-accent);
   outline-offset: 2px;
 }
-.game-shell .player-chat-dialog :is(.player-chat-channels button[aria-pressed="true"], .player-chat-send button:not(:disabled)) {
-  background: var(--jantar-accent);
-  color: var(--jantar-accent-ink);
-  border-color: var(--jantar-accent);
+.game-shell .player-chat button:disabled {
+  cursor: default;
 }
-.player-chat-close { flex: 0 0 44px; height: 44px; padding: 0; font-size: 1.6rem; }
-.player-chat-channels { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 9px; }
-.player-chat-channels button { min-height: 36px; padding: 4px 10px; font-size: .8125rem; font-weight: 800; }
-.player-chat-ai-tab { margin-left: auto; }
-.player-chat-audience {
-  padding-bottom: 9px;
-  border-bottom: 1px solid rgba(var(--jantar-tint), .24);
+.game-shell .player-chat .player-chat-expand {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  font-size: 20px;
+  padding: 0;
+}
+.player-chat-human {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.player-chat-history {
+  position: relative;
+  min-height: 0;
+}
+.player-chat-log {
+  max-height: min(340px, 40dvh);
+  padding: 0 10px 4px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--jantar-control-line) transparent;
+}
+.player-chat-idle .player-chat-log {
+  max-height: min(240px, 30dvh);
+}
+.player-chat-log article {
+  padding: 6px 0;
+}
+.player-chat-log article + article {
+  border-top: 1px solid rgba(var(--jantar-tint), 0.1);
+}
+.player-chat-log article:focus {
+  background: rgba(var(--jantar-tint), 0.08);
+  box-shadow: inset 2px 0 var(--jantar-accent);
+}
+.player-chat-log article p {
+  margin: 2px 0 0;
+  font: 400 var(--ui-text)/1.45 var(--jantar-font);
+  overflow-wrap: anywhere;
+}
+.player-chat-byline {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 6px;
+  min-height: 24px;
+}
+.player-chat-byline strong {
+  font-size: var(--ui-text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.player-chat-byline .player-chat-channel {
+  min-width: 0;
+  max-width: 100%;
   color: var(--jantar-muted);
-  font-size: .8125rem;
+  font-size: var(--ui-meta);
+  overflow-wrap: anywhere;
 }
-.player-chat-audience strong { color: var(--jantar-ink); }
-.player-chat-audience select { width: auto; max-width: 100%; margin-top: 6px; padding: 5px 8px; }
-.player-chat-history { position: relative; min-height: 0; }
-.player-chat-log { height: 100%; padding-block: 6px; overflow: auto; overscroll-behavior: contain; }
-.player-chat-log article { padding-block: 8px; border-bottom: 1px solid rgba(var(--jantar-tint), .19); }
-.player-chat-log article:last-child { border-bottom: 0; }
-.player-chat-log article:focus { outline: 0; box-shadow: inset 3px 0 var(--jantar-accent); padding-left: 8px; }
-.player-chat-log article p { margin: 3px 0 0; font-size: .9375rem; line-height: 1.5; overflow-wrap: anywhere; }
-.player-chat-log > p { color: var(--jantar-muted); }
-.player-chat-byline { display: flex; align-items: center; gap: 8px; }
-.player-chat-byline strong { min-width: 0; overflow-wrap: anywhere; font-size: .9375rem; font-weight: 800; }
-.player-chat-byline :is(time, span) { flex: none; color: var(--jantar-muted); font-size: .75rem; font-weight: 700; }
-.player-chat-byline button {
-  flex: none;
+.player-chat-byline time {
   margin-left: auto;
-  min-height: 30px;
-  padding: 4px 7px;
-  font-size: .75rem;
-}
-.game-shell .player-chat-dialog .player-chat-quote, .player-chat-reference {
-  border: 0;
-  border-left: 2px solid var(--jantar-accent);
-  border-radius: 5px;
   color: var(--jantar-muted);
-  background: #ffcf9214;
-  font-size: .75rem;
+  font: 400 var(--ui-meta)/1.4 var(--jantar-font);
+  font-variant-numeric: tabular-nums;
 }
-.game-shell .player-chat-dialog .player-chat-quote {
+.game-shell .player-chat .player-chat-reply {
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  padding: 0;
+  font-size: 18px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .player-chat-reply {
+    opacity: 0;
+  }
+  .player-chat-log article:is(:hover, :focus-within) .player-chat-reply {
+    opacity: 1;
+  }
+}
+.player-chat-empty {
+  padding: 6px 10px;
+  margin: 0;
+  color: var(--jantar-muted);
+  font-size: var(--ui-control);
+}
+.game-shell .player-chat .player-chat-quote {
   display: block;
   width: 100%;
-  margin-block: 4px;
-  padding: 5px 8px;
+  padding: 4px 8px;
+  margin-top: 4px;
+  border: 0;
+  border-left: 2px solid var(--jantar-accent);
+  border-radius: 0;
+  color: var(--jantar-muted);
+  background: rgba(var(--jantar-tint), 0.06);
+  font-size: var(--ui-meta);
   text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
-.player-chat-bottom { position: absolute; right: 22px; bottom: 5px; padding: 6px 9px; font-size: .75rem; }
+.game-shell .player-chat .player-chat-bottom {
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+  border-color: var(--jantar-control-line);
+  background: rgb(var(--jantar-panel));
+  color: var(--jantar-accent);
+  font-size: var(--ui-meta);
+}
 .player-chat-composer {
   display: grid;
-  gap: 7px;
-  padding-block: 10px 14px;
-  background: rgb(var(--jantar-panel));
-  border-top: 1px solid rgba(var(--jantar-tint), .24);
+  gap: 6px;
+  padding: 8px 10px 10px;
+  border-top: 1px solid rgba(var(--jantar-tint), 0.16);
 }
-.player-chat-reference, .player-chat-send { display: flex; min-width: 0; align-items: center; gap: 8px; }
-.player-chat-reference { padding-left: 8px; }
-.player-chat-reference span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.player-chat-reference button { flex: none; min-height: 30px; padding: 4px 8px; font-size: .75rem; }
-.player-chat-send input { min-width: 0; flex: 1; min-height: 44px; padding: 6px 10px; font-size: 1rem; }
-.player-chat-send input::placeholder { color: var(--jantar-muted); }
-.player-chat-send button { min-height: 44px; padding-inline: 12px; font-weight: 800; }
-.player-chat-composer > :is([role="alert"], [role="status"]) { color: var(--jantar-accent); font-size: .8125rem; }
-.player-chat-content { overflow: auto; padding-bottom: 12px; }
-.player-chat-dialog .crazy-chat {
-  --paper: var(--jantar-recess);
-  --ink: var(--jantar-ink);
-  --line: var(--jantar-control-line);
+.player-chat-reference {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--jantar-accent);
+  color: var(--jantar-muted);
+  font-size: var(--ui-meta);
 }
-.game-shell .player-chat-settings { margin: 12px 0; border: 1px solid var(--jantar-control-line); border-radius: 8px; }
-.player-chat-settings label { display: block; margin: 6px 0; }
-.player-chat-settings input[type="checkbox"] { display: inline; width: auto; accent-color: var(--jantar-accent); }
+.player-chat-reference > span {
+  flex: 1;
+  min-width: 0;
+  max-height: 3.1em;
+  overflow: hidden;
+}
+.game-shell .player-chat-reference > button {
+  flex: 0 0 28px;
+  min-height: 28px;
+  font-size: 20px;
+}
+.player-chat-composer > :is([role="alert"], [role="status"]) {
+  color: var(--jantar-accent);
+  font-size: var(--ui-meta);
+}
+.player-chat-send {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+}
+.game-shell .player-chat-send input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  color: var(--jantar-ink);
+  background: var(--jantar-recess);
+  border: 1px solid var(--jantar-control-line);
+  font-size: var(--ui-text);
+}
+.game-shell .player-chat-send input::placeholder {
+  color: var(--jantar-muted);
+}
+.game-shell .player-chat-send > button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  background: var(--jantar-accent);
+  border-color: var(--jantar-accent);
+  color: var(--jantar-accent-ink);
+  font-size: 20px;
+}
+.game-shell .player-chat-send > button:hover:not(:disabled) {
+  background: var(--jantar-accent);
+  color: var(--jantar-accent-ink);
+}
+.game-shell .player-chat-send > button:disabled {
+  color: var(--jantar-muted);
+  background: var(--jantar-recess);
+  border-color: var(--jantar-control-line);
+}
+.player-chat-ai {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+  max-height: min(480px, 55dvh);
+}
+.player-chat-ai .crazy-embedded {
+  max-height: min(480px, 55dvh);
+  border: 0;
+  border-radius: 0 0 12px 12px;
+}
+.player-chat .crazy-chat-info-content {
+  z-index: 5;
+  max-width: min(310px, calc(100vw - 48px));
+  max-height: min(430px, calc(100dvh - 100px));
+  overflow: auto;
+}
+.player-chat-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: #120d0d66;
+}
+.game-shell .player-chat-expanded {
+  position: fixed;
+  inset: var(--player-chat-y, 0) 16px var(--player-chat-bottom, 0);
+  margin: auto;
+  width: min(720px, calc(100vw - 32px));
+  height: min(
+    680px,
+    calc(100dvh - 32px),
+    calc(var(--player-chat-height, 100dvh) - 32px)
+  );
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background: rgba(var(--jantar-panel), 0.98);
+}
+.player-chat-expanded .player-chat-human {
+  flex: 1;
+}
+.player-chat-expanded .player-chat-history {
+  flex: 1;
+  min-height: 100px;
+}
+.player-chat-expanded .player-chat-log {
+  height: 100%;
+  max-height: none;
+}
+.player-chat-expanded .player-chat-ai {
+  flex: 1;
+  max-height: none;
+}
+.player-chat-expanded .player-chat-ai .crazy-embedded {
+  max-height: none;
+}
+.player-chat-expanded .player-chat-recipient {
+  font-size: var(--ui-control);
+}
+
+.player-chat-settings {
+  border: 1px solid var(--jantar-control-line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.player-chat-settings label {
+  display: block;
+  margin: 6px 0;
+}
+.player-chat-settings input[type="checkbox"] {
+  display: inline;
+  width: auto;
+  accent-color: var(--jantar-accent);
+}
 
 @media (max-width: 760px), (max-height: 540px) {
-  .game-shell .player-chat-preview, .game-shell .world-dock .dock-chat-count { display: none; }
-  .game-shell .world-dock .dock-chat-count-narrow { display: block; }
-  .game-shell .player-chat-dialog {
+  .game-shell .player-chat {
+    width: min(360px, calc(100vw - 24px));
+  }
+  .game-shell .player-chat-expanded {
     width: calc(100vw - 16px);
-    height: min(calc(100dvh - 16px), calc(var(--player-chat-height, 100dvh) - 16px));
-    border-radius: 14px;
+    inset-inline: 8px;
   }
-  .player-chat-header, .player-chat-channels, .player-chat-audience, .player-chat-log, .player-chat-composer, .player-chat-content {
-    padding-inline: 12px;
+  .player-chat-idle .player-chat-log article:not(:nth-last-child(-n + 2)) {
+    display: none;
   }
-  .player-chat-header { padding-block: 9px 6px; }
-  .player-chat-header h2 { font-size: 1.25rem; }
-  .player-chat-ai-tab { margin-left: 0; }
-  .player-chat-dialog :is(.player-chat-channels button, .player-chat-byline button, .player-chat-reference button) {
+  .player-chat-idle .player-chat-log {
+    max-height: 150px;
+  }
+  .player-chat-log {
+    max-height: min(280px, 35dvh);
+  }
+  .game-shell[data-chat-mode="composing"] .minimap-frame {
+    display: none;
+  }
+  .game-shell[data-chat-mode="composing"] .chat-map-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     min-height: 44px;
   }
-  .player-chat-composer { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+  .game-shell[data-chat-mode="composing"] .minimap {
+    min-height: 44px;
+  }
+  .game-shell .player-chat .player-chat-expand,
+  .game-shell .player-chat .player-chat-reply,
+  .game-shell .player-chat-reference > button {
+    min-width: 36px;
+    min-height: 36px;
+  }
+  .game-shell .world-dock .dock-chat-count {
+    display: none;
+  }
+  .game-shell .world-dock .dock-chat-count-narrow {
+    display: block;
+  }
 }
 @media (max-height: 540px) {
-  .player-chat-log { overscroll-behavior: auto; }
+  .player-chat-composing .player-chat-log {
+    max-height: 100px;
+  }
+  .player-chat-log {
+    overscroll-behavior: auto;
+  }
 }
